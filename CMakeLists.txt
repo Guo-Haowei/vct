@@ -16,6 +16,8 @@ message("Configuring glad...")
 include_directories(external/glad/include)
 add_subdirectory(external/glad)
 
+add_definitions(-DSHADER_DIR="${CMAKE_SOURCE_DIR}/shaders/")
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_subdirectory(source)
