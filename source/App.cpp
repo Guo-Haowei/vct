@@ -7,6 +7,7 @@
 // temp
 #include "GL/ShaderProgram.h"
 #include "GL/VertexArray.h"
+#include "SceneManager.h"
 // temp
 #ifdef _DEBUG
 #   include "internal/Debug.h"
@@ -65,6 +66,9 @@ void App::run()
             glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
         }
 #endif
+
+        SceneManager sm;
+        sm.load("bunny.obj");
 
         ///////////////////////////////////////////////////////////////////////
         // temp code
