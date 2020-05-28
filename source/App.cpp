@@ -15,6 +15,9 @@
 #define WINDOW_WIDTH 1200
 #define WINDOW_HEIGHT 800
 #define TITLE "Voxel GI"
+#ifndef MODEL_DIR
+#define MODEL_DIR ""
+#endif
 
 void App::run()
 {
@@ -79,7 +82,10 @@ void App::run()
 
         // load scene
         SceneManager sm;
-        sm.load("bunny.obj");
+        // sm.load(MODEL_DIR "cube/", "cube.json");
+        sm.load(MODEL_DIR "bunny/", "bunny.json");
+        // sm.write();
+
         auto& mesh = sm.getScene().meshes.front();
 
         // position buffer

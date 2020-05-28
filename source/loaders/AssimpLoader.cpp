@@ -19,7 +19,7 @@ Scene* AssimpLoader::parse(const char* root, const char* file)
         aiProcess_JoinIdenticalVertices
     );
     m_scene = new Scene();
-    m_scene->name = "Scene";
+    m_scene->name = file;
 
     // check for errors
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
@@ -51,8 +51,21 @@ Scene* AssimpLoader::parse(const char* root, const char* file)
 
     // process ASSIMP's root node recursively
     // processNode(scene->mRootNode, scene);
-    std::cout << "[Log] Scene loaded correctly." << std::endl;
+    std::cout << "[LOG] Scene loaded correctly." << std::endl;
     std::cout << "..............................." << std::endl;
+
+    std::cout << "[LOG] Calculating bounding box\n" << std::endl;
+    for (auto& mesh : m_scene->meshes)
+    {
+        for (auto &v : mesh->positions)
+        {
+            mesh->aabb.expand(v);
+        }
+
+        std::cout << "\tmesh " << mesh->name << " has bbox " << mesh->aabb << std::endl;
+        m_scene->aabb.expand(mesh->aabb);
+    }
+    std::cout << "\tscene " << m_scene->name << " has bbox " << m_scene->aabb << std::endl;
 
     return m_scene;
 }

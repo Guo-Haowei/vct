@@ -1,5 +1,6 @@
 add_library(lib_scene_loader
     AssimpLoader.cpp
+    MyLoader.cpp
 )
 
 target_link_libraries(lib_scene_loader

@@ -27,6 +27,9 @@ set(lib_assimp_debug "${PROJECT_SOURCE_DIR}/external/assimp/build/lib/Debug/assi
 set(lib_irrxmld_debug "${PROJECT_SOURCE_DIR}/external/assimp/build/lib/Debug/IrrXMLd.lib" CACHE STRING "IrrXMLd Debug")
 set(lib_zlib_debug "${PROJECT_SOURCE_DIR}/external/assimp/build/lib/Debug/zlibstaticd.lib" CACHE STRING "zlib static Debug")
 
+# rapid json
+include_directories(external/rapidjson/include)
+
 add_definitions(-DSHADER_DIR="${CMAKE_SOURCE_DIR}/shaders/")
 add_definitions(-DMODEL_DIR="${CMAKE_SOURCE_DIR}/models/")
 

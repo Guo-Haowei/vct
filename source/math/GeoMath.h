@@ -54,8 +54,8 @@ struct Box3D
 
 static std::ostream& operator<<(std::ostream& os, const Box3D& b)
 {
-    os << "{ min: " << b.min.x << ", " << b.min.y << ", " << b.min.x << ";";
-    os << " max: " << b.max.x << ", " << b.max.y << ", " << b.max.y << " }";
+    os << "{ \"min\" : [ " << b.min.x << ", " << b.min.y << ", " << b.min.x << "],";
+    os << "\"max\" : [ " << b.max.x << ", " << b.max.y << ", " << b.max.y << " ] }";
     return os;
 }
 

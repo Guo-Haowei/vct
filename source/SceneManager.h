@@ -1,13 +1,23 @@
 #pragma once
-#include "loaders/AssimpLoader.h"
+#include "loaders/Scene.h"
+#include <fstream>
+
+namespace JSONCpp { class JSON; }
 
 class SceneManager
 {
 public:
-    void load(const char* path);
+    void load(const char* root, const char* path);
+    void write();
 
     Scene& getScene() const { return *m_scene.get(); }
 private:
+    void writeBuffer(std::ofstream& text,
+                     std::ofstream& bin,
+                     const char* bufferName,
+                     const void* data,
+                     size_t sizeInByte,
+                     size_t offset);
 
     std::unique_ptr<Scene> m_scene;
 };

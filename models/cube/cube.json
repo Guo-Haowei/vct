@@ -1,0 +1,28 @@
+{
+  "name": "Cube",
+  "bounding box": {
+    "min": [ 0, 0, 0 ],
+    "max": [ 1, 1, 1 ]
+  },
+  "meshes": [
+    {
+      "name": "Cube",
+      "bounding box": {
+        "min": [ 0, 0, 0 ],
+        "max": [ 1, 1, 1 ]
+      },
+      "positions": {
+        "offset": 0,
+        "size": 288
+      },
+      "normals": {
+        "offset": 288,
+        "size": 288
+      },
+      "indices": {
+        "offset": 576,
+        "size": 144
+      }
+    }
+  ]
+}
