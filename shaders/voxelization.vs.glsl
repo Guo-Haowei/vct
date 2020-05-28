@@ -1,11 +1,17 @@
 #version 450 core
 layout (location = 0) in vec3 in_position;
-layout (location = 1) in vec3 in_color;
+layout (location = 1) in vec3 in_normal;
 
-out vec3 pass_color;
+out vec3 pass_position;
+out vec3 pass_normal;
+
+uniform mat4 PV;
 
 void main()
 {
-    gl_Position = vec4(in_position, 1.0);
-    pass_color = in_color;
+    vec4 worldPos = vec4(in_position, 1.0); // assume no transformation
+    pass_position = worldPos.xyz;
+    pass_normal = normalize(in_normal); // assume no transformation
+
+    gl_Position = PV * worldPos;
 }

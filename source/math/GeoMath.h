@@ -5,8 +5,25 @@
 #include <limits>
 
 using glm::vec3;
+using glm::mat4;
+
+namespace glm {
 
 constexpr float INFINITY_F = std::numeric_limits<float>::infinity();
+constexpr float QUARTER_PI_F = 0.25f * glm::pi<float>();
+constexpr float HALF_PI_F = 0.5f * glm::pi<float>();
+constexpr float PI_F = glm::pi<float>();
+constexpr float TWO_PI_F = 2.0f * glm::pi<float>();
+
+const vec3 VEC3_ZERO        { 0.0f, 0.0f, 0.0f };
+const vec3 VEC3_UNIT_SCALE  { 1.0f, 1.0f, 1.0f };
+const vec3 VEC3_UNIT_X      { 1.0f, 0.0f, 0.0f };
+const vec3 VEC3_UNIT_Y      { 0.0f, 1.0f, 0.0f };
+const vec3 VEC3_UNIT_Z      { 0.0f, 0.0f, 1.0f };
+
+} // namespace glm
+
+using namespace glm;
 
 struct Box3D
 {

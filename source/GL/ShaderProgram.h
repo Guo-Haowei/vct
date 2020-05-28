@@ -1,5 +1,6 @@
 #pragma once
 #include "GpuResource.h"
+#include "../math/GeoMath.h"
 
 class ShaderProgram : public GpuResource
 {
@@ -12,6 +13,9 @@ public:
     };
 
     ShaderProgram(const std::string& debugName, const CreateInfo& info);
+
+    void setUniform(const char* name, const mat4& mat);
+
 protected:
     virtual void internalRelease() override;
 

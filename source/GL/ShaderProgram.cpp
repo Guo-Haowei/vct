@@ -118,3 +118,15 @@ void ShaderProgram::internalRelease()
 {
     glDeleteProgram(m_handle);
 }
+
+void ShaderProgram::setUniform(const char* name, const mat4& mat)
+{
+    GLint location = glGetUniformLocation(m_handle, name);
+#ifdef _DEBUG
+    if (location < 0)
+    {
+        std::cout << "[ERROR][GLSL] uniform '" << name << "' not found" << std::endl;
+    }
+#endif
+    glUniformMatrix4fv(location, 1, GL_FALSE, &mat[0].x);
+}

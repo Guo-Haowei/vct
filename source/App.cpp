@@ -66,9 +66,8 @@ void App::run()
             glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
         }
 #endif
-
-        SceneManager sm;
-        sm.load("bunny.obj");
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
 
         ///////////////////////////////////////////////////////////////////////
         // temp code
@@ -77,62 +76,43 @@ void App::run()
         shaderCreateInfo.vs = "voxelization.vs.glsl";
         shaderCreateInfo.fs = "voxelization.fs.glsl";
         ShaderProgram voxelShader("voxelization", shaderCreateInfo);
+
+        // load scene
+        SceneManager sm;
+        sm.load("bunny.obj");
+        auto& mesh = sm.getScene().meshes.front();
+
         // position buffer
-        struct Vertex
-        {
-            float x, y, z;
-            // float r, g, b;
-        };
-        Vertex positions[4] = {
-            { -0.5f,  0.5f, 0.0f }, // top left
-            { -0.5f, -0.5f, 0.0f }, // bottom left
-            {  0.5f, -0.5f, 0.0f }, // bottom right
-            {  0.5f,  0.5f, 0.0f }, // top right
-        };
         GpuBuffer::CreateInfo vertexBufferCreateInfo {};
         vertexBufferCreateInfo.type = GL_ARRAY_BUFFER;
         vertexBufferCreateInfo.usage = GL_STATIC_DRAW;
-        vertexBufferCreateInfo.initialBuffer.data = positions; 
-        vertexBufferCreateInfo.initialBuffer.size = sizeof(positions); 
-        GpuBuffer vertexBuffer("triangle.positions", vertexBufferCreateInfo);
-        // color buffer
-        struct Color
-        {
-            float r, g, b;
-        };
-        Vertex colors[4] = {
-            { 0.0f, 0.9f, 0.0f }, // top left
-            { 0.0f, 0.0f, 0.0f }, // bottom left
-            { 0.9f, 0.0f, 0.0f }, // bottom right
-            { 0.9f, 0.9f, 0.0f }, // top right
-        };
-        GpuBuffer::CreateInfo colorBufferCreateInfo {};
-        colorBufferCreateInfo.type = GL_ARRAY_BUFFER;
-        colorBufferCreateInfo.usage = GL_STATIC_DRAW;
-        colorBufferCreateInfo.initialBuffer.data = colors;
-        colorBufferCreateInfo.initialBuffer.size = sizeof(colors); 
-        GpuBuffer colorBuffer("triangle.colors", colorBufferCreateInfo);
+        vertexBufferCreateInfo.initialBuffer.data = mesh->positions.data(); 
+        vertexBufferCreateInfo.initialBuffer.size = sizeof(vec3) * mesh->positions.size();
+        GpuBuffer vertexBuffer("mesh.positions", vertexBufferCreateInfo);
+        // normal buffer
+        GpuBuffer::CreateInfo normalBufferCreateInfo {};
+        normalBufferCreateInfo.type = GL_ARRAY_BUFFER;
+        normalBufferCreateInfo.usage = GL_STATIC_DRAW;
+        normalBufferCreateInfo.initialBuffer.data = mesh->normals.data();
+        normalBufferCreateInfo.initialBuffer.size = sizeof(vec3) * mesh->normals.size();
+        GpuBuffer normalBuffer("mesh.colors", normalBufferCreateInfo);
         // index array
-        unsigned short indices[6] = {
-            0, 1, 2,
-            0, 2, 3
-        };
         GpuBuffer::CreateInfo indexBufferCreateInfo {};
         indexBufferCreateInfo.type = GL_ELEMENT_ARRAY_BUFFER;
         indexBufferCreateInfo.usage = GL_STATIC_DRAW;
-        indexBufferCreateInfo.initialBuffer.data = indices; 
-        indexBufferCreateInfo.initialBuffer.size = sizeof(indices); 
-        GpuBuffer indexBuffer("triangle.indices", indexBufferCreateInfo);
+        indexBufferCreateInfo.initialBuffer.data = mesh->indices.data(); 
+        indexBufferCreateInfo.initialBuffer.size = sizeof(unsigned int) * mesh->indices.size();
+        GpuBuffer indexBuffer("mesh.indices", indexBufferCreateInfo);
         // vertex array
-        VertexArray vertexArray("triangle.vao", { GL_TRIANGLES });
+        VertexArray vertexArray("mesh.vao", { GL_TRIANGLES });
         vertexArray
             .bind()
-            .appendAttribute({ GL_FLOAT, 3, sizeof(Vertex), 0 }, vertexBuffer)
-            .appendAttribute({ GL_FLOAT, 3, sizeof(Color), 0 }, colorBuffer)
-            .appendIndexBuffer({ GL_UNSIGNED_SHORT }, indexBuffer)
+            .appendAttribute({ GL_FLOAT, 3, sizeof(vec3), 0 }, vertexBuffer)
+            .appendAttribute({ GL_FLOAT, 3, sizeof(vec3), 0 }, normalBuffer)
+            .appendIndexBuffer({ GL_UNSIGNED_INT }, indexBuffer)
             .unbind();
-        ////////////////////////////////////////////////////////////////////////
 
+        ////////////////////////////////////////////////////////////////////////
         // timer stuff, needs refactor
         double currentTime = glfwGetTime();
         double elapsedTime = 0;
@@ -149,10 +129,16 @@ void App::run()
             glClearColor(0.3f, 0.4f, 0.3f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+            // uniforms
             glUseProgram(voxelShader.getHandle());
+            static mat4 P = glm::perspective(0.25f * glm::pi<float>(), (float)width/height, 0.1f, 100.0f);
+            static mat4 V = glm::lookAt(vec3(0, 2, 4), vec3(0), vec3(0, 1, 0));
+            mat4 PV = P * V;
+            voxelShader.setUniform("PV", PV);
+
             glBindVertexArray(vertexArray.getHandle());
-            // glDrawArrays(GL_TRIANGLES, 0, 6);
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+            //glDrawArrays(GL_TRIANGLES, 0, mesh->positions.size());
+            glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
 
             // swap front and back buffers
             glfwSwapBuffers(m_pWindow);
@@ -173,7 +159,7 @@ void App::run()
 
         // temp
         indexBuffer.release();
-        colorBuffer.release();
+        normalBuffer.release();
         voxelShader.release();
         vertexBuffer.release();
         vertexArray.release();
