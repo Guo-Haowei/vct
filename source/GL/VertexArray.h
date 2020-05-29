@@ -16,6 +16,12 @@ public:
         int dataDimension; // 1, 2, 3 or 4
         int stride;
         size_t offset = 0;
+        int divisor = 0;
+    };
+
+    struct InstanceInfo
+    {
+        int divisor = 1;
     };
 
     struct IndexInfo

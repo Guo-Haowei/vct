@@ -8,6 +8,7 @@ add_executable(VoxelGI
     SceneManager.cpp
     VoxelPass.cpp
     Camera.cpp
+    MainPass.cpp
 )
 
 target_link_libraries(VoxelGI
@@ -25,6 +26,7 @@ add_executable(convert
     SceneManager.cpp
     VoxelPass.cpp
     Camera.cpp
+    MainPass.cpp
 )
 
 target_link_libraries(convert

@@ -9,6 +9,7 @@
 #include "GL/VertexArray.h"
 #include "SceneManager.h"
 #include "VoxelPass.h"
+#include "MainPass.h"
 // temp
 #include "InputManager.h"
 #ifdef _DEBUG
@@ -111,8 +112,8 @@ void App::run()
         // cam.moveFront(-3.0f);
         // cam.moveUp(1.0f);
 
-        VoxelPass voxelPass;
-        voxelPass.initialize();
+        MainPass mainPass;
+        mainPass.initialize();
 
         ////////////////////////////////////////////////////////////////////////
         // timer stuff, needs refactor
@@ -137,7 +138,7 @@ void App::run()
             // post update
             InputManager::getInstance().postUpdate();
             // swap front and back buffers
-            voxelPass.render();
+            mainPass.render();
             glfwSwapBuffers(m_pWindow);
 
             // timer
@@ -155,7 +156,7 @@ void App::run()
         }
 
         // temp
-        voxelPass.finalize();
+        mainPass.finalize();
         g_pSceneManager->releaseGpuResources();
         // temp
 

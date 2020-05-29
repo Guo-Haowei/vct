@@ -30,7 +30,7 @@ void SceneManager::writeBuffer(std::ofstream& text,
     if (!data || sizeInByte == 0)
         return;
     
-    text << "\"" << bufferName << "\":{\"offset\":" << offset << ", \"size\":" << sizeInByte << "},";
+    text << "\"" << bufferName << "\":{\"offset\":" << offset << ", \"size\":" << sizeInByte << '}';
     bin.write((const char*)data, sizeInByte);
 }
 
@@ -66,12 +66,14 @@ void SceneManager::write()
             size_t bufferSize = mesh->positions.size() * sizeof(vec3);
             writeBuffer(text, bin, "positions", mesh->positions.data(), bufferSize, offset);
             offset += bufferSize;
+            text << ',';
         }
         if (mesh->normals.size())
         {
             size_t bufferSize = mesh->normals.size() * sizeof(vec3);
             writeBuffer(text, bin, "normals", mesh->normals.data(), bufferSize, offset);
             offset += bufferSize;
+            text << ',';
         }
         if (mesh->indices.size())
         {
@@ -153,8 +155,11 @@ void SceneManager::initializeCamera()
     float aabbMin = glm::min(halfSize.x, glm::min(halfSize.y, halfSize.z));
     float aabbMax = glm::max(halfSize.x, glm::max(halfSize.y, halfSize.z));
     cam.setSpeed(0.5f * aabbMin);
-    cam.setNear(0.1f);
-    cam.setFar(2.0f * aabbMax);
+    // cam.setNear(1.f);
+    float zNear = 0.1f;
+    float zFar = glm::max(10.f, 2.0f * aabbMax);
+    cam.setNear(zNear);
+    cam.setFar(zFar);
 }
 
 SceneManager* g_pSceneManager = new SceneManager();

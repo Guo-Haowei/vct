@@ -46,22 +46,22 @@ struct Box3D
 
     void expand(const vec3& point)
     {
-        max.x = glm::max(point.x, max.x);
-        max.y = glm::max(point.y, max.y);
-        max.z = glm::max(point.z, max.z);
         min.x = glm::min(point.x, min.x);
         min.y = glm::min(point.y, min.y);
         min.z = glm::min(point.z, min.z);
+        max.x = glm::max(point.x, max.x);
+        max.y = glm::max(point.y, max.y);
+        max.z = glm::max(point.z, max.z);
     }
 
     void expand(const Box3D& o)
     {
-        max.x = glm::max(o.max.x, max.x);
-        max.y = glm::max(o.max.y, max.y);
-        max.z = glm::max(o.max.z, max.z);
         min.x = glm::min(o.min.x, min.x);
         min.y = glm::min(o.min.y, min.y);
         min.z = glm::min(o.min.z, min.z);
+        max.x = glm::max(o.max.x, max.x);
+        max.y = glm::max(o.max.y, max.y);
+        max.z = glm::max(o.max.z, max.z);
     }
 
     vec3 getCenter() const { return 0.5f * (min + max); }
@@ -70,8 +70,8 @@ struct Box3D
 
 static std::ostream& operator<<(std::ostream& os, const Box3D& b)
 {
-    os << "{ \"min\" : [ " << b.min.x << ", " << b.min.y << ", " << b.min.x << "],";
-    os << "\"max\" : [ " << b.max.x << ", " << b.max.y << ", " << b.max.y << " ] }";
+    os << "{ \"min\" : [ " << b.min.x << ", " << b.min.y << ", " << b.min.z << "],";
+    os << "\"max\" : [ " << b.max.x << ", " << b.max.y << ", " << b.max.z << " ] }";
     return os;
 }
 

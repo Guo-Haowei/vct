@@ -31,6 +31,7 @@ VertexArray& VertexArray::appendAttribute(const AttribInfo& info, const GpuBuffe
     auto location = m_attribsCount++;
     glEnableVertexAttribArray(location);
     glVertexAttribPointer(location, info.dataDimension, info.dataType, GL_FALSE, info.stride, (void*)info.offset);
+    if (info.divisor != 0) glVertexAttribDivisor(location, info.divisor);
     glBindBuffer(vertexBuffer.getType(), 0);
     return *this;
 }

@@ -14,11 +14,10 @@ struct SceneMaterial
 
 struct SceneMesh
 {
-    std::string                 name;
-    std::vector<vec3>  positions;
-    std::vector<vec3>  normals;
-    // TODO: change to unsigned short if possible
-    std::vector<unsigned int>   indices;
+    std::string name;
+    std::vector<vec3> positions;
+    std::vector<vec3> normals;
+    std::vector<unsigned int> indices;
     // std::vector<vec3>  tagents;
     // std::vector<vec3>  bitTagents;
     // std::vector<vec2>  uvs;
