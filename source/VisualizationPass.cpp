@@ -50,7 +50,8 @@ void VisualizationPass::render()
     glEnable(GL_BLEND);
     int width, height;
     g_pApp->getFrameBufferSize(width, height);
-    glViewport(0, 0, width, height);
+    // glViewport(0, 0, width, height);
+    glViewport(0, 0, width / 2, height /2);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // upload uniforms
     glUseProgram(m_visualizationShader->getHandle());
@@ -58,7 +59,6 @@ void VisualizationPass::render()
     mat4 PV = cam.getP() * cam.getV();
     const Box3D& aabb = g_pSceneManager->getScene().aabb;
     const vec3 center = aabb.getCenter();
-    const vec3 size = 0.5f * float(1. / VOXEL_SIZE) * aabb.getSize();
     float unitSize = g_pSceneManager->getScene().aabbSizeMax / float(VOXEL_SIZE);
     // float voxelSize = 
     m_visualizationShader->setUniform("PV", PV);

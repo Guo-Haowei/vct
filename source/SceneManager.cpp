@@ -158,12 +158,13 @@ void SceneManager::initializeCamera()
     m_scene->camera.moveFront(-z + center.z - halfSize.z);
     float aabbMin = glm::min(halfSize.x, glm::min(halfSize.y, halfSize.z));
     float aabbMax = glm::max(halfSize.x, glm::max(halfSize.y, halfSize.z));
-    cam.setSpeed(0.5f * aabbMin);
     // cam.setNear(1.f);
     float zNear = 0.1f;
     float zFar = glm::max(10.f, 2.0f * aabbMax);
+    float speed = glm::max(aabbMin, 0.5f);
     cam.setNear(zNear);
     cam.setFar(zFar);
+    cam.setSpeed(0.5f * speed);
 }
 
 SceneManager* g_pSceneManager = new SceneManager();

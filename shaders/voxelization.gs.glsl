@@ -20,7 +20,7 @@ void main(){
     for(uint i = 0; i < 3; ++i)
     {
         // transform gl_Position from world space to ndc space
-        pass_position = gl_Position.xyz;
+        pass_position = pass_positions[i];
         pass_normal = pass_normals[i];
         gl_Position = vec4((pass_positions[i] - u_world_center) / u_world_size_half, 1.0);
         if (dominant == 0)
@@ -32,7 +32,7 @@ void main(){
             gl_Position.xyz = gl_Position.xzy;
         }
         // projected position
-        gl_Position.z = 0.5; // make sure every triangle is rendered
+        // gl_Position.z = 1.0; // make sure every triangle is rendered
         // TODO: expand vertex?
         EmitVertex();
     }

@@ -64,6 +64,10 @@ void PerspectiveCamera::update()
     }
     if (m_projDirty)
     {
+        // use orthographic camera
+        float h = 1.0f;
+        float w = m_aspect * h;
+        // m_P = glm::ortho(-w, w, -h, h);
         m_P = glm::perspective(m_fov, m_aspect, m_zNear, m_zFar);
         m_projDirty = false;
     }

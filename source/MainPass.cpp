@@ -81,18 +81,19 @@ void MainPass::initialize()
 
 void MainPass::render()
 {
+    auto& cam = g_pSceneManager->getScene().camera;
+    int width, height;
+    g_pApp->getFrameBufferSize(width, height);
+    // glViewport(0, 0, width, height);
+    glViewport(width / 2, 0, width / 2, height /2);
+
+    mat4 PV = cam.getP() * cam.getV();
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
-    int width, height;
-    g_pApp->getFrameBufferSize(width, height);
-    glViewport(0, 0, width, height);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+    // scene
     // upload uniforms
     glUseProgram(m_mainShader->getHandle());
-    auto& cam = g_pSceneManager->getScene().camera;
-    mat4 PV = cam.getP() * cam.getV();
     m_mainShader->setUniform("PV", PV);
 
     for (auto& mesh : g_pSceneManager->getScene().meshes)
@@ -102,13 +103,15 @@ void MainPass::render()
         glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
     }
 
+#if 0
+    // debug box
     // render debug boxes
-    // glDisable(GL_DEPTH_TEST); // always on top
     glUseProgram(m_boxShader->getHandle());
     m_boxShader->setUniform("PV", PV);
     glBindVertexArray(m_boxVao->getHandle());
     // glDrawElements(GL_LINES, 32, GL_UNSIGNED_INT, 0);
     glDrawElementsInstanced(GL_LINES, 32, GL_UNSIGNED_INT, 0, m_boxCount);
+#endif
 }
 
 void MainPass::finalize()
