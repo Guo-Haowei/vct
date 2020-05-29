@@ -21,6 +21,17 @@ const vec3 VEC3_UNIT_X      { 1.0f, 0.0f, 0.0f };
 const vec3 VEC3_UNIT_Y      { 0.0f, 1.0f, 0.0f };
 const vec3 VEC3_UNIT_Z      { 0.0f, 0.0f, 1.0f };
 
+const vec4 VEC4_ZERO        { 0.0f, 0.0f, 0.0f, 0.0f };
+const vec4 VEC4_UNIT_SCALE  { 1.0f, 1.0f, 1.0f, 0.0f };
+const vec4 VEC4_UNIT_X      { 1.0f, 0.0f, 0.0f, 0.0f };
+const vec4 VEC4_UNIT_Y      { 0.0f, 1.0f, 0.0f, 0.0f };
+const vec4 VEC4_UNIT_Z      { 0.0f, 0.0f, 1.0f, 0.0f };
+const vec4 VEC4_UNIT_W      { 0.0f, 0.0f, 0.0f, 1.0f };
+const mat4 MAT4_IDENTITY    { { 1.0f, 0.0f, 0.0f, 0.0f },
+                              { 0.0f, 1.0f, 0.0f, 0.0f },
+                              { 0.0f, 0.0f, 1.0f, 0.0f },
+                              { 0.0f, 0.0f, 0.0f, 1.0f } };
+
 } // namespace glm
 
 using namespace glm;

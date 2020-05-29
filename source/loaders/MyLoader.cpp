@@ -25,17 +25,13 @@ Scene* MyLoader::parse(const char* root, const char* file)
 {
     using namespace std;
     // parse
-    std::string fullPath(root);
-    fullPath.append(file);
-    const std::string fStr(file);
-    auto pos = fStr.find(".json");
+    const std::string fullPath = std::string(root) + "/" + std::string(file);
+    auto pos = fullPath.find(".json");
     assert(pos != string::npos);
-    string fileName = fStr.substr(0, pos);
     ifstream text(fullPath);
     if (!text.is_open())
         std::cout << "[ERROR][MyLoader] failed to open file " << fullPath << " for read." << std::endl;
-    string binPath(root);
-    binPath.append(fileName).append(".bin");
+    string binPath(fullPath.substr(0, pos) + ".bin");
     ifstream bin(binPath, ios::ate | ios::binary);
     if (!bin.is_open())
         std::cout << "[ERROR][MyLoader] failed to open file " << binPath << " for read." << std::endl;

@@ -8,6 +8,7 @@
 #include "GL/ShaderProgram.h"
 #include "GL/VertexArray.h"
 #include "SceneManager.h"
+#include "VoxelPass.h"
 // temp
 #ifdef _DEBUG
 #   include "internal/Debug.h"
@@ -72,51 +73,17 @@ void App::run()
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
 
-        ///////////////////////////////////////////////////////////////////////
-        // temp code
-        // shader
-        ShaderProgram::CreateInfo shaderCreateInfo {};
-        shaderCreateInfo.vs = "voxelization.vs.glsl";
-        shaderCreateInfo.fs = "voxelization.fs.glsl";
-        ShaderProgram voxelShader("voxelization", shaderCreateInfo);
+        //// load scene
+        g_pSceneManager->load(MODEL_DIR "bunny", "bunny.json");
 
-        // load scene
-        SceneManager sm;
-        // sm.load(MODEL_DIR "cube/", "cube.json");
-        sm.load(MODEL_DIR "bunny/", "bunny.json");
-        // sm.write();
+        ////// temp
+        // manually set camera position
+        auto& cam = g_pSceneManager->getScene().camera;
+        cam.moveFront(-3.0f);
+        cam.moveUp(1.0f);
 
-        auto& mesh = sm.getScene().meshes.front();
-
-        // position buffer
-        GpuBuffer::CreateInfo vertexBufferCreateInfo {};
-        vertexBufferCreateInfo.type = GL_ARRAY_BUFFER;
-        vertexBufferCreateInfo.usage = GL_STATIC_DRAW;
-        vertexBufferCreateInfo.initialBuffer.data = mesh->positions.data(); 
-        vertexBufferCreateInfo.initialBuffer.size = sizeof(vec3) * mesh->positions.size();
-        GpuBuffer vertexBuffer("mesh.positions", vertexBufferCreateInfo);
-        // normal buffer
-        GpuBuffer::CreateInfo normalBufferCreateInfo {};
-        normalBufferCreateInfo.type = GL_ARRAY_BUFFER;
-        normalBufferCreateInfo.usage = GL_STATIC_DRAW;
-        normalBufferCreateInfo.initialBuffer.data = mesh->normals.data();
-        normalBufferCreateInfo.initialBuffer.size = sizeof(vec3) * mesh->normals.size();
-        GpuBuffer normalBuffer("mesh.colors", normalBufferCreateInfo);
-        // index array
-        GpuBuffer::CreateInfo indexBufferCreateInfo {};
-        indexBufferCreateInfo.type = GL_ELEMENT_ARRAY_BUFFER;
-        indexBufferCreateInfo.usage = GL_STATIC_DRAW;
-        indexBufferCreateInfo.initialBuffer.data = mesh->indices.data(); 
-        indexBufferCreateInfo.initialBuffer.size = sizeof(unsigned int) * mesh->indices.size();
-        GpuBuffer indexBuffer("mesh.indices", indexBufferCreateInfo);
-        // vertex array
-        VertexArray vertexArray("mesh.vao", { GL_TRIANGLES });
-        vertexArray
-            .bind()
-            .appendAttribute({ GL_FLOAT, 3, sizeof(vec3), 0 }, vertexBuffer)
-            .appendAttribute({ GL_FLOAT, 3, sizeof(vec3), 0 }, normalBuffer)
-            .appendIndexBuffer({ GL_UNSIGNED_INT }, indexBuffer)
-            .unbind();
+        VoxelPass voxelPass;
+        voxelPass.initialize();
 
         ////////////////////////////////////////////////////////////////////////
         // timer stuff, needs refactor
@@ -127,26 +94,18 @@ void App::run()
         while (!glfwWindowShouldClose(m_pWindow))
         {
             glfwPollEvents();
-
             int width, height;
             glfwGetFramebufferSize(m_pWindow, &width, &height);
-            glViewport(0, 0, width, height);
+            cam.setAspect(width, height);
+            cam.update();
 
-            glClearColor(0.3f, 0.4f, 0.3f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            // glViewport(0, 0, width, height);
 
-            // uniforms
-            glUseProgram(voxelShader.getHandle());
-            static mat4 P = glm::perspective(0.25f * glm::pi<float>(), (float)width/height, 0.1f, 100.0f);
-            static mat4 V = glm::lookAt(vec3(0, 2, 4), vec3(0), vec3(0, 1, 0));
-            mat4 PV = P * V;
-            voxelShader.setUniform("PV", PV);
-
-            glBindVertexArray(vertexArray.getHandle());
-            //glDrawArrays(GL_TRIANGLES, 0, mesh->positions.size());
-            glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
+            // glClearColor(0.3f, 0.4f, 0.3f, 1.0f);
+            // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             // swap front and back buffers
+            voxelPass.render();
             glfwSwapBuffers(m_pWindow);
 
             // timer
@@ -164,11 +123,7 @@ void App::run()
         }
 
         // temp
-        indexBuffer.release();
-        normalBuffer.release();
-        voxelShader.release();
-        vertexBuffer.release();
-        vertexArray.release();
+        voxelPass.finalize();
         // temp
 
         glfwDestroyWindow(m_pWindow);
@@ -180,5 +135,9 @@ void App::run()
     }
 }
 
-    // GLFWwindow* m_pWindow;
-    // int m_width, m_height;
+void App::getFrameBufferSize(int& width, int& height)
+{
+    glfwGetFramebufferSize(m_pWindow, &width, &height);
+}
+
+App* g_pApp = new App();

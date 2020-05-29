@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "../math/GeoMath.h"
+#include "Camera.h"
 
 struct SceneMaterial
 {
@@ -40,4 +40,5 @@ struct Scene
     std::vector<std::unique_ptr<SceneMesh>> meshes;
     std::vector<std::unique_ptr<SceneMaterial>> materials;
     Box3D aabb;
+    PerspectiveCamera camera;
 };

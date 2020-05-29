@@ -87,3 +87,5 @@ void SceneManager::write()
     text.close();
     bin.close();
 }
+
+SceneManager* g_pSceneManager = new SceneManager();

@@ -1,5 +1,5 @@
 #pragma once
-#include "loaders/Scene.h"
+#include "Scene.h"
 #include <fstream>
 
 namespace JSONCpp { class JSON; }
@@ -21,3 +21,5 @@ private:
 
     std::unique_ptr<Scene> m_scene;
 };
+
+extern SceneManager* g_pSceneManager;

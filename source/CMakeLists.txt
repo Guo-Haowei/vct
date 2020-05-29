@@ -6,6 +6,8 @@ add_executable(VoxelGI
     main.cpp
     App.cpp
     SceneManager.cpp
+    VoxelPass.cpp
+    Camera.cpp
 )
 
 target_link_libraries(VoxelGI

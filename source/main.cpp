@@ -2,7 +2,6 @@
 
 int main()
 {
-    App app;
-    app.run();
+    g_pApp->run();
     return 0;
 }

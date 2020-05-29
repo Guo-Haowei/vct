@@ -1,3 +1,4 @@
+#pragma once
 #include "GpuResource.h"
 #include "GpuBuffer.h"
 
