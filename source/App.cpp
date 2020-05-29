@@ -10,6 +10,7 @@
 #include "SceneManager.h"
 #include "VoxelPass.h"
 // temp
+#include "InputManager.h"
 #ifdef _DEBUG
 #   include "internal/Debug.h"
 #endif
@@ -47,6 +48,29 @@ void App::run()
 
         glfwMakeContextCurrent(m_pWindow);
         glfwSwapInterval(1); // Enable vsync
+
+        /*************************  Input Manager  *************************/
+        // cursor
+        InputManager& im = InputManager::getInstance();
+        glfwGetCursorPos(m_pWindow, &im.m_cursorPos.x, &im.m_cursorPos.y);
+        im.m_prevCursorPos = im.m_cursorPos;
+        glfwSetCursorPosCallback(m_pWindow, [](GLFWwindow* window, double xpos, double ypos){
+            InputManager::getInstance().m_cursorPos = { xpos, ypos };
+        });
+
+        // mouse button
+        glfwSetMouseButtonCallback(m_pWindow, [](GLFWwindow* window, int button, int action, int mods){
+            if (button > InputManager::BUTTON_COUNT)
+                return;
+
+            InputManager::getInstance().m_mouseButtons[button] = action;
+        });
+
+        // scroll
+        glfwSetScrollCallback(m_pWindow, [](GLFWwindow* window, double xoffset, double yoffset){
+            InputManager::getInstance().m_scroll = static_cast<float>(yoffset);
+            std::cout << "scroll is " << yoffset << std::endl;
+        });
 
         /*************************  GLAD  *************************/
         if (!gladLoadGL())
@@ -104,6 +128,8 @@ void App::run()
             // glClearColor(0.3f, 0.4f, 0.3f, 1.0f);
             // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+            // post update
+            InputManager::getInstance().postUpdate();
             // swap front and back buffers
             voxelPass.render();
             glfwSwapBuffers(m_pWindow);
