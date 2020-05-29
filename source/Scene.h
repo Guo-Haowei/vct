@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include "GL/VertexArray.h"
 #include "Camera.h"
 
 struct SceneMaterial
@@ -23,6 +24,10 @@ struct SceneMesh
     // std::vector<vec2>  uvs;
     // int materialIndex = -1;
     Box3D aabb;
+
+    // gpu resources
+    std::unique_ptr<VertexArray> vertexArray;
+    std::vector<std::unique_ptr<GpuBuffer>> gpuBuffers;
 };
 
 // struct SceneNode

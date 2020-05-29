@@ -11,8 +11,8 @@ public:
     void finalize();
 private:
     std::unique_ptr<ShaderProgram> m_voxelShader;
-    std::unique_ptr<GpuBuffer> m_positionBuffer;
-    std::unique_ptr<GpuBuffer> m_normalBuffer;
-    std::unique_ptr<GpuBuffer> m_indexBuffer;
-    std::unique_ptr<VertexArray> m_vertexArray;
+    // std::unique_ptr<GpuBuffer> m_positionBuffer;
+    // std::unique_ptr<GpuBuffer> m_normalBuffer;
+    // std::unique_ptr<GpuBuffer> m_indexBuffer;
+    // std::unique_ptr<VertexArray> m_vertexArray;
 };

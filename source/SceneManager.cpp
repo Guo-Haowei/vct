@@ -88,4 +88,57 @@ void SceneManager::write()
     bin.close();
 }
 
+void SceneManager::createGpuResources()
+{
+    for (auto& mesh : m_scene->meshes)
+    {
+        const std::string& name = mesh->name;
+        mesh->vertexArray.reset(new VertexArray(name, { GL_TRIANGLES }));
+        mesh->vertexArray->bind();
+        {
+            GpuBuffer::CreateInfo vertexBufferCreateInfo {};
+            vertexBufferCreateInfo.type = GL_ARRAY_BUFFER;
+            vertexBufferCreateInfo.usage = GL_STATIC_DRAW;
+            vertexBufferCreateInfo.initialBuffer.data = mesh->positions.data(); 
+            vertexBufferCreateInfo.initialBuffer.size = sizeof(vec3) * mesh->positions.size();
+            mesh->gpuBuffers.push_back(std::move(std::unique_ptr<GpuBuffer>(new GpuBuffer(name + ".position", vertexBufferCreateInfo))));
+            mesh->vertexArray->appendAttribute({ GL_FLOAT, 3, sizeof(vec3), 0 }, *mesh->gpuBuffers.back().get());
+        }
+        if (mesh->normals.size())
+        {
+            GpuBuffer::CreateInfo normalBufferCreateInfo {};
+            normalBufferCreateInfo.type = GL_ARRAY_BUFFER;
+            normalBufferCreateInfo.usage = GL_STATIC_DRAW;
+            normalBufferCreateInfo.initialBuffer.data = mesh->normals.data(); 
+            normalBufferCreateInfo.initialBuffer.size = sizeof(vec3) * mesh->normals.size();
+            mesh->gpuBuffers.push_back(std::move(std::unique_ptr<GpuBuffer>(new GpuBuffer(name + ".normal", normalBufferCreateInfo))));
+            mesh->vertexArray->appendAttribute({ GL_FLOAT, 3, sizeof(vec3), 0 }, *mesh->gpuBuffers.back().get());
+        }
+        if (mesh->indices.size())
+        {
+            GpuBuffer::CreateInfo indexBufferCreateInfo {};
+            indexBufferCreateInfo.type = GL_ELEMENT_ARRAY_BUFFER;
+            indexBufferCreateInfo.usage = GL_STATIC_DRAW;
+            indexBufferCreateInfo.initialBuffer.data = mesh->indices.data(); 
+            indexBufferCreateInfo.initialBuffer.size = sizeof(unsigned int) * mesh->indices.size();
+            mesh->gpuBuffers.push_back(std::move(std::unique_ptr<GpuBuffer>(new GpuBuffer(name + ".index", indexBufferCreateInfo))));
+            mesh->vertexArray->appendIndexBuffer({ GL_UNSIGNED_INT }, *mesh->gpuBuffers.back().get());
+
+        }
+        mesh->vertexArray->unbind();
+    }
+}
+
+void SceneManager::releaseGpuResources()
+{
+    for (auto& mesh : m_scene->meshes)
+    {
+        for (auto& gpuBuffer : mesh->gpuBuffers)
+        {
+            gpuBuffer->release();
+        }
+        mesh->vertexArray->release();
+    }
+}
+
 SceneManager* g_pSceneManager = new SceneManager();

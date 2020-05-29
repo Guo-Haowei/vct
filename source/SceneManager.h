@@ -9,6 +9,8 @@ class SceneManager
 public:
     void load(const char* root, const char* path);
     void write();
+    void createGpuResources();
+    void releaseGpuResources();
 
     Scene& getScene() const { return *m_scene.get(); }
 private:

@@ -99,6 +99,8 @@ void App::run()
 
         //// load scene
         g_pSceneManager->load(MODEL_DIR "bunny", "bunny.json");
+        // create buffers
+        g_pSceneManager->createGpuResources();
 
         ////// temp
         // manually set camera position
@@ -150,6 +152,7 @@ void App::run()
 
         // temp
         voxelPass.finalize();
+        g_pSceneManager->releaseGpuResources();
         // temp
 
         glfwDestroyWindow(m_pWindow);

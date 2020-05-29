@@ -11,6 +11,7 @@ void VoxelPass::initialize()
     shaderCreateInfo.fs = "voxelization.fs.glsl";
     m_voxelShader.reset(new ShaderProgram("voxelization", shaderCreateInfo));
 
+#if 0
     auto& mesh = g_pSceneManager->getScene().meshes.front();
 
     // position buffer
@@ -41,6 +42,7 @@ void VoxelPass::initialize()
         .appendAttribute({ GL_FLOAT, 3, sizeof(vec3), 0 }, *m_normalBuffer.get())
         .appendIndexBuffer({ GL_UNSIGNED_INT }, *m_indexBuffer.get())
         .unbind();
+#endif
 }
 
 void VoxelPass::render()
@@ -59,16 +61,20 @@ void VoxelPass::render()
     mat4 PV = cam.getP() * cam.getV();
     m_voxelShader->setUniform("PV", PV);
 
-    glBindVertexArray(m_vertexArray->getHandle());
-    auto& mesh = g_pSceneManager->getScene().meshes.front();
-    glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
+    for (auto& mesh : g_pSceneManager->getScene().meshes)
+    {
+        auto& vao = mesh->vertexArray;
+        glBindVertexArray(vao->getHandle());
+        glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
+    }
+
 }
 
 void VoxelPass::finalize()
 {
     m_voxelShader->release();
-    m_positionBuffer->release();
-    m_normalBuffer->release();
-    m_indexBuffer->release();
-    m_vertexArray->release();
+    // m_positionBuffer->release();
+    // m_normalBuffer->release();
+    // m_indexBuffer->release();
+    // m_vertexArray->release();
 }
