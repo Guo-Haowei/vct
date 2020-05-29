@@ -1,0 +1,10628 @@
+{
+  "name": "sponza.obj",
+  "bounding box": {
+    "min": [
+      -1920.95,
+      -126.443,
+      -1182.81
+    ],
+    "max": [
+      1799.91,
+      1429.43,
+      1105.43
+    ]
+  },
+  "meshes": [
+    {
+      "name": "Mesh1",
+      "bounding box": {
+        "min": [
+          -437.835,
+          674.124,
+          218.531
+        ],
+        "max": [
+          -428.61,
+          687.219,
+          233.531
+        ]
+      },
+      "positions": {
+        "offset": 0,
+        "size": 264
+      },
+      "normals": {
+        "offset": 264,
+        "size": 264
+      },
+      "indices": {
+        "offset": 528,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh2",
+      "bounding box": {
+        "min": [
+          160.99,
+          -0.308855,
+          -295.254
+        ],
+        "max": [
+          448.034,
+          283.681,
+          -269.946
+        ]
+      },
+      "positions": {
+        "offset": 744,
+        "size": 27672
+      },
+      "normals": {
+        "offset": 28416,
+        "size": 27672
+      },
+      "indices": {
+        "offset": 56088,
+        "size": 55296
+      }
+    },
+    {
+      "name": "Mesh3",
+      "bounding box": {
+        "min": [
+          532.877,
+          0.130545,
+          -289.257
+        ],
+        "max": [
+          820.174,
+          283.015,
+          -264.676
+        ]
+      },
+      "positions": {
+        "offset": 111384,
+        "size": 29208
+      },
+      "normals": {
+        "offset": 140592,
+        "size": 29208
+      },
+      "indices": {
+        "offset": 169800,
+        "size": 58368
+      }
+    },
+    {
+      "name": "Mesh4",
+      "bounding box": {
+        "min": [
+          -436.715,
+          661.124,
+          216.379
+        ],
+        "max": [
+          -429.838,
+          674.155,
+          230.523
+        ]
+      },
+      "positions": {
+        "offset": 228168,
+        "size": 600
+      },
+      "normals": {
+        "offset": 228768,
+        "size": 600
+      },
+      "indices": {
+        "offset": 229368,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh5",
+      "bounding box": {
+        "min": [
+          111.454,
+          828.811,
+          -257.784
+        ],
+        "max": [
+          132.114,
+          849.471,
+          -250.387
+        ]
+      },
+      "positions": {
+        "offset": 229896,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 232788,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 235680,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh6",
+      "bounding box": {
+        "min": [
+          1287.66,
+          182.652,
+          152.162
+        ],
+        "max": [
+          1303.27,
+          217.612,
+          240.677
+        ]
+      },
+      "positions": {
+        "offset": 241152,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 242232,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 243312,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh7",
+      "bounding box": {
+        "min": [
+          1287.66,
+          182.652,
+          -310.059
+        ],
+        "max": [
+          1303.27,
+          217.612,
+          -221.544
+        ]
+      },
+      "positions": {
+        "offset": 244368,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 245448,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 246528,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh8",
+      "bounding box": {
+        "min": [
+          -204.937,
+          0.130467,
+          188.902
+        ],
+        "max": [
+          82.3598,
+          283.015,
+          213.482
+        ]
+      },
+      "positions": {
+        "offset": 247584,
+        "size": 29208
+      },
+      "normals": {
+        "offset": 276792,
+        "size": 29208
+      },
+      "indices": {
+        "offset": 306000,
+        "size": 58368
+      }
+    },
+    {
+      "name": "Mesh9",
+      "bounding box": {
+        "min": [
+          -577.62,
+          -0.308933,
+          182.904
+        ],
+        "max": [
+          -290.577,
+          283.681,
+          208.212
+        ]
+      },
+      "positions": {
+        "offset": 364368,
+        "size": 27672
+      },
+      "normals": {
+        "offset": 392040,
+        "size": 27672
+      },
+      "indices": {
+        "offset": 419712,
+        "size": 55296
+      }
+    },
+    {
+      "name": "Mesh10",
+      "bounding box": {
+        "min": [
+          -946.238,
+          0.130467,
+          188.902
+        ],
+        "max": [
+          -658.941,
+          283.015,
+          213.482
+        ]
+      },
+      "positions": {
+        "offset": 475008,
+        "size": 29208
+      },
+      "normals": {
+        "offset": 504216,
+        "size": 29208
+      },
+      "indices": {
+        "offset": 533424,
+        "size": 58368
+      }
+    },
+    {
+      "name": "Mesh11",
+      "bounding box": {
+        "min": [
+          -946.238,
+          0.130545,
+          -289.257
+        ],
+        "max": [
+          -658.941,
+          283.015,
+          -264.676
+        ]
+      },
+      "positions": {
+        "offset": 591792,
+        "size": 29208
+      },
+      "normals": {
+        "offset": 621000,
+        "size": 29208
+      },
+      "indices": {
+        "offset": 650208,
+        "size": 58368
+      }
+    },
+    {
+      "name": "Mesh12",
+      "bounding box": {
+        "min": [
+          160.99,
+          -0.308933,
+          182.904
+        ],
+        "max": [
+          448.034,
+          283.681,
+          208.212
+        ]
+      },
+      "positions": {
+        "offset": 708576,
+        "size": 27672
+      },
+      "normals": {
+        "offset": 736248,
+        "size": 27672
+      },
+      "indices": {
+        "offset": 763920,
+        "size": 55296
+      }
+    },
+    {
+      "name": "Mesh13",
+      "bounding box": {
+        "min": [
+          532.877,
+          0.130467,
+          188.902
+        ],
+        "max": [
+          820.174,
+          283.015,
+          213.482
+        ]
+      },
+      "positions": {
+        "offset": 819216,
+        "size": 29208
+      },
+      "normals": {
+        "offset": 848424,
+        "size": 29208
+      },
+      "indices": {
+        "offset": 877632,
+        "size": 58368
+      }
+    },
+    {
+      "name": "Mesh14",
+      "bounding box": {
+        "min": [
+          -577.62,
+          -0.308855,
+          -295.254
+        ],
+        "max": [
+          -290.577,
+          283.681,
+          -269.946
+        ]
+      },
+      "positions": {
+        "offset": 936000,
+        "size": 27672
+      },
+      "normals": {
+        "offset": 963672,
+        "size": 27672
+      },
+      "indices": {
+        "offset": 991344,
+        "size": 55296
+      }
+    },
+    {
+      "name": "Mesh15",
+      "bounding box": {
+        "min": [
+          -204.937,
+          0.130545,
+          -289.257
+        ],
+        "max": [
+          82.3598,
+          283.015,
+          -264.676
+        ]
+      },
+      "positions": {
+        "offset": 1046640,
+        "size": 29208
+      },
+      "normals": {
+        "offset": 1075848,
+        "size": 29208
+      },
+      "indices": {
+        "offset": 1105056,
+        "size": 58368
+      }
+    },
+    {
+      "name": "Mesh16",
+      "bounding box": {
+        "min": [
+          -258.315,
+          828.811,
+          -257.784
+        ],
+        "max": [
+          -237.656,
+          849.471,
+          -250.387
+        ]
+      },
+      "positions": {
+        "offset": 1163424,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 1166316,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 1169208,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh17",
+      "bounding box": {
+        "min": [
+          276.483,
+          674.124,
+          -284.777
+        ],
+        "max": [
+          291.483,
+          687.219,
+          -275.552
+        ]
+      },
+      "positions": {
+        "offset": 1174680,
+        "size": 264
+      },
+      "normals": {
+        "offset": 1174944,
+        "size": 264
+      },
+      "indices": {
+        "offset": 1175208,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh18",
+      "bounding box": {
+        "min": [
+          -628.654,
+          828.811,
+          -257.784
+        ],
+        "max": [
+          -607.994,
+          849.471,
+          -250.387
+        ]
+      },
+      "positions": {
+        "offset": 1175424,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 1178316,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 1181208,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh19",
+      "bounding box": {
+        "min": [
+          275.511,
+          687.191,
+          -309.705
+        ],
+        "max": [
+          335.304,
+          695.666,
+          -250.018
+        ]
+      },
+      "positions": {
+        "offset": 1186680,
+        "size": 2520
+      },
+      "normals": {
+        "offset": 1189200,
+        "size": 2520
+      },
+      "indices": {
+        "offset": 1191720,
+        "size": 3600
+      }
+    },
+    {
+      "name": "Mesh20",
+      "bounding box": {
+        "min": [
+          317.239,
+          661.125,
+          -283.529
+        ],
+        "max": [
+          331.383,
+          674.156,
+          -276.653
+        ]
+      },
+      "positions": {
+        "offset": 1195320,
+        "size": 600
+      },
+      "normals": {
+        "offset": 1195920,
+        "size": 600
+      },
+      "indices": {
+        "offset": 1196520,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh21",
+      "bounding box": {
+        "min": [
+          -621.967,
+          831.655,
+          -270.83
+        ],
+        "max": [
+          -614.237,
+          886.139,
+          -79.2371
+        ]
+      },
+      "positions": {
+        "offset": 1197048,
+        "size": 2172
+      },
+      "normals": {
+        "offset": 1199220,
+        "size": 2172
+      },
+      "indices": {
+        "offset": 1201392,
+        "size": 2712
+      }
+    },
+    {
+      "name": "Mesh22",
+      "bounding box": {
+        "min": [
+          -1428.52,
+          -2.50629,
+          -644.311
+        ],
+        "max": [
+          1302.19,
+          -2.50609,
+          574.03
+        ]
+      },
+      "positions": {
+        "offset": 1204104,
+        "size": 84
+      },
+      "normals": {
+        "offset": 1204188,
+        "size": 84
+      },
+      "indices": {
+        "offset": 1204272,
+        "size": 60
+      }
+    },
+    {
+      "name": "Mesh23",
+      "bounding box": {
+        "min": [
+          -1428.52,
+          -3.37949,
+          -644.311
+        ],
+        "max": [
+          1302.19,
+          5.62521,
+          574.03
+        ]
+      },
+      "positions": {
+        "offset": 1204332,
+        "size": 1032
+      },
+      "normals": {
+        "offset": 1205364,
+        "size": 1032
+      },
+      "indices": {
+        "offset": 1206396,
+        "size": 600
+      }
+    },
+    {
+      "name": "Mesh24",
+      "bounding box": {
+        "min": [
+          -1430.15,
+          182.652,
+          559.631
+        ],
+        "max": [
+          -1417.05,
+          217.612,
+          575.726
+        ]
+      },
+      "positions": {
+        "offset": 1206996,
+        "size": 996
+      },
+      "normals": {
+        "offset": 1207992,
+        "size": 996
+      },
+      "indices": {
+        "offset": 1208988,
+        "size": 888
+      }
+    },
+    {
+      "name": "Mesh25",
+      "bounding box": {
+        "min": [
+          -1430.15,
+          182.652,
+          -645.289
+        ],
+        "max": [
+          -1417.05,
+          217.612,
+          -629.194
+        ]
+      },
+      "positions": {
+        "offset": 1209876,
+        "size": 996
+      },
+      "normals": {
+        "offset": 1210872,
+        "size": 996
+      },
+      "indices": {
+        "offset": 1211868,
+        "size": 888
+      }
+    },
+    {
+      "name": "Mesh26",
+      "bounding box": {
+        "min": [
+          -1430.31,
+          182.652,
+          152.162
+        ],
+        "max": [
+          -1414.69,
+          217.612,
+          240.677
+        ]
+      },
+      "positions": {
+        "offset": 1212756,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 1213836,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 1214916,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh27",
+      "bounding box": {
+        "min": [
+          -49.4366,
+          674.124,
+          200.493
+        ],
+        "max": [
+          -34.436,
+          687.219,
+          209.718
+        ]
+      },
+      "positions": {
+        "offset": 1215972,
+        "size": 264
+      },
+      "normals": {
+        "offset": 1216236,
+        "size": 264
+      },
+      "indices": {
+        "offset": 1216500,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh28",
+      "bounding box": {
+        "min": [
+          -90.7272,
+          506.633,
+          177.604
+        ],
+        "max": [
+          -35.7872,
+          517.401,
+          232.555
+        ]
+      },
+      "positions": {
+        "offset": 1216716,
+        "size": 1596
+      },
+      "normals": {
+        "offset": 1218312,
+        "size": 1596
+      },
+      "indices": {
+        "offset": 1219908,
+        "size": 1992
+      }
+    },
+    {
+      "name": "Mesh29",
+      "bounding box": {
+        "min": [
+          -93.3161,
+          687.191,
+          175.086
+        ],
+        "max": [
+          -33.5233,
+          695.666,
+          234.773
+        ]
+      },
+      "positions": {
+        "offset": 1221900,
+        "size": 2520
+      },
+      "normals": {
+        "offset": 1224420,
+        "size": 2520
+      },
+      "indices": {
+        "offset": 1226940,
+        "size": 3600
+      }
+    },
+    {
+      "name": "Mesh30",
+      "bounding box": {
+        "min": [
+          -809.509,
+          674.124,
+          219.01
+        ],
+        "max": [
+          -800.284,
+          687.219,
+          234.01
+        ]
+      },
+      "positions": {
+        "offset": 1230540,
+        "size": 264
+      },
+      "normals": {
+        "offset": 1230804,
+        "size": 264
+      },
+      "indices": {
+        "offset": 1231068,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh31",
+      "bounding box": {
+        "min": [
+          -793.046,
+          661.124,
+          201.741
+        ],
+        "max": [
+          -778.902,
+          674.155,
+          208.618
+        ]
+      },
+      "positions": {
+        "offset": 1231284,
+        "size": 600
+      },
+      "normals": {
+        "offset": 1231884,
+        "size": 600
+      },
+      "indices": {
+        "offset": 1232484,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh32",
+      "bounding box": {
+        "min": [
+          -1057.22,
+          -2.46066,
+          -316.869
+        ],
+        "max": [
+          -947.956,
+          220.997,
+          -207.605
+        ]
+      },
+      "positions": {
+        "offset": 1233012,
+        "size": 3024
+      },
+      "normals": {
+        "offset": 1236036,
+        "size": 3024
+      },
+      "indices": {
+        "offset": 1239060,
+        "size": 4080
+      }
+    },
+    {
+      "name": "Mesh33",
+      "bounding box": {
+        "min": [
+          -1057.22,
+          -2.46074,
+          137.35
+        ],
+        "max": [
+          -947.956,
+          220.997,
+          246.615
+        ]
+      },
+      "positions": {
+        "offset": 1243140,
+        "size": 3048
+      },
+      "normals": {
+        "offset": 1246188,
+        "size": 3048
+      },
+      "indices": {
+        "offset": 1249236,
+        "size": 4080
+      }
+    },
+    {
+      "name": "Mesh34",
+      "bounding box": {
+        "min": [
+          -1431.9,
+          415.461,
+          -641.602
+        ],
+        "max": [
+          1302.19,
+          424.466,
+          575.3
+        ]
+      },
+      "positions": {
+        "offset": 1253316,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 1254396,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 1255476,
+        "size": 600
+      }
+    },
+    {
+      "name": "Mesh35",
+      "bounding box": {
+        "min": [
+          1296.62,
+          414.249,
+          -110.879
+        ],
+        "max": [
+          1315.52,
+          716.851,
+          42.5921
+        ]
+      },
+      "positions": {
+        "offset": 1256076,
+        "size": 3696
+      },
+      "normals": {
+        "offset": 1259772,
+        "size": 3696
+      },
+      "indices": {
+        "offset": 1263468,
+        "size": 3336
+      }
+    },
+    {
+      "name": "Mesh36",
+      "bounding box": {
+        "min": [
+          1290,
+          660.363,
+          559.631
+        ],
+        "max": [
+          1303.1,
+          695.323,
+          575.726
+        ]
+      },
+      "positions": {
+        "offset": 1266804,
+        "size": 996
+      },
+      "normals": {
+        "offset": 1267800,
+        "size": 996
+      },
+      "indices": {
+        "offset": 1268796,
+        "size": 888
+      }
+    },
+    {
+      "name": "Mesh37",
+      "bounding box": {
+        "min": [
+          1290,
+          660.363,
+          -645.288
+        ],
+        "max": [
+          1303.1,
+          695.323,
+          -629.194
+        ]
+      },
+      "positions": {
+        "offset": 1269684,
+        "size": 996
+      },
+      "normals": {
+        "offset": 1270680,
+        "size": 996
+      },
+      "indices": {
+        "offset": 1271676,
+        "size": 888
+      }
+    },
+    {
+      "name": "Mesh38",
+      "bounding box": {
+        "min": [
+          -509.683,
+          119.805,
+          573.104
+        ],
+        "max": [
+          -357.128,
+          289.317,
+          589.753
+        ]
+      },
+      "positions": {
+        "offset": 1272564,
+        "size": 960
+      },
+      "normals": {
+        "offset": 1273524,
+        "size": 960
+      },
+      "indices": {
+        "offset": 1274484,
+        "size": 984
+      }
+    },
+    {
+      "name": "Mesh39",
+      "bounding box": {
+        "min": [
+          -509.684,
+          119.805,
+          573.104
+        ],
+        "max": [
+          -357.128,
+          289.317,
+          583.672
+        ]
+      },
+      "positions": {
+        "offset": 1275468,
+        "size": 576
+      },
+      "normals": {
+        "offset": 1276044,
+        "size": 576
+      },
+      "indices": {
+        "offset": 1276620,
+        "size": 288
+      }
+    },
+    {
+      "name": "Mesh40",
+      "bounding box": {
+        "min": [
+          -170.025,
+          -2.13499,
+          554.27
+        ],
+        "max": [
+          41.1111,
+          243.564,
+          605.014
+        ]
+      },
+      "positions": {
+        "offset": 1276908,
+        "size": 1560
+      },
+      "normals": {
+        "offset": 1278468,
+        "size": 1560
+      },
+      "indices": {
+        "offset": 1280028,
+        "size": 1920
+      }
+    },
+    {
+      "name": "Mesh41",
+      "bounding box": {
+        "min": [
+          -140.447,
+          -2.2154,
+          -651.539
+        ],
+        "max": [
+          13.0236,
+          300.386,
+          -632.635
+        ]
+      },
+      "positions": {
+        "offset": 1281948,
+        "size": 3696
+      },
+      "normals": {
+        "offset": 1285644,
+        "size": 3696
+      },
+      "indices": {
+        "offset": 1289340,
+        "size": 3336
+      }
+    },
+    {
+      "name": "Mesh42",
+      "bounding box": {
+        "min": [
+          231.565,
+          119.805,
+          573.104
+        ],
+        "max": [
+          384.121,
+          289.318,
+          589.753
+        ]
+      },
+      "positions": {
+        "offset": 1292676,
+        "size": 960
+      },
+      "normals": {
+        "offset": 1293636,
+        "size": 960
+      },
+      "indices": {
+        "offset": 1294596,
+        "size": 984
+      }
+    },
+    {
+      "name": "Mesh43",
+      "bounding box": {
+        "min": [
+          231.565,
+          119.805,
+          573.104
+        ],
+        "max": [
+          384.121,
+          289.318,
+          583.672
+        ]
+      },
+      "positions": {
+        "offset": 1295580,
+        "size": 576
+      },
+      "normals": {
+        "offset": 1296156,
+        "size": 576
+      },
+      "indices": {
+        "offset": 1296732,
+        "size": 288
+      }
+    },
+    {
+      "name": "Mesh44",
+      "bounding box": {
+        "min": [
+          462.665,
+          660.363,
+          -646.968
+        ],
+        "max": [
+          523.368,
+          695.323,
+          -631.352
+        ]
+      },
+      "positions": {
+        "offset": 1297020,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 1298100,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 1299180,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh45",
+      "bounding box": {
+        "min": [
+          1287.66,
+          660.363,
+          152.162
+        ],
+        "max": [
+          1303.27,
+          695.323,
+          240.677
+        ]
+      },
+      "positions": {
+        "offset": 1300236,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 1301316,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 1302396,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh46",
+      "bounding box": {
+        "min": [
+          1287.66,
+          660.363,
+          -310.059
+        ],
+        "max": [
+          1303.27,
+          695.323,
+          -221.544
+        ]
+      },
+      "positions": {
+        "offset": 1303452,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 1304532,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 1305612,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh47",
+      "bounding box": {
+        "min": [
+          1290,
+          182.652,
+          559.631
+        ],
+        "max": [
+          1303.1,
+          217.612,
+          575.725
+        ]
+      },
+      "positions": {
+        "offset": 1306668,
+        "size": 996
+      },
+      "normals": {
+        "offset": 1307664,
+        "size": 996
+      },
+      "indices": {
+        "offset": 1308660,
+        "size": 888
+      }
+    },
+    {
+      "name": "Mesh48",
+      "bounding box": {
+        "min": [
+          1290,
+          182.652,
+          -645.289
+        ],
+        "max": [
+          1303.1,
+          217.612,
+          -629.194
+        ]
+      },
+      "positions": {
+        "offset": 1309548,
+        "size": 996
+      },
+      "normals": {
+        "offset": 1310544,
+        "size": 996
+      },
+      "indices": {
+        "offset": 1311540,
+        "size": 888
+      }
+    },
+    {
+      "name": "Mesh49",
+      "bounding box": {
+        "min": [
+          -1430.15,
+          660.363,
+          559.631
+        ],
+        "max": [
+          -1417.05,
+          695.323,
+          575.726
+        ]
+      },
+      "positions": {
+        "offset": 1312428,
+        "size": 996
+      },
+      "normals": {
+        "offset": 1313424,
+        "size": 996
+      },
+      "indices": {
+        "offset": 1314420,
+        "size": 888
+      }
+    },
+    {
+      "name": "Mesh50",
+      "bounding box": {
+        "min": [
+          -644.829,
+          104.802,
+          -245.079
+        ],
+        "max": [
+          -594.019,
+          128.146,
+          -194.325
+        ]
+      },
+      "positions": {
+        "offset": 1315308,
+        "size": 10752
+      },
+      "normals": {
+        "offset": 1326060,
+        "size": 10752
+      },
+      "indices": {
+        "offset": 1336812,
+        "size": 19692
+      }
+    },
+    {
+      "name": "Mesh51",
+      "bounding box": {
+        "min": [
+          -644.933,
+          133.751,
+          -219.7
+        ],
+        "max": [
+          -617.764,
+          214.355,
+          -219.7
+        ]
+      },
+      "positions": {
+        "offset": 1356504,
+        "size": 48
+      },
+      "normals": {
+        "offset": 1356552,
+        "size": 48
+      },
+      "indices": {
+        "offset": 1356600,
+        "size": 24
+      }
+    },
+    {
+      "name": "Mesh52",
+      "bounding box": {
+        "min": [
+          -621.11,
+          133.721,
+          -219.7
+        ],
+        "max": [
+          -593.53,
+          214.133,
+          -219.7
+        ]
+      },
+      "positions": {
+        "offset": 1356624,
+        "size": 48
+      },
+      "normals": {
+        "offset": 1356672,
+        "size": 48
+      },
+      "indices": {
+        "offset": 1356720,
+        "size": 24
+      }
+    },
+    {
+      "name": "Mesh53",
+      "bounding box": {
+        "min": [
+          -654.184,
+          111.898,
+          -221.825
+        ],
+        "max": [
+          -639.014,
+          137.188,
+          -217.575
+        ]
+      },
+      "positions": {
+        "offset": 1356744,
+        "size": 7488
+      },
+      "normals": {
+        "offset": 1364232,
+        "size": 7488
+      },
+      "indices": {
+        "offset": 1371720,
+        "size": 14928
+      }
+    },
+    {
+      "name": "Mesh54",
+      "bounding box": {
+        "min": [
+          -621.111,
+          207.454,
+          -246.834
+        ],
+        "max": [
+          -617.737,
+          216.951,
+          -211.601
+        ]
+      },
+      "positions": {
+        "offset": 1386648,
+        "size": 1668
+      },
+      "normals": {
+        "offset": 1388316,
+        "size": 1668
+      },
+      "indices": {
+        "offset": 1389984,
+        "size": 3240
+      }
+    },
+    {
+      "name": "Mesh55",
+      "bounding box": {
+        "min": [
+          -1430.15,
+          660.363,
+          -645.288
+        ],
+        "max": [
+          -1417.05,
+          695.323,
+          -629.194
+        ]
+      },
+      "positions": {
+        "offset": 1393224,
+        "size": 996
+      },
+      "normals": {
+        "offset": 1394220,
+        "size": 996
+      },
+      "indices": {
+        "offset": 1395216,
+        "size": 888
+      }
+    },
+    {
+      "name": "Mesh56",
+      "bounding box": {
+        "min": [
+          -599.395,
+          111.898,
+          -221.825
+        ],
+        "max": [
+          -584.225,
+          137.188,
+          -217.576
+        ]
+      },
+      "positions": {
+        "offset": 1396104,
+        "size": 7488
+      },
+      "normals": {
+        "offset": 1403592,
+        "size": 7488
+      },
+      "indices": {
+        "offset": 1411080,
+        "size": 14928
+      }
+    },
+    {
+      "name": "Mesh57",
+      "bounding box": {
+        "min": [
+          -643.443,
+          134.157,
+          141.555
+        ],
+        "max": [
+          -618.733,
+          213.697,
+          145.128
+        ]
+      },
+      "positions": {
+        "offset": 1426008,
+        "size": 48
+      },
+      "normals": {
+        "offset": 1426056,
+        "size": 48
+      },
+      "indices": {
+        "offset": 1426104,
+        "size": 24
+      }
+    },
+    {
+      "name": "Mesh58",
+      "bounding box": {
+        "min": [
+          -620.644,
+          133.751,
+          143.342
+        ],
+        "max": [
+          -593.475,
+          214.355,
+          143.342
+        ]
+      },
+      "positions": {
+        "offset": 1426128,
+        "size": 48
+      },
+      "normals": {
+        "offset": 1426176,
+        "size": 48
+      },
+      "indices": {
+        "offset": 1426224,
+        "size": 24
+      }
+    },
+    {
+      "name": "Mesh59",
+      "bounding box": {
+        "min": [
+          -1430.31,
+          660.363,
+          152.162
+        ],
+        "max": [
+          -1414.69,
+          695.323,
+          240.677
+        ]
+      },
+      "positions": {
+        "offset": 1426248,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 1427328,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 1428408,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh60",
+      "bounding box": {
+        "min": [
+          -1430.31,
+          660.363,
+          -310.059
+        ],
+        "max": [
+          -1414.69,
+          695.323,
+          -221.544
+        ]
+      },
+      "positions": {
+        "offset": 1429464,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 1430544,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 1431624,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh61",
+      "bounding box": {
+        "min": [
+          -459.217,
+          661.125,
+          -283.529
+        ],
+        "max": [
+          -445.073,
+          674.156,
+          -276.653
+        ]
+      },
+      "positions": {
+        "offset": 1432680,
+        "size": 600
+      },
+      "normals": {
+        "offset": 1433280,
+        "size": 600
+      },
+      "indices": {
+        "offset": 1433880,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh62",
+      "bounding box": {
+        "min": [
+          -463.139,
+          687.191,
+          -309.705
+        ],
+        "max": [
+          -403.346,
+          695.666,
+          -250.018
+        ]
+      },
+      "positions": {
+        "offset": 1434408,
+        "size": 2520
+      },
+      "normals": {
+        "offset": 1436928,
+        "size": 2520
+      },
+      "indices": {
+        "offset": 1439448,
+        "size": 3600
+      }
+    },
+    {
+      "name": "Mesh63",
+      "bounding box": {
+        "min": [
+          -421.47,
+          661.125,
+          -283.549
+        ],
+        "max": [
+          -407.326,
+          674.156,
+          -276.673
+        ]
+      },
+      "positions": {
+        "offset": 1443048,
+        "size": 600
+      },
+      "normals": {
+        "offset": 1443648,
+        "size": 600
+      },
+      "indices": {
+        "offset": 1444248,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh64",
+      "bounding box": {
+        "min": [
+          -437.933,
+          674.124,
+          -308.942
+        ],
+        "max": [
+          -428.708,
+          687.219,
+          -293.942
+        ]
+      },
+      "positions": {
+        "offset": 1444776,
+        "size": 264
+      },
+      "normals": {
+        "offset": 1445040,
+        "size": 264
+      },
+      "indices": {
+        "offset": 1445304,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh65",
+      "bounding box": {
+        "min": [
+          -436.705,
+          661.125,
+          -305.934
+        ],
+        "max": [
+          -429.829,
+          674.156,
+          -291.79
+        ]
+      },
+      "positions": {
+        "offset": 1445520,
+        "size": 600
+      },
+      "normals": {
+        "offset": 1446120,
+        "size": 600
+      },
+      "indices": {
+        "offset": 1446720,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh66",
+      "bounding box": {
+        "min": [
+          -462.226,
+          674.124,
+          -284.65
+        ],
+        "max": [
+          -447.225,
+          687.219,
+          -275.425
+        ]
+      },
+      "positions": {
+        "offset": 1447248,
+        "size": 264
+      },
+      "normals": {
+        "offset": 1447512,
+        "size": 264
+      },
+      "indices": {
+        "offset": 1447776,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh67",
+      "bounding box": {
+        "min": [
+          -460.019,
+          517.223,
+          -306.5
+        ],
+        "max": [
+          -407.506,
+          687.421,
+          -254.028
+        ]
+      },
+      "positions": {
+        "offset": 1447992,
+        "size": 8364
+      },
+      "normals": {
+        "offset": 1456356,
+        "size": 8364
+      },
+      "indices": {
+        "offset": 1464720,
+        "size": 14640
+      }
+    },
+    {
+      "name": "Mesh68",
+      "bounding box": {
+        "min": [
+          -437.835,
+          674.124,
+          -266.261
+        ],
+        "max": [
+          -428.61,
+          687.219,
+          -251.26
+        ]
+      },
+      "positions": {
+        "offset": 1479360,
+        "size": 264
+      },
+      "normals": {
+        "offset": 1479624,
+        "size": 264
+      },
+      "indices": {
+        "offset": 1479888,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh69",
+      "bounding box": {
+        "min": [
+          -436.715,
+          661.125,
+          -268.413
+        ],
+        "max": [
+          -429.838,
+          674.156,
+          -254.269
+        ]
+      },
+      "positions": {
+        "offset": 1480104,
+        "size": 600
+      },
+      "normals": {
+        "offset": 1480704,
+        "size": 600
+      },
+      "indices": {
+        "offset": 1481304,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh70",
+      "bounding box": {
+        "min": [
+          -419.318,
+          674.124,
+          -284.778
+        ],
+        "max": [
+          -404.317,
+          687.219,
+          -275.552
+        ]
+      },
+      "positions": {
+        "offset": 1481832,
+        "size": 264
+      },
+      "normals": {
+        "offset": 1482096,
+        "size": 264
+      },
+      "indices": {
+        "offset": 1482360,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh71",
+      "bounding box": {
+        "min": [
+          -1052.88,
+          413.911,
+          -317.269
+        ],
+        "max": [
+          921.935,
+          422.242,
+          245.814
+        ]
+      },
+      "positions": {
+        "offset": 1482576,
+        "size": 300
+      },
+      "normals": {
+        "offset": 1482876,
+        "size": 300
+      },
+      "indices": {
+        "offset": 1483176,
+        "size": 192
+      }
+    },
+    {
+      "name": "Mesh72",
+      "bounding box": {
+        "min": [
+          -990.438,
+          690.922,
+          -302.353
+        ],
+        "max": [
+          862.44,
+          823.344,
+          -244.773
+        ]
+      },
+      "positions": {
+        "offset": 1483368,
+        "size": 14784
+      },
+      "normals": {
+        "offset": 1498152,
+        "size": 14784
+      },
+      "indices": {
+        "offset": 1512936,
+        "size": 22320
+      }
+    },
+    {
+      "name": "Mesh73",
+      "bounding box": {
+        "min": [
+          816.339,
+          -2.46066,
+          -316.869
+        ],
+        "max": [
+          925.604,
+          220.997,
+          -207.605
+        ]
+      },
+      "positions": {
+        "offset": 1535256,
+        "size": 3048
+      },
+      "normals": {
+        "offset": 1538304,
+        "size": 3048
+      },
+      "indices": {
+        "offset": 1541352,
+        "size": 4080
+      }
+    },
+    {
+      "name": "Mesh74",
+      "bounding box": {
+        "min": [
+          816.339,
+          -2.46074,
+          137.35
+        ],
+        "max": [
+          925.604,
+          220.997,
+          246.615
+        ]
+      },
+      "positions": {
+        "offset": 1545432,
+        "size": 3048
+      },
+      "normals": {
+        "offset": 1548480,
+        "size": 3048
+      },
+      "indices": {
+        "offset": 1551528,
+        "size": 4080
+      }
+    },
+    {
+      "name": "Mesh75",
+      "bounding box": {
+        "min": [
+          -1015.74,
+          680.957,
+          -59.8615
+        ],
+        "max": [
+          -1007.75,
+          692.297,
+          -46.8718
+        ]
+      },
+      "positions": {
+        "offset": 1555608,
+        "size": 264
+      },
+      "normals": {
+        "offset": 1555872,
+        "size": 264
+      },
+      "indices": {
+        "offset": 1556136,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh76",
+      "bounding box": {
+        "min": [
+          -1014.77,
+          669.7,
+          -57.2564
+        ],
+        "max": [
+          -1008.81,
+          680.985,
+          -45.0083
+        ]
+      },
+      "positions": {
+        "offset": 1556352,
+        "size": 600
+      },
+      "normals": {
+        "offset": 1556952,
+        "size": 600
+      },
+      "indices": {
+        "offset": 1557552,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh77",
+      "bounding box": {
+        "min": [
+          -808.291,
+          661.125,
+          -305.455
+        ],
+        "max": [
+          -801.414,
+          674.156,
+          -291.31
+        ]
+      },
+      "positions": {
+        "offset": 1558080,
+        "size": 600
+      },
+      "normals": {
+        "offset": 1558680,
+        "size": 600
+      },
+      "indices": {
+        "offset": 1559280,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh78",
+      "bounding box": {
+        "min": [
+          319.391,
+          674.124,
+          200.142
+        ],
+        "max": [
+          334.391,
+          687.219,
+          209.367
+        ]
+      },
+      "positions": {
+        "offset": 1559808,
+        "size": 264
+      },
+      "normals": {
+        "offset": 1560072,
+        "size": 264
+      },
+      "indices": {
+        "offset": 1560336,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh79",
+      "bounding box": {
+        "min": [
+          301.994,
+          661.124,
+          178.858
+        ],
+        "max": [
+          308.87,
+          674.156,
+          193.002
+        ]
+      },
+      "positions": {
+        "offset": 1560552,
+        "size": 600
+      },
+      "normals": {
+        "offset": 1561152,
+        "size": 600
+      },
+      "indices": {
+        "offset": 1561752,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh80",
+      "bounding box": {
+        "min": [
+          300.873,
+          674.124,
+          175.849
+        ],
+        "max": [
+          310.098,
+          687.219,
+          190.85
+        ]
+      },
+      "positions": {
+        "offset": 1562280,
+        "size": 264
+      },
+      "normals": {
+        "offset": 1562544,
+        "size": 264
+      },
+      "indices": {
+        "offset": 1562808,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh81",
+      "bounding box": {
+        "min": [
+          279.491,
+          661.124,
+          201.242
+        ],
+        "max": [
+          293.635,
+          674.155,
+          208.118
+        ]
+      },
+      "positions": {
+        "offset": 1563024,
+        "size": 600
+      },
+      "normals": {
+        "offset": 1563624,
+        "size": 600
+      },
+      "indices": {
+        "offset": 1564224,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh82",
+      "bounding box": {
+        "min": [
+          276.483,
+          674.124,
+          200.014
+        ],
+        "max": [
+          291.483,
+          687.219,
+          209.239
+        ]
+      },
+      "positions": {
+        "offset": 1564752,
+        "size": 264
+      },
+      "normals": {
+        "offset": 1565016,
+        "size": 264
+      },
+      "indices": {
+        "offset": 1565280,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh83",
+      "bounding box": {
+        "min": [
+          302.004,
+          661.124,
+          216.379
+        ],
+        "max": [
+          308.88,
+          674.155,
+          230.523
+        ]
+      },
+      "positions": {
+        "offset": 1565496,
+        "size": 600
+      },
+      "normals": {
+        "offset": 1566096,
+        "size": 600
+      },
+      "indices": {
+        "offset": 1566696,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh84",
+      "bounding box": {
+        "min": [
+          300.776,
+          674.124,
+          218.531
+        ],
+        "max": [
+          310,
+          687.219,
+          233.531
+        ]
+      },
+      "positions": {
+        "offset": 1567224,
+        "size": 264
+      },
+      "normals": {
+        "offset": 1567488,
+        "size": 264
+      },
+      "indices": {
+        "offset": 1567752,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh85",
+      "bounding box": {
+        "min": [
+          279.672,
+          517.223,
+          178.291
+        ],
+        "max": [
+          332.184,
+          687.421,
+          230.763
+        ]
+      },
+      "positions": {
+        "offset": 1567968,
+        "size": 8364
+      },
+      "normals": {
+        "offset": 1576332,
+        "size": 8364
+      },
+      "indices": {
+        "offset": 1584696,
+        "size": 14640
+      }
+    },
+    {
+      "name": "Mesh86",
+      "bounding box": {
+        "min": [
+          649.946,
+          506.633,
+          177.304
+        ],
+        "max": [
+          704.886,
+          517.401,
+          232.256
+        ]
+      },
+      "positions": {
+        "offset": 1599336,
+        "size": 1596
+      },
+      "normals": {
+        "offset": 1600932,
+        "size": 1596
+      },
+      "indices": {
+        "offset": 1602528,
+        "size": 1992
+      }
+    },
+    {
+      "name": "Mesh87",
+      "bounding box": {
+        "min": [
+          647.682,
+          687.191,
+          175.086
+        ],
+        "max": [
+          707.475,
+          695.666,
+          234.773
+        ]
+      },
+      "positions": {
+        "offset": 1604520,
+        "size": 2520
+      },
+      "normals": {
+        "offset": 1607040,
+        "size": 2520
+      },
+      "indices": {
+        "offset": 1609560,
+        "size": 3600
+      }
+    },
+    {
+      "name": "Mesh88",
+      "bounding box": {
+        "min": [
+          -793.046,
+          661.125,
+          -283.05
+        ],
+        "max": [
+          -778.902,
+          674.156,
+          -276.174
+        ]
+      },
+      "positions": {
+        "offset": 1613160,
+        "size": 600
+      },
+      "normals": {
+        "offset": 1613760,
+        "size": 600
+      },
+      "indices": {
+        "offset": 1614360,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh89",
+      "bounding box": {
+        "min": [
+          631.49,
+          927.363,
+          169.319
+        ],
+        "max": [
+          721.82,
+          1014.47,
+          202.787
+        ]
+      },
+      "positions": {
+        "offset": 1614888,
+        "size": 360
+      },
+      "normals": {
+        "offset": 1615248,
+        "size": 360
+      },
+      "indices": {
+        "offset": 1615608,
+        "size": 480
+      }
+    },
+    {
+      "name": "Mesh90",
+      "bounding box": {
+        "min": [
+          260.613,
+          927.363,
+          169.319
+        ],
+        "max": [
+          350.943,
+          1014.47,
+          202.787
+        ]
+      },
+      "positions": {
+        "offset": 1616088,
+        "size": 360
+      },
+      "normals": {
+        "offset": 1616448,
+        "size": 360
+      },
+      "indices": {
+        "offset": 1616808,
+        "size": 480
+      }
+    },
+    {
+      "name": "Mesh91",
+      "bounding box": {
+        "min": [
+          -790.894,
+          674.124,
+          -284.171
+        ],
+        "max": [
+          -775.893,
+          687.219,
+          -274.946
+        ]
+      },
+      "positions": {
+        "offset": 1617288,
+        "size": 264
+      },
+      "normals": {
+        "offset": 1617552,
+        "size": 264
+      },
+      "indices": {
+        "offset": 1617816,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh92",
+      "bounding box": {
+        "min": [
+          -663.558,
+          1215.9,
+          169.437
+        ],
+        "max": [
+          -606.091,
+          1273.49,
+          189.929
+        ]
+      },
+      "positions": {
+        "offset": 1618032,
+        "size": 1152
+      },
+      "normals": {
+        "offset": 1619184,
+        "size": 1152
+      },
+      "indices": {
+        "offset": 1620336,
+        "size": 1920
+      }
+    },
+    {
+      "name": "Mesh93",
+      "bounding box": {
+        "min": [
+          -282.272,
+          1226.98,
+          182.271
+        ],
+        "max": [
+          -246.926,
+          1262.4,
+          197.768
+        ]
+      },
+      "positions": {
+        "offset": 1622256,
+        "size": 1368
+      },
+      "normals": {
+        "offset": 1623624,
+        "size": 1368
+      },
+      "indices": {
+        "offset": 1624992,
+        "size": 1344
+      }
+    },
+    {
+      "name": "Mesh94",
+      "bounding box": {
+        "min": [
+          -293.332,
+          1215.9,
+          169.437
+        ],
+        "max": [
+          -235.865,
+          1273.49,
+          189.929
+        ]
+      },
+      "positions": {
+        "offset": 1626336,
+        "size": 1152
+      },
+      "normals": {
+        "offset": 1627488,
+        "size": 1152
+      },
+      "indices": {
+        "offset": 1628640,
+        "size": 1920
+      }
+    },
+    {
+      "name": "Mesh95",
+      "bounding box": {
+        "min": [
+          119.428,
+          1226.98,
+          182.271
+        ],
+        "max": [
+          154.775,
+          1262.4,
+          197.768
+        ]
+      },
+      "positions": {
+        "offset": 1630560,
+        "size": 1368
+      },
+      "normals": {
+        "offset": 1631928,
+        "size": 1368
+      },
+      "indices": {
+        "offset": 1633296,
+        "size": 1344
+      }
+    },
+    {
+      "name": "Mesh96",
+      "bounding box": {
+        "min": [
+          -106.846,
+          927.363,
+          169.319
+        ],
+        "max": [
+          -16.5163,
+          1014.47,
+          202.787
+        ]
+      },
+      "positions": {
+        "offset": 1634640,
+        "size": 360
+      },
+      "normals": {
+        "offset": 1635000,
+        "size": 360
+      },
+      "indices": {
+        "offset": 1635360,
+        "size": 480
+      }
+    },
+    {
+      "name": "Mesh97",
+      "bounding box": {
+        "min": [
+          -479.031,
+          927.363,
+          169.319
+        ],
+        "max": [
+          -388.701,
+          1014.47,
+          202.787
+        ]
+      },
+      "positions": {
+        "offset": 1635840,
+        "size": 360
+      },
+      "normals": {
+        "offset": 1636200,
+        "size": 360
+      },
+      "indices": {
+        "offset": 1636560,
+        "size": 480
+      }
+    },
+    {
+      "name": "Mesh98",
+      "bounding box": {
+        "min": [
+          -850.058,
+          927.363,
+          169.32
+        ],
+        "max": [
+          -759.728,
+          1014.47,
+          202.787
+        ]
+      },
+      "positions": {
+        "offset": 1637040,
+        "size": 360
+      },
+      "normals": {
+        "offset": 1637400,
+        "size": 360
+      },
+      "indices": {
+        "offset": 1637760,
+        "size": 480
+      }
+    },
+    {
+      "name": "Mesh99",
+      "bounding box": {
+        "min": [
+          -652.498,
+          1226.98,
+          182.271
+        ],
+        "max": [
+          -617.151,
+          1262.4,
+          197.768
+        ]
+      },
+      "positions": {
+        "offset": 1638240,
+        "size": 1368
+      },
+      "normals": {
+        "offset": 1639608,
+        "size": 1368
+      },
+      "indices": {
+        "offset": 1640976,
+        "size": 1344
+      }
+    },
+    {
+      "name": "Mesh100",
+      "bounding box": {
+        "min": [
+          -783.794,
+          339.443,
+          157.164
+        ],
+        "max": [
+          -453.862,
+          520.594,
+          252.286
+        ]
+      },
+      "positions": {
+        "offset": 1642320,
+        "size": 33816
+      },
+      "normals": {
+        "offset": 1676136,
+        "size": 33816
+      },
+      "indices": {
+        "offset": 1709952,
+        "size": 66048
+      }
+    },
+    {
+      "name": "Mesh101",
+      "bounding box": {
+        "min": [
+          -808.281,
+          661.125,
+          -267.934
+        ],
+        "max": [
+          -801.405,
+          674.156,
+          -253.79
+        ]
+      },
+      "positions": {
+        "offset": 1776000,
+        "size": 600
+      },
+      "normals": {
+        "offset": 1776600,
+        "size": 600
+      },
+      "indices": {
+        "offset": 1777200,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh102",
+      "bounding box": {
+        "min": [
+          -830.794,
+          661.125,
+          -283.07
+        ],
+        "max": [
+          -816.649,
+          674.156,
+          -276.194
+        ]
+      },
+      "positions": {
+        "offset": 1777728,
+        "size": 600
+      },
+      "normals": {
+        "offset": 1778328,
+        "size": 600
+      },
+      "indices": {
+        "offset": 1778928,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh103",
+      "bounding box": {
+        "min": [
+          318.92,
+          339.443,
+          -324.526
+        ],
+        "max": [
+          648.852,
+          520.594,
+          -229.405
+        ]
+      },
+      "positions": {
+        "offset": 1779456,
+        "size": 33816
+      },
+      "normals": {
+        "offset": 1813272,
+        "size": 33816
+      },
+      "indices": {
+        "offset": 1847088,
+        "size": 66048
+      }
+    },
+    {
+      "name": "Mesh104",
+      "bounding box": {
+        "min": [
+          -833.802,
+          674.124,
+          -284.298
+        ],
+        "max": [
+          -818.802,
+          687.219,
+          -275.073
+        ]
+      },
+      "positions": {
+        "offset": 1913136,
+        "size": 264
+      },
+      "normals": {
+        "offset": 1913400,
+        "size": 264
+      },
+      "indices": {
+        "offset": 1913664,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh105",
+      "bounding box": {
+        "min": [
+          -67.9539,
+          674.124,
+          219.01
+        ],
+        "max": [
+          -58.7289,
+          687.219,
+          234.01
+        ]
+      },
+      "positions": {
+        "offset": 1913880,
+        "size": 264
+      },
+      "normals": {
+        "offset": 1914144,
+        "size": 264
+      },
+      "indices": {
+        "offset": 1914408,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh106",
+      "bounding box": {
+        "min": [
+          -66.8334,
+          661.124,
+          216.858
+        ],
+        "max": [
+          -59.957,
+          674.155,
+          231.002
+        ]
+      },
+      "positions": {
+        "offset": 1914624,
+        "size": 600
+      },
+      "normals": {
+        "offset": 1915224,
+        "size": 600
+      },
+      "indices": {
+        "offset": 1915824,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh107",
+      "bounding box": {
+        "min": [
+          -68.0518,
+          674.124,
+          176.328
+        ],
+        "max": [
+          -58.8268,
+          687.219,
+          191.329
+        ]
+      },
+      "positions": {
+        "offset": 1916352,
+        "size": 264
+      },
+      "normals": {
+        "offset": 1916616,
+        "size": 264
+      },
+      "indices": {
+        "offset": 1916880,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh108",
+      "bounding box": {
+        "min": [
+          -66.8238,
+          661.124,
+          179.337
+        ],
+        "max": [
+          -59.9473,
+          674.156,
+          193.481
+        ]
+      },
+      "positions": {
+        "offset": 1917096,
+        "size": 600
+      },
+      "normals": {
+        "offset": 1917696,
+        "size": 600
+      },
+      "indices": {
+        "offset": 1918296,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh109",
+      "bounding box": {
+        "min": [
+          -92.3447,
+          674.124,
+          200.621
+        ],
+        "max": [
+          -77.3441,
+          687.219,
+          209.846
+        ]
+      },
+      "positions": {
+        "offset": 1918824,
+        "size": 264
+      },
+      "normals": {
+        "offset": 1919088,
+        "size": 264
+      },
+      "indices": {
+        "offset": 1919352,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh110",
+      "bounding box": {
+        "min": [
+          -89.3363,
+          661.124,
+          201.741
+        ],
+        "max": [
+          -75.1922,
+          674.155,
+          208.618
+        ]
+      },
+      "positions": {
+        "offset": 1919568,
+        "size": 600
+      },
+      "normals": {
+        "offset": 1920168,
+        "size": 600
+      },
+      "indices": {
+        "offset": 1920768,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh111",
+      "bounding box": {
+        "min": [
+          317.239,
+          661.124,
+          201.262
+        ],
+        "max": [
+          331.383,
+          674.155,
+          208.139
+        ]
+      },
+      "positions": {
+        "offset": 1921296,
+        "size": 600
+      },
+      "normals": {
+        "offset": 1921896,
+        "size": 600
+      },
+      "indices": {
+        "offset": 1922496,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh112",
+      "bounding box": {
+        "min": [
+          275.511,
+          687.191,
+          175.086
+        ],
+        "max": [
+          335.304,
+          695.666,
+          234.774
+        ]
+      },
+      "positions": {
+        "offset": 1923024,
+        "size": 2520
+      },
+      "normals": {
+        "offset": 1925544,
+        "size": 2520
+      },
+      "indices": {
+        "offset": 1928064,
+        "size": 3600
+      }
+    },
+    {
+      "name": "Mesh113",
+      "bounding box": {
+        "min": [
+          278.1,
+          506.633,
+          177.304
+        ],
+        "max": [
+          333.04,
+          517.401,
+          232.256
+        ]
+      },
+      "positions": {
+        "offset": 1931664,
+        "size": 1596
+      },
+      "normals": {
+        "offset": 1933260,
+        "size": 1596
+      },
+      "indices": {
+        "offset": 1934856,
+        "size": 1992
+      }
+    },
+    {
+      "name": "Mesh114",
+      "bounding box": {
+        "min": [
+          -89.1555,
+          517.223,
+          179.097
+        ],
+        "max": [
+          -36.6429,
+          687.421,
+          231.569
+        ]
+      },
+      "positions": {
+        "offset": 1936848,
+        "size": 8364
+      },
+      "normals": {
+        "offset": 1945212,
+        "size": 8364
+      },
+      "indices": {
+        "offset": 1953576,
+        "size": 14640
+      }
+    },
+    {
+      "name": "Mesh115",
+      "bounding box": {
+        "min": [
+          482.539,
+          828.811,
+          -257.784
+        ],
+        "max": [
+          503.199,
+          849.471,
+          -250.387
+        ]
+      },
+      "positions": {
+        "offset": 1968216,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 1971108,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 1974000,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh116",
+      "bounding box": {
+        "min": [
+          -1046.29,
+          507.14,
+          -315.447
+        ],
+        "max": [
+          -948.1,
+          695.323,
+          -217.256
+        ]
+      },
+      "positions": {
+        "offset": 1979472,
+        "size": 3564
+      },
+      "normals": {
+        "offset": 1983036,
+        "size": 3564
+      },
+      "indices": {
+        "offset": 1986600,
+        "size": 4752
+      }
+    },
+    {
+      "name": "Mesh117",
+      "bounding box": {
+        "min": [
+          -655.613,
+          507.14,
+          -315.447
+        ],
+        "max": [
+          -581.041,
+          695.323,
+          -240.886
+        ]
+      },
+      "positions": {
+        "offset": 1991352,
+        "size": 2544
+      },
+      "normals": {
+        "offset": 1993896,
+        "size": 2544
+      },
+      "indices": {
+        "offset": 1996440,
+        "size": 3144
+      }
+    },
+    {
+      "name": "Mesh118",
+      "bounding box": {
+        "min": [
+          454.546,
+          507.14,
+          168.788
+        ],
+        "max": [
+          529.118,
+          695.323,
+          243.35
+        ]
+      },
+      "positions": {
+        "offset": 1999584,
+        "size": 2544
+      },
+      "normals": {
+        "offset": 2002128,
+        "size": 2544
+      },
+      "indices": {
+        "offset": 2004672,
+        "size": 3144
+      }
+    },
+    {
+      "name": "Mesh119",
+      "bounding box": {
+        "min": [
+          819.311,
+          507.14,
+          145.159
+        ],
+        "max": [
+          917.503,
+          695.323,
+          243.35
+        ]
+      },
+      "positions": {
+        "offset": 2007816,
+        "size": 3564
+      },
+      "normals": {
+        "offset": 2011380,
+        "size": 3564
+      },
+      "indices": {
+        "offset": 2014944,
+        "size": 4752
+      }
+    },
+    {
+      "name": "Mesh120",
+      "bounding box": {
+        "min": [
+          -286.073,
+          507.14,
+          168.788
+        ],
+        "max": [
+          -211.501,
+          695.323,
+          243.35
+        ]
+      },
+      "positions": {
+        "offset": 2019696,
+        "size": 2544
+      },
+      "normals": {
+        "offset": 2022240,
+        "size": 2544
+      },
+      "indices": {
+        "offset": 2024784,
+        "size": 3144
+      }
+    },
+    {
+      "name": "Mesh121",
+      "bounding box": {
+        "min": [
+          82.6617,
+          507.14,
+          168.788
+        ],
+        "max": [
+          157.234,
+          695.323,
+          243.35
+        ]
+      },
+      "positions": {
+        "offset": 2027928,
+        "size": 2544
+      },
+      "normals": {
+        "offset": 2030472,
+        "size": 2544
+      },
+      "indices": {
+        "offset": 2033016,
+        "size": 3144
+      }
+    },
+    {
+      "name": "Mesh122",
+      "bounding box": {
+        "min": [
+          -1046.29,
+          507.14,
+          145.159
+        ],
+        "max": [
+          -948.1,
+          695.323,
+          243.35
+        ]
+      },
+      "positions": {
+        "offset": 2036160,
+        "size": 3564
+      },
+      "normals": {
+        "offset": 2039724,
+        "size": 3564
+      },
+      "indices": {
+        "offset": 2043288,
+        "size": 4752
+      }
+    },
+    {
+      "name": "Mesh123",
+      "bounding box": {
+        "min": [
+          -655.613,
+          507.14,
+          168.788
+        ],
+        "max": [
+          -581.041,
+          695.323,
+          243.35
+        ]
+      },
+      "positions": {
+        "offset": 2048040,
+        "size": 2544
+      },
+      "normals": {
+        "offset": 2050584,
+        "size": 2544
+      },
+      "indices": {
+        "offset": 2053128,
+        "size": 3144
+      }
+    },
+    {
+      "name": "Mesh124",
+      "bounding box": {
+        "min": [
+          -1029.18,
+          695.737,
+          -241.119
+        ],
+        "max": [
+          -991.908,
+          820.133,
+          171.455
+        ]
+      },
+      "positions": {
+        "offset": 2056272,
+        "size": 3780
+      },
+      "normals": {
+        "offset": 2060052,
+        "size": 3780
+      },
+      "indices": {
+        "offset": 2063832,
+        "size": 6576
+      }
+    },
+    {
+      "name": "Mesh125",
+      "bounding box": {
+        "min": [
+          859.975,
+          695.737,
+          -241.119
+        ],
+        "max": [
+          897.25,
+          820.133,
+          171.455
+        ]
+      },
+      "positions": {
+        "offset": 2070408,
+        "size": 3780
+      },
+      "normals": {
+        "offset": 2074188,
+        "size": 3780
+      },
+      "indices": {
+        "offset": 2077968,
+        "size": 6576
+      }
+    },
+    {
+      "name": "Mesh126",
+      "bounding box": {
+        "min": [
+          111.454,
+          828.811,
+          178.947
+        ],
+        "max": [
+          132.114,
+          849.471,
+          186.344
+        ]
+      },
+      "positions": {
+        "offset": 2084544,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 2087436,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 2090328,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh127",
+      "bounding box": {
+        "min": [
+          482.539,
+          828.811,
+          178.947
+        ],
+        "max": [
+          503.199,
+          849.471,
+          186.344
+        ]
+      },
+      "positions": {
+        "offset": 2095800,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 2098692,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 2101584,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh128",
+      "bounding box": {
+        "min": [
+          -68.0518,
+          674.124,
+          -308.463
+        ],
+        "max": [
+          -58.8268,
+          687.219,
+          -293.462
+        ]
+      },
+      "positions": {
+        "offset": 2107056,
+        "size": 264
+      },
+      "normals": {
+        "offset": 2107320,
+        "size": 264
+      },
+      "indices": {
+        "offset": 2107584,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh129",
+      "bounding box": {
+        "min": [
+          -89.1555,
+          517.223,
+          -305.695
+        ],
+        "max": [
+          -36.6429,
+          687.421,
+          -253.223
+        ]
+      },
+      "positions": {
+        "offset": 2107800,
+        "size": 8364
+      },
+      "normals": {
+        "offset": 2116164,
+        "size": 8364
+      },
+      "indices": {
+        "offset": 2124528,
+        "size": 14640
+      }
+    },
+    {
+      "name": "Mesh130",
+      "bounding box": {
+        "min": [
+          301.994,
+          661.125,
+          -305.934
+        ],
+        "max": [
+          308.87,
+          674.156,
+          -291.79
+        ]
+      },
+      "positions": {
+        "offset": 2139168,
+        "size": 600
+      },
+      "normals": {
+        "offset": 2139768,
+        "size": 600
+      },
+      "indices": {
+        "offset": 2140368,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh131",
+      "bounding box": {
+        "min": [
+          300.873,
+          674.124,
+          -308.942
+        ],
+        "max": [
+          310.098,
+          687.219,
+          -293.941
+        ]
+      },
+      "positions": {
+        "offset": 2140896,
+        "size": 264
+      },
+      "normals": {
+        "offset": 2141160,
+        "size": 264
+      },
+      "indices": {
+        "offset": 2141424,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh132",
+      "bounding box": {
+        "min": [
+          279.491,
+          661.125,
+          -283.549
+        ],
+        "max": [
+          293.635,
+          674.156,
+          -276.673
+        ]
+      },
+      "positions": {
+        "offset": 2141640,
+        "size": 600
+      },
+      "normals": {
+        "offset": 2142240,
+        "size": 600
+      },
+      "indices": {
+        "offset": 2142840,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh133",
+      "bounding box": {
+        "min": [
+          118.141,
+          831.655,
+          -270.83
+        ],
+        "max": [
+          125.871,
+          886.139,
+          -79.2371
+        ]
+      },
+      "positions": {
+        "offset": 2143368,
+        "size": 2172
+      },
+      "normals": {
+        "offset": 2145540,
+        "size": 2172
+      },
+      "indices": {
+        "offset": 2147712,
+        "size": 2712
+      }
+    },
+    {
+      "name": "Mesh134",
+      "bounding box": {
+        "min": [
+          278.1,
+          506.633,
+          -307.487
+        ],
+        "max": [
+          333.04,
+          517.402,
+          -252.536
+        ]
+      },
+      "positions": {
+        "offset": 2150424,
+        "size": 1596
+      },
+      "normals": {
+        "offset": 2152020,
+        "size": 1596
+      },
+      "indices": {
+        "offset": 2153616,
+        "size": 1992
+      }
+    },
+    {
+      "name": "Mesh135",
+      "bounding box": {
+        "min": [
+          -251.628,
+          831.655,
+          -270.83
+        ],
+        "max": [
+          -243.899,
+          886.139,
+          -79.2371
+        ]
+      },
+      "positions": {
+        "offset": 2155608,
+        "size": 2172
+      },
+      "normals": {
+        "offset": 2157780,
+        "size": 2172
+      },
+      "indices": {
+        "offset": 2159952,
+        "size": 2712
+      }
+    },
+    {
+      "name": "Mesh136",
+      "bounding box": {
+        "min": [
+          489.226,
+          831.655,
+          7.79774
+        ],
+        "max": [
+          496.955,
+          886.139,
+          199.391
+        ]
+      },
+      "positions": {
+        "offset": 2162664,
+        "size": 2172
+      },
+      "normals": {
+        "offset": 2164836,
+        "size": 2172
+      },
+      "indices": {
+        "offset": 2167008,
+        "size": 2712
+      }
+    },
+    {
+      "name": "Mesh137",
+      "bounding box": {
+        "min": [
+          319.391,
+          674.124,
+          -284.65
+        ],
+        "max": [
+          334.391,
+          687.219,
+          -275.425
+        ]
+      },
+      "positions": {
+        "offset": 2169720,
+        "size": 264
+      },
+      "normals": {
+        "offset": 2169984,
+        "size": 264
+      },
+      "indices": {
+        "offset": 2170248,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh138",
+      "bounding box": {
+        "min": [
+          -668.845,
+          274.96,
+          -289.704
+        ],
+        "max": [
+          -656.071,
+          294.114,
+          -269.044
+        ]
+      },
+      "positions": {
+        "offset": 2170464,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 2173356,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 2176248,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh139",
+      "bounding box": {
+        "min": [
+          835.216,
+          660.363,
+          -646.968
+        ],
+        "max": [
+          923.732,
+          695.323,
+          -631.352
+        ]
+      },
+      "positions": {
+        "offset": 2181720,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 2182800,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 2183880,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh140",
+      "bounding box": {
+        "min": [
+          -588.886,
+          279.881,
+          196.755
+        ],
+        "max": [
+          -279.009,
+          284.386,
+          201.259
+        ]
+      },
+      "positions": {
+        "offset": 2184936,
+        "size": 2340
+      },
+      "normals": {
+        "offset": 2187276,
+        "size": 2340
+      },
+      "indices": {
+        "offset": 2189616,
+        "size": 2304
+      }
+    },
+    {
+      "name": "Mesh141",
+      "bounding box": {
+        "min": [
+          -581.635,
+          274.96,
+          188.455
+        ],
+        "max": [
+          -568.861,
+          294.114,
+          209.115
+        ]
+      },
+      "positions": {
+        "offset": 2191920,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 2194812,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 2197704,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh142",
+      "bounding box": {
+        "min": [
+          -951.447,
+          274.96,
+          -289.704
+        ],
+        "max": [
+          -938.673,
+          294.114,
+          -269.044
+        ]
+      },
+      "positions": {
+        "offset": 2203176,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 2206068,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 2208960,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh143",
+      "bounding box": {
+        "min": [
+          -299.033,
+          274.96,
+          188.455
+        ],
+        "max": [
+          -286.259,
+          294.114,
+          209.115
+        ]
+      },
+      "positions": {
+        "offset": 2214432,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 2217324,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 2220216,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh144",
+      "bounding box": {
+        "min": [
+          -680.264,
+          -28.0496,
+          91.5013
+        ],
+        "max": [
+          -547.969,
+          222.716,
+          266.442
+        ]
+      },
+      "positions": {
+        "offset": 2225688,
+        "size": 42936
+      },
+      "normals": {
+        "offset": 2268624,
+        "size": 42936
+      },
+      "indices": {
+        "offset": 2311560,
+        "size": 57864
+      }
+    },
+    {
+      "name": "Mesh145",
+      "bounding box": {
+        "min": [
+          -958.698,
+          279.881,
+          -281.404
+        ],
+        "max": [
+          -648.821,
+          284.386,
+          -276.9
+        ]
+      },
+      "positions": {
+        "offset": 2369424,
+        "size": 2340
+      },
+      "normals": {
+        "offset": 2371764,
+        "size": 2340
+      },
+      "indices": {
+        "offset": 2374104,
+        "size": 2304
+      }
+    },
+    {
+      "name": "Mesh146",
+      "bounding box": {
+        "min": [
+          520.417,
+          279.881,
+          -281.404
+        ],
+        "max": [
+          830.294,
+          284.386,
+          -276.9
+        ]
+      },
+      "positions": {
+        "offset": 2376408,
+        "size": 2340
+      },
+      "normals": {
+        "offset": 2378748,
+        "size": 2340
+      },
+      "indices": {
+        "offset": 2381088,
+        "size": 2304
+      }
+    },
+    {
+      "name": "Mesh147",
+      "bounding box": {
+        "min": [
+          527.667,
+          274.96,
+          -289.704
+        ],
+        "max": [
+          540.441,
+          294.114,
+          -269.044
+        ]
+      },
+      "positions": {
+        "offset": 2383392,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 2386284,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 2389176,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh148",
+      "bounding box": {
+        "min": [
+          -653.2,
+          123.53,
+          -299.437
+        ],
+        "max": [
+          -587.934,
+          222.716,
+          -244.66
+        ]
+      },
+      "positions": {
+        "offset": 2394648,
+        "size": 18924
+      },
+      "normals": {
+        "offset": 2413572,
+        "size": 18924
+      },
+      "indices": {
+        "offset": 2432496,
+        "size": 26448
+      }
+    },
+    {
+      "name": "Mesh149",
+      "bounding box": {
+        "min": [
+          -668.845,
+          274.96,
+          188.455
+        ],
+        "max": [
+          -656.071,
+          294.114,
+          209.115
+        ]
+      },
+      "positions": {
+        "offset": 2458944,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 2461836,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 2464728,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh150",
+      "bounding box": {
+        "min": [
+          -958.698,
+          279.881,
+          196.755
+        ],
+        "max": [
+          -648.821,
+          284.386,
+          201.259
+        ]
+      },
+      "positions": {
+        "offset": 2470200,
+        "size": 2340
+      },
+      "normals": {
+        "offset": 2472540,
+        "size": 2340
+      },
+      "indices": {
+        "offset": 2474880,
+        "size": 2304
+      }
+    },
+    {
+      "name": "Mesh151",
+      "bounding box": {
+        "min": [
+          674.116,
+          661.125,
+          -305.934
+        ],
+        "max": [
+          680.993,
+          674.156,
+          -291.79
+        ]
+      },
+      "positions": {
+        "offset": 2477184,
+        "size": 600
+      },
+      "normals": {
+        "offset": 2477784,
+        "size": 600
+      },
+      "indices": {
+        "offset": 2478384,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh152",
+      "bounding box": {
+        "min": [
+          648.595,
+          674.124,
+          -284.65
+        ],
+        "max": [
+          663.596,
+          687.219,
+          -275.425
+        ]
+      },
+      "positions": {
+        "offset": 2478912,
+        "size": 264
+      },
+      "normals": {
+        "offset": 2479176,
+        "size": 264
+      },
+      "indices": {
+        "offset": 2479440,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh153",
+      "bounding box": {
+        "min": [
+          651.604,
+          661.125,
+          -283.529
+        ],
+        "max": [
+          665.748,
+          674.156,
+          -276.653
+        ]
+      },
+      "positions": {
+        "offset": 2479656,
+        "size": 600
+      },
+      "normals": {
+        "offset": 2480256,
+        "size": 600
+      },
+      "indices": {
+        "offset": 2480856,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh154",
+      "bounding box": {
+        "min": [
+          647.682,
+          687.191,
+          -309.705
+        ],
+        "max": [
+          707.475,
+          695.666,
+          -250.018
+        ]
+      },
+      "positions": {
+        "offset": 2481384,
+        "size": 2520
+      },
+      "normals": {
+        "offset": 2483904,
+        "size": 2520
+      },
+      "indices": {
+        "offset": 2486424,
+        "size": 3600
+      }
+    },
+    {
+      "name": "Mesh155",
+      "bounding box": {
+        "min": [
+          649.946,
+          506.633,
+          -307.487
+        ],
+        "max": [
+          704.886,
+          517.402,
+          -252.536
+        ]
+      },
+      "positions": {
+        "offset": 2490024,
+        "size": 1596
+      },
+      "normals": {
+        "offset": 2491620,
+        "size": 1596
+      },
+      "indices": {
+        "offset": 2493216,
+        "size": 1992
+      }
+    },
+    {
+      "name": "Mesh156",
+      "bounding box": {
+        "min": [
+          279.672,
+          517.223,
+          -306.5
+        ],
+        "max": [
+          332.184,
+          687.421,
+          -254.028
+        ]
+      },
+      "positions": {
+        "offset": 2495208,
+        "size": 8364
+      },
+      "normals": {
+        "offset": 2503572,
+        "size": 8364
+      },
+      "indices": {
+        "offset": 2511936,
+        "size": 14640
+      }
+    },
+    {
+      "name": "Mesh157",
+      "bounding box": {
+        "min": [
+          -1045.74,
+          413.911,
+          -310.135
+        ],
+        "max": [
+          914.801,
+          494.053,
+          238.68
+        ]
+      },
+      "positions": {
+        "offset": 2526576,
+        "size": 168
+      },
+      "normals": {
+        "offset": 2526744,
+        "size": 168
+      },
+      "indices": {
+        "offset": 2526912,
+        "size": 96
+      }
+    },
+    {
+      "name": "Mesh158",
+      "bounding box": {
+        "min": [
+          -998.518,
+          221.488,
+          -250.818
+        ],
+        "max": [
+          869.351,
+          495.69,
+          180.131
+        ]
+      },
+      "positions": {
+        "offset": 2527008,
+        "size": 1296
+      },
+      "normals": {
+        "offset": 2528304,
+        "size": 1296
+      },
+      "indices": {
+        "offset": 2529600,
+        "size": 1200
+      }
+    },
+    {
+      "name": "Mesh159",
+      "bounding box": {
+        "min": [
+          -1048.31,
+          492.989,
+          -318.106
+        ],
+        "max": [
+          917.684,
+          507.803,
+          243.558
+        ]
+      },
+      "positions": {
+        "offset": 2530800,
+        "size": 1920
+      },
+      "normals": {
+        "offset": 2532720,
+        "size": 1920
+      },
+      "indices": {
+        "offset": 2534640,
+        "size": 3360
+      }
+    },
+    {
+      "name": "Mesh160",
+      "bounding box": {
+        "min": [
+          449.563,
+          85.3714,
+          152.091
+        ],
+        "max": [
+          540.997,
+          210.943,
+          244.898
+        ]
+      },
+      "positions": {
+        "offset": 2538000,
+        "size": 33912
+      },
+      "normals": {
+        "offset": 2571912,
+        "size": 33912
+      },
+      "indices": {
+        "offset": 2605824,
+        "size": 43680
+      }
+    },
+    {
+      "name": "Mesh161",
+      "bounding box": {
+        "min": [
+          -271.255,
+          -0.140066,
+          -250.777
+        ],
+        "max": [
+          -219.324,
+          56.1995,
+          -198.788
+        ]
+      },
+      "positions": {
+        "offset": 2649504,
+        "size": 14376
+      },
+      "normals": {
+        "offset": 2663880,
+        "size": 14376
+      },
+      "indices": {
+        "offset": 2678256,
+        "size": 26532
+      }
+    },
+    {
+      "name": "Mesh162",
+      "bounding box": {
+        "min": [
+          -277.356,
+          46.0815,
+          -252.999
+        ],
+        "max": [
+          -209.13,
+          73.1236,
+          -189.043
+        ]
+      },
+      "positions": {
+        "offset": 2704788,
+        "size": 6396
+      },
+      "normals": {
+        "offset": 2711184,
+        "size": 6396
+      },
+      "indices": {
+        "offset": 2717580,
+        "size": 5616
+      }
+    },
+    {
+      "name": "Mesh163",
+      "bounding box": {
+        "min": [
+          -1424.66,
+          493.047,
+          -163.386
+        ],
+        "max": [
+          -1401.68,
+          758.553,
+          85.7052
+        ]
+      },
+      "positions": {
+        "offset": 2723196,
+        "size": 8964
+      },
+      "normals": {
+        "offset": 2732160,
+        "size": 8964
+      },
+      "indices": {
+        "offset": 2741124,
+        "size": 16344
+      }
+    },
+    {
+      "name": "Mesh164",
+      "bounding box": {
+        "min": [
+          -1429.45,
+          215.804,
+          -645.148
+        ],
+        "max": [
+          1302.2,
+          383.988,
+          574.903
+        ]
+      },
+      "positions": {
+        "offset": 2757468,
+        "size": 22128
+      },
+      "normals": {
+        "offset": 2779596,
+        "size": 22128
+      },
+      "indices": {
+        "offset": 2801724,
+        "size": 27984
+      }
+    },
+    {
+      "name": "Mesh165",
+      "bounding box": {
+        "min": [
+          -658.595,
+          -2.46074,
+          167.692
+        ],
+        "max": [
+          -581.841,
+          220.997,
+          244.57
+        ]
+      },
+      "positions": {
+        "offset": 2829708,
+        "size": 1812
+      },
+      "normals": {
+        "offset": 2831520,
+        "size": 1812
+      },
+      "indices": {
+        "offset": 2833332,
+        "size": 2184
+      }
+    },
+    {
+      "name": "Mesh166",
+      "bounding box": {
+        "min": [
+          691.503,
+          674.124,
+          -284.778
+        ],
+        "max": [
+          706.504,
+          687.219,
+          -275.552
+        ]
+      },
+      "positions": {
+        "offset": 2835516,
+        "size": 264
+      },
+      "normals": {
+        "offset": 2835780,
+        "size": 264
+      },
+      "indices": {
+        "offset": 2836044,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh167",
+      "bounding box": {
+        "min": [
+          674.107,
+          661.125,
+          -268.413
+        ],
+        "max": [
+          680.983,
+          674.156,
+          -254.269
+        ]
+      },
+      "positions": {
+        "offset": 2836260,
+        "size": 600
+      },
+      "normals": {
+        "offset": 2836860,
+        "size": 600
+      },
+      "indices": {
+        "offset": 2837460,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh168",
+      "bounding box": {
+        "min": [
+          -1035.69,
+          507.202,
+          -58.757
+        ],
+        "max": [
+          -988.116,
+          516.527,
+          -11.1718
+        ]
+      },
+      "positions": {
+        "offset": 2837988,
+        "size": 1596
+      },
+      "normals": {
+        "offset": 2839584,
+        "size": 1596
+      },
+      "indices": {
+        "offset": 2841180,
+        "size": 1992
+      }
+    },
+    {
+      "name": "Mesh169",
+      "bounding box": {
+        "min": [
+          -1037.65,
+          692.273,
+          -60.9373
+        ],
+        "max": [
+          -985.874,
+          699.612,
+          -9.25099
+        ]
+      },
+      "positions": {
+        "offset": 2843172,
+        "size": 2520
+      },
+      "normals": {
+        "offset": 2845692,
+        "size": 2520
+      },
+      "indices": {
+        "offset": 2848212,
+        "size": 3600
+      }
+    },
+    {
+      "name": "Mesh170",
+      "bounding box": {
+        "min": [
+          672.986,
+          674.124,
+          -266.261
+        ],
+        "max": [
+          682.211,
+          687.219,
+          -251.26
+        ]
+      },
+      "positions": {
+        "offset": 2851812,
+        "size": 264
+      },
+      "normals": {
+        "offset": 2852076,
+        "size": 264
+      },
+      "indices": {
+        "offset": 2852340,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh171",
+      "bounding box": {
+        "min": [
+          650.802,
+          517.223,
+          -306.5
+        ],
+        "max": [
+          703.315,
+          687.421,
+          -254.028
+        ]
+      },
+      "positions": {
+        "offset": 2852556,
+        "size": 8364
+      },
+      "normals": {
+        "offset": 2860920,
+        "size": 8364
+      },
+      "indices": {
+        "offset": 2869284,
+        "size": 14640
+      }
+    },
+    {
+      "name": "Mesh172",
+      "bounding box": {
+        "min": [
+          -1014.76,
+          669.7,
+          -24.7652
+        ],
+        "max": [
+          -1008.81,
+          680.985,
+          -12.517
+        ]
+      },
+      "positions": {
+        "offset": 2883924,
+        "size": 600
+      },
+      "normals": {
+        "offset": 2884524,
+        "size": 600
+      },
+      "indices": {
+        "offset": 2885124,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh173",
+      "bounding box": {
+        "min": [
+          -1015.83,
+          680.957,
+          -22.9017
+        ],
+        "max": [
+          -1007.84,
+          692.297,
+          -9.91199
+        ]
+      },
+      "positions": {
+        "offset": 2885652,
+        "size": 264
+      },
+      "normals": {
+        "offset": 2885916,
+        "size": 264
+      },
+      "indices": {
+        "offset": 2886180,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh174",
+      "bounding box": {
+        "min": [
+          -1034.26,
+          669.7,
+          -37.8728
+        ],
+        "max": [
+          -1022.01,
+          680.985,
+          -31.9181
+        ]
+      },
+      "positions": {
+        "offset": 2886396,
+        "size": 600
+      },
+      "normals": {
+        "offset": 2886996,
+        "size": 600
+      },
+      "indices": {
+        "offset": 2887596,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh175",
+      "bounding box": {
+        "min": [
+          -1036.86,
+          680.957,
+          -38.9362
+        ],
+        "max": [
+          -1023.87,
+          692.297,
+          -30.9478
+        ]
+      },
+      "positions": {
+        "offset": 2888124,
+        "size": 264
+      },
+      "normals": {
+        "offset": 2888388,
+        "size": 264
+      },
+      "indices": {
+        "offset": 2888652,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh176",
+      "bounding box": {
+        "min": [
+          -459.217,
+          661.124,
+          201.262
+        ],
+        "max": [
+          -445.073,
+          674.155,
+          208.139
+        ]
+      },
+      "positions": {
+        "offset": 2888868,
+        "size": 600
+      },
+      "normals": {
+        "offset": 2889468,
+        "size": 600
+      },
+      "indices": {
+        "offset": 2890068,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh177",
+      "bounding box": {
+        "min": [
+          -462.226,
+          674.124,
+          200.142
+        ],
+        "max": [
+          -447.225,
+          687.219,
+          209.367
+        ]
+      },
+      "positions": {
+        "offset": 2890596,
+        "size": 264
+      },
+      "normals": {
+        "offset": 2890860,
+        "size": 264
+      },
+      "indices": {
+        "offset": 2891124,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh178",
+      "bounding box": {
+        "min": [
+          -436.705,
+          661.124,
+          178.858
+        ],
+        "max": [
+          -429.829,
+          674.156,
+          193.002
+        ]
+      },
+      "positions": {
+        "offset": 2891340,
+        "size": 600
+      },
+      "normals": {
+        "offset": 2891940,
+        "size": 600
+      },
+      "indices": {
+        "offset": 2892540,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh179",
+      "bounding box": {
+        "min": [
+          -437.933,
+          674.124,
+          175.849
+        ],
+        "max": [
+          -428.708,
+          687.219,
+          190.85
+        ]
+      },
+      "positions": {
+        "offset": 2893068,
+        "size": 264
+      },
+      "normals": {
+        "offset": 2893332,
+        "size": 264
+      },
+      "indices": {
+        "offset": 2893596,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh180",
+      "bounding box": {
+        "min": [
+          877.541,
+          680.957,
+          -59.8615
+        ],
+        "max": [
+          885.529,
+          692.297,
+          -46.8718
+        ]
+      },
+      "positions": {
+        "offset": 2893812,
+        "size": 264
+      },
+      "normals": {
+        "offset": 2894076,
+        "size": 264
+      },
+      "indices": {
+        "offset": 2894340,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh181",
+      "bounding box": {
+        "min": [
+          858.331,
+          516.372,
+          -57.4644
+        ],
+        "max": [
+          903.804,
+          692.472,
+          -12.0262
+        ]
+      },
+      "positions": {
+        "offset": 2894556,
+        "size": 8364
+      },
+      "normals": {
+        "offset": 2902920,
+        "size": 8364
+      },
+      "indices": {
+        "offset": 2911284,
+        "size": 14640
+      }
+    },
+    {
+      "name": "Mesh182",
+      "bounding box": {
+        "min": [
+          -460.875,
+          506.633,
+          177.304
+        ],
+        "max": [
+          -405.935,
+          517.401,
+          232.256
+        ]
+      },
+      "positions": {
+        "offset": 2925924,
+        "size": 1596
+      },
+      "normals": {
+        "offset": 2927520,
+        "size": 1596
+      },
+      "indices": {
+        "offset": 2929116,
+        "size": 1992
+      }
+    },
+    {
+      "name": "Mesh183",
+      "bounding box": {
+        "min": [
+          -463.139,
+          687.191,
+          175.086
+        ],
+        "max": [
+          -403.346,
+          695.666,
+          234.773
+        ]
+      },
+      "positions": {
+        "offset": 2931108,
+        "size": 2520
+      },
+      "normals": {
+        "offset": 2933628,
+        "size": 2520
+      },
+      "indices": {
+        "offset": 2936148,
+        "size": 3600
+      }
+    },
+    {
+      "name": "Mesh184",
+      "bounding box": {
+        "min": [
+          893.576,
+          680.957,
+          -38.8257
+        ],
+        "max": [
+          906.566,
+          692.297,
+          -30.8372
+        ]
+      },
+      "positions": {
+        "offset": 2939748,
+        "size": 264
+      },
+      "normals": {
+        "offset": 2940012,
+        "size": 264
+      },
+      "indices": {
+        "offset": 2940276,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh185",
+      "bounding box": {
+        "min": [
+          878.511,
+          669.7,
+          -57.2564
+        ],
+        "max": [
+          884.466,
+          680.985,
+          -45.0083
+        ]
+      },
+      "positions": {
+        "offset": 2940492,
+        "size": 600
+      },
+      "normals": {
+        "offset": 2941092,
+        "size": 600
+      },
+      "indices": {
+        "offset": 2941692,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh186",
+      "bounding box": {
+        "min": [
+          -1041.23,
+          211.395,
+          -305.538
+        ],
+        "max": [
+          912.848,
+          410.405,
+          233.326
+        ]
+      },
+      "positions": {
+        "offset": 2942220,
+        "size": 23400
+      },
+      "normals": {
+        "offset": 2965620,
+        "size": 23400
+      },
+      "indices": {
+        "offset": 2989020,
+        "size": 34752
+      }
+    },
+    {
+      "name": "Mesh187",
+      "bounding box": {
+        "min": [
+          452.187,
+          -2.46066,
+          -316.517
+        ],
+        "max": [
+          528.941,
+          220.997,
+          -239.639
+        ]
+      },
+      "positions": {
+        "offset": 3023772,
+        "size": 1812
+      },
+      "normals": {
+        "offset": 3025584,
+        "size": 1812
+      },
+      "indices": {
+        "offset": 3027396,
+        "size": 2184
+      }
+    },
+    {
+      "name": "Mesh188",
+      "bounding box": {
+        "min": [
+          83.2853,
+          -2.46066,
+          -316.869
+        ],
+        "max": [
+          160.039,
+          220.997,
+          -239.991
+        ]
+      },
+      "positions": {
+        "offset": 3029580,
+        "size": 1812
+      },
+      "normals": {
+        "offset": 3031392,
+        "size": 1812
+      },
+      "indices": {
+        "offset": 3033204,
+        "size": 2184
+      }
+    },
+    {
+      "name": "Mesh189",
+      "bounding box": {
+        "min": [
+          -284.582,
+          -2.46066,
+          -316.495
+        ],
+        "max": [
+          -207.704,
+          220.997,
+          -239.741
+        ]
+      },
+      "positions": {
+        "offset": 3035388,
+        "size": 1812
+      },
+      "normals": {
+        "offset": 3037200,
+        "size": 1812
+      },
+      "indices": {
+        "offset": 3039012,
+        "size": 2184
+      }
+    },
+    {
+      "name": "Mesh190",
+      "bounding box": {
+        "min": [
+          -658.344,
+          -2.46066,
+          -316.767
+        ],
+        "max": [
+          -581.466,
+          220.997,
+          -240.013
+        ]
+      },
+      "positions": {
+        "offset": 3041196,
+        "size": 1812
+      },
+      "normals": {
+        "offset": 3043008,
+        "size": 1812
+      },
+      "indices": {
+        "offset": 3044820,
+        "size": 2184
+      }
+    },
+    {
+      "name": "Mesh191",
+      "bounding box": {
+        "min": [
+          451.916,
+          -2.46074,
+          167.692
+        ],
+        "max": [
+          528.67,
+          220.997,
+          244.57
+        ]
+      },
+      "positions": {
+        "offset": 3047004,
+        "size": 1812
+      },
+      "normals": {
+        "offset": 3048816,
+        "size": 1812
+      },
+      "indices": {
+        "offset": 3050628,
+        "size": 2184
+      }
+    },
+    {
+      "name": "Mesh192",
+      "bounding box": {
+        "min": [
+          83.5356,
+          -2.46074,
+          167.714
+        ],
+        "max": [
+          160.414,
+          220.997,
+          244.468
+        ]
+      },
+      "positions": {
+        "offset": 3052812,
+        "size": 1812
+      },
+      "normals": {
+        "offset": 3054624,
+        "size": 1812
+      },
+      "indices": {
+        "offset": 3056436,
+        "size": 2184
+      }
+    },
+    {
+      "name": "Mesh193",
+      "bounding box": {
+        "min": [
+          -284.583,
+          -2.46074,
+          167.442
+        ],
+        "max": [
+          -207.704,
+          220.997,
+          244.196
+        ]
+      },
+      "positions": {
+        "offset": 3058620,
+        "size": 1812
+      },
+      "normals": {
+        "offset": 3060432,
+        "size": 1812
+      },
+      "indices": {
+        "offset": 3062244,
+        "size": 2184
+      }
+    },
+    {
+      "name": "Mesh194",
+      "bounding box": {
+        "min": [
+          -1429.45,
+          694.467,
+          -645.148
+        ],
+        "max": [
+          1302.2,
+          862.652,
+          574.903
+        ]
+      },
+      "positions": {
+        "offset": 3064428,
+        "size": 22128
+      },
+      "normals": {
+        "offset": 3086556,
+        "size": 22128
+      },
+      "indices": {
+        "offset": 3108684,
+        "size": 27984
+      }
+    },
+    {
+      "name": "Mesh195",
+      "bounding box": {
+        "min": [
+          -1432.22,
+          415.53,
+          -645.431
+        ],
+        "max": [
+          1302.22,
+          415.53,
+          574.185
+        ]
+      },
+      "positions": {
+        "offset": 3136668,
+        "size": 192
+      },
+      "normals": {
+        "offset": 3136860,
+        "size": 192
+      },
+      "indices": {
+        "offset": 3137052,
+        "size": 192
+      }
+    },
+    {
+      "name": "Mesh196",
+      "bounding box": {
+        "min": [
+          891.712,
+          669.7,
+          -37.8553
+        ],
+        "max": [
+          903.961,
+          680.985,
+          -31.9007
+        ]
+      },
+      "positions": {
+        "offset": 3137244,
+        "size": 600
+      },
+      "normals": {
+        "offset": 3137844,
+        "size": 600
+      },
+      "indices": {
+        "offset": 3138444,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh197",
+      "bounding box": {
+        "min": [
+          877.456,
+          680.957,
+          -22.9017
+        ],
+        "max": [
+          885.445,
+          692.297,
+          -9.91199
+        ]
+      },
+      "positions": {
+        "offset": 3138972,
+        "size": 264
+      },
+      "normals": {
+        "offset": 3139236,
+        "size": 264
+      },
+      "indices": {
+        "offset": 3139500,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh198",
+      "bounding box": {
+        "min": [
+          878.519,
+          669.7,
+          -24.7652
+        ],
+        "max": [
+          884.474,
+          680.985,
+          -12.517
+        ]
+      },
+      "positions": {
+        "offset": 3139716,
+        "size": 600
+      },
+      "normals": {
+        "offset": 3140316,
+        "size": 600
+      },
+      "indices": {
+        "offset": 3140916,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh199",
+      "bounding box": {
+        "min": [
+          856.42,
+          680.957,
+          -38.9362
+        ],
+        "max": [
+          869.409,
+          692.297,
+          -30.9478
+        ]
+      },
+      "positions": {
+        "offset": 3141444,
+        "size": 264
+      },
+      "normals": {
+        "offset": 3141708,
+        "size": 264
+      },
+      "indices": {
+        "offset": 3141972,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh200",
+      "bounding box": {
+        "min": [
+          859.025,
+          669.7,
+          -37.8728
+        ],
+        "max": [
+          871.273,
+          680.985,
+          -31.9181
+        ]
+      },
+      "positions": {
+        "offset": 3142188,
+        "size": 600
+      },
+      "normals": {
+        "offset": 3142788,
+        "size": 600
+      },
+      "indices": {
+        "offset": 3143388,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh201",
+      "bounding box": {
+        "min": [
+          855.629,
+          692.273,
+          -60.9373
+        ],
+        "max": [
+          907.407,
+          699.612,
+          -9.25099
+        ]
+      },
+      "positions": {
+        "offset": 3143916,
+        "size": 2520
+      },
+      "normals": {
+        "offset": 3146436,
+        "size": 2520
+      },
+      "indices": {
+        "offset": 3148956,
+        "size": 3600
+      }
+    },
+    {
+      "name": "Mesh202",
+      "bounding box": {
+        "min": [
+          857.59,
+          507.202,
+          -58.757
+        ],
+        "max": [
+          905.165,
+          516.527,
+          -11.1718
+        ]
+      },
+      "positions": {
+        "offset": 3152556,
+        "size": 1596
+      },
+      "normals": {
+        "offset": 3154152,
+        "size": 1596
+      },
+      "indices": {
+        "offset": 3155748,
+        "size": 1992
+      }
+    },
+    {
+      "name": "Mesh203",
+      "bounding box": {
+        "min": [
+          -119.407,
+          256.731,
+          568.658
+        ],
+        "max": [
+          -8.2629,
+          348.197,
+          575.505
+        ]
+      },
+      "positions": {
+        "offset": 3157740,
+        "size": 192
+      },
+      "normals": {
+        "offset": 3157932,
+        "size": 192
+      },
+      "indices": {
+        "offset": 3158124,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh204",
+      "bounding box": {
+        "min": [
+          -1086.42,
+          907.744,
+          -408.147
+        ],
+        "max": [
+          997.596,
+          1330.77,
+          318.901
+        ]
+      },
+      "positions": {
+        "offset": 3158340,
+        "size": 1152
+      },
+      "normals": {
+        "offset": 3159492,
+        "size": 1152
+      },
+      "indices": {
+        "offset": 3160644,
+        "size": 768
+      }
+    },
+    {
+      "name": "Mesh205",
+      "bounding box": {
+        "min": [
+          489.226,
+          831.655,
+          -270.83
+        ],
+        "max": [
+          496.955,
+          886.139,
+          -79.2371
+        ]
+      },
+      "positions": {
+        "offset": 3161412,
+        "size": 2172
+      },
+      "normals": {
+        "offset": 3163584,
+        "size": 2172
+      },
+      "indices": {
+        "offset": 3165756,
+        "size": 2712
+      }
+    },
+    {
+      "name": "Mesh206",
+      "bounding box": {
+        "min": [
+          -999.705,
+          680.957,
+          -38.8257
+        ],
+        "max": [
+          -986.715,
+          692.297,
+          -30.8372
+        ]
+      },
+      "positions": {
+        "offset": 3168468,
+        "size": 264
+      },
+      "normals": {
+        "offset": 3168732,
+        "size": 264
+      },
+      "indices": {
+        "offset": 3168996,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh207",
+      "bounding box": {
+        "min": [
+          -1001.57,
+          669.7,
+          -37.8553
+        ],
+        "max": [
+          -989.32,
+          680.985,
+          -31.9007
+        ]
+      },
+      "positions": {
+        "offset": 3169212,
+        "size": 600
+      },
+      "normals": {
+        "offset": 3169812,
+        "size": 600
+      },
+      "indices": {
+        "offset": 3170412,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh208",
+      "bounding box": {
+        "min": [
+          -620.245,
+          134.411,
+          141.555
+        ],
+        "max": [
+          -594.407,
+          213.695,
+          145.128
+        ]
+      },
+      "positions": {
+        "offset": 3170940,
+        "size": 48
+      },
+      "normals": {
+        "offset": 3170988,
+        "size": 48
+      },
+      "indices": {
+        "offset": 3171036,
+        "size": 24
+      }
+    },
+    {
+      "name": "Mesh209",
+      "bounding box": {
+        "min": [
+          -479.031,
+          927.363,
+          -274.778
+        ],
+        "max": [
+          -388.701,
+          1014.47,
+          -241.31
+        ]
+      },
+      "positions": {
+        "offset": 3171060,
+        "size": 360
+      },
+      "normals": {
+        "offset": 3171420,
+        "size": 360
+      },
+      "indices": {
+        "offset": 3171780,
+        "size": 480
+      }
+    },
+    {
+      "name": "Mesh210",
+      "bounding box": {
+        "min": [
+          -106.846,
+          927.363,
+          -274.778
+        ],
+        "max": [
+          -16.5163,
+          1014.47,
+          -241.31
+        ]
+      },
+      "positions": {
+        "offset": 3172260,
+        "size": 360
+      },
+      "normals": {
+        "offset": 3172620,
+        "size": 360
+      },
+      "indices": {
+        "offset": 3172980,
+        "size": 480
+      }
+    },
+    {
+      "name": "Mesh211",
+      "bounding box": {
+        "min": [
+          -1030.05,
+          921.729,
+          -79.3526
+        ],
+        "max": [
+          -996.586,
+          1008.84,
+          10.977
+        ]
+      },
+      "positions": {
+        "offset": 3173460,
+        "size": 360
+      },
+      "normals": {
+        "offset": 3173820,
+        "size": 360
+      },
+      "indices": {
+        "offset": 3174180,
+        "size": 480
+      }
+    },
+    {
+      "name": "Mesh212",
+      "bounding box": {
+        "min": [
+          -850.057,
+          927.363,
+          -274.778
+        ],
+        "max": [
+          -759.728,
+          1014.47,
+          -241.31
+        ]
+      },
+      "positions": {
+        "offset": 3174660,
+        "size": 360
+      },
+      "normals": {
+        "offset": 3175020,
+        "size": 360
+      },
+      "indices": {
+        "offset": 3175380,
+        "size": 480
+      }
+    },
+    {
+      "name": "Mesh213",
+      "bounding box": {
+        "min": [
+          -1086.42,
+          907.744,
+          -408.147
+        ],
+        "max": [
+          997.596,
+          1314.49,
+          318.901
+        ]
+      },
+      "positions": {
+        "offset": 3175860,
+        "size": 624
+      },
+      "normals": {
+        "offset": 3176484,
+        "size": 624
+      },
+      "indices": {
+        "offset": 3177108,
+        "size": 384
+      }
+    },
+    {
+      "name": "Mesh214",
+      "bounding box": {
+        "min": [
+          -1048.31,
+          915.451,
+          -318.106
+        ],
+        "max": [
+          917.684,
+          930.266,
+          243.558
+        ]
+      },
+      "positions": {
+        "offset": 3177492,
+        "size": 1920
+      },
+      "normals": {
+        "offset": 3179412,
+        "size": 1920
+      },
+      "indices": {
+        "offset": 3181332,
+        "size": 3360
+      }
+    },
+    {
+      "name": "Mesh215",
+      "bounding box": {
+        "min": [
+          260.613,
+          927.363,
+          -274.778
+        ],
+        "max": [
+          350.943,
+          1014.47,
+          -241.31
+        ]
+      },
+      "positions": {
+        "offset": 3184692,
+        "size": 360
+      },
+      "normals": {
+        "offset": 3185052,
+        "size": 360
+      },
+      "indices": {
+        "offset": 3185412,
+        "size": 480
+      }
+    },
+    {
+      "name": "Mesh216",
+      "bounding box": {
+        "min": [
+          631.49,
+          927.363,
+          -274.778
+        ],
+        "max": [
+          721.82,
+          1014.47,
+          -241.31
+        ]
+      },
+      "positions": {
+        "offset": 3185892,
+        "size": 360
+      },
+      "normals": {
+        "offset": 3186252,
+        "size": 360
+      },
+      "indices": {
+        "offset": 3186612,
+        "size": 480
+      }
+    },
+    {
+      "name": "Mesh217",
+      "bounding box": {
+        "min": [
+          -1431.2,
+          415.53,
+          -640.633
+        ],
+        "max": [
+          1302.22,
+          867.387,
+          574.706
+        ]
+      },
+      "positions": {
+        "offset": 3187092,
+        "size": 240
+      },
+      "normals": {
+        "offset": 3187332,
+        "size": 240
+      },
+      "indices": {
+        "offset": 3187572,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh218",
+      "bounding box": {
+        "min": [
+          -1428.52,
+          -2.62019,
+          -644.311
+        ],
+        "max": [
+          1302.19,
+          403.448,
+          574.03
+        ]
+      },
+      "positions": {
+        "offset": 3187788,
+        "size": 408
+      },
+      "normals": {
+        "offset": 3188196,
+        "size": 408
+      },
+      "indices": {
+        "offset": 3188604,
+        "size": 432
+      }
+    },
+    {
+      "name": "Mesh219",
+      "bounding box": {
+        "min": [
+          -809.411,
+          674.124,
+          176.328
+        ],
+        "max": [
+          -800.186,
+          687.219,
+          191.329
+        ]
+      },
+      "positions": {
+        "offset": 3189036,
+        "size": 264
+      },
+      "normals": {
+        "offset": 3189300,
+        "size": 264
+      },
+      "indices": {
+        "offset": 3189564,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh220",
+      "bounding box": {
+        "min": [
+          462.835,
+          134.412,
+          -221.487
+        ],
+        "max": [
+          488.673,
+          213.695,
+          -217.914
+        ]
+      },
+      "positions": {
+        "offset": 3189780,
+        "size": 48
+      },
+      "normals": {
+        "offset": 3189828,
+        "size": 48
+      },
+      "indices": {
+        "offset": 3189876,
+        "size": 24
+      }
+    },
+    {
+      "name": "Mesh221",
+      "bounding box": {
+        "min": [
+          -831.595,
+          517.223,
+          179.097
+        ],
+        "max": [
+          -779.083,
+          687.421,
+          231.569
+        ]
+      },
+      "positions": {
+        "offset": 3189900,
+        "size": 8364
+      },
+      "normals": {
+        "offset": 3198264,
+        "size": 8364
+      },
+      "indices": {
+        "offset": 3206628,
+        "size": 14640
+      }
+    },
+    {
+      "name": "Mesh222",
+      "bounding box": {
+        "min": [
+          -790.894,
+          674.124,
+          200.621
+        ],
+        "max": [
+          -775.893,
+          687.219,
+          209.846
+        ]
+      },
+      "positions": {
+        "offset": 3221268,
+        "size": 264
+      },
+      "normals": {
+        "offset": 3221532,
+        "size": 264
+      },
+      "indices": {
+        "offset": 3221796,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh223",
+      "bounding box": {
+        "min": [
+          461.958,
+          133.721,
+          143.342
+        ],
+        "max": [
+          489.538,
+          214.133,
+          143.342
+        ]
+      },
+      "positions": {
+        "offset": 3222012,
+        "size": 48
+      },
+      "normals": {
+        "offset": 3222060,
+        "size": 48
+      },
+      "indices": {
+        "offset": 3222108,
+        "size": 24
+      }
+    },
+    {
+      "name": "Mesh224",
+      "bounding box": {
+        "min": [
+          486.192,
+          133.751,
+          143.342
+        ],
+        "max": [
+          513.361,
+          214.355,
+          143.342
+        ]
+      },
+      "positions": {
+        "offset": 3222132,
+        "size": 48
+      },
+      "normals": {
+        "offset": 3222180,
+        "size": 48
+      },
+      "indices": {
+        "offset": 3222228,
+        "size": 24
+      }
+    },
+    {
+      "name": "Mesh225",
+      "bounding box": {
+        "min": [
+          -808.291,
+          661.124,
+          179.337
+        ],
+        "max": [
+          -801.414,
+          674.156,
+          193.481
+        ]
+      },
+      "positions": {
+        "offset": 3222252,
+        "size": 600
+      },
+      "normals": {
+        "offset": 3222852,
+        "size": 600
+      },
+      "indices": {
+        "offset": 3223452,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh226",
+      "bounding box": {
+        "min": [
+          -599.394,
+          111.898,
+          141.217
+        ],
+        "max": [
+          -584.224,
+          137.188,
+          145.467
+        ]
+      },
+      "positions": {
+        "offset": 3223980,
+        "size": 7488
+      },
+      "normals": {
+        "offset": 3231468,
+        "size": 7488
+      },
+      "indices": {
+        "offset": 3238956,
+        "size": 14928
+      }
+    },
+    {
+      "name": "Mesh227",
+      "bounding box": {
+        "min": [
+          -654.184,
+          111.898,
+          141.217
+        ],
+        "max": [
+          -639.014,
+          137.188,
+          145.467
+        ]
+      },
+      "positions": {
+        "offset": 3253884,
+        "size": 7488
+      },
+      "normals": {
+        "offset": 3261372,
+        "size": 7488
+      },
+      "indices": {
+        "offset": 3268860,
+        "size": 14928
+      }
+    },
+    {
+      "name": "Mesh228",
+      "bounding box": {
+        "min": [
+          463.393,
+          134.157,
+          141.555
+        ],
+        "max": [
+          488.103,
+          213.697,
+          145.128
+        ]
+      },
+      "positions": {
+        "offset": 3283788,
+        "size": 48
+      },
+      "normals": {
+        "offset": 3283836,
+        "size": 48
+      },
+      "indices": {
+        "offset": 3283884,
+        "size": 24
+      }
+    },
+    {
+      "name": "Mesh229",
+      "bounding box": {
+        "min": [
+          -620.671,
+          207.454,
+          135.242
+        ],
+        "max": [
+          -617.298,
+          216.951,
+          170.476
+        ]
+      },
+      "positions": {
+        "offset": 3283908,
+        "size": 1668
+      },
+      "normals": {
+        "offset": 3285576,
+        "size": 1668
+      },
+      "indices": {
+        "offset": 3287244,
+        "size": 3240
+      }
+    },
+    {
+      "name": "Mesh230",
+      "bounding box": {
+        "min": [
+          -51.5886,
+          661.124,
+          201.721
+        ],
+        "max": [
+          -37.4444,
+          674.155,
+          208.598
+        ]
+      },
+      "positions": {
+        "offset": 3290484,
+        "size": 600
+      },
+      "normals": {
+        "offset": 3291084,
+        "size": 600
+      },
+      "indices": {
+        "offset": 3291684,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh231",
+      "bounding box": {
+        "min": [
+          -644.878,
+          133.721,
+          143.342
+        ],
+        "max": [
+          -617.299,
+          214.133,
+          143.342
+        ]
+      },
+      "positions": {
+        "offset": 3292212,
+        "size": 48
+      },
+      "normals": {
+        "offset": 3292260,
+        "size": 48
+      },
+      "indices": {
+        "offset": 3292308,
+        "size": 24
+      }
+    },
+    {
+      "name": "Mesh232",
+      "bounding box": {
+        "min": [
+          -622.327,
+          98.6729,
+          140.061
+        ],
+        "max": [
+          -615.649,
+          104.802,
+          146.732
+        ]
+      },
+      "positions": {
+        "offset": 3292332,
+        "size": 3840
+      },
+      "normals": {
+        "offset": 3296172,
+        "size": 3840
+      },
+      "indices": {
+        "offset": 3300012,
+        "size": 6696
+      }
+    },
+    {
+      "name": "Mesh233",
+      "bounding box": {
+        "min": [
+          -644.39,
+          104.802,
+          117.966
+        ],
+        "max": [
+          -593.579,
+          128.146,
+          168.72
+        ]
+      },
+      "positions": {
+        "offset": 3306708,
+        "size": 10752
+      },
+      "normals": {
+        "offset": 3317460,
+        "size": 10752
+      },
+      "indices": {
+        "offset": 3328212,
+        "size": 19692
+      }
+    },
+    {
+      "name": "Mesh234",
+      "bounding box": {
+        "min": [
+          -1430.31,
+          182.652,
+          -310.059
+        ],
+        "max": [
+          -1414.69,
+          217.612,
+          -221.544
+        ]
+      },
+      "positions": {
+        "offset": 3347904,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 3348984,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 3350064,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh235",
+      "bounding box": {
+        "min": [
+          -217.397,
+          279.881,
+          -281.404
+        ],
+        "max": [
+          92.4797,
+          284.386,
+          -276.9
+        ]
+      },
+      "positions": {
+        "offset": 3351120,
+        "size": 2340
+      },
+      "normals": {
+        "offset": 3353460,
+        "size": 2340
+      },
+      "indices": {
+        "offset": 3355800,
+        "size": 2304
+      }
+    },
+    {
+      "name": "Mesh236",
+      "bounding box": {
+        "min": [
+          835.216,
+          182.652,
+          -646.968
+        ],
+        "max": [
+          923.732,
+          217.612,
+          -631.352
+        ]
+      },
+      "positions": {
+        "offset": 3358104,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 3359184,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 3360264,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh237",
+      "bounding box": {
+        "min": [
+          -93.3161,
+          687.191,
+          -309.705
+        ],
+        "max": [
+          -33.5233,
+          695.666,
+          -250.018
+        ]
+      },
+      "positions": {
+        "offset": 3361320,
+        "size": 2520
+      },
+      "normals": {
+        "offset": 3363840,
+        "size": 2520
+      },
+      "indices": {
+        "offset": 3366360,
+        "size": 3600
+      }
+    },
+    {
+      "name": "Mesh238",
+      "bounding box": {
+        "min": [
+          462.665,
+          182.652,
+          -646.968
+        ],
+        "max": [
+          523.368,
+          217.612,
+          -631.352
+        ]
+      },
+      "positions": {
+        "offset": 3369960,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 3371040,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 3372120,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh239",
+      "bounding box": {
+        "min": [
+          442.375,
+          274.96,
+          -289.704
+        ],
+        "max": [
+          455.149,
+          294.114,
+          -269.044
+        ]
+      },
+      "positions": {
+        "offset": 3373176,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 3376068,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 3378960,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh240",
+      "bounding box": {
+        "min": [
+          -49.4366,
+          674.124,
+          -284.298
+        ],
+        "max": [
+          -34.436,
+          687.219,
+          -275.073
+        ]
+      },
+      "positions": {
+        "offset": 3384432,
+        "size": 264
+      },
+      "normals": {
+        "offset": 3384696,
+        "size": 264
+      },
+      "indices": {
+        "offset": 3384960,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh241",
+      "bounding box": {
+        "min": [
+          648.595,
+          674.124,
+          200.142
+        ],
+        "max": [
+          663.596,
+          687.219,
+          209.367
+        ]
+      },
+      "positions": {
+        "offset": 3385176,
+        "size": 264
+      },
+      "normals": {
+        "offset": 3385440,
+        "size": 264
+      },
+      "indices": {
+        "offset": 3385704,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh242",
+      "bounding box": {
+        "min": [
+          674.116,
+          661.124,
+          178.858
+        ],
+        "max": [
+          680.993,
+          674.156,
+          193.002
+        ]
+      },
+      "positions": {
+        "offset": 3385920,
+        "size": 600
+      },
+      "normals": {
+        "offset": 3386520,
+        "size": 600
+      },
+      "indices": {
+        "offset": 3387120,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh243",
+      "bounding box": {
+        "min": [
+          672.888,
+          674.124,
+          175.849
+        ],
+        "max": [
+          682.113,
+          687.219,
+          190.85
+        ]
+      },
+      "positions": {
+        "offset": 3387648,
+        "size": 264
+      },
+      "normals": {
+        "offset": 3387912,
+        "size": 264
+      },
+      "indices": {
+        "offset": 3388176,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh244",
+      "bounding box": {
+        "min": [
+          689.351,
+          661.124,
+          201.242
+        ],
+        "max": [
+          703.496,
+          674.155,
+          208.118
+        ]
+      },
+      "positions": {
+        "offset": 3388392,
+        "size": 600
+      },
+      "normals": {
+        "offset": 3388992,
+        "size": 600
+      },
+      "indices": {
+        "offset": 3389592,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh245",
+      "bounding box": {
+        "min": [
+          691.503,
+          674.124,
+          200.014
+        ],
+        "max": [
+          706.504,
+          687.219,
+          209.239
+        ]
+      },
+      "positions": {
+        "offset": 3390120,
+        "size": 264
+      },
+      "normals": {
+        "offset": 3390384,
+        "size": 264
+      },
+      "indices": {
+        "offset": 3390648,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh246",
+      "bounding box": {
+        "min": [
+          674.107,
+          661.124,
+          216.379
+        ],
+        "max": [
+          680.983,
+          674.155,
+          230.523
+        ]
+      },
+      "positions": {
+        "offset": 3390864,
+        "size": 600
+      },
+      "normals": {
+        "offset": 3391464,
+        "size": 600
+      },
+      "indices": {
+        "offset": 3392064,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh247",
+      "bounding box": {
+        "min": [
+          672.986,
+          674.124,
+          218.531
+        ],
+        "max": [
+          682.211,
+          687.219,
+          233.531
+        ]
+      },
+      "positions": {
+        "offset": 3392592,
+        "size": 264
+      },
+      "normals": {
+        "offset": 3392856,
+        "size": 264
+      },
+      "indices": {
+        "offset": 3393120,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh248",
+      "bounding box": {
+        "min": [
+          650.802,
+          517.223,
+          178.291
+        ],
+        "max": [
+          703.315,
+          687.421,
+          230.763
+        ]
+      },
+      "positions": {
+        "offset": 3393336,
+        "size": 8364
+      },
+      "normals": {
+        "offset": 3401700,
+        "size": 8364
+      },
+      "indices": {
+        "offset": 3410064,
+        "size": 14640
+      }
+    },
+    {
+      "name": "Mesh249",
+      "bounding box": {
+        "min": [
+          -460.875,
+          506.633,
+          -307.487
+        ],
+        "max": [
+          -405.935,
+          517.402,
+          -252.536
+        ]
+      },
+      "positions": {
+        "offset": 3424704,
+        "size": 1596
+      },
+      "normals": {
+        "offset": 3426300,
+        "size": 1596
+      },
+      "indices": {
+        "offset": 3427896,
+        "size": 1992
+      }
+    },
+    {
+      "name": "Mesh250",
+      "bounding box": {
+        "min": [
+          -588.886,
+          279.881,
+          -281.404
+        ],
+        "max": [
+          -279.009,
+          284.386,
+          -276.9
+        ]
+      },
+      "positions": {
+        "offset": 3429888,
+        "size": 2340
+      },
+      "normals": {
+        "offset": 3432228,
+        "size": 2340
+      },
+      "indices": {
+        "offset": 3434568,
+        "size": 2304
+      }
+    },
+    {
+      "name": "Mesh251",
+      "bounding box": {
+        "min": [
+          -581.635,
+          274.96,
+          -289.704
+        ],
+        "max": [
+          -568.861,
+          294.114,
+          -269.044
+        ]
+      },
+      "positions": {
+        "offset": 3436872,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 3439764,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 3442656,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh252",
+      "bounding box": {
+        "min": [
+          72.4553,
+          274.96,
+          -289.704
+        ],
+        "max": [
+          85.2291,
+          294.114,
+          -269.044
+        ]
+      },
+      "positions": {
+        "offset": 3448128,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 3451020,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 3453912,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh253",
+      "bounding box": {
+        "min": [
+          462.665,
+          182.652,
+          559.872
+        ],
+        "max": [
+          523.368,
+          217.612,
+          575.488
+        ]
+      },
+      "positions": {
+        "offset": 3459384,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 3460464,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 3461544,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh254",
+      "bounding box": {
+        "min": [
+          835.216,
+          182.652,
+          559.872
+        ],
+        "max": [
+          923.732,
+          217.612,
+          575.488
+        ]
+      },
+      "positions": {
+        "offset": 3462600,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 3463680,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 3464760,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh255",
+      "bounding box": {
+        "min": [
+          -419.318,
+          674.124,
+          200.014
+        ],
+        "max": [
+          -404.317,
+          687.219,
+          209.239
+        ]
+      },
+      "positions": {
+        "offset": 3465816,
+        "size": 264
+      },
+      "normals": {
+        "offset": 3466080,
+        "size": 264
+      },
+      "indices": {
+        "offset": 3466344,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh256",
+      "bounding box": {
+        "min": [
+          -421.47,
+          661.124,
+          201.242
+        ],
+        "max": [
+          -407.326,
+          674.155,
+          208.118
+        ]
+      },
+      "positions": {
+        "offset": 3466560,
+        "size": 600
+      },
+      "normals": {
+        "offset": 3467160,
+        "size": 600
+      },
+      "indices": {
+        "offset": 3467760,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh257",
+      "bounding box": {
+        "min": [
+          -649.721,
+          182.652,
+          559.872
+        ],
+        "max": [
+          -589.018,
+          217.612,
+          575.488
+        ]
+      },
+      "positions": {
+        "offset": 3468288,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 3469368,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 3470448,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh258",
+      "bounding box": {
+        "min": [
+          -1049.05,
+          182.652,
+          559.872
+        ],
+        "max": [
+          -962.745,
+          217.612,
+          575.488
+        ]
+      },
+      "positions": {
+        "offset": 3471504,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 3472584,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 3473664,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh259",
+      "bounding box": {
+        "min": [
+          -278.647,
+          182.652,
+          559.872
+        ],
+        "max": [
+          -217.943,
+          217.612,
+          575.488
+        ]
+      },
+      "positions": {
+        "offset": 3474720,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 3475800,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 3476880,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh260",
+      "bounding box": {
+        "min": [
+          92.204,
+          182.652,
+          559.872
+        ],
+        "max": [
+          152.907,
+          217.612,
+          575.488
+        ]
+      },
+      "positions": {
+        "offset": 3477936,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 3479016,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 3480096,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh261",
+      "bounding box": {
+        "min": [
+          -830.794,
+          661.124,
+          201.721
+        ],
+        "max": [
+          -816.649,
+          674.155,
+          208.598
+        ]
+      },
+      "positions": {
+        "offset": 3481152,
+        "size": 600
+      },
+      "normals": {
+        "offset": 3481752,
+        "size": 600
+      },
+      "indices": {
+        "offset": 3482352,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh262",
+      "bounding box": {
+        "min": [
+          -834.715,
+          687.191,
+          175.086
+        ],
+        "max": [
+          -774.922,
+          695.666,
+          234.774
+        ]
+      },
+      "positions": {
+        "offset": 3482880,
+        "size": 2520
+      },
+      "normals": {
+        "offset": 3485400,
+        "size": 2520
+      },
+      "indices": {
+        "offset": 3487920,
+        "size": 3600
+      }
+    },
+    {
+      "name": "Mesh263",
+      "bounding box": {
+        "min": [
+          -808.281,
+          661.124,
+          216.858
+        ],
+        "max": [
+          -801.405,
+          674.155,
+          231.002
+        ]
+      },
+      "positions": {
+        "offset": 3491520,
+        "size": 600
+      },
+      "normals": {
+        "offset": 3492120,
+        "size": 600
+      },
+      "indices": {
+        "offset": 3492720,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh264",
+      "bounding box": {
+        "min": [
+          -833.802,
+          674.124,
+          200.493
+        ],
+        "max": [
+          -818.802,
+          687.219,
+          209.718
+        ]
+      },
+      "positions": {
+        "offset": 3493248,
+        "size": 264
+      },
+      "normals": {
+        "offset": 3493512,
+        "size": 264
+      },
+      "indices": {
+        "offset": 3493776,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh265",
+      "bounding box": {
+        "min": [
+          -278.647,
+          182.652,
+          -646.968
+        ],
+        "max": [
+          -217.943,
+          217.612,
+          -631.352
+        ]
+      },
+      "positions": {
+        "offset": 3493992,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 3495072,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 3496152,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh266",
+      "bounding box": {
+        "min": [
+          92.204,
+          182.652,
+          -646.968
+        ],
+        "max": [
+          152.907,
+          217.612,
+          -631.352
+        ]
+      },
+      "positions": {
+        "offset": 3497208,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 3498288,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 3499368,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh267",
+      "bounding box": {
+        "min": [
+          -832.451,
+          506.633,
+          177.604
+        ],
+        "max": [
+          -777.511,
+          517.401,
+          232.555
+        ]
+      },
+      "positions": {
+        "offset": 3500424,
+        "size": 1596
+      },
+      "normals": {
+        "offset": 3502020,
+        "size": 1596
+      },
+      "indices": {
+        "offset": 3503616,
+        "size": 1992
+      }
+    },
+    {
+      "name": "Mesh268",
+      "bounding box": {
+        "min": [
+          -460.019,
+          517.223,
+          178.291
+        ],
+        "max": [
+          -407.506,
+          687.421,
+          230.763
+        ]
+      },
+      "positions": {
+        "offset": 3505608,
+        "size": 8364
+      },
+      "normals": {
+        "offset": 3513972,
+        "size": 8364
+      },
+      "indices": {
+        "offset": 3522336,
+        "size": 14640
+      }
+    },
+    {
+      "name": "Mesh269",
+      "bounding box": {
+        "min": [
+          489.555,
+          1226.98,
+          182.271
+        ],
+        "max": [
+          524.901,
+          1262.4,
+          197.768
+        ]
+      },
+      "positions": {
+        "offset": 3536976,
+        "size": 1368
+      },
+      "normals": {
+        "offset": 3538344,
+        "size": 1368
+      },
+      "indices": {
+        "offset": 3539712,
+        "size": 1344
+      }
+    },
+    {
+      "name": "Mesh270",
+      "bounding box": {
+        "min": [
+          108.368,
+          1215.9,
+          169.437
+        ],
+        "max": [
+          165.835,
+          1273.49,
+          189.929
+        ]
+      },
+      "positions": {
+        "offset": 3541056,
+        "size": 1152
+      },
+      "normals": {
+        "offset": 3542208,
+        "size": 1152
+      },
+      "indices": {
+        "offset": 3543360,
+        "size": 1920
+      }
+    },
+    {
+      "name": "Mesh271",
+      "bounding box": {
+        "min": [
+          119.428,
+          1226.98,
+          -271.464
+        ],
+        "max": [
+          154.775,
+          1262.4,
+          -255.967
+        ]
+      },
+      "positions": {
+        "offset": 3545280,
+        "size": 1368
+      },
+      "normals": {
+        "offset": 3546648,
+        "size": 1368
+      },
+      "indices": {
+        "offset": 3548016,
+        "size": 1344
+      }
+    },
+    {
+      "name": "Mesh272",
+      "bounding box": {
+        "min": [
+          -293.332,
+          1215.9,
+          -263.625
+        ],
+        "max": [
+          -235.865,
+          1273.49,
+          -243.133
+        ]
+      },
+      "positions": {
+        "offset": 3549360,
+        "size": 1152
+      },
+      "normals": {
+        "offset": 3550512,
+        "size": 1152
+      },
+      "indices": {
+        "offset": 3551664,
+        "size": 1920
+      }
+    },
+    {
+      "name": "Mesh273",
+      "bounding box": {
+        "min": [
+          -282.272,
+          1226.98,
+          -271.464
+        ],
+        "max": [
+          -246.926,
+          1262.4,
+          -255.967
+        ]
+      },
+      "positions": {
+        "offset": 3553584,
+        "size": 1368
+      },
+      "normals": {
+        "offset": 3554952,
+        "size": 1368
+      },
+      "indices": {
+        "offset": 3556320,
+        "size": 1344
+      }
+    },
+    {
+      "name": "Mesh274",
+      "bounding box": {
+        "min": [
+          -663.558,
+          1215.9,
+          -263.625
+        ],
+        "max": [
+          -606.091,
+          1273.49,
+          -243.133
+        ]
+      },
+      "positions": {
+        "offset": 3557664,
+        "size": 1152
+      },
+      "normals": {
+        "offset": 3558816,
+        "size": 1152
+      },
+      "indices": {
+        "offset": 3559968,
+        "size": 1920
+      }
+    },
+    {
+      "name": "Mesh275",
+      "bounding box": {
+        "min": [
+          -652.498,
+          1226.98,
+          -271.464
+        ],
+        "max": [
+          -617.151,
+          1262.4,
+          -255.967
+        ]
+      },
+      "positions": {
+        "offset": 3561888,
+        "size": 1368
+      },
+      "normals": {
+        "offset": 3563256,
+        "size": 1368
+      },
+      "indices": {
+        "offset": 3564624,
+        "size": 1344
+      }
+    },
+    {
+      "name": "Mesh276",
+      "bounding box": {
+        "min": [
+          -1012.61,
+          1217.43,
+          -63.7048
+        ],
+        "max": [
+          -992.115,
+          1275.01,
+          -6.2379
+        ]
+      },
+      "positions": {
+        "offset": 3565968,
+        "size": 1152
+      },
+      "normals": {
+        "offset": 3567120,
+        "size": 1152
+      },
+      "indices": {
+        "offset": 3568272,
+        "size": 1920
+      }
+    },
+    {
+      "name": "Mesh277",
+      "bounding box": {
+        "min": [
+          -1020.45,
+          1228.51,
+          -52.6448
+        ],
+        "max": [
+          -1004.95,
+          1263.93,
+          -17.2981
+        ]
+      },
+      "positions": {
+        "offset": 3570192,
+        "size": 1368
+      },
+      "normals": {
+        "offset": 3571560,
+        "size": 1368
+      },
+      "indices": {
+        "offset": 3572928,
+        "size": 1344
+      }
+    },
+    {
+      "name": "Mesh278",
+      "bounding box": {
+        "min": [
+          478.494,
+          1215.9,
+          169.437
+        ],
+        "max": [
+          535.961,
+          1273.49,
+          189.929
+        ]
+      },
+      "positions": {
+        "offset": 3574272,
+        "size": 1152
+      },
+      "normals": {
+        "offset": 3575424,
+        "size": 1152
+      },
+      "indices": {
+        "offset": 3576576,
+        "size": 1920
+      }
+    },
+    {
+      "name": "Mesh279",
+      "bounding box": {
+        "min": [
+          507.441,
+          111.898,
+          141.217
+        ],
+        "max": [
+          522.612,
+          137.188,
+          145.466
+        ]
+      },
+      "positions": {
+        "offset": 3578496,
+        "size": 7488
+      },
+      "normals": {
+        "offset": 3585984,
+        "size": 7488
+      },
+      "indices": {
+        "offset": 3593472,
+        "size": 14928
+      }
+    },
+    {
+      "name": "Mesh280",
+      "bounding box": {
+        "min": [
+          651.604,
+          661.124,
+          201.262
+        ],
+        "max": [
+          665.748,
+          674.155,
+          208.139
+        ]
+      },
+      "positions": {
+        "offset": 3608400,
+        "size": 600
+      },
+      "normals": {
+        "offset": 3609000,
+        "size": 600
+      },
+      "indices": {
+        "offset": 3609600,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh281",
+      "bounding box": {
+        "min": [
+          -49.6864,
+          339.443,
+          -324.526
+        ],
+        "max": [
+          280.246,
+          520.594,
+          -229.405
+        ]
+      },
+      "positions": {
+        "offset": 3610128,
+        "size": 33816
+      },
+      "normals": {
+        "offset": 3643944,
+        "size": 33816
+      },
+      "indices": {
+        "offset": 3677760,
+        "size": 66048
+      }
+    },
+    {
+      "name": "Mesh282",
+      "bounding box": {
+        "min": [
+          -809.411,
+          674.124,
+          -308.463
+        ],
+        "max": [
+          -800.186,
+          687.219,
+          -293.462
+        ]
+      },
+      "positions": {
+        "offset": 3743808,
+        "size": 264
+      },
+      "normals": {
+        "offset": 3744072,
+        "size": 264
+      },
+      "indices": {
+        "offset": 3744336,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh283",
+      "bounding box": {
+        "min": [
+          322.024,
+          339.443,
+          157.164
+        ],
+        "max": [
+          651.956,
+          520.594,
+          252.286
+        ]
+      },
+      "positions": {
+        "offset": 3744552,
+        "size": 33816
+      },
+      "normals": {
+        "offset": 3778368,
+        "size": 33816
+      },
+      "indices": {
+        "offset": 3812184,
+        "size": 66048
+      }
+    },
+    {
+      "name": "Mesh284",
+      "bounding box": {
+        "min": [
+          -46.5819,
+          339.443,
+          157.164
+        ],
+        "max": [
+          283.35,
+          520.594,
+          252.286
+        ]
+      },
+      "positions": {
+        "offset": 3878232,
+        "size": 33816
+      },
+      "normals": {
+        "offset": 3912048,
+        "size": 33816
+      },
+      "indices": {
+        "offset": 3945864,
+        "size": 66048
+      }
+    },
+    {
+      "name": "Mesh285",
+      "bounding box": {
+        "min": [
+          -415.188,
+          339.443,
+          157.164
+        ],
+        "max": [
+          -85.256,
+          520.594,
+          252.286
+        ]
+      },
+      "positions": {
+        "offset": 4011912,
+        "size": 33816
+      },
+      "normals": {
+        "offset": 4045728,
+        "size": 33816
+      },
+      "indices": {
+        "offset": 4079544,
+        "size": 66048
+      }
+    },
+    {
+      "name": "Mesh286",
+      "bounding box": {
+        "min": [
+          -809.509,
+          674.124,
+          -265.782
+        ],
+        "max": [
+          -800.284,
+          687.219,
+          -250.781
+        ]
+      },
+      "positions": {
+        "offset": 4145592,
+        "size": 264
+      },
+      "normals": {
+        "offset": 4145856,
+        "size": 264
+      },
+      "indices": {
+        "offset": 4146120,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh287",
+      "bounding box": {
+        "min": [
+          62.4091,
+          109.924,
+          144.544
+        ],
+        "max": [
+          175.734,
+          225.102,
+          253.782
+        ]
+      },
+      "positions": {
+        "offset": 4146336,
+        "size": 27756
+      },
+      "normals": {
+        "offset": 4174092,
+        "size": 27756
+      },
+      "indices": {
+        "offset": 4201848,
+        "size": 39696
+      }
+    },
+    {
+      "name": "Mesh288",
+      "bounding box": {
+        "min": [
+          428.777,
+          -28.0496,
+          -341.136
+        ],
+        "max": [
+          551.226,
+          222.716,
+          -219.698
+        ]
+      },
+      "positions": {
+        "offset": 4241544,
+        "size": 37536
+      },
+      "normals": {
+        "offset": 4279080,
+        "size": 37536
+      },
+      "indices": {
+        "offset": 4316616,
+        "size": 53064
+      }
+    },
+    {
+      "name": "Mesh289",
+      "bounding box": {
+        "min": [
+          -832.451,
+          506.633,
+          -307.188
+        ],
+        "max": [
+          -777.511,
+          517.402,
+          -252.236
+        ]
+      },
+      "positions": {
+        "offset": 4369680,
+        "size": 1596
+      },
+      "normals": {
+        "offset": 4371276,
+        "size": 1596
+      },
+      "indices": {
+        "offset": 4372872,
+        "size": 1992
+      }
+    },
+    {
+      "name": "Mesh290",
+      "bounding box": {
+        "min": [
+          -834.715,
+          687.191,
+          -309.705
+        ],
+        "max": [
+          -774.922,
+          695.666,
+          -250.018
+        ]
+      },
+      "positions": {
+        "offset": 4374864,
+        "size": 2520
+      },
+      "normals": {
+        "offset": 4377384,
+        "size": 2520
+      },
+      "indices": {
+        "offset": 4379904,
+        "size": 3600
+      }
+    },
+    {
+      "name": "Mesh291",
+      "bounding box": {
+        "min": [
+          -786.899,
+          339.443,
+          -324.526
+        ],
+        "max": [
+          -456.967,
+          520.594,
+          -229.405
+        ]
+      },
+      "positions": {
+        "offset": 4383504,
+        "size": 33816
+      },
+      "normals": {
+        "offset": 4417320,
+        "size": 33816
+      },
+      "indices": {
+        "offset": 4451136,
+        "size": 66048
+      }
+    },
+    {
+      "name": "Mesh292",
+      "bounding box": {
+        "min": [
+          -418.293,
+          339.443,
+          -324.526
+        ],
+        "max": [
+          -88.3605,
+          520.594,
+          -229.405
+        ]
+      },
+      "positions": {
+        "offset": 4517184,
+        "size": 33816
+      },
+      "normals": {
+        "offset": 4551000,
+        "size": 33816
+      },
+      "indices": {
+        "offset": 4584816,
+        "size": 66048
+      }
+    },
+    {
+      "name": "Mesh293",
+      "bounding box": {
+        "min": [
+          1224.05,
+          79.9048,
+          -114.691
+        ],
+        "max": [
+          1299.03,
+          264.761,
+          41.4676
+        ]
+      },
+      "positions": {
+        "offset": 4650864,
+        "size": 10368
+      },
+      "normals": {
+        "offset": 4661232,
+        "size": 10368
+      },
+      "indices": {
+        "offset": 4671600,
+        "size": 18252
+      }
+    },
+    {
+      "name": "Mesh294",
+      "bounding box": {
+        "min": [
+          1277.02,
+          40.8186,
+          -160.465
+        ],
+        "max": [
+          1299.87,
+          306.325,
+          88.6266
+        ]
+      },
+      "positions": {
+        "offset": 4689852,
+        "size": 8964
+      },
+      "normals": {
+        "offset": 4698816,
+        "size": 8964
+      },
+      "indices": {
+        "offset": 4707780,
+        "size": 16344
+      }
+    },
+    {
+      "name": "Mesh295",
+      "bounding box": {
+        "min": [
+          1045.22,
+          -0.693474,
+          329.31
+        ],
+        "max": [
+          1194.17,
+          133.017,
+          478.262
+        ]
+      },
+      "positions": {
+        "offset": 4724124,
+        "size": 15924
+      },
+      "normals": {
+        "offset": 4740048,
+        "size": 15924
+      },
+      "indices": {
+        "offset": 4755972,
+        "size": 27552
+      }
+    },
+    {
+      "name": "Mesh296",
+      "bounding box": {
+        "min": [
+          1045.22,
+          -0.693335,
+          -523.5
+        ],
+        "max": [
+          1194.17,
+          133.017,
+          -374.548
+        ]
+      },
+      "positions": {
+        "offset": 4783524,
+        "size": 15924
+      },
+      "normals": {
+        "offset": 4799448,
+        "size": 15924
+      },
+      "indices": {
+        "offset": 4815372,
+        "size": 27552
+      }
+    },
+    {
+      "name": "Mesh297",
+      "bounding box": {
+        "min": [
+          -1276.67,
+          -0.693335,
+          -523.5
+        ],
+        "max": [
+          -1127.72,
+          133.017,
+          -374.548
+        ]
+      },
+      "positions": {
+        "offset": 4842924,
+        "size": 15924
+      },
+      "normals": {
+        "offset": 4858848,
+        "size": 15924
+      },
+      "indices": {
+        "offset": 4874772,
+        "size": 27552
+      }
+    },
+    {
+      "name": "Mesh298",
+      "bounding box": {
+        "min": [
+          -1276.67,
+          -0.693474,
+          329.31
+        ],
+        "max": [
+          -1127.72,
+          133.017,
+          478.262
+        ]
+      },
+      "positions": {
+        "offset": 4902324,
+        "size": 15924
+      },
+      "normals": {
+        "offset": 4918248,
+        "size": 15924
+      },
+      "indices": {
+        "offset": 4934172,
+        "size": 27552
+      }
+    },
+    {
+      "name": "Mesh299",
+      "bounding box": {
+        "min": [
+          92.7551,
+          -0.140067,
+          -249.514
+        ],
+        "max": [
+          144.744,
+          56.1995,
+          -197.584
+        ]
+      },
+      "positions": {
+        "offset": 4961724,
+        "size": 14376
+      },
+      "normals": {
+        "offset": 4976100,
+        "size": 14376
+      },
+      "indices": {
+        "offset": 4990476,
+        "size": 26532
+      }
+    },
+    {
+      "name": "Mesh300",
+      "bounding box": {
+        "min": [
+          91.807,
+          47.7629,
+          -250.741
+        ],
+        "max": [
+          147.334,
+          70.9582,
+          -193.557
+        ]
+      },
+      "positions": {
+        "offset": 5017008,
+        "size": 5400
+      },
+      "normals": {
+        "offset": 5022408,
+        "size": 5400
+      },
+      "indices": {
+        "offset": 5027808,
+        "size": 4800
+      }
+    },
+    {
+      "name": "Mesh301",
+      "bounding box": {
+        "min": [
+          807.307,
+          -0.140067,
+          -249.514
+        ],
+        "max": [
+          859.295,
+          56.1995,
+          -197.584
+        ]
+      },
+      "positions": {
+        "offset": 5032608,
+        "size": 14376
+      },
+      "normals": {
+        "offset": 5046984,
+        "size": 14376
+      },
+      "indices": {
+        "offset": 5061360,
+        "size": 26532
+      }
+    },
+    {
+      "name": "Mesh302",
+      "bounding box": {
+        "min": [
+          806.358,
+          47.7629,
+          -250.741
+        ],
+        "max": [
+          861.886,
+          70.9582,
+          -193.557
+        ]
+      },
+      "positions": {
+        "offset": 5087892,
+        "size": 5400
+      },
+      "normals": {
+        "offset": 5093292,
+        "size": 5400
+      },
+      "indices": {
+        "offset": 5098692,
+        "size": 4800
+      }
+    },
+    {
+      "name": "Mesh303",
+      "bounding box": {
+        "min": [
+          807.307,
+          -3.47903,
+          127.38
+        ],
+        "max": [
+          859.295,
+          52.8606,
+          179.311
+        ]
+      },
+      "positions": {
+        "offset": 5103492,
+        "size": 14376
+      },
+      "normals": {
+        "offset": 5117868,
+        "size": 14376
+      },
+      "indices": {
+        "offset": 5132244,
+        "size": 26532
+      }
+    },
+    {
+      "name": "Mesh304",
+      "bounding box": {
+        "min": [
+          806.358,
+          44.424,
+          126.154
+        ],
+        "max": [
+          861.886,
+          67.6194,
+          183.338
+        ]
+      },
+      "positions": {
+        "offset": 5158776,
+        "size": 5400
+      },
+      "normals": {
+        "offset": 5164176,
+        "size": 5400
+      },
+      "indices": {
+        "offset": 5169576,
+        "size": 4800
+      }
+    },
+    {
+      "name": "Mesh305",
+      "bounding box": {
+        "min": [
+          484.509,
+          98.6729,
+          140.061
+        ],
+        "max": [
+          491.187,
+          104.802,
+          146.731
+        ]
+      },
+      "positions": {
+        "offset": 5174376,
+        "size": 3840
+      },
+      "normals": {
+        "offset": 5178216,
+        "size": 3840
+      },
+      "indices": {
+        "offset": 5182056,
+        "size": 6696
+      }
+    },
+    {
+      "name": "Mesh306",
+      "bounding box": {
+        "min": [
+          -1866.98,
+          -126.443,
+          -1139.03
+        ],
+        "max": [
+          1746.69,
+          1347.2,
+          1039.71
+        ]
+      },
+      "positions": {
+        "offset": 5188752,
+        "size": 288
+      },
+      "normals": {
+        "offset": 5189040,
+        "size": 288
+      },
+      "indices": {
+        "offset": 5189328,
+        "size": 336
+      }
+    },
+    {
+      "name": "Mesh307",
+      "bounding box": {
+        "min": [
+          -1427.43,
+          79.9048,
+          -113.306
+        ],
+        "max": [
+          -1352.46,
+          264.761,
+          42.8534
+        ]
+      },
+      "positions": {
+        "offset": 5189664,
+        "size": 10368
+      },
+      "normals": {
+        "offset": 5200032,
+        "size": 10368
+      },
+      "indices": {
+        "offset": 5210400,
+        "size": 18252
+      }
+    },
+    {
+      "name": "Mesh308",
+      "bounding box": {
+        "min": [
+          -1428.27,
+          40.8186,
+          -160.465
+        ],
+        "max": [
+          -1405.43,
+          306.325,
+          88.6269
+        ]
+      },
+      "positions": {
+        "offset": 5228652,
+        "size": 8964
+      },
+      "normals": {
+        "offset": 5237616,
+        "size": 8964
+      },
+      "indices": {
+        "offset": 5246580,
+        "size": 16344
+      }
+    },
+    {
+      "name": "Mesh309",
+      "bounding box": {
+        "min": [
+          -990.438,
+          690.922,
+          173.854
+        ],
+        "max": [
+          862.44,
+          823.344,
+          231.435
+        ]
+      },
+      "positions": {
+        "offset": 5262924,
+        "size": 14784
+      },
+      "normals": {
+        "offset": 5277708,
+        "size": 14784
+      },
+      "indices": {
+        "offset": 5292492,
+        "size": 22320
+      }
+    },
+    {
+      "name": "Mesh310",
+      "bounding box": {
+        "min": [
+          -299.033,
+          274.96,
+          -289.704
+        ],
+        "max": [
+          -286.259,
+          294.114,
+          -269.044
+        ]
+      },
+      "positions": {
+        "offset": 5314812,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 5317704,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 5320596,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh311",
+      "bounding box": {
+        "min": [
+          -271.255,
+          -3.90253,
+          126.117
+        ],
+        "max": [
+          -219.324,
+          52.4371,
+          178.106
+        ]
+      },
+      "positions": {
+        "offset": 5326068,
+        "size": 14376
+      },
+      "normals": {
+        "offset": 5340444,
+        "size": 14376
+      },
+      "indices": {
+        "offset": 5354820,
+        "size": 26532
+      }
+    },
+    {
+      "name": "Mesh312",
+      "bounding box": {
+        "min": [
+          -277.356,
+          42.3191,
+          123.896
+        ],
+        "max": [
+          -209.13,
+          69.3612,
+          187.852
+        ]
+      },
+      "positions": {
+        "offset": 5381352,
+        "size": 6396
+      },
+      "normals": {
+        "offset": 5387748,
+        "size": 6396
+      },
+      "indices": {
+        "offset": 5394144,
+        "size": 5616
+      }
+    },
+    {
+      "name": "Mesh313",
+      "bounding box": {
+        "min": [
+          -51.5886,
+          661.125,
+          -283.07
+        ],
+        "max": [
+          -37.4444,
+          674.156,
+          -276.194
+        ]
+      },
+      "positions": {
+        "offset": 5399760,
+        "size": 600
+      },
+      "normals": {
+        "offset": 5400360,
+        "size": 600
+      },
+      "indices": {
+        "offset": 5400960,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh314",
+      "bounding box": {
+        "min": [
+          -210.147,
+          274.96,
+          -289.704
+        ],
+        "max": [
+          -197.373,
+          294.114,
+          -269.044
+        ]
+      },
+      "positions": {
+        "offset": 5401488,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 5404380,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 5407272,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh315",
+      "bounding box": {
+        "min": [
+          -66.8334,
+          661.125,
+          -267.934
+        ],
+        "max": [
+          -59.957,
+          674.156,
+          -253.79
+        ]
+      },
+      "positions": {
+        "offset": 5412744,
+        "size": 600
+      },
+      "normals": {
+        "offset": 5413344,
+        "size": 600
+      },
+      "indices": {
+        "offset": 5413944,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh316",
+      "bounding box": {
+        "min": [
+          152.523,
+          279.881,
+          -281.404
+        ],
+        "max": [
+          462.4,
+          284.386,
+          -276.9
+        ]
+      },
+      "positions": {
+        "offset": 5414472,
+        "size": 2340
+      },
+      "normals": {
+        "offset": 5416812,
+        "size": 2340
+      },
+      "indices": {
+        "offset": 5419152,
+        "size": 2304
+      }
+    },
+    {
+      "name": "Mesh317",
+      "bounding box": {
+        "min": [
+          -89.3363,
+          661.125,
+          -283.05
+        ],
+        "max": [
+          -75.1922,
+          674.156,
+          -276.174
+        ]
+      },
+      "positions": {
+        "offset": 5421456,
+        "size": 600
+      },
+      "normals": {
+        "offset": 5422056,
+        "size": 600
+      },
+      "indices": {
+        "offset": 5422656,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh318",
+      "bounding box": {
+        "min": [
+          -67.9539,
+          674.124,
+          -265.782
+        ],
+        "max": [
+          -58.7289,
+          687.219,
+          -250.781
+        ]
+      },
+      "positions": {
+        "offset": 5423184,
+        "size": 264
+      },
+      "normals": {
+        "offset": 5423448,
+        "size": 264
+      },
+      "indices": {
+        "offset": 5423712,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh319",
+      "bounding box": {
+        "min": [
+          -66.8238,
+          661.125,
+          -305.455
+        ],
+        "max": [
+          -59.9473,
+          674.156,
+          -291.31
+        ]
+      },
+      "positions": {
+        "offset": 5423928,
+        "size": 600
+      },
+      "normals": {
+        "offset": 5424528,
+        "size": 600
+      },
+      "indices": {
+        "offset": 5425128,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh320",
+      "bounding box": {
+        "min": [
+          -92.3447,
+          674.124,
+          -284.171
+        ],
+        "max": [
+          -77.3441,
+          687.219,
+          -274.946
+        ]
+      },
+      "positions": {
+        "offset": 5425656,
+        "size": 264
+      },
+      "normals": {
+        "offset": 5425920,
+        "size": 264
+      },
+      "indices": {
+        "offset": 5426184,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh321",
+      "bounding box": {
+        "min": [
+          485.726,
+          133.721,
+          -219.7
+        ],
+        "max": [
+          513.306,
+          214.133,
+          -219.7
+        ]
+      },
+      "positions": {
+        "offset": 5426400,
+        "size": 48
+      },
+      "normals": {
+        "offset": 5426448,
+        "size": 48
+      },
+      "indices": {
+        "offset": 5426496,
+        "size": 24
+      }
+    },
+    {
+      "name": "Mesh322",
+      "bounding box": {
+        "min": [
+          -1034.95,
+          516.372,
+          -57.4644
+        ],
+        "max": [
+          -989.477,
+          692.472,
+          -12.0262
+        ]
+      },
+      "positions": {
+        "offset": 5426520,
+        "size": 8364
+      },
+      "normals": {
+        "offset": 5434884,
+        "size": 8364
+      },
+      "indices": {
+        "offset": 5443248,
+        "size": 14640
+      }
+    },
+    {
+      "name": "Mesh323",
+      "bounding box": {
+        "min": [
+          159.773,
+          274.96,
+          -289.704
+        ],
+        "max": [
+          172.547,
+          294.114,
+          -269.044
+        ]
+      },
+      "positions": {
+        "offset": 5457888,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 5460780,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 5463672,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh324",
+      "bounding box": {
+        "min": [
+          810.269,
+          274.96,
+          -289.704
+        ],
+        "max": [
+          823.043,
+          294.114,
+          -269.044
+        ]
+      },
+      "positions": {
+        "offset": 5469144,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 5472036,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 5474928,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh325",
+      "bounding box": {
+        "min": [
+          -90.7272,
+          506.633,
+          -307.188
+        ],
+        "max": [
+          -35.7872,
+          517.402,
+          -252.236
+        ]
+      },
+      "positions": {
+        "offset": 5480400,
+        "size": 1596
+      },
+      "normals": {
+        "offset": 5481996,
+        "size": 1596
+      },
+      "indices": {
+        "offset": 5483592,
+        "size": 1992
+      }
+    },
+    {
+      "name": "Mesh326",
+      "bounding box": {
+        "min": [
+          -831.595,
+          517.223,
+          -305.695
+        ],
+        "max": [
+          -779.083,
+          687.421,
+          -253.223
+        ]
+      },
+      "positions": {
+        "offset": 5485584,
+        "size": 8364
+      },
+      "normals": {
+        "offset": 5493948,
+        "size": 8364
+      },
+      "indices": {
+        "offset": 5502312,
+        "size": 14640
+      }
+    },
+    {
+      "name": "Mesh327",
+      "bounding box": {
+        "min": [
+          461.903,
+          133.751,
+          -219.7
+        ],
+        "max": [
+          489.072,
+          214.355,
+          -219.7
+        ]
+      },
+      "positions": {
+        "offset": 5516952,
+        "size": 48
+      },
+      "normals": {
+        "offset": 5517000,
+        "size": 48
+      },
+      "indices": {
+        "offset": 5517048,
+        "size": 24
+      }
+    },
+    {
+      "name": "Mesh328",
+      "bounding box": {
+        "min": [
+          486.165,
+          207.454,
+          135.242
+        ],
+        "max": [
+          489.539,
+          216.951,
+          170.476
+        ]
+      },
+      "positions": {
+        "offset": 5517072,
+        "size": 1668
+      },
+      "normals": {
+        "offset": 5518740,
+        "size": 1668
+      },
+      "indices": {
+        "offset": 5520408,
+        "size": 3240
+      }
+    },
+    {
+      "name": "Mesh329",
+      "bounding box": {
+        "min": [
+          -990.739,
+          -0.140066,
+          -251.643
+        ],
+        "max": [
+          -938.75,
+          56.1995,
+          -199.712
+        ]
+      },
+      "positions": {
+        "offset": 5523648,
+        "size": 14376
+      },
+      "normals": {
+        "offset": 5538024,
+        "size": 14376
+      },
+      "indices": {
+        "offset": 5552400,
+        "size": 26532
+      }
+    },
+    {
+      "name": "Mesh330",
+      "bounding box": {
+        "min": [
+          -992.96,
+          46.0815,
+          -261.836
+        ],
+        "max": [
+          -929.005,
+          73.1236,
+          -193.611
+        ]
+      },
+      "positions": {
+        "offset": 5578932,
+        "size": 6396
+      },
+      "normals": {
+        "offset": 5585328,
+        "size": 6396
+      },
+      "indices": {
+        "offset": 5591724,
+        "size": 5616
+      }
+    },
+    {
+      "name": "Mesh331",
+      "bounding box": {
+        "min": [
+          -990.739,
+          -3.90253,
+          125.251
+        ],
+        "max": [
+          -938.75,
+          52.4371,
+          177.182
+        ]
+      },
+      "positions": {
+        "offset": 5597340,
+        "size": 14376
+      },
+      "normals": {
+        "offset": 5611716,
+        "size": 14376
+      },
+      "indices": {
+        "offset": 5626092,
+        "size": 26532
+      }
+    },
+    {
+      "name": "Mesh332",
+      "bounding box": {
+        "min": [
+          -992.96,
+          42.3191,
+          115.058
+        ],
+        "max": [
+          -929.005,
+          69.3612,
+          183.283
+        ]
+      },
+      "positions": {
+        "offset": 5652624,
+        "size": 6396
+      },
+      "normals": {
+        "offset": 5659020,
+        "size": 6396
+      },
+      "indices": {
+        "offset": 5665416,
+        "size": 5616
+      }
+    },
+    {
+      "name": "Mesh333",
+      "bounding box": {
+        "min": [
+          486.591,
+          134.411,
+          141.555
+        ],
+        "max": [
+          512.429,
+          213.695,
+          145.128
+        ]
+      },
+      "positions": {
+        "offset": 5671032,
+        "size": 48
+      },
+      "normals": {
+        "offset": 5671080,
+        "size": 48
+      },
+      "indices": {
+        "offset": 5671128,
+        "size": 24
+      }
+    },
+    {
+      "name": "Mesh334",
+      "bounding box": {
+        "min": [
+          462.446,
+          104.802,
+          117.966
+        ],
+        "max": [
+          513.257,
+          128.146,
+          168.72
+        ]
+      },
+      "positions": {
+        "offset": 5671152,
+        "size": 10752
+      },
+      "normals": {
+        "offset": 5681904,
+        "size": 10752
+      },
+      "indices": {
+        "offset": 5692656,
+        "size": 19692
+      }
+    },
+    {
+      "name": "Mesh335",
+      "bounding box": {
+        "min": [
+          487.161,
+          134.157,
+          -221.487
+        ],
+        "max": [
+          511.871,
+          213.697,
+          -217.914
+        ]
+      },
+      "positions": {
+        "offset": 5712348,
+        "size": 48
+      },
+      "normals": {
+        "offset": 5712396,
+        "size": 48
+      },
+      "indices": {
+        "offset": 5712444,
+        "size": 24
+      }
+    },
+    {
+      "name": "Mesh336",
+      "bounding box": {
+        "min": [
+          452.652,
+          111.898,
+          141.217
+        ],
+        "max": [
+          467.822,
+          137.188,
+          145.467
+        ]
+      },
+      "positions": {
+        "offset": 5712468,
+        "size": 7488
+      },
+      "normals": {
+        "offset": 5719956,
+        "size": 7488
+      },
+      "indices": {
+        "offset": 5727444,
+        "size": 14928
+      }
+    },
+    {
+      "name": "Mesh337",
+      "bounding box": {
+        "min": [
+          452.652,
+          111.898,
+          -221.825
+        ],
+        "max": [
+          467.822,
+          137.188,
+          -217.575
+        ]
+      },
+      "positions": {
+        "offset": 5742372,
+        "size": 7488
+      },
+      "normals": {
+        "offset": 5749860,
+        "size": 7488
+      },
+      "indices": {
+        "offset": 5757348,
+        "size": 14928
+      }
+    },
+    {
+      "name": "Mesh338",
+      "bounding box": {
+        "min": [
+          92.7551,
+          -4.03073,
+          127.38
+        ],
+        "max": [
+          144.744,
+          52.3089,
+          179.311
+        ]
+      },
+      "positions": {
+        "offset": 5772276,
+        "size": 14376
+      },
+      "normals": {
+        "offset": 5786652,
+        "size": 14376
+      },
+      "indices": {
+        "offset": 5801028,
+        "size": 26532
+      }
+    },
+    {
+      "name": "Mesh339",
+      "bounding box": {
+        "min": [
+          91.807,
+          43.8723,
+          126.154
+        ],
+        "max": [
+          147.334,
+          67.0677,
+          183.338
+        ]
+      },
+      "positions": {
+        "offset": 5827560,
+        "size": 5400
+      },
+      "normals": {
+        "offset": 5832960,
+        "size": 5400
+      },
+      "indices": {
+        "offset": 5838360,
+        "size": 4800
+      }
+    },
+    {
+      "name": "Mesh340",
+      "bounding box": {
+        "min": [
+          507.441,
+          111.898,
+          -221.825
+        ],
+        "max": [
+          522.612,
+          137.188,
+          -217.576
+        ]
+      },
+      "positions": {
+        "offset": 5843160,
+        "size": 7488
+      },
+      "normals": {
+        "offset": 5850648,
+        "size": 7488
+      },
+      "indices": {
+        "offset": 5858136,
+        "size": 14928
+      }
+    },
+    {
+      "name": "Mesh341",
+      "bounding box": {
+        "min": [
+          484.077,
+          98.6729,
+          -223.09
+        ],
+        "max": [
+          490.755,
+          104.802,
+          -216.42
+        ]
+      },
+      "positions": {
+        "offset": 5873064,
+        "size": 3840
+      },
+      "normals": {
+        "offset": 5876904,
+        "size": 3840
+      },
+      "indices": {
+        "offset": 5880744,
+        "size": 6696
+      }
+    },
+    {
+      "name": "Mesh342",
+      "bounding box": {
+        "min": [
+          462.007,
+          104.802,
+          -245.079
+        ],
+        "max": [
+          512.818,
+          128.146,
+          -194.325
+        ]
+      },
+      "positions": {
+        "offset": 5887440,
+        "size": 10752
+      },
+      "normals": {
+        "offset": 5898192,
+        "size": 10752
+      },
+      "indices": {
+        "offset": 5908944,
+        "size": 19692
+      }
+    },
+    {
+      "name": "Mesh343",
+      "bounding box": {
+        "min": [
+          72.4553,
+          274.96,
+          188.455
+        ],
+        "max": [
+          85.2291,
+          294.114,
+          209.115
+        ]
+      },
+      "positions": {
+        "offset": 5928636,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 5931528,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 5934420,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh344",
+      "bounding box": {
+        "min": [
+          -951.447,
+          274.96,
+          188.455
+        ],
+        "max": [
+          -938.673,
+          294.114,
+          209.115
+        ]
+      },
+      "positions": {
+        "offset": 5939892,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 5942784,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 5945676,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh345",
+      "bounding box": {
+        "min": [
+          -210.147,
+          274.96,
+          188.455
+        ],
+        "max": [
+          -197.373,
+          294.114,
+          209.115
+        ]
+      },
+      "positions": {
+        "offset": 5951148,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 5954040,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 5956932,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh346",
+      "bounding box": {
+        "min": [
+          -217.397,
+          279.881,
+          196.755
+        ],
+        "max": [
+          92.4797,
+          284.386,
+          201.259
+        ]
+      },
+      "positions": {
+        "offset": 5962404,
+        "size": 2340
+      },
+      "normals": {
+        "offset": 5964744,
+        "size": 2340
+      },
+      "indices": {
+        "offset": 5967084,
+        "size": 2304
+      }
+    },
+    {
+      "name": "Mesh347",
+      "bounding box": {
+        "min": [
+          152.523,
+          279.881,
+          196.755
+        ],
+        "max": [
+          462.4,
+          284.386,
+          201.259
+        ]
+      },
+      "positions": {
+        "offset": 5969388,
+        "size": 2340
+      },
+      "normals": {
+        "offset": 5971728,
+        "size": 2340
+      },
+      "indices": {
+        "offset": 5974068,
+        "size": 2304
+      }
+    },
+    {
+      "name": "Mesh348",
+      "bounding box": {
+        "min": [
+          442.375,
+          274.96,
+          188.455
+        ],
+        "max": [
+          455.149,
+          294.114,
+          209.115
+        ]
+      },
+      "positions": {
+        "offset": 5976372,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 5979264,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 5982156,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh349",
+      "bounding box": {
+        "min": [
+          810.269,
+          274.96,
+          188.455
+        ],
+        "max": [
+          823.043,
+          294.114,
+          209.115
+        ]
+      },
+      "positions": {
+        "offset": 5987628,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 5990520,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 5993412,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh350",
+      "bounding box": {
+        "min": [
+          159.773,
+          274.96,
+          188.455
+        ],
+        "max": [
+          172.547,
+          294.114,
+          209.115
+        ]
+      },
+      "positions": {
+        "offset": 5998884,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 6001776,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 6004668,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh351",
+      "bounding box": {
+        "min": [
+          527.667,
+          274.96,
+          188.455
+        ],
+        "max": [
+          540.441,
+          294.114,
+          209.115
+        ]
+      },
+      "positions": {
+        "offset": 6010140,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 6013032,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 6015924,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh352",
+      "bounding box": {
+        "min": [
+          520.417,
+          279.881,
+          196.755
+        ],
+        "max": [
+          830.294,
+          284.386,
+          201.259
+        ]
+      },
+      "positions": {
+        "offset": 6021396,
+        "size": 2340
+      },
+      "normals": {
+        "offset": 6023736,
+        "size": 2340
+      },
+      "indices": {
+        "offset": 6026076,
+        "size": 2304
+      }
+    },
+    {
+      "name": "Mesh353",
+      "bounding box": {
+        "min": [
+          82.6617,
+          507.14,
+          -315.447
+        ],
+        "max": [
+          157.234,
+          695.323,
+          -240.886
+        ]
+      },
+      "positions": {
+        "offset": 6028380,
+        "size": 2544
+      },
+      "normals": {
+        "offset": 6030924,
+        "size": 2544
+      },
+      "indices": {
+        "offset": 6033468,
+        "size": 3144
+      }
+    },
+    {
+      "name": "Mesh354",
+      "bounding box": {
+        "min": [
+          -286.073,
+          507.14,
+          -315.447
+        ],
+        "max": [
+          -211.501,
+          695.323,
+          -240.886
+        ]
+      },
+      "positions": {
+        "offset": 6036612,
+        "size": 2544
+      },
+      "normals": {
+        "offset": 6039156,
+        "size": 2544
+      },
+      "indices": {
+        "offset": 6041700,
+        "size": 3144
+      }
+    },
+    {
+      "name": "Mesh355",
+      "bounding box": {
+        "min": [
+          819.311,
+          507.14,
+          -315.447
+        ],
+        "max": [
+          917.503,
+          695.323,
+          -217.256
+        ]
+      },
+      "positions": {
+        "offset": 6044844,
+        "size": 3564
+      },
+      "normals": {
+        "offset": 6048408,
+        "size": 3564
+      },
+      "indices": {
+        "offset": 6051972,
+        "size": 4752
+      }
+    },
+    {
+      "name": "Mesh356",
+      "bounding box": {
+        "min": [
+          454.546,
+          507.14,
+          -315.447
+        ],
+        "max": [
+          529.118,
+          695.323,
+          -240.886
+        ]
+      },
+      "positions": {
+        "offset": 6056724,
+        "size": 2544
+      },
+      "normals": {
+        "offset": 6059268,
+        "size": 2544
+      },
+      "indices": {
+        "offset": 6061812,
+        "size": 3144
+      }
+    },
+    {
+      "name": "Mesh357",
+      "bounding box": {
+        "min": [
+          -1022.57,
+          693.767,
+          -295.494
+        ],
+        "max": [
+          892.657,
+          921.729,
+          225.295
+        ]
+      },
+      "positions": {
+        "offset": 6064956,
+        "size": 2472
+      },
+      "normals": {
+        "offset": 6067428,
+        "size": 2472
+      },
+      "indices": {
+        "offset": 6069900,
+        "size": 2448
+      }
+    },
+    {
+      "name": "Mesh358",
+      "bounding box": {
+        "min": [
+          -1002.36,
+          693.767,
+          -259.326
+        ],
+        "max": [
+          868.647,
+          921.729,
+          185.967
+        ]
+      },
+      "positions": {
+        "offset": 6072348,
+        "size": 2508
+      },
+      "normals": {
+        "offset": 6074856,
+        "size": 2508
+      },
+      "indices": {
+        "offset": 6077364,
+        "size": 2448
+      }
+    },
+    {
+      "name": "Mesh359",
+      "bounding box": {
+        "min": [
+          478.494,
+          1215.9,
+          -263.625
+        ],
+        "max": [
+          535.961,
+          1273.49,
+          -243.133
+        ]
+      },
+      "positions": {
+        "offset": 6079812,
+        "size": 1152
+      },
+      "normals": {
+        "offset": 6080964,
+        "size": 1152
+      },
+      "indices": {
+        "offset": 6082116,
+        "size": 1920
+      }
+    },
+    {
+      "name": "Mesh360",
+      "bounding box": {
+        "min": [
+          -1002.38,
+          921.729,
+          -253.548
+        ],
+        "max": [
+          868.594,
+          1296.71,
+          181.299
+        ]
+      },
+      "positions": {
+        "offset": 6084036,
+        "size": 1608
+      },
+      "normals": {
+        "offset": 6085644,
+        "size": 1608
+      },
+      "indices": {
+        "offset": 6087252,
+        "size": 1776
+      }
+    },
+    {
+      "name": "Mesh361",
+      "bounding box": {
+        "min": [
+          108.368,
+          1215.9,
+          -263.625
+        ],
+        "max": [
+          165.835,
+          1273.49,
+          -243.133
+        ]
+      },
+      "positions": {
+        "offset": 6089028,
+        "size": 1152
+      },
+      "normals": {
+        "offset": 6090180,
+        "size": 1152
+      },
+      "indices": {
+        "offset": 6091332,
+        "size": 1920
+      }
+    },
+    {
+      "name": "Mesh362",
+      "bounding box": {
+        "min": [
+          489.555,
+          1226.98,
+          -271.464
+        ],
+        "max": [
+          524.901,
+          1262.4,
+          -255.967
+        ]
+      },
+      "positions": {
+        "offset": 6093252,
+        "size": 1368
+      },
+      "normals": {
+        "offset": 6094620,
+        "size": 1368
+      },
+      "indices": {
+        "offset": 6095988,
+        "size": 1344
+      }
+    },
+    {
+      "name": "Mesh363",
+      "bounding box": {
+        "min": [
+          300.776,
+          674.124,
+          -266.261
+        ],
+        "max": [
+          310,
+          687.219,
+          -251.26
+        ]
+      },
+      "positions": {
+        "offset": 6097332,
+        "size": 264
+      },
+      "normals": {
+        "offset": 6097596,
+        "size": 264
+      },
+      "indices": {
+        "offset": 6097860,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh364",
+      "bounding box": {
+        "min": [
+          302.004,
+          661.125,
+          -268.413
+        ],
+        "max": [
+          308.88,
+          674.156,
+          -254.269
+        ]
+      },
+      "positions": {
+        "offset": 6098076,
+        "size": 600
+      },
+      "normals": {
+        "offset": 6098676,
+        "size": 600
+      },
+      "indices": {
+        "offset": 6099276,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh365",
+      "bounding box": {
+        "min": [
+          -290.128,
+          96.7355,
+          -320.364
+        ],
+        "max": [
+          -197.71,
+          210.943,
+          -228.768
+        ]
+      },
+      "positions": {
+        "offset": 6099804,
+        "size": 35064
+      },
+      "normals": {
+        "offset": 6134868,
+        "size": 35064
+      },
+      "indices": {
+        "offset": 6169932,
+        "size": 45624
+      }
+    },
+    {
+      "name": "Mesh366",
+      "bounding box": {
+        "min": [
+          58.5265,
+          109.924,
+          -333.37
+        ],
+        "max": [
+          176.683,
+          225.102,
+          -214.287
+        ]
+      },
+      "positions": {
+        "offset": 6215556,
+        "size": 27756
+      },
+      "normals": {
+        "offset": 6243312,
+        "size": 27756
+      },
+      "indices": {
+        "offset": 6271068,
+        "size": 39696
+      }
+    },
+    {
+      "name": "Mesh367",
+      "bounding box": {
+        "min": [
+          689.351,
+          661.125,
+          -283.549
+        ],
+        "max": [
+          703.496,
+          674.156,
+          -276.673
+        ]
+      },
+      "positions": {
+        "offset": 6310764,
+        "size": 600
+      },
+      "normals": {
+        "offset": 6311364,
+        "size": 600
+      },
+      "indices": {
+        "offset": 6311964,
+        "size": 528
+      }
+    },
+    {
+      "name": "Mesh368",
+      "bounding box": {
+        "min": [
+          672.888,
+          674.124,
+          -308.942
+        ],
+        "max": [
+          682.113,
+          687.219,
+          -293.942
+        ]
+      },
+      "positions": {
+        "offset": 6312492,
+        "size": 264
+      },
+      "normals": {
+        "offset": 6312756,
+        "size": 264
+      },
+      "indices": {
+        "offset": 6313020,
+        "size": 216
+      }
+    },
+    {
+      "name": "Mesh369",
+      "bounding box": {
+        "min": [
+          -621.967,
+          831.655,
+          7.79774
+        ],
+        "max": [
+          -614.237,
+          886.139,
+          199.391
+        ]
+      },
+      "positions": {
+        "offset": 6313236,
+        "size": 2172
+      },
+      "normals": {
+        "offset": 6315408,
+        "size": 2172
+      },
+      "indices": {
+        "offset": 6317580,
+        "size": 2712
+      }
+    },
+    {
+      "name": "Mesh370",
+      "bounding box": {
+        "min": [
+          -306.992,
+          -28.0496,
+          157.742
+        ],
+        "max": [
+          -187.865,
+          210.943,
+          257.557
+        ]
+      },
+      "positions": {
+        "offset": 6320292,
+        "size": 53136
+      },
+      "normals": {
+        "offset": 6373428,
+        "size": 53136
+      },
+      "indices": {
+        "offset": 6426564,
+        "size": 71160
+      }
+    },
+    {
+      "name": "Mesh371",
+      "bounding box": {
+        "min": [
+          -251.628,
+          831.655,
+          7.79774
+        ],
+        "max": [
+          -243.899,
+          886.139,
+          199.391
+        ]
+      },
+      "positions": {
+        "offset": 6497724,
+        "size": 2172
+      },
+      "normals": {
+        "offset": 6499896,
+        "size": 2172
+      },
+      "indices": {
+        "offset": 6502068,
+        "size": 2712
+      }
+    },
+    {
+      "name": "Mesh372",
+      "bounding box": {
+        "min": [
+          -628.654,
+          828.811,
+          178.947
+        ],
+        "max": [
+          -607.994,
+          849.471,
+          186.344
+        ]
+      },
+      "positions": {
+        "offset": 6504780,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 6507672,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 6510564,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh373",
+      "bounding box": {
+        "min": [
+          118.141,
+          831.655,
+          7.79774
+        ],
+        "max": [
+          125.871,
+          886.139,
+          199.391
+        ]
+      },
+      "positions": {
+        "offset": 6516036,
+        "size": 2172
+      },
+      "normals": {
+        "offset": 6518208,
+        "size": 2172
+      },
+      "indices": {
+        "offset": 6520380,
+        "size": 2712
+      }
+    },
+    {
+      "name": "Mesh374",
+      "bounding box": {
+        "min": [
+          -258.315,
+          828.811,
+          178.947
+        ],
+        "max": [
+          -237.656,
+          849.471,
+          186.344
+        ]
+      },
+      "positions": {
+        "offset": 6523092,
+        "size": 2892
+      },
+      "normals": {
+        "offset": 6525984,
+        "size": 2892
+      },
+      "indices": {
+        "offset": 6528876,
+        "size": 5472
+      }
+    },
+    {
+      "name": "Mesh375",
+      "bounding box": {
+        "min": [
+          -1504.47,
+          -115.979,
+          -782.52
+        ],
+        "max": [
+          1380.6,
+          1271.04,
+          674.757
+        ]
+      },
+      "positions": {
+        "offset": 6534348,
+        "size": 144
+      },
+      "normals": {
+        "offset": 6534492,
+        "size": 144
+      },
+      "indices": {
+        "offset": 6534636,
+        "size": 120
+      }
+    },
+    {
+      "name": "Mesh376",
+      "bounding box": {
+        "min": [
+          -1920.95,
+          1330.03,
+          -1182.81
+        ],
+        "max": [
+          1799.91,
+          1422.21,
+          1105.43
+        ]
+      },
+      "positions": {
+        "offset": 6534756,
+        "size": 2976
+      },
+      "normals": {
+        "offset": 6537732,
+        "size": 2976
+      },
+      "indices": {
+        "offset": 6540708,
+        "size": 5952
+      }
+    },
+    {
+      "name": "Mesh377",
+      "bounding box": {
+        "min": [
+          -1442.19,
+          1280.51,
+          -701.691
+        ],
+        "max": [
+          1319.29,
+          1429.43,
+          625.957
+        ]
+      },
+      "positions": {
+        "offset": 6546660,
+        "size": 125784
+      },
+      "normals": {
+        "offset": 6672444,
+        "size": 125784
+      },
+      "indices": {
+        "offset": 6798228,
+        "size": 167856
+      }
+    },
+    {
+      "name": "Mesh378",
+      "bounding box": {
+        "min": [
+          -644.001,
+          134.412,
+          -221.487
+        ],
+        "max": [
+          -618.163,
+          213.695,
+          -217.914
+        ]
+      },
+      "positions": {
+        "offset": 6966084,
+        "size": 48
+      },
+      "normals": {
+        "offset": 6966132,
+        "size": 48
+      },
+      "indices": {
+        "offset": 6966180,
+        "size": 24
+      }
+    },
+    {
+      "name": "Mesh379",
+      "bounding box": {
+        "min": [
+          -649.721,
+          182.652,
+          -646.968
+        ],
+        "max": [
+          -589.018,
+          217.612,
+          -631.352
+        ]
+      },
+      "positions": {
+        "offset": 6966204,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 6967284,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 6968364,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh380",
+      "bounding box": {
+        "min": [
+          -619.675,
+          134.157,
+          -221.487
+        ],
+        "max": [
+          -594.965,
+          213.697,
+          -217.914
+        ]
+      },
+      "positions": {
+        "offset": 6969420,
+        "size": 48
+      },
+      "normals": {
+        "offset": 6969468,
+        "size": 48
+      },
+      "indices": {
+        "offset": 6969516,
+        "size": 24
+      }
+    },
+    {
+      "name": "Mesh381",
+      "bounding box": {
+        "min": [
+          485.725,
+          207.454,
+          -246.834
+        ],
+        "max": [
+          489.099,
+          216.951,
+          -211.601
+        ]
+      },
+      "positions": {
+        "offset": 6969540,
+        "size": 1668
+      },
+      "normals": {
+        "offset": 6971208,
+        "size": 1668
+      },
+      "indices": {
+        "offset": 6972876,
+        "size": 3240
+      }
+    },
+    {
+      "name": "Mesh382",
+      "bounding box": {
+        "min": [
+          -278.647,
+          660.363,
+          -646.968
+        ],
+        "max": [
+          -217.943,
+          695.323,
+          -631.352
+        ]
+      },
+      "positions": {
+        "offset": 6976116,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 6977196,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 6978276,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh383",
+      "bounding box": {
+        "min": [
+          92.204,
+          660.363,
+          -646.968
+        ],
+        "max": [
+          152.907,
+          695.323,
+          -631.352
+        ]
+      },
+      "positions": {
+        "offset": 6979332,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 6980412,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 6981492,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh384",
+      "bounding box": {
+        "min": [
+          -1049.05,
+          182.652,
+          -646.968
+        ],
+        "max": [
+          -962.745,
+          217.612,
+          -631.352
+        ]
+      },
+      "positions": {
+        "offset": 6982548,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 6983628,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 6984708,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh385",
+      "bounding box": {
+        "min": [
+          462.665,
+          660.363,
+          559.872
+        ],
+        "max": [
+          523.368,
+          695.323,
+          575.488
+        ]
+      },
+      "positions": {
+        "offset": 6985764,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 6986844,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 6987924,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh386",
+      "bounding box": {
+        "min": [
+          835.216,
+          660.363,
+          559.872
+        ],
+        "max": [
+          923.732,
+          695.323,
+          575.488
+        ]
+      },
+      "positions": {
+        "offset": 6988980,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 6990060,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 6991140,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh387",
+      "bounding box": {
+        "min": [
+          -649.721,
+          660.363,
+          -646.968
+        ],
+        "max": [
+          -589.018,
+          695.323,
+          -631.352
+        ]
+      },
+      "positions": {
+        "offset": 6992196,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 6993276,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 6994356,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh388",
+      "bounding box": {
+        "min": [
+          -1049.05,
+          660.363,
+          -646.968
+        ],
+        "max": [
+          -962.745,
+          695.323,
+          -631.352
+        ]
+      },
+      "positions": {
+        "offset": 6995412,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 6996492,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 6997572,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh389",
+      "bounding box": {
+        "min": [
+          -649.721,
+          660.363,
+          559.872
+        ],
+        "max": [
+          -589.018,
+          695.323,
+          575.488
+        ]
+      },
+      "positions": {
+        "offset": 6998628,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 6999708,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 7000788,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh390",
+      "bounding box": {
+        "min": [
+          -1049.05,
+          660.363,
+          559.872
+        ],
+        "max": [
+          -962.745,
+          695.323,
+          575.488
+        ]
+      },
+      "positions": {
+        "offset": 7001844,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 7002924,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 7004004,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh391",
+      "bounding box": {
+        "min": [
+          -278.647,
+          660.363,
+          559.872
+        ],
+        "max": [
+          -217.943,
+          695.323,
+          575.488
+        ]
+      },
+      "positions": {
+        "offset": 7005060,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 7006140,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 7007220,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh392",
+      "bounding box": {
+        "min": [
+          92.204,
+          660.363,
+          559.872
+        ],
+        "max": [
+          152.907,
+          695.323,
+          575.488
+        ]
+      },
+      "positions": {
+        "offset": 7008276,
+        "size": 1080
+      },
+      "normals": {
+        "offset": 7009356,
+        "size": 1080
+      },
+      "indices": {
+        "offset": 7010436,
+        "size": 1056
+      }
+    },
+    {
+      "name": "Mesh393",
+      "bounding box": {
+        "min": [
+          -622.759,
+          98.6729,
+          -223.09
+        ],
+        "max": [
+          -616.081,
+          104.802,
+          -216.42
+        ]
+      },
+      "positions": {
+        "offset": 7011492,
+        "size": 3840
+      },
+      "normals": {
+        "offset": 7015332,
+        "size": 3840
+      },
+      "indices": {
+        "offset": 7019172,
+        "size": 6696
+      }
+    }
+  ]
+}
