@@ -10,3 +10,6 @@
 [submodule "external/rapidjson"]
 	path = external/rapidjson
 	url = https://github.com/Tencent/rapidjson.git
+[submodule "models/Sponza"]
+	path = models/Sponza
+	url = https://github.com/jimmiebergmann/Sponza.git

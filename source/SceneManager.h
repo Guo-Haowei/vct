@@ -13,6 +13,8 @@ public:
     void releaseGpuResources();
 
     Scene& getScene() const { return *m_scene.get(); }
+
+    void initializeCamera();
 private:
     void writeBuffer(std::ofstream& text,
                      std::ofstream& bin,

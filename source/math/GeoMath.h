@@ -64,6 +64,8 @@ struct Box3D
         min.z = glm::min(o.min.z, min.z);
     }
 
+    vec3 getCenter() const { return 0.5f * (min + max); }
+    vec3 getSize() const { return max - min; }
 };
 
 static std::ostream& operator<<(std::ostream& os, const Box3D& b)

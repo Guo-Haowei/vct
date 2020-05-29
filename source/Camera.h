@@ -13,8 +13,18 @@ public:
     void moveUp(float d);
     void moveRight(float d);
 
-    const mat4& getV() const { return m_V; }
-    const mat4& getP() const { return m_P; }
+    inline const mat4& getV() const { return m_V; }
+    inline const mat4& getP() const { return m_P; }
+
+    inline float getFov() const { return m_fov; }
+    inline float getNear() const { return m_zNear; }
+    inline float getFar() const { return m_zFar; }
+
+    inline void setFov(float fov) { m_fov = fov; m_projDirty = true; }
+    inline void setNear(float zNear) { m_zNear = zNear; m_projDirty = true; }
+    inline void setFar(float zFar) { m_zFar = zFar; m_projDirty = true; }
+
+    inline void setSpeed(float speed) { m_speed = speed; }
 
     void setAspect(float aspect);
 
@@ -37,6 +47,7 @@ private:
     float m_aspect;
     float m_zNear;
     float m_zFar;
-    bool m_dirty;
+    bool m_viewDirty;
+    bool m_projDirty;
     float m_speed; // in scale of world bounding box size?
 };

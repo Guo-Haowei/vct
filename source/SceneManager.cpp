@@ -141,4 +141,20 @@ void SceneManager::releaseGpuResources()
     }
 }
 
+void SceneManager::initializeCamera()
+{
+    const vec3 center = m_scene->aabb.getCenter();
+    const vec3 halfSize = 0.5f * m_scene->aabb.getSize();
+
+    auto& cam = m_scene->camera;
+    cam.moveUp(halfSize.y);
+    float z = halfSize.y / (2.f * glm::tan(cam.getFov() / 2.f));
+    m_scene->camera.moveFront(-z + center.z - halfSize.z);
+    float aabbMin = glm::min(halfSize.x, glm::min(halfSize.y, halfSize.z));
+    float aabbMax = glm::max(halfSize.x, glm::max(halfSize.y, halfSize.z));
+    cam.setSpeed(0.5f * aabbMin);
+    cam.setNear(0.1f);
+    cam.setFar(2.0f * aabbMax);
+}
+
 SceneManager* g_pSceneManager = new SceneManager();

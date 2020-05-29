@@ -14,8 +14,6 @@
 #ifdef _DEBUG
 #   include "internal/Debug.h"
 #endif
-#define WINDOW_WIDTH 1200
-#define WINDOW_HEIGHT 800
 #define TITLE "Voxel GI"
 #ifndef MODEL_DIR
 #define MODEL_DIR ""
@@ -36,8 +34,12 @@ void App::run()
 #ifdef _DEBUG
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #endif
-        // glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-        m_pWindow = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, TITLE, NULL, NULL);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
+        const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        double width = mode->width * 0.8;
+        double height = mode->height * 0.8;
+        m_pWindow = glfwCreateWindow(width, height, "Voxel GI", NULL, NULL);
 
         glfwSetWindowUserPointer(m_pWindow, this);
         // glfwGetFramebufferSize(m_pWindow, &m_frameBufferSizeCache.x, &m_frameBufferSizeCache.y);
@@ -69,7 +71,6 @@ void App::run()
         // scroll
         glfwSetScrollCallback(m_pWindow, [](GLFWwindow* window, double xoffset, double yoffset){
             InputManager::getInstance().m_scroll = static_cast<float>(yoffset);
-            std::cout << "scroll is " << yoffset << std::endl;
         });
 
         /*************************  GLAD  *************************/
@@ -98,15 +99,17 @@ void App::run()
         glEnable(GL_CULL_FACE);
 
         //// load scene
-        g_pSceneManager->load(MODEL_DIR "bunny", "bunny.json");
+        g_pSceneManager->load(MODEL_DIR "Sponza", "sponza.json");
+        // g_pSceneManager->load(MODEL_DIR "bunny", "bunny.json");
         // create buffers
         g_pSceneManager->createGpuResources();
+        g_pSceneManager->initializeCamera();
 
         ////// temp
         // manually set camera position
-        auto& cam = g_pSceneManager->getScene().camera;
-        cam.moveFront(-3.0f);
-        cam.moveUp(1.0f);
+        // auto& cam = g_pSceneManager->getScene().camera;
+        // cam.moveFront(-3.0f);
+        // cam.moveUp(1.0f);
 
         VoxelPass voxelPass;
         voxelPass.initialize();
@@ -121,6 +124,7 @@ void App::run()
         {
             glfwPollEvents();
             int width, height;
+            auto& cam = g_pSceneManager->getScene().camera;
             glfwGetFramebufferSize(m_pWindow, &width, &height);
             cam.setAspect(width, height);
             cam.update();
