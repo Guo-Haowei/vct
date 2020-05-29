@@ -45,4 +45,5 @@ struct Scene
     std::vector<std::unique_ptr<SceneMaterial>> materials;
     Box3D aabb;
     PerspectiveCamera camera;
+    float aabbSizeMax;
 };

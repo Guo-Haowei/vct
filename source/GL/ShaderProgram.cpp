@@ -131,6 +131,18 @@ void ShaderProgram::setUniform(const char* name, int val)
     glUniform1i(location, val);
 }
 
+void ShaderProgram::setUniform(const char* name, float val)
+{
+    GLint location = glGetUniformLocation(m_handle, name);
+#ifdef _DEBUG
+    if (location < 0)
+    {
+        std::cout << "[ERROR][GLSL] uniform '" << name << "' not found" << std::endl;
+    }
+#endif
+    glUniform1f(location, val);
+}
+
 void ShaderProgram::setUniform(const char* name, const vec3& val)
 {
     GLint location = glGetUniformLocation(m_handle, name);

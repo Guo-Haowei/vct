@@ -10,6 +10,7 @@
 #include "SceneManager.h"
 #include "VoxelPass.h"
 #include "MainPass.h"
+#include "VisualizationPass.h"
 // temp
 #include "InputManager.h"
 #ifdef _DEBUG
@@ -117,6 +118,8 @@ void App::run()
         mainPass.initialize();
         VoxelPass voxelPass;
         voxelPass.initialize();
+        VisualizationPass visualizationPass;
+        visualizationPass.initialize();
 
         ////////////////////////////////////////////////////////////////////////
         // timer stuff, needs refactor
@@ -142,7 +145,8 @@ void App::run()
             InputManager::getInstance().postUpdate();
             // swap front and back buffers
             voxelPass.render();
-            mainPass.render();
+            // mainPass.render();
+            visualizationPass.render();
             glfwSwapBuffers(m_pWindow);
 
             // timer
@@ -162,6 +166,7 @@ void App::run()
         // temp
         mainPass.finalize();
         voxelPass.finalize();
+        visualizationPass.finalize();
         g_pSceneManager->releaseGpuResources();
         // temp
 

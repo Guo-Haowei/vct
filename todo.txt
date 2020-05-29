@@ -1,1 +1,2 @@
-draw bbox to see if it's accurate
+[ ] visualize 3d texture
+[x] draw bbox to see if it's accurate

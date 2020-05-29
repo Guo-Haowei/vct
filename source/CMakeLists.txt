@@ -9,6 +9,7 @@ add_executable(VoxelGI
     VoxelPass.cpp
     Camera.cpp
     MainPass.cpp
+    VisualizationPass.cpp
 )
 
 target_link_libraries(VoxelGI
@@ -27,6 +28,7 @@ add_executable(convert
     VoxelPass.cpp
     Camera.cpp
     MainPass.cpp
+    VisualizationPass.cpp
 )
 
 target_link_libraries(convert

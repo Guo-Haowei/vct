@@ -27,7 +27,7 @@ void VoxelPass::initialize()
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     // Upload texture buffer.
-    const int levels = 7;
+    const int levels = 5;
     glTexStorage3D(GL_TEXTURE_3D, levels, GL_RGBA8, VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE);
     //std::vector<GLfloat> data(4 * VOXEL_SIZE * VOXEL_SIZE * VOXEL_SIZE, 0.0f);
     //glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE, 0, GL_RGBA, GL_FLOAT, data.data());
@@ -52,11 +52,11 @@ void VoxelPass::render()
     // upload uniforms
     const Box3D& aabb = g_pSceneManager->getScene().aabb;
     const vec3 center = aabb.getCenter();
-    const vec3 size = 0.5f * aabb.getSize();
+    float size = 0.5f * g_pSceneManager->getScene().aabbSizeMax;
 
     m_voxelShader->setUniform("u_voxel_texture", int(0));
     m_voxelShader->setUniform("u_world_center", center);
-    m_voxelShader->setUniform("u_world_size", size);
+    m_voxelShader->setUniform("u_world_size_half", size);
 
     for (auto& mesh : g_pSceneManager->getScene().meshes)
     {

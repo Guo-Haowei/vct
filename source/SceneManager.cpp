@@ -18,6 +18,10 @@ void SceneManager::load(const char* root, const char* path)
         AssimpLoader loader;
         m_scene.reset(loader.parse(root, path));
     }
+
+    const auto& size = m_scene->aabb.getSize();
+    float aabbSizeMax = glm::max(size.x, glm::max(size.y, size.z));
+    m_scene->aabbSizeMax = aabbSizeMax;
 }
 
 void SceneManager::writeBuffer(std::ofstream& text,

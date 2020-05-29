@@ -9,7 +9,7 @@ out vec3 pass_position; // fragment world position
 out vec3 pass_normal; // fragment normal
 
 uniform vec3 u_world_center;
-uniform vec3 u_world_size; // half of the world size
+uniform float u_world_size_half;
 
 void main(){
 	const vec3 p0 = pass_positions[1] - pass_positions[0];
@@ -22,7 +22,7 @@ void main(){
         // transform gl_Position from world space to ndc space
         pass_position = gl_Position.xyz;
         pass_normal = pass_normals[i];
-        gl_Position = vec4((pass_positions[i] - u_world_center) / u_world_size, 1.0);
+        gl_Position = vec4((pass_positions[i] - u_world_center) / u_world_size_half, 1.0);
         if (dominant == 0)
         {
             gl_Position.xyz = gl_Position.zyx;
@@ -32,7 +32,7 @@ void main(){
             gl_Position.xyz = gl_Position.xzy;
         }
         // projected position
-
+        gl_Position.z = 0.5; // make sure every triangle is rendered
         // TODO: expand vertex?
         EmitVertex();
     }

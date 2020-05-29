@@ -1,13 +1,9 @@
 #include "MainPass.h"
 #include "SceneManager.h"
 #include "math/GeoMath.h"
+#include "internal/Geometries.h"
 #include "App.h"
 
-namespace internal {
-
-static void genHexahedronBufferData(std::vector<vec3>& outPositions, std::vector<unsigned int>& outIndices);
-
-} // namespace::internal
 
 void MainPass::initialize()
 {
@@ -32,7 +28,7 @@ void MainPass::initialize()
         // mesh data
         std::vector<vec3> positions;
         std::vector<unsigned int> indices;
-        internal::genHexahedronBufferData(positions, indices);
+        internal::genBoxWireframe(positions, indices);
         {
             GpuBuffer::CreateInfo vertexBufferCreateInfo {};
             vertexBufferCreateInfo.type = GL_ARRAY_BUFFER;
@@ -88,15 +84,13 @@ void MainPass::render()
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
-    // TODO: rendering to a 3d texture, no need to clear
     int width, height;
     g_pApp->getFrameBufferSize(width, height);
     glViewport(0, 0, width, height);
-    // glClearColor(1.f, 1.f, 1.f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glUseProgram(m_mainShader->getHandle());
 
     // upload uniforms
+    glUseProgram(m_mainShader->getHandle());
     auto& cam = g_pSceneManager->getScene().camera;
     mat4 PV = cam.getP() * cam.getV();
     m_mainShader->setUniform("PV", PV);
@@ -127,47 +121,3 @@ void MainPass::finalize()
     m_boxCenter->release();
     m_boxSize->release();
 }
-
-namespace internal {
-
-void genHexahedronBufferData(std::vector<vec3>& outPositions, std::vector<unsigned int>& outIndices)
-{
-    /**
-     *        E__________________ H
-     *       /|                 /|
-     *      / |                / |
-     *     /  |               /  |
-     *   A/___|______________/D  |
-     *    |   |              |   |
-     *    |   |              |   |
-     *    |   |              |   |
-     *    |  F|______________|___|G
-     *    |  /               |  /
-     *    | /                | /
-     *   B|/_________________|C
-     * 
-     */
-    enum HexahedronVertexIndex { A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7 };
-
-    float scale = 0.5f;
-    outPositions.clear();
-    outPositions = {
-        { -scale, +scale, +scale }, // A
-        { -scale, -scale, +scale }, // B
-        { +scale, -scale, +scale }, // C
-        { +scale, +scale, +scale }, // D
-        { -scale, +scale, -scale }, // E
-        { -scale, -scale, -scale }, // F
-        { +scale, -scale, -scale }, // G
-        { +scale, +scale, -scale }  // H
-    };
-
-    outIndices.clear();
-    outIndices = {
-        A, B, B, C, C, D, D, A,
-        E, F, F, G, G, H, H, E,
-        A, E, B, F, D, H, C, G
-    };
-}
-
-} // namespace::internal
