@@ -14,9 +14,9 @@ void MainPass::initialize()
     // scene shader
     {
         ShaderProgram::CreateInfo shaderCreateInfo {};
-        shaderCreateInfo.vs = "voxelization.vs.glsl";
-        shaderCreateInfo.fs = "voxelization.fs.glsl";
-        m_mainShader.reset(new ShaderProgram("voxelization", shaderCreateInfo));
+        shaderCreateInfo.vs = "main.vs.glsl";
+        shaderCreateInfo.fs = "main.fs.glsl";
+        m_mainShader.reset(new ShaderProgram("main", shaderCreateInfo));
     }
     // box shader
     {
@@ -85,18 +85,18 @@ void MainPass::initialize()
 
 void MainPass::render()
 {
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
     // TODO: rendering to a 3d texture, no need to clear
     int width, height;
     g_pApp->getFrameBufferSize(width, height);
-
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
+    glViewport(0, 0, width, height);
     // glClearColor(1.f, 1.f, 1.f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glViewport(0, 0, width, height);
-
     glUseProgram(m_mainShader->getHandle());
 
+    // upload uniforms
     auto& cam = g_pSceneManager->getScene().camera;
     mat4 PV = cam.getP() * cam.getV();
     m_mainShader->setUniform("PV", PV);

@@ -100,8 +100,9 @@ void App::run()
         glEnable(GL_CULL_FACE);
 
         //// load scene
-        g_pSceneManager->load(MODEL_DIR "Sponza", "sponza.json");
+        // g_pSceneManager->load(MODEL_DIR "Sponza", "sponza.json");
         // g_pSceneManager->load(MODEL_DIR "bunny", "bunny.json");
+        g_pSceneManager->load(MODEL_DIR "suzanne", "suzanne.json");
         // create buffers
         g_pSceneManager->createGpuResources();
         g_pSceneManager->initializeCamera();
@@ -114,6 +115,8 @@ void App::run()
 
         MainPass mainPass;
         mainPass.initialize();
+        VoxelPass voxelPass;
+        voxelPass.initialize();
 
         ////////////////////////////////////////////////////////////////////////
         // timer stuff, needs refactor
@@ -138,6 +141,7 @@ void App::run()
             // post update
             InputManager::getInstance().postUpdate();
             // swap front and back buffers
+            voxelPass.render();
             mainPass.render();
             glfwSwapBuffers(m_pWindow);
 
@@ -157,6 +161,7 @@ void App::run()
 
         // temp
         mainPass.finalize();
+        voxelPass.finalize();
         g_pSceneManager->releaseGpuResources();
         // temp
 
