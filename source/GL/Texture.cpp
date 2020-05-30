@@ -48,9 +48,6 @@ Texture2D::Texture2D(const std::string& debugName, const Texture::CreateInfo& in
     glTexParameteri(m_type, GL_TEXTURE_WRAP_T, info.wrapT);
     glTexParameteri(m_type, GL_TEXTURE_MIN_FILTER, info.minFilter);
     glTexParameteri(m_type, GL_TEXTURE_MAG_FILTER, info.magFilter);
-
-    // hard code GL_RGBA8 for now
-    // glTexStorage2D(m_type, info.mipLevel, GL_RGBA8, info.width, info.height);
     unbind();
 }
 

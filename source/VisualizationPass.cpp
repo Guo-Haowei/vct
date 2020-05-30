@@ -42,6 +42,15 @@ void VisualizationPass::initialize()
         }
         m_boxVao->unbind();
     }
+
+    // can be set at compile time as #define
+    const Box3D& aabb = g_pSceneManager->getScene().aabb;
+    const vec3 center = aabb.getCenter();
+    float unitSize = g_pSceneManager->getScene().aabbSizeMax / float(VOXEL_SIZE);
+    glUseProgram(m_visualizationShader->getHandle());
+    m_visualizationShader->setUniform("u_voxel_texture", int(VOXEL_TEXTURE_DEFAULT_SLOT));
+    m_visualizationShader->setUniform("u_world_center", center);
+    m_visualizationShader->setUniform("u_unit_size", unitSize);
 }
 
 void VisualizationPass::render()
@@ -58,19 +67,9 @@ void VisualizationPass::render()
     glUseProgram(m_visualizationShader->getHandle());
     auto& cam = g_pSceneManager->getScene().camera;
     mat4 PV = cam.getP() * cam.getV();
-    const Box3D& aabb = g_pSceneManager->getScene().aabb;
-    const vec3 center = aabb.getCenter();
-    float unitSize = g_pSceneManager->getScene().aabbSizeMax / float(VOXEL_SIZE);
     g_pVoxelTexture->bindToSlot(VOXEL_TEXTURE_DEFAULT_SLOT);
     m_visualizationShader->setUniform("PV", PV);
-    m_visualizationShader->setUniform("u_voxel_texture", int(VOXEL_TEXTURE_DEFAULT_SLOT));
-    m_visualizationShader->setUniform("u_world_center", center);
-    m_visualizationShader->setUniform("u_unit_size", unitSize);
-    m_visualizationShader->setUniform("u_voxel_dim", int(VOXEL_SIZE));
-    // TODO: extract texture
-
     glBindVertexArray(m_boxVao->getHandle());
-    // glDrawElementsInstanced(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0, 1);
     glDrawElementsInstanced(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0, VOXEL_SIZE * VOXEL_SIZE * VOXEL_SIZE);
 }
 

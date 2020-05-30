@@ -10,6 +10,7 @@ add_executable(VoxelGI
     Camera.cpp
     MainPass.cpp
     VisualizationPass.cpp
+    TextureRenderer.cpp
 )
 
 target_link_libraries(VoxelGI
@@ -29,6 +30,7 @@ add_executable(convert
     Camera.cpp
     MainPass.cpp
     VisualizationPass.cpp
+    TextureRenderer.cpp
 )
 
 target_link_libraries(convert
