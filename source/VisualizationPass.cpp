@@ -3,6 +3,7 @@
 #include "SceneManager.h"
 #include "internal/Geometries.h"
 #include "common.h"
+#include "GL/Texture.h"
 
 void VisualizationPass::initialize()
 {
@@ -60,9 +61,9 @@ void VisualizationPass::render()
     const Box3D& aabb = g_pSceneManager->getScene().aabb;
     const vec3 center = aabb.getCenter();
     float unitSize = g_pSceneManager->getScene().aabbSizeMax / float(VOXEL_SIZE);
-    // float voxelSize = 
+    g_pVoxelTexture->bindToSlot(VOXEL_TEXTURE_DEFAULT_SLOT);
     m_visualizationShader->setUniform("PV", PV);
-    m_visualizationShader->setUniform("u_voxel_texture", int(0));
+    m_visualizationShader->setUniform("u_voxel_texture", int(VOXEL_TEXTURE_DEFAULT_SLOT));
     m_visualizationShader->setUniform("u_world_center", center);
     m_visualizationShader->setUniform("u_unit_size", unitSize);
     m_visualizationShader->setUniform("u_voxel_dim", int(VOXEL_SIZE));

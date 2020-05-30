@@ -3,6 +3,7 @@ add_library(lib_gl
     GpuBuffer.cpp
     VertexArray.cpp
     ShaderProgram.cpp
+    Texture.cpp
 )
 
 target_link_libraries(lib_gl PUBLIC glad)

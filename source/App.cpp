@@ -11,6 +11,7 @@
 #include "VoxelPass.h"
 #include "MainPass.h"
 #include "VisualizationPass.h"
+#include "GL/Texture.h"
 // temp
 #include "InputManager.h"
 #ifdef _DEBUG
@@ -39,7 +40,7 @@ void App::run()
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
         const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        double width = mode->width * 0.8;
+        double width = mode->width * 0.9;
         double height = mode->height * 0.8;
         m_pWindow = glfwCreateWindow(width, height, "Voxel GI", NULL, NULL);
 
@@ -115,6 +116,15 @@ void App::run()
         // cam.moveFront(-3.0f);
         // cam.moveUp(1.0f);
 
+        // initialize voxel texture
+        Texture::CreateInfo voxelTextureInfo;
+        voxelTextureInfo.width = voxelTextureInfo.height = voxelTextureInfo.depth = VOXEL_SIZE;
+        voxelTextureInfo.wrapS = voxelTextureInfo.wrapR = voxelTextureInfo.wrapT = GL_CLAMP_TO_BORDER;
+        voxelTextureInfo.minFilter = GL_LINEAR_MIPMAP_LINEAR;
+        voxelTextureInfo.magFilter = GL_NEAREST;
+        voxelTextureInfo.mipLevel = 6;
+        g_pVoxelTexture.reset(new Texture3D("voxelTexture", voxelTextureInfo));
+
         MainPass mainPass;
         mainPass.initialize();
         VoxelPass voxelPass;
@@ -149,6 +159,8 @@ void App::run()
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             voxelPass.render();
             visualizationPass.render();
+            float clearColor[4] = { .0f, .0f, .0f, .0f };
+            g_pVoxelTexture->clear(clearColor);
             mainPass.render();
             glfwSwapBuffers(m_pWindow);
 
@@ -167,6 +179,7 @@ void App::run()
         }
 
         // temp
+        g_pVoxelTexture->release();
         mainPass.finalize();
         voxelPass.finalize();
         visualizationPass.finalize();
