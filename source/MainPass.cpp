@@ -110,6 +110,7 @@ void MainPass::render()
         glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
     }
 
+#if 0
     // debug box
     // render debug boxes
     glUseProgram(m_boxShader->getHandle());
@@ -117,6 +118,7 @@ void MainPass::render()
     glBindVertexArray(m_boxVao->getHandle());
     // glDrawElements(GL_LINES, 32, GL_UNSIGNED_INT, 0);
     glDrawElementsInstanced(GL_LINES, 32, GL_UNSIGNED_INT, 0, m_boxCount);
+#endif
 }
 
 void MainPass::finalize()
