@@ -11040,7 +11040,7 @@
         {
             "name": "Material__47",
             "index": 3,
-            "albedo": "",
+            "albedo": "textures/white.jpg",
             "normal": ""
         },
         {
@@ -11175,5 +11175,10 @@
             "albedo": "textures/vase_round.tga",
             "normal": "textures/vase_round_ddn.tga"
         }
-    ]
+    ],
+    "light": {
+        "position": [ 0.0, 3000.0, 1000.0 ],
+        "near": 2500.0,
+        "far": 5000.0
+    }
 }

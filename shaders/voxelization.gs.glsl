@@ -43,7 +43,7 @@ void main(){
     vec2 side0N = normalize(output_positions[1].xy - output_positions[0].xy);
     vec2 side1N = normalize(output_positions[2].xy - output_positions[1].xy);
     vec2 side2N = normalize(output_positions[0].xy - output_positions[2].xy);
-    const float texelSize = 1.0 / float(u_voxel_dim);
+    const float texelSize = 2.0 / float(u_voxel_dim);
     output_positions[0].xy += normalize(side2N - side0N) * texelSize;
     output_positions[1].xy += normalize(side0N - side1N) * texelSize;
     output_positions[2].xy += normalize(side1N - side2N) * texelSize;

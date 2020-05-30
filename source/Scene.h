@@ -31,6 +31,16 @@ struct SceneMesh
     std::vector<std::unique_ptr<GpuBuffer>> gpuBuffers;
 };
 
+struct Light
+{
+    vec3 position { 0.0f, 3000.0f, 200.0f };
+    mat4 P;
+    mat4 V;
+    mat4 PV;
+    float zNear = 0.1f;
+    float zFar = 10000.0f;
+};
+
 struct Scene
 {
     std::string name;
@@ -39,4 +49,5 @@ struct Scene
     Box3D aabb;
     PerspectiveCamera camera;
     float aabbSizeMax;
+    Light light;
 };

@@ -88,11 +88,6 @@ Scene* MyLoader::parse(const char* root, const char* file)
 
         scene->meshes.push_back(std::move(sceneMesh));
     }
-        //StringBuffer sb;
-        //PrettyWriter<StringBuffer> writer(sb);
-        //mesh.Accept(writer);
-        //auto str = sb.GetString();
-        //std::cout << str << std::endl;
     if (document["materials"].IsArray())
     {
         for (auto& mat : document["materials"].GetArray())
@@ -102,6 +97,22 @@ Scene* MyLoader::parse(const char* root, const char* file)
             sceneMaterial->albedoPath = mat["albedo"].GetString();
             scene->materials.push_back(std::move(sceneMaterial));
         }
+    }
+    auto& lightNode = document["light"];
+    if (lightNode.IsObject())
+    {
+        auto& light = scene->light;
+        auto& pos = lightNode["position"];
+        //StringBuffer sb;
+        //PrettyWriter<StringBuffer> writer(sb);
+        //pos.Accept(writer);
+        //auto str = sb.GetString();
+        //std::cout << str << std::endl;
+        light.position = vec3(pos[0].GetFloat(), pos[1].GetFloat(), pos[2].GetFloat());
+        if (lightNode["far"].IsFloat())
+            light.zFar = lightNode["far"].GetFloat();
+        if (lightNode["near"].IsFloat())
+            light.zNear = lightNode["near"].GetFloat();
     }
 
     delete [] buffer;

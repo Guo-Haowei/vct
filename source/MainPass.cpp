@@ -3,6 +3,7 @@
 #include "math/GeoMath.h"
 #include "internal/Geometries.h"
 #include "App.h"
+#include "common.h"
 
 
 void MainPass::initialize()
@@ -82,6 +83,7 @@ void MainPass::initialize()
 void MainPass::render()
 {
     auto& cam = g_pSceneManager->getScene().camera;
+    auto& light = g_pSceneManager->getScene().light;
     int width, height;
     g_pApp->getFrameBufferSize(width, height);
     // glViewport(0, 0, width, height);
@@ -93,8 +95,12 @@ void MainPass::render()
     // scene
     // upload uniforms
     glUseProgram(m_mainShader->getHandle());
+    g_pShadowMap->bindToSlot(SHADOW_MAP_DEFAULT_SLOT);
     mat4 PV = cam.getP() * cam.getV();
     m_mainShader->setUniform("PV", PV);
+    m_mainShader->setUniform("u_light_pos", light.position);
+    m_mainShader->setUniform("u_shadow", SHADOW_MAP_DEFAULT_SLOT);
+    m_mainShader->setUniform("u_light_pv", light.PV);
 
     for (auto& mesh : g_pSceneManager->getScene().meshes)
     {

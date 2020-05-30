@@ -51,10 +51,10 @@ Texture2D::Texture2D(const std::string& debugName, const Texture::CreateInfo& in
     unbind();
 }
 
-void Texture2D::texImage2D(GLenum imageFormat, GLenum textureFormat, const void* data)
+void Texture2D::texImage2D(GLenum imageFormat, GLenum textureFormat, GLenum componentFormat, const void* data)
 {
     // hard code GL_UNSIGNED_BYTE
-    glTexImage2D(m_type, 0, textureFormat, m_width, m_height, 0, imageFormat, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(m_type, 0, textureFormat, m_width, m_height, 0, imageFormat, componentFormat, data);
 }
 
 Texture3D::Texture3D(const std::string& debugName, const Texture::CreateInfo& info)
@@ -79,3 +79,6 @@ void Texture3D::bindToSlotForWrite(int i)
     glBindTexture(m_type, m_handle);
     glBindImageTexture(i, m_handle, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 }
+
+std::unique_ptr<Texture3D> g_pVoxelTexture;
+std::unique_ptr<Texture2D> g_pShadowMap;

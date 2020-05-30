@@ -8,13 +8,11 @@ layout (RGBA8) uniform image3D u_voxel_texture;
 uniform vec3 u_world_center;
 uniform float u_world_size_half;
 uniform sampler2D u_albedo;
+uniform vec3 u_light_pos;
 
 void main()
 {
-    // vec3 lightPos = vec3(0, 2000, 3);
-    // float diffuse = max(0, dot(normalize(pass_normal), normalize(lightPos - pass_position)));
-    vec3 lightDir = normalize(vec3(0, 1, 1));
-    float diffuse = max(0, dot(normalize(pass_normal), lightDir));
+    float diffuse = max(0, dot(normalize(pass_normal), normalize(u_light_pos - pass_position)));
     vec4 color = (diffuse) * texture(u_albedo, pass_uv);
 
     // write lighting information to texel
@@ -25,8 +23,12 @@ void main()
     // ignore transparency for now
     ivec3 coord = ivec3(dim * voxel);
     // need to accumulate alpha
-    vec4 acummulated_color = imageLoad(u_voxel_texture, coord).rgba;
-    vec4 final_color = vec4(color + acummulated_color);
+    vec4 max_so_far = imageLoad(u_voxel_texture, coord).rgba;
+    float r = max(max_so_far.r, color.r);
+    float g = max(max_so_far.g, color.g);
+    float b = max(max_so_far.b, color.b);
+    vec4 final_color = vec4(r, g, b, 1.0);
+    // vec4 final_color = vec4(color);
     // a texel is affected by multiple texels, calculate average of it?
     imageStore(u_voxel_texture, coord, final_color);
 }

@@ -10,6 +10,7 @@
 #include "SceneManager.h"
 #include "VoxelPass.h"
 #include "MainPass.h"
+#include "ShadowPass.h"
 #include "DebugRenderer.h"
 #include "VisualizationPass.h"
 #include "GL/Texture.h"
@@ -124,7 +125,7 @@ void App::run()
         voxelTextureInfo.wrapS = voxelTextureInfo.wrapR = voxelTextureInfo.wrapT = GL_CLAMP_TO_BORDER;
         voxelTextureInfo.minFilter = GL_LINEAR_MIPMAP_LINEAR;
         voxelTextureInfo.magFilter = GL_NEAREST;
-        voxelTextureInfo.mipLevel = 6;
+        voxelTextureInfo.mipLevel = MIPMAP_LEVEL;
         g_pVoxelTexture.reset(new Texture3D("voxelTexture", voxelTextureInfo));
 
         DebugRenderer debugRenderer;
@@ -135,6 +136,8 @@ void App::run()
         voxelPass.initialize();
         VisualizationPass visualizationPass;
         visualizationPass.initialize();
+        ShadowPass shadowPass;
+        shadowPass.initialize();
 
         ////////////////////////////////////////////////////////////////////////
         // timer stuff, needs refactor
@@ -158,16 +161,18 @@ void App::run()
 
             // post update
             InputManager::getInstance().postUpdate();
-            // swap front and back buffers
+
+            shadowPass.render();
+
+            voxelPass.render();
             glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            voxelPass.render();
             visualizationPass.render();
-            // float clearColor[4] = { .0f, .0f, .0f, .0f };
-            // g_pVoxelTexture->clear(clearColor);
-            voxelPass.clearTexture();
             mainPass.render();
             debugRenderer.render();
+
+            voxelPass.clearTexture();
+            // swap front and back buffers
             glfwSwapBuffers(m_pWindow);
 
             // timer
@@ -186,6 +191,7 @@ void App::run()
 
         // temp
         g_pVoxelTexture->release();
+        shadowPass.finalize();
         mainPass.finalize();
         voxelPass.finalize();
         debugRenderer.finalize();

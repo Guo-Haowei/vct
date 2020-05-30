@@ -3,6 +3,8 @@
 #include "GL/VertexArray.h"
 #include <memory>
 
+class Texture;
+
 class DebugRenderer
 {
 public:
@@ -10,7 +12,7 @@ public:
     void render();
     void finalize();
 private:
-    void renderTexture(int texture, int slot);
+    void renderTexture(Texture* texture, int slot, int index);
 
     std::unique_ptr<ShaderProgram> m_quadShader;
     std::unique_ptr<VertexArray> m_quadVao;

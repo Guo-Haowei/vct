@@ -1,6 +1,8 @@
 #include "DebugRenderer.h"
 #include "App.h"
 #include "SceneManager.h"
+#include "GL/Texture.h"
+#include "common.h"
 
 void DebugRenderer::initialize()
 {
@@ -88,7 +90,7 @@ void DebugRenderer::render()
     glDisable(GL_BLEND);
     glUseProgram(m_quadShader->getHandle());
     glBindVertexArray(m_quadVao->getHandle());
-    renderTexture(0, 1);
+    renderTexture(g_pShadowMap.get(), SHADOW_MAP_DEFAULT_SLOT, 1);
 
     glUseProgram(m_axisShader->getHandle());
     auto& cam = g_pSceneManager->getScene().camera;
@@ -101,10 +103,12 @@ void DebugRenderer::render()
     glDrawArrays(GL_LINES, 0, 6);
 }
 
-void DebugRenderer::renderTexture(int texture, int slot)
+void DebugRenderer::renderTexture(Texture* texture, int slot, int index)
 {
-    auto s = .15;
-    glViewport((1 - s) * m_width, (1 / s - slot) / (1 / s) * m_height, s * m_width, s * m_height);
+    static double s = .15;
+    texture->bindToSlot(slot);
+    m_quadShader->setUniform("u_texture", slot);
+    glViewport((1 - s) * m_width, (1 / s - index) / (1 / s) * m_height, s * m_width, s * m_height);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 

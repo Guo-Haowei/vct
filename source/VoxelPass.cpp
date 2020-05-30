@@ -23,6 +23,7 @@ void VoxelPass::initialize()
     m_voxelShader->setUniform("u_world_center", center);
     m_voxelShader->setUniform("u_world_size_half", size);
     m_voxelShader->setUniform("u_voxel_dim", int(VOXEL_SIZE));
+    m_voxelShader->setUniform("u_light_pos", g_pSceneManager->getScene().light.position);
 }
 
 void VoxelPass::render()
@@ -77,5 +78,3 @@ void VoxelPass::clearTexture()
     float clearColor[4] = { 0.f, 0.f, 0.f, 0.f };
     g_pVoxelTexture->clear(clearColor);
 }
-
-std::unique_ptr<Texture3D> g_pVoxelTexture;

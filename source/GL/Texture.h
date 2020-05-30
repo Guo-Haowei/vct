@@ -33,7 +33,7 @@ class Texture2D : public Texture
 public:
     Texture2D(const std::string& debugName, const Texture::CreateInfo& info);
 
-    void texImage2D(GLenum imageFormat, GLenum textureFormat, const void* data);
+    void texImage2D(GLenum imageFormat, GLenum textureFormat, GLenum componentFormat, const void* data = NULL);
 };
 
 class Texture3D : public Texture
@@ -49,3 +49,4 @@ private:
 
 // TODO: refactor
 extern std::unique_ptr<Texture3D> g_pVoxelTexture;
+extern std::unique_ptr<Texture2D> g_pShadowMap;

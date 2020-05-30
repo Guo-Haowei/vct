@@ -25,6 +25,13 @@ void SceneManager::load(const char* root, const char* path)
     const auto& size = m_scene->aabb.getSize();
     float aabbSizeMax = glm::max(size.x, glm::max(size.y, size.z));
     m_scene->aabbSizeMax = aabbSizeMax;
+
+    // set light
+    auto& light = m_scene->light;
+    light.V = glm::lookAt(light.position, m_scene->aabb.getCenter(), vec3(0, 100, 0));
+    float s = 0.5 * aabbSizeMax;
+    light.P = glm::ortho(-s, s, -s, s, light.zNear, light.zFar);
+    light.PV = light.P * light.V;
 }
 
 void SceneManager::writeBuffer(std::ofstream& text,
@@ -188,7 +195,7 @@ void SceneManager::createGpuResources()
                 albedoCreateInfo.minFilter = albedoCreateInfo.magFilter = GL_LINEAR;
                 mat->albedo.reset(new Texture2D(name, albedoCreateInfo));
                 mat->albedo->bind();
-                mat->albedo->texImage2D(imageFormat, GL_RGBA, data);
+                mat->albedo->texImage2D(imageFormat, GL_RGBA, GL_UNSIGNED_BYTE, data);
                 mat->albedo->generateMipMap();
                 mat->albedo->unbind();
             }
@@ -226,8 +233,8 @@ void SceneManager::initializeCamera()
     float aabbMin = glm::min(halfSize.x, glm::min(halfSize.y, halfSize.z));
     float aabbMax = glm::max(halfSize.x, glm::max(halfSize.y, halfSize.z));
     // cam.setNear(1.f);
-    float zNear = 0.1f;
-    float zFar = glm::max(10.f, 2.0f * aabbMax);
+    float zNear = 10.0f;
+    float zFar = glm::max(2 * zNear, 2.0f * aabbMax);
     float speed = glm::max(aabbMin, 0.5f);
     cam.setNear(zNear);
     cam.setFar(zFar);

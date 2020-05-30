@@ -1,3 +1,5 @@
 #pragma once
-#define VOXEL_SIZE 128
+#define MIPMAP_LEVEL 7
+#define VOXEL_SIZE ((1) << (MIPMAP_LEVEL))
 #define VOXEL_TEXTURE_DEFAULT_SLOT 0
+#define SHADOW_MAP_DEFAULT_SLOT 15

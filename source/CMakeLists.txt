@@ -9,6 +9,7 @@ add_executable(VoxelGI
     VoxelPass.cpp
     Camera.cpp
     MainPass.cpp
+    ShadowPass.cpp
     VisualizationPass.cpp
     DebugRenderer.cpp
 )
@@ -29,6 +30,7 @@ add_executable(convert
     VoxelPass.cpp
     Camera.cpp
     MainPass.cpp
+    ShadowPass.cpp
     VisualizationPass.cpp
     DebugRenderer.cpp
 )
