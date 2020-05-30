@@ -26,8 +26,11 @@ void Texture::clear(const void* color)
     glClearTexImage(m_handle, 0, GL_RGBA, GL_FLOAT, color);
 }
 
-Texture::Texture(const std::string& debugName, const CreateInfo& info)
+Texture::Texture(const std::string& debugName, const CreateInfo& info, GLenum type)
     : GpuResource(debugName)
+    , m_width(info.width)
+    , m_height(info.height)
+    , m_type(type)
 {
 }
 
@@ -36,26 +39,46 @@ void Texture::internalRelease()
     glDeleteTextures(1, &m_handle);
 }
 
-Texture3D::Texture3D(const std::string& debugName, const Texture::CreateInfo& info)
-    : Texture(debugName, info)
+Texture2D::Texture2D(const std::string& debugName, const Texture::CreateInfo& info)
+    : Texture(debugName, info, GL_TEXTURE_2D)
 {
-    m_type = GL_TEXTURE_3D;
     glGenTextures(1, &m_handle);
     bind();
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, info.wrapS);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, info.wrapT);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, info.wrapR);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, info.minFilter);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, info.magFilter);
+    glTexParameteri(m_type, GL_TEXTURE_WRAP_S, info.wrapS);
+    glTexParameteri(m_type, GL_TEXTURE_WRAP_T, info.wrapT);
+    glTexParameteri(m_type, GL_TEXTURE_MIN_FILTER, info.minFilter);
+    glTexParameteri(m_type, GL_TEXTURE_MAG_FILTER, info.magFilter);
 
     // hard code GL_RGBA8 for now
-    glTexStorage3D(GL_TEXTURE_3D, info.mipLevel, GL_RGBA8, info.width, info.height, info.depth);
+    // glTexStorage2D(m_type, info.mipLevel, GL_RGBA8, info.width, info.height);
+    unbind();
+}
+
+void Texture2D::texImage2D(GLenum imageFormat, GLenum textureFormat, const void* data)
+{
+    // hard code GL_UNSIGNED_BYTE
+    glTexImage2D(m_type, 0, textureFormat, m_width, m_height, 0, imageFormat, GL_UNSIGNED_BYTE, data);
+}
+
+Texture3D::Texture3D(const std::string& debugName, const Texture::CreateInfo& info)
+    : Texture(debugName, info, GL_TEXTURE_3D), m_depth(info.depth)
+{
+    glGenTextures(1, &m_handle);
+    bind();
+    glTexParameteri(m_type, GL_TEXTURE_WRAP_S, info.wrapS);
+    glTexParameteri(m_type, GL_TEXTURE_WRAP_T, info.wrapT);
+    glTexParameteri(m_type, GL_TEXTURE_WRAP_R, info.wrapR);
+    glTexParameteri(m_type, GL_TEXTURE_MIN_FILTER, info.minFilter);
+    glTexParameteri(m_type, GL_TEXTURE_MAG_FILTER, info.magFilter);
+
+    // hard code GL_RGBA8 for now
+    glTexStorage3D(m_type, info.mipLevel, GL_RGBA8, info.width, info.height, info.depth);
     unbind();
 }
 
 void Texture3D::bindToSlotForWrite(int i)
 {
     glActiveTexture(GL_TEXTURE0 + i);
-    glBindTexture(GL_TEXTURE_3D, m_handle);
+    glBindTexture(m_type, m_handle);
     glBindImageTexture(i, m_handle, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 }

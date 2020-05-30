@@ -58,13 +58,6 @@ Scene* MyLoader::parse(const char* root, const char* file)
         sceneMesh->name = std::string(mesh["name"].GetString());
         json2Box3D(mesh["bounding box"], sceneMesh->aabb);
         auto& positions = mesh["positions"];
-
-        //StringBuffer sb;
-        //PrettyWriter<StringBuffer> writer(sb);
-        //mesh.Accept(writer);
-        //auto str = sb.GetString();
-        //std::cout << str << std::endl;
-
         assert(positions.IsObject());
         {
             size_t size = positions["size"].GetUint64();
@@ -93,6 +86,21 @@ Scene* MyLoader::parse(const char* root, const char* file)
         }
 
         scene->meshes.push_back(std::move(sceneMesh));
+    }
+        //StringBuffer sb;
+        //PrettyWriter<StringBuffer> writer(sb);
+        //mesh.Accept(writer);
+        //auto str = sb.GetString();
+        //std::cout << str << std::endl;
+    if (document["materials"].IsArray())
+    {
+        for (auto& mat : document["materials"].GetArray())
+        {
+            std::unique_ptr<SceneMaterial> sceneMaterial(new SceneMaterial());
+            sceneMaterial->name = mat["name"].GetString();
+            sceneMaterial->albedoPath = mat["albedo"].GetString();
+            scene->materials.push_back(std::move(sceneMaterial));
+        }
     }
 
     delete [] buffer;

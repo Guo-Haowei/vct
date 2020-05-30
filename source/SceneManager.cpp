@@ -3,10 +3,13 @@
 #include "loaders/AssimpLoader.h"
 #include "loaders/MyLoader.h"
 #include "internal/VectorUtils.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 void SceneManager::load(const char* root, const char* path)
 {
     // calculate bounding box
+    m_sceneRoot = root;
     std::string fileName(path);
     if (fileName.find(".json") != std::string::npos)
     {
@@ -62,9 +65,10 @@ void SceneManager::write()
     size_t offset = 0;
     for (const auto& mesh : m_scene->meshes)
     {
-        std::string meshName = mesh->name == "" ? "Mesh" + std::to_string(++i) : mesh->name;
+        std::string meshName = mesh->name == "" ? "Mesh" + std::to_string(i) : mesh->name;
         Box3D& aabb = mesh->aabb;
         text << "{\"name\":\""<< meshName << "\",\"bounding box\":" << aabb << ",";
+        text << "\"material\":" << mesh->materialIndex << ",";
         assert(mesh->positions.size());
         {
             size_t bufferSize = mesh->positions.size() * sizeof(vec3);
@@ -86,8 +90,21 @@ void SceneManager::write()
             offset += bufferSize;
         }
         text << "},";
+        ++i;
     }
 
+    text << "],\"materials\":[";
+    i = 0;
+    for (const auto& mat : m_scene->materials)
+    {
+        std::string matName = mat->name == "" ? "Material" + std::to_string(i) : mat->name;
+        text << "{\"name\":\""<< matName << "\",";
+        text << "\"index\":"<< i << ",";
+        text << "\"albedo\":\"" << mat->albedoPath << "\"";
+        text << ",\"normal\":\"" << mat->normalPath << "\"";
+        text << "},";
+        ++i;
+    }
     text << "]}\n";
     // close
     text.close();
@@ -133,6 +150,41 @@ void SceneManager::createGpuResources()
         }
         mesh->vertexArray->unbind();
     }
+    for (auto& mat : m_scene->materials)
+    {
+        // albedo
+        const std::string& albedoPath = mat->albedoPath;
+        if (albedoPath != "")
+        {
+            std::string path = m_sceneRoot + "/" + mat->albedoPath;
+            std::cout << path << std::endl;
+            int width, height, nrChannels;
+            unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0); 
+            GLenum imageFormat;
+            if (nrChannels == 3) imageFormat = GL_RGB;
+            else if (nrChannels == 4) imageFormat = GL_RGBA;
+            else assert(0);
+            if (!data)
+            {
+                std::cout << "[WARNNING][sbt_image] Failed to open file: " << path << std::endl;
+                continue;
+            }
+            else
+            {
+                const std::string& name = mat->name;
+                Texture::CreateInfo albedoCreateInfo;
+                albedoCreateInfo.width = width;
+                albedoCreateInfo.height = height;
+                albedoCreateInfo.wrapS = albedoCreateInfo.wrapT = GL_CLAMP_TO_EDGE;
+                albedoCreateInfo.minFilter = albedoCreateInfo.magFilter = GL_LINEAR;
+                mat->albedo.reset(new Texture2D(name, albedoCreateInfo));
+                mat->albedo->bind();
+                mat->albedo->texImage2D(imageFormat, GL_RGBA, data);
+                mat->albedo->generateMipMap();
+                mat->albedo->unbind();
+            }
+        }
+    }
 }
 
 void SceneManager::releaseGpuResources()
@@ -144,6 +196,12 @@ void SceneManager::releaseGpuResources()
             gpuBuffer->release();
         }
         mesh->vertexArray->release();
+    }
+    for (auto& mat : m_scene->materials)
+    {
+        if (mat->albedo == nullptr)
+            continue;
+        mat->albedo->release();
     }
 }
 

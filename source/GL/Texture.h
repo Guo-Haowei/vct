@@ -20,12 +20,21 @@ public:
     void clear(const void* color);
 
 protected:
-    Texture(const std::string& debugName, const CreateInfo& info);
+    Texture(const std::string& debugName, const CreateInfo& info, GLenum type);
 
     virtual void internalRelease() override;
 
-    GLenum m_type;
+    const GLenum m_type;
+    int m_width, m_height;
 }; 
+
+class Texture2D : public Texture
+{
+public:
+    Texture2D(const std::string& debugName, const Texture::CreateInfo& info);
+
+    void texImage2D(GLenum imageFormat, GLenum textureFormat, const void* data);
+};
 
 class Texture3D : public Texture
 {
@@ -33,6 +42,9 @@ public:
     Texture3D(const std::string& debugName, const Texture::CreateInfo& info);
 
     void bindToSlotForWrite(int i);
+
+private:
+    int m_depth;
 };
 
 // TODO: refactor

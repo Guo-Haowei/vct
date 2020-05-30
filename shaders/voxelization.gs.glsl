@@ -39,7 +39,7 @@ void main(){
         gl_Position = vec4(output_positions[i], 1.0);
         EmitVertex();
     }
-    // stretch the triangle to fill one more texel
+    // stretch the triangle to fill more texels
     // vec2 side0N = normalize(output_positions[1].xy - output_positions[0].xy);
     // vec2 side1N = normalize(output_positions[2].xy - output_positions[1].xy);
     // vec2 side2N = normalize(output_positions[0].xy - output_positions[2].xy);

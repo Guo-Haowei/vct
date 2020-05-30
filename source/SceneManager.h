@@ -2,8 +2,6 @@
 #include "Scene.h"
 #include <fstream>
 
-namespace JSONCpp { class JSON; }
-
 class SceneManager
 {
 public:
@@ -24,6 +22,7 @@ private:
                      size_t offset);
 
     std::unique_ptr<Scene> m_scene;
+    std::string m_sceneRoot;
 };
 
 extern SceneManager* g_pSceneManager;

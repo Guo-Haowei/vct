@@ -39,9 +39,9 @@ void VoxelPass::initialize()
 
 void VoxelPass::render()
 {
-    if (m_textureContructed)
+    if (!m_needsUpdate)
         return;
-    // m_textureContructed = true;
+    m_needsUpdate = false;
 
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
@@ -86,6 +86,8 @@ void VoxelPass::finalize()
 
 void VoxelPass::clearTexture()
 {
+    if (!m_needsUpdate)
+        return;
     glBindTexture(GL_TEXTURE_3D, m_texture3d);
     float clearColor[4] = { 0.f, 0.f, 0.f, 0.f };
     glClearTexImage(m_texture3d, 0, GL_RGBA, GL_FLOAT, &clearColor);

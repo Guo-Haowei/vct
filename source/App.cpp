@@ -103,9 +103,10 @@ void App::run()
 
         //// load scene
         g_pSceneManager->load(MODEL_DIR "sponza", "sponza.json");
+        // g_pSceneManager->load(MODEL_DIR "sponza_pbr", "sponza_pbr.obj");
+        // g_pSceneManager->load(MODEL_DIR "sponza_pbr", "sponza_pbr.json");
         // g_pSceneManager->load(MODEL_DIR "bunny", "bunny.json");
         // g_pSceneManager->load(MODEL_DIR "suzanne", "suzanne.json");
-        // g_pSceneManager->load(MODEL_DIR "triangle", "triangle.obj");
         // create buffers
         g_pSceneManager->createGpuResources();
         g_pSceneManager->initializeCamera();
@@ -159,8 +160,9 @@ void App::run()
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             voxelPass.render();
             visualizationPass.render();
-            float clearColor[4] = { .0f, .0f, .0f, .0f };
-            g_pVoxelTexture->clear(clearColor);
+            // float clearColor[4] = { .0f, .0f, .0f, .0f };
+            // g_pVoxelTexture->clear(clearColor);
+            voxelPass.clearTexture();
             mainPass.render();
             glfwSwapBuffers(m_pWindow);
 

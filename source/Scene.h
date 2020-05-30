@@ -3,13 +3,15 @@
 #include <vector>
 #include <memory>
 #include "GL/VertexArray.h"
+#include "GL/Texture.h"
 #include "Camera.h"
 
 struct SceneMaterial
 {
     std::string name;
-    std::string diffusePath;
+    std::string albedoPath;
     std::string normalPath;
+    std::unique_ptr<Texture2D> albedo;
 };
 
 struct SceneMesh
@@ -17,26 +19,17 @@ struct SceneMesh
     std::string name;
     std::vector<vec3> positions;
     std::vector<vec3> normals;
+    std::vector<vec2>  uvs;
     std::vector<unsigned int> indices;
     // std::vector<vec3>  tagents;
     // std::vector<vec3>  bitTagents;
-    // std::vector<vec2>  uvs;
-    // int materialIndex = -1;
+    int materialIndex = -1;
     Box3D aabb;
 
     // gpu resources
     std::unique_ptr<VertexArray> vertexArray;
     std::vector<std::unique_ptr<GpuBuffer>> gpuBuffers;
 };
-
-// struct SceneNode
-// {
-//     using Ptr = std::unique_ptr<SceneNode>;
-//     SceneMesh* mesh;
-
-//     std::vector<Ptr> child;
-//     // material
-// };
 
 struct Scene
 {
