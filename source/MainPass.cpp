@@ -87,13 +87,13 @@ void MainPass::render()
     // glViewport(0, 0, width, height);
     glViewport(width / 2, 0, width / 2, height);
 
-    mat4 PV = cam.getP() * cam.getV();
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     // scene
     // upload uniforms
     glUseProgram(m_mainShader->getHandle());
+    mat4 PV = cam.getP() * cam.getV();
     m_mainShader->setUniform("PV", PV);
 
     for (auto& mesh : g_pSceneManager->getScene().meshes)

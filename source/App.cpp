@@ -10,7 +10,7 @@
 #include "SceneManager.h"
 #include "VoxelPass.h"
 #include "MainPass.h"
-#include "TextureRenderer.h"
+#include "DebugRenderer.h"
 #include "VisualizationPass.h"
 #include "GL/Texture.h"
 // temp
@@ -127,8 +127,8 @@ void App::run()
         voxelTextureInfo.mipLevel = 6;
         g_pVoxelTexture.reset(new Texture3D("voxelTexture", voxelTextureInfo));
 
-        TextureRenderer textureRenderer;
-        textureRenderer.initialize();
+        DebugRenderer debugRenderer;
+        debugRenderer.initialize();
         MainPass mainPass;
         mainPass.initialize();
         VoxelPass voxelPass;
@@ -167,7 +167,7 @@ void App::run()
             // g_pVoxelTexture->clear(clearColor);
             voxelPass.clearTexture();
             mainPass.render();
-            textureRenderer.render();
+            debugRenderer.render();
             glfwSwapBuffers(m_pWindow);
 
             // timer
@@ -188,7 +188,7 @@ void App::run()
         g_pVoxelTexture->release();
         mainPass.finalize();
         voxelPass.finalize();
-        textureRenderer.finalize();
+        debugRenderer.finalize();
         visualizationPass.finalize();
         g_pSceneManager->releaseGpuResources();
         // temp
