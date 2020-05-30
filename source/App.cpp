@@ -101,9 +101,9 @@ void App::run()
         glEnable(GL_CULL_FACE);
 
         //// load scene
-        // g_pSceneManager->load(MODEL_DIR "Sponza", "sponza.json");
+        g_pSceneManager->load(MODEL_DIR "sponza", "sponza.json");
         // g_pSceneManager->load(MODEL_DIR "bunny", "bunny.json");
-        g_pSceneManager->load(MODEL_DIR "suzanne", "suzanne.json");
+        // g_pSceneManager->load(MODEL_DIR "suzanne", "suzanne.json");
         // g_pSceneManager->load(MODEL_DIR "triangle", "triangle.obj");
         // create buffers
         g_pSceneManager->createGpuResources();
@@ -145,6 +145,7 @@ void App::run()
             // post update
             InputManager::getInstance().postUpdate();
             // swap front and back buffers
+            glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             voxelPass.render();
             visualizationPass.render();

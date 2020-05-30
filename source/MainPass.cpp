@@ -85,7 +85,7 @@ void MainPass::render()
     int width, height;
     g_pApp->getFrameBufferSize(width, height);
     // glViewport(0, 0, width, height);
-    glViewport(width / 2, 0, width / 2, height /2);
+    glViewport(width / 2, 0, width / 2, height);
 
     mat4 PV = cam.getP() * cam.getV();
     glEnable(GL_CULL_FACE);
@@ -103,7 +103,6 @@ void MainPass::render()
         glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
     }
 
-#if 0
     // debug box
     // render debug boxes
     glUseProgram(m_boxShader->getHandle());
@@ -111,7 +110,6 @@ void MainPass::render()
     glBindVertexArray(m_boxVao->getHandle());
     // glDrawElements(GL_LINES, 32, GL_UNSIGNED_INT, 0);
     glDrawElementsInstanced(GL_LINES, 32, GL_UNSIGNED_INT, 0, m_boxCount);
-#endif
 }
 
 void MainPass::finalize()

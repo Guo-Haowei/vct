@@ -38,6 +38,10 @@ void VoxelPass::initialize()
 
 void VoxelPass::render()
 {
+    if (m_textureContructed)
+        return;
+    m_textureContructed = true;
+
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
@@ -57,6 +61,7 @@ void VoxelPass::render()
     m_voxelShader->setUniform("u_voxel_texture", int(0));
     m_voxelShader->setUniform("u_world_center", center);
     m_voxelShader->setUniform("u_world_size_half", size);
+    m_voxelShader->setUniform("u_voxel_dim", int(VOXEL_SIZE));
 
     for (auto& mesh : g_pSceneManager->getScene().meshes)
     {

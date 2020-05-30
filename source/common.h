@@ -1,2 +1,2 @@
 #pragma once
-#define VOXEL_SIZE 32
+#define VOXEL_SIZE 128

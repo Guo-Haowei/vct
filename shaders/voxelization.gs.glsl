@@ -10,6 +10,7 @@ out vec3 pass_normal; // fragment normal
 
 uniform vec3 u_world_center;
 uniform float u_world_size_half;
+uniform int u_voxel_dim;
 
 void main(){
 	const vec3 p0 = pass_positions[1] - pass_positions[0];
@@ -17,24 +18,41 @@ void main(){
 	const vec3 triangle_normal = abs(cross(p0, p1)); 
     uint dominant = triangle_normal.x > triangle_normal.y ? 0 : 1;
     dominant = triangle_normal.z > dominant ? 2 : dominant;
+
+    vec3 output_positions[3];
+    // vec3 output_normals[3];
     for(uint i = 0; i < 3; ++i)
     {
         // transform gl_Position from world space to ndc space
         pass_position = pass_positions[i];
         pass_normal = pass_normals[i];
-        gl_Position = vec4((pass_positions[i] - u_world_center) / u_world_size_half, 1.0);
+        // output_normals[i] = pass_normals[i];
+        output_positions[i] = (pass_positions[i] - u_world_center) / u_world_size_half;
         if (dominant == 0)
         {
-            gl_Position.xyz = gl_Position.zyx;
+            output_positions[i].xyz = output_positions[i].zyx;
         }
         else if (dominant == 1)
         {
-            gl_Position.xyz = gl_Position.xzy;
+            output_positions[i].xyz = output_positions[i].xzy;
         }
-        // projected position
-        // gl_Position.z = 1.0; // make sure every triangle is rendered
-        // TODO: expand vertex?
+        gl_Position = vec4(output_positions[i], 1.0);
         EmitVertex();
     }
+    // stretch the triangle to fill one more texel
+    // vec2 side0N = normalize(output_positions[1].xy - output_positions[0].xy);
+    // vec2 side1N = normalize(output_positions[2].xy - output_positions[1].xy);
+    // vec2 side2N = normalize(output_positions[0].xy - output_positions[2].xy);
+    // const float texelSize = 1.0 / float(u_voxel_dim);
+    // output_positions[0].xy += normalize(side2N - side0N) * texelSize;
+    // output_positions[1].xy += normalize(side0N - side1N) * texelSize;
+    // output_positions[2].xy += normalize(side1N - side2N) * texelSize;
+
+    // gl_Position = vec4(output_positions[0], 1.0);
+    // EmitVertex();
+    // gl_Position = vec4(output_positions[1], 1.0);
+    // EmitVertex();
+    // gl_Position = vec4(output_positions[2], 1.0);
+    // EmitVertex();
     EndPrimitive();
 }

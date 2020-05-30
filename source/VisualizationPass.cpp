@@ -51,7 +51,7 @@ void VisualizationPass::render()
     int width, height;
     g_pApp->getFrameBufferSize(width, height);
     // glViewport(0, 0, width, height);
-    glViewport(0, 0, width / 2, height /2);
+    glViewport(0, 0, width / 2, height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // upload uniforms
     glUseProgram(m_visualizationShader->getHandle());
