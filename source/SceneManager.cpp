@@ -137,6 +137,16 @@ void SceneManager::createGpuResources()
             mesh->gpuBuffers.push_back(std::move(std::unique_ptr<GpuBuffer>(new GpuBuffer(name + ".normal", normalBufferCreateInfo))));
             mesh->vertexArray->appendAttribute({ GL_FLOAT, 3, sizeof(vec3), 0 }, *mesh->gpuBuffers.back().get());
         }
+        if (mesh->uvs.size())
+        {
+            GpuBuffer::CreateInfo uvBufferCreateInfo {};
+            uvBufferCreateInfo.type = GL_ARRAY_BUFFER;
+            uvBufferCreateInfo.usage = GL_STATIC_DRAW;
+            uvBufferCreateInfo.initialBuffer.data = mesh->uvs.data(); 
+            uvBufferCreateInfo.initialBuffer.size = sizeof(vec2) * mesh->uvs.size();
+            mesh->gpuBuffers.push_back(std::move(std::unique_ptr<GpuBuffer>(new GpuBuffer(name + ".uvs", uvBufferCreateInfo))));
+            mesh->vertexArray->appendAttribute({ GL_FLOAT, 2, sizeof(vec2), 0 }, *mesh->gpuBuffers.back().get());
+        }
         if (mesh->indices.size())
         {
             GpuBuffer::CreateInfo indexBufferCreateInfo {};
@@ -157,7 +167,6 @@ void SceneManager::createGpuResources()
         if (albedoPath != "")
         {
             std::string path = m_sceneRoot + "/" + mat->albedoPath;
-            std::cout << path << std::endl;
             int width, height, nrChannels;
             unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0); 
             GLenum imageFormat;

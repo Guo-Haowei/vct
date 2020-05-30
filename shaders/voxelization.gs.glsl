@@ -4,9 +4,11 @@ layout(triangle_strip, max_vertices = 3) out;
 
 in vec3 pass_positions[];
 in vec3 pass_normals[];
+in vec2 pass_uvs[];
 
 out vec3 pass_position; // fragment world position
 out vec3 pass_normal; // fragment normal
+out vec2 pass_uv;
 
 uniform vec3 u_world_center;
 uniform float u_world_size_half;
@@ -26,6 +28,7 @@ void main(){
         // transform gl_Position from world space to ndc space
         pass_position = pass_positions[i];
         pass_normal = pass_normals[i];
+        pass_uv = pass_uvs[i];
         // output_normals[i] = pass_normals[i];
         output_positions[i] = (pass_positions[i] - u_world_center) / u_world_size_half;
         if (dominant == 0)

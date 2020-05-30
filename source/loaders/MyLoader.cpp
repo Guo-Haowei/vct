@@ -56,6 +56,7 @@ Scene* MyLoader::parse(const char* root, const char* file)
     {
         std::unique_ptr<SceneMesh> sceneMesh(new SceneMesh());
         sceneMesh->name = std::string(mesh["name"].GetString());
+        sceneMesh->materialIndex = mesh["material"].GetInt();
         json2Box3D(mesh["bounding box"], sceneMesh->aabb);
         auto& positions = mesh["positions"];
         assert(positions.IsObject());

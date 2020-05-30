@@ -66,6 +66,13 @@ void VoxelPass::render()
 
     for (auto& mesh : g_pSceneManager->getScene().meshes)
     {
+        // bind texture
+        auto& albedo = g_pSceneManager->getScene().materials.at(mesh->materialIndex)->albedo;
+        if (albedo != nullptr)
+        {
+            albedo->bindToSlot(0);
+        }
+        m_voxelShader->setUniform("u_albedo", 0);
         auto& vao = mesh->vertexArray;
         glBindVertexArray(vao->getHandle());
         glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
