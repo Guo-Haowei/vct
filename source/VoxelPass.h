@@ -15,7 +15,5 @@ private:
 
     std::unique_ptr<ShaderProgram> m_voxelShader;
 
-    GLuint m_texture3d;
-
     bool m_needsUpdate = true;
 };

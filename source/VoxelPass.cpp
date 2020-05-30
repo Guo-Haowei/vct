@@ -63,6 +63,7 @@ void VoxelPass::render()
     m_voxelShader->setUniform("u_voxel_texture", int(VOXEL_TEXTURE_DEFAULT_SLOT));
     m_voxelShader->setUniform("u_world_center", center);
     m_voxelShader->setUniform("u_world_size_half", size);
+    m_voxelShader->setUniform("u_voxel_dim", int(VOXEL_SIZE));
 
     for (auto& mesh : g_pSceneManager->getScene().meshes)
     {
@@ -95,9 +96,8 @@ void VoxelPass::clearTexture()
 {
     if (!m_needsUpdate)
         return;
-    glBindTexture(GL_TEXTURE_3D, m_texture3d);
     float clearColor[4] = { 0.f, 0.f, 0.f, 0.f };
-    glClearTexImage(m_texture3d, 0, GL_RGBA, GL_FLOAT, &clearColor);
+    g_pVoxelTexture->clear(clearColor);
 }
 
 std::unique_ptr<Texture3D> g_pVoxelTexture;
