@@ -21,6 +21,10 @@ message("Configuring glm...")
 include_directories(external/glm/)
 add_subdirectory(external/glm)
 
+# stb
+message("Configuring stb...")
+include_directories(external/stb/)
+
 # assimp
 # TODO: config Debug/Release
 set(lib_assimp_debug "${PROJECT_SOURCE_DIR}/external/assimp/build/lib/Debug/assimp-vc142-mtd.lib" CACHE STRING "assimp Debug")
