@@ -10,3 +10,6 @@
 [submodule "external/rapidjson"]
 	path = external/rapidjson
 	url = https://github.com/Tencent/rapidjson.git
+[submodule "external/glad"]
+	path = external/glad
+	url = https://github.com/Guo-Haowei/glad.git
