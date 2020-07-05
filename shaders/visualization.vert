@@ -19,7 +19,6 @@ void main()
     int x = gl_InstanceID % voxel_dim;
     int y = (gl_InstanceID / voxel_dim) % voxel_dim;
     int z = gl_InstanceID / (voxel_dim * voxel_dim);
-    // vec3 texCoord = vec3(float(x), float(y), float(z)) / float(voxel_dim);
     vec4 color = imageLoad(u_voxel_texture, ivec3(x, y, z));
     if (color.a == 0.0)
     {

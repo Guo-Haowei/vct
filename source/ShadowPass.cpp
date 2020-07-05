@@ -6,8 +6,8 @@
 void ShadowPass::initialize()
 {    // shader
     ShaderProgram::CreateInfo shaderCreateInfo {};
-    shaderCreateInfo.vs = "shadow.vs.glsl";
-    shaderCreateInfo.fs = "shadow.fs.glsl";
+    shaderCreateInfo.vs = "shadow.vert";
+    shaderCreateInfo.fs = "shadow.frag";
     m_shadowShader.reset(new ShaderProgram("shadow", shaderCreateInfo));
     // shadow map
     Texture::CreateInfo shadowMapCreateInfo;

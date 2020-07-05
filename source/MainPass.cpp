@@ -11,15 +11,15 @@ void MainPass::initialize()
     // scene shader
     {
         ShaderProgram::CreateInfo shaderCreateInfo {};
-        shaderCreateInfo.vs = "main.vs.glsl";
-        shaderCreateInfo.fs = "main.fs.glsl";
+        shaderCreateInfo.vs = "main.vert";
+        shaderCreateInfo.fs = "main.frag";
         m_mainShader.reset(new ShaderProgram("main", shaderCreateInfo));
     }
     // box shader
     {
         ShaderProgram::CreateInfo shaderCreateInfo {};
-        shaderCreateInfo.vs = "bbox.vs.glsl";
-        shaderCreateInfo.fs = "bbox.fs.glsl";
+        shaderCreateInfo.vs = "bbox.vert";
+        shaderCreateInfo.fs = "bbox.frag";
         m_boxShader.reset(new ShaderProgram("bbox", shaderCreateInfo));
     }
     // create box data (after scene is initialized)
@@ -34,7 +34,7 @@ void MainPass::initialize()
             GpuBuffer::CreateInfo vertexBufferCreateInfo {};
             vertexBufferCreateInfo.type = GL_ARRAY_BUFFER;
             vertexBufferCreateInfo.usage = GL_STATIC_DRAW;
-            vertexBufferCreateInfo.initialBuffer.data = positions.data(); 
+            vertexBufferCreateInfo.initialBuffer.data = positions.data();
             vertexBufferCreateInfo.initialBuffer.size = sizeof(vec3) * positions.size();
             m_boxVbo.reset(new GpuBuffer("box.position", vertexBufferCreateInfo));
             m_boxVao->appendAttribute({ GL_FLOAT, 3, sizeof(vec3) }, *m_boxVbo.get());
@@ -52,7 +52,7 @@ void MainPass::initialize()
             GpuBuffer::CreateInfo centerBufferCreateInfo {};
             centerBufferCreateInfo.type = GL_ARRAY_BUFFER;
             centerBufferCreateInfo.usage = GL_STATIC_DRAW;
-            centerBufferCreateInfo.initialBuffer.data = centers.data(); 
+            centerBufferCreateInfo.initialBuffer.data = centers.data();
             centerBufferCreateInfo.initialBuffer.size = sizeof(vec3) * centers.size();
             m_boxCenter.reset(new GpuBuffer("box.center", centerBufferCreateInfo));
             m_boxVao->appendAttribute({ GL_FLOAT, 3, sizeof(vec3), 0, 1 }, *m_boxCenter.get());
@@ -61,7 +61,7 @@ void MainPass::initialize()
             GpuBuffer::CreateInfo sizeBufferCreateInfo {};
             sizeBufferCreateInfo.type = GL_ARRAY_BUFFER;
             sizeBufferCreateInfo.usage = GL_STATIC_DRAW;
-            sizeBufferCreateInfo.initialBuffer.data = sizes.data(); 
+            sizeBufferCreateInfo.initialBuffer.data = sizes.data();
             sizeBufferCreateInfo.initialBuffer.size = sizeof(vec3) * sizes.size();
             m_boxSize.reset(new GpuBuffer("box.center", sizeBufferCreateInfo));
             m_boxVao->appendAttribute({ GL_FLOAT, 3, sizeof(vec3), 0, 1 }, *m_boxSize.get());
@@ -71,7 +71,7 @@ void MainPass::initialize()
             GpuBuffer::CreateInfo indexBufferCreateInfo {};
             indexBufferCreateInfo.type = GL_ELEMENT_ARRAY_BUFFER;
             indexBufferCreateInfo.usage = GL_STATIC_DRAW;
-            indexBufferCreateInfo.initialBuffer.data = indices.data(); 
+            indexBufferCreateInfo.initialBuffer.data = indices.data();
             indexBufferCreateInfo.initialBuffer.size = sizeof(unsigned int) * indices.size();
             m_boxEbo.reset(new GpuBuffer("box.index", indexBufferCreateInfo));
             m_boxVao->appendIndexBuffer({ GL_UNSIGNED_INT }, *m_boxEbo.get());

@@ -9,8 +9,8 @@ void VisualizationPass::initialize()
 {
     // shader
     ShaderProgram::CreateInfo shaderCreateInfo {};
-    shaderCreateInfo.vs = "visualization.vs.glsl";
-    shaderCreateInfo.fs = "visualization.fs.glsl";
+    shaderCreateInfo.vs = "visualization.vert";
+    shaderCreateInfo.fs = "visualization.frag";
     m_visualizationShader.reset(new ShaderProgram("visualization", shaderCreateInfo));
     // box buffer
     // create box data (after scene is initialized)

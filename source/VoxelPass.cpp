@@ -8,9 +8,9 @@ void VoxelPass::initialize()
 {
     // shader
     ShaderProgram::CreateInfo shaderCreateInfo {};
-    shaderCreateInfo.vs = "voxelization.vs.glsl";
-    shaderCreateInfo.gs = "voxelization.gs.glsl";
-    shaderCreateInfo.fs = "voxelization.fs.glsl";
+    shaderCreateInfo.vs = "voxelization.vert";
+    shaderCreateInfo.gs = "voxelization.geom";
+    shaderCreateInfo.fs = "voxelization.frag";
     m_voxelShader.reset(new ShaderProgram("voxelization", shaderCreateInfo));
 
     // upload uniforms
@@ -28,9 +28,10 @@ void VoxelPass::initialize()
 
 void VoxelPass::render()
 {
-    // if (!m_needsUpdate)
-    //     return;
-    // m_needsUpdate = false;
+    if (!m_needsUpdate)
+        return;
+    m_needsUpdate = false;
+    // glSubpixelPrecisionBiasNV(8, 8);
 
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
@@ -64,6 +65,7 @@ void VoxelPass::render()
     // reset color mask
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     // clear texture after use
+    // glSubpixelPrecisionBiasNV(0, 0);
 }
 
 void VoxelPass::finalize()
@@ -73,8 +75,8 @@ void VoxelPass::finalize()
 
 void VoxelPass::clearTexture()
 {
-    // if (!m_needsUpdate)
-    //     return;
+    if (!m_needsUpdate)
+        return;
     float clearColor[4] = { 0.f, 0.f, 0.f, 0.f };
     g_pVoxelTexture->clear(clearColor);
 }

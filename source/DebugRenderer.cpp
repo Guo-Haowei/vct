@@ -10,8 +10,8 @@ void DebugRenderer::initialize()
     {
         // shader
         ShaderProgram::CreateInfo shaderCreateInfo{};
-        shaderCreateInfo.vs = "quad.vs.glsl";
-        shaderCreateInfo.fs = "quad.fs.glsl";
+        shaderCreateInfo.vs = "quad.vert";
+        shaderCreateInfo.fs = "quad.frag";
         m_quadShader.reset(new ShaderProgram("quad", shaderCreateInfo));
         // quad
         m_quadVao.reset(new VertexArray("quad", {GL_TRIANGLES}));
@@ -49,8 +49,8 @@ void DebugRenderer::initialize()
     {
         // shader
         ShaderProgram::CreateInfo shaderCreateInfo{};
-        shaderCreateInfo.vs = "line3d.vs.glsl";
-        shaderCreateInfo.fs = "line3d.fs.glsl";
+        shaderCreateInfo.vs = "line3d.vert";
+        shaderCreateInfo.fs = "line3d.frag";
         m_axisShader.reset(new ShaderProgram("axis", shaderCreateInfo));
         // lines
         m_axisVao.reset(new VertexArray("axis", { GL_LINES }));

@@ -103,6 +103,8 @@ void App::run()
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
 
+        // glEnable(GL_CONSERVATIVE_RASTERIZATION_NV);
+
         //// load scene
         g_pSceneManager->load(MODEL_DIR "sponza", "sponza.json");
         // g_pSceneManager->load(MODEL_DIR "sponza_pbr", "sponza_pbr.obj");
