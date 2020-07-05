@@ -28,9 +28,9 @@ void VoxelPass::initialize()
 
 void VoxelPass::render()
 {
-    if (!m_needsUpdate)
-        return;
-    m_needsUpdate = false;
+    // if (!m_needsUpdate)
+    //     return;
+    // m_needsUpdate = false;
 
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
@@ -73,8 +73,8 @@ void VoxelPass::finalize()
 
 void VoxelPass::clearTexture()
 {
-    if (!m_needsUpdate)
-        return;
+    // if (!m_needsUpdate)
+    //     return;
     float clearColor[4] = { 0.f, 0.f, 0.f, 0.f };
     g_pVoxelTexture->clear(clearColor);
 }

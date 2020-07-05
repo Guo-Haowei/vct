@@ -87,7 +87,7 @@ GpuResource::Handle ShaderProgram::compileAndAttachShader(const char* path, GLen
         std::cout << "[ERROR] Failed to open file [" << path << "]\n";
         return INVALID_HANDLE;
     }
-    
+
     std::string shaderSource((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
     const char* shaderSourceCStr = shaderSource.c_str();
 
@@ -122,47 +122,47 @@ void ShaderProgram::internalRelease()
 void ShaderProgram::setUniform(const char* name, int val)
 {
     GLint location = glGetUniformLocation(m_handle, name);
-#ifdef _DEBUG
-    if (location < 0)
-    {
-        std::cout << "[ERROR][GLSL] uniform '" << name << "' not found" << std::endl;
-    }
-#endif
+// #ifdef _DEBUG
+//     if (location < 0)
+//     {
+//         std::cout << "[ERROR][GLSL] uniform '" << name << "' not found" << std::endl;
+//     }
+// #endif
     glUniform1i(location, val);
 }
 
 void ShaderProgram::setUniform(const char* name, float val)
 {
     GLint location = glGetUniformLocation(m_handle, name);
-#ifdef _DEBUG
-    if (location < 0)
-    {
-        std::cout << "[ERROR][GLSL] uniform '" << name << "' not found" << std::endl;
-    }
-#endif
+// #ifdef _DEBUG
+//     if (location < 0)
+//     {
+//         std::cout << "[ERROR][GLSL] uniform '" << name << "' not found" << std::endl;
+//     }
+// #endif
     glUniform1f(location, val);
 }
 
 void ShaderProgram::setUniform(const char* name, const vec3& val)
 {
     GLint location = glGetUniformLocation(m_handle, name);
-#ifdef _DEBUG
-    if (location < 0)
-    {
-        std::cout << "[ERROR][GLSL] uniform '" << name << "' not found" << std::endl;
-    }
-#endif
+// #ifdef _DEBUG
+//     if (location < 0)
+//     {
+//         std::cout << "[ERROR][GLSL] uniform '" << name << "' not found" << std::endl;
+//     }
+// #endif
     glUniform3f(location, val.x, val.y, val.z);
 }
 
 void ShaderProgram::setUniform(const char* name, const mat4& val)
 {
     GLint location = glGetUniformLocation(m_handle, name);
-#ifdef _DEBUG
-    if (location < 0)
-    {
-        std::cout << "[ERROR][GLSL] uniform '" << name << "' not found" << std::endl;
-    }
-#endif
+// #ifdef _DEBUG
+//     if (location < 0)
+//     {
+//         std::cout << "[ERROR][GLSL] uniform '" << name << "' not found" << std::endl;
+//     }
+// #endif
     glUniformMatrix4fv(location, 1, GL_FALSE, &val[0].x);
 }

@@ -68,8 +68,9 @@ Texture3D::Texture3D(const std::string& debugName, const Texture::CreateInfo& in
     glTexParameteri(m_type, GL_TEXTURE_MIN_FILTER, info.minFilter);
     glTexParameteri(m_type, GL_TEXTURE_MAG_FILTER, info.magFilter);
 
-    // hard code GL_RGBA8 for now
-    glTexStorage3D(m_type, info.mipLevel, GL_RGBA8, info.width, info.height, info.depth);
+    // TODO: fix hard code image type
+    glTexStorage3D(m_type, info.mipLevel, GL_RGBA16F, info.width, info.height, info.depth);
+    // glTexStorage3D(m_type, info.mipLevel, GL_RGBA8, info.width, info.height, info.depth);
     unbind();
 }
 
@@ -77,7 +78,9 @@ void Texture3D::bindToSlotForWrite(int i)
 {
     glActiveTexture(GL_TEXTURE0 + i);
     glBindTexture(m_type, m_handle);
-    glBindImageTexture(i, m_handle, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    // TODO: fix hard code image type
+    glBindImageTexture(i, m_handle, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+    // glBindImageTexture(i, m_handle, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 }
 
 std::unique_ptr<Texture3D> g_pVoxelTexture;

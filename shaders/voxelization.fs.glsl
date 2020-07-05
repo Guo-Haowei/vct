@@ -1,9 +1,14 @@
 #version 450 core
+#extension GL_NV_gpu_shader5: enable
+#extension GL_NV_shader_atomic_float: enable
+#extension GL_NV_shader_atomic_fp16_vector: enable
+
 in vec3 pass_position; // fragment world position
 in vec3 pass_normal; // fragment normal
 in vec2 pass_uv; // fragment normal
 // layout (location = 0) out vec4 out_color;
-layout (RGBA8) uniform image3D u_voxel_texture;
+
+layout (rgba16f) uniform image3D u_voxel_texture;
 
 uniform vec3 u_world_center;
 uniform float u_world_size_half;
@@ -23,12 +28,14 @@ void main()
     // ignore transparency for now
     ivec3 coord = ivec3(dim * voxel);
     // need to accumulate alpha
-    vec4 max_so_far = imageLoad(u_voxel_texture, coord).rgba;
-    float r = max(max_so_far.r, color.r);
-    float g = max(max_so_far.g, color.g);
-    float b = max(max_so_far.b, color.b);
-    vec4 final_color = vec4(r, g, b, 1.0);
+    // vec4 max_so_far = imageLoad(u_voxel_texture, coord).rgba;
+    // float r = max(max_so_far.r, color.r);
+    // float g = max(max_so_far.g, color.g);
+    // float b = max(max_so_far.b, color.b);
+    f16vec4 final_color = f16vec4(color.r, color.g, color.b, 1.0);
     // vec4 final_color = vec4(color);
     // a texel is affected by multiple texels, calculate average of it?
-    imageStore(u_voxel_texture, coord, final_color);
+    // imageStore(u_voxel_texture, coord, final_color);
+    // imageAtomicMax(u_voxel_texture, coord, final_color);
+    imageAtomicAdd(u_voxel_texture, coord, final_color);
 }
