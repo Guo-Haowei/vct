@@ -1,10 +1,21 @@
 #pragma once
 #include "MainRenderer.h"
+#include "scene/Scene.h"
+#include <unordered_map>
 
 namespace vct {
 
-// TODO: refactor
-unsigned int VBO, VAO;
+struct PerDrawData
+{
+    GLuint vao;
+    // TODO: refactor
+    GLuint ebo;
+    GLuint vbo1;
+    GLuint vbo2;
+    unsigned int count;
+};
+
+static std::unordered_map<const Mesh*, PerDrawData> g_meshLUT;
 
 void MainRenderer::createGpuResources()
 {
@@ -13,30 +24,33 @@ void MainRenderer::createGpuResources()
         DATA_DIR "shaders/basic.vert",
         DATA_DIR "shaders/basic.frag");
 
+    // load scene
+    for (const std::unique_ptr<Mesh>& mesh : g_scene.meshes)
+    {
+        PerDrawData data;
+        glGenVertexArrays(1, &data.vao);
+        glGenBuffers(3, &data.ebo);
+        glBindVertexArray(data.vao);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data.ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Vector3u) * mesh->faces.size(), mesh->faces.data(), GL_STATIC_DRAW);
 
-    float vertices[] = {
-        -0.5f, -0.5f, 0.0f, // left
-         0.5f, -0.5f, 0.0f, // right
-         0.0f,  0.5f, 0.0f  // top
-    };
+        glBindBuffer(GL_ARRAY_BUFFER, data.vbo1);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3) * mesh->positions.size(), mesh->positions.data(), GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), (void*)0);
+        glEnableVertexAttribArray(0);
 
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(VAO);
+        glBindBuffer(GL_ARRAY_BUFFER, data.vbo2);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3) * mesh->normals.size(), mesh->normals.data(), GL_STATIC_DRAW);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), (void*)0);
+        glEnableVertexAttribArray(1);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        //glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+        data.count = mesh->faces.size() * 3;
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+        g_meshLUT.insert({ mesh.get(), data });
+    }
 
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    glBindVertexArray(0);
 }
 
 void MainRenderer::render()
@@ -47,6 +61,9 @@ void MainRenderer::render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_basic.use();
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glDisable(GL_SCISSOR_TEST);
     /// TODO: uniform buffer
     static const GLint PVLocation = m_basic.getUniformLocation("u_PV");
     static const GLint MLocation = m_basic.getUniformLocation("u_M");
@@ -56,16 +73,19 @@ void MainRenderer::render()
     Matrix4 V = three::lookAt(Vector3::UnitZ, Vector3::Zero, Vector3::UnitY);
     Matrix4 P = three::perspectiveRH_NO(1.0f, aspect, 0.1f, 100.0f);
     Matrix4 PV = P * V;
-    static Vector3 translation = Vector3::Zero;
-    translation.z -= 0.01f;
-    Matrix4 M = three::translate(translation);
-    // Matrix4 M = Matrix4::Identity;
 
     m_basic.setUniform(PVLocation, PV);
-    m_basic.setUniform(MLocation, M);
 
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    for (const GeometryNode& node : g_scene.geometries)
+    {
+        m_basic.setUniform(MLocation, node.transform);
+        for (const Geometry& geom : node.geometries)
+        {
+            const PerDrawData& drawData = g_meshLUT.find(geom.pMesh)->second;
+            glBindVertexArray(drawData.vao);
+            glDrawElements(GL_TRIANGLES, drawData.count, GL_UNSIGNED_INT, 0);
+        }
+    }
 }
 
 void MainRenderer::destroyGpuResources()

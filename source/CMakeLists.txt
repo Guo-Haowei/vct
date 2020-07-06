@@ -1,6 +1,7 @@
 add_subdirectory(base)
 add_subdirectory(imgui)
 add_subdirectory(application)
+add_subdirectory(scene)
 add_subdirectory(renderer)
 
 add_executable(vct
@@ -13,4 +14,5 @@ target_link_libraries(vct
     vct::app
     vct::imgui
     vct::renderer
+    vct::scene
 )

@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "base/Exception.h"
 #include "imgui/imgui.h"
+#include "scene/CreateScene.h"
 #include <iostream>
 
 namespace vct {
@@ -39,6 +40,9 @@ void Application::commandLineArgs(int argc, const char** argv)
 
 void Application::initialize()
 {
+    // load scene
+    createDefaultScene();
+
     m_window.initialize();
     m_renderSystem.initialize(&m_window);
 }
