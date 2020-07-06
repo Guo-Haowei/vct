@@ -25,9 +25,8 @@
 #include "imgui/imgui.h"      // IMGUI_IMPL_API
 
 // Backend API
-IMGUI_IMPL_API bool     ImGui_ImplOpenGL3_Init();
-IMGUI_IMPL_API void     ImGui_ImplOpenGL3_Shutdown();
-IMGUI_IMPL_API void     ImGui_ImplOpenGL3_NewFrame();
+bool ImGui_ImplOpenGL3_CreateDeviceObjects(unsigned int shaderHandle);
+void ImGui_ImplOpenGL3_DestroyDeviceObjects();
 IMGUI_IMPL_API void     ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data);
 
 // (Optional) Called by Init/NewFrame/Shutdown

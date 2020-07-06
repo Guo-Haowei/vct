@@ -7,7 +7,7 @@ class Exception
 {
 public:
     Exception(int line, const char* file, const std::string error);
-    inline const std::string& what() { return m_message; }
+    inline const std::string& what() const { return m_message; }
 protected:
     std::string m_message;
 };

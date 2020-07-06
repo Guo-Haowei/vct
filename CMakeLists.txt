@@ -35,8 +35,7 @@ include_directories(${PROJECT_SOURCE_DIR}/external/three.math/include/)
 # rapid json
 # include_directories(external/rapidjson/include)
 
-# add_definitions(-DSHADER_DIR="${CMAKE_SOURCE_DIR}/shaders/")
-# add_definitions(-DMODEL_DIR="${CMAKE_SOURCE_DIR}/models/")
+add_definitions(-DDATA_DIR="${CMAKE_SOURCE_DIR}/data/")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 

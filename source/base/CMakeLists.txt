@@ -1,5 +1,6 @@
 add_library(base
     Exception.cpp
+    File.cpp
 )
 
 target_include_directories(base PUBLIC

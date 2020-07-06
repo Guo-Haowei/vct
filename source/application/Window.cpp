@@ -20,6 +20,9 @@ void Window::initialize()
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+#ifdef _DEBUG
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
+#endif
 
     // hard code width height for now
     constexpr int WIDTH = 1280;
