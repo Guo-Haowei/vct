@@ -1,45 +1,22 @@
-add_subdirectory(GL)
-add_subdirectory(math)
-add_subdirectory(loaders)
+add_subdirectory(base)
+add_subdirectory(imgui)
+add_subdirectory(application)
 
-add_executable(VoxelGI
+add_executable(vct
+    imgui_impl_opengl3.cpp
     main.cpp
-    App.cpp
-    SceneManager.cpp
-    VoxelPass.cpp
-    Camera.cpp
-    MainPass.cpp
-    ShadowPass.cpp
-    VisualizationPass.cpp
-    DebugRenderer.cpp
 )
 
-target_link_libraries(VoxelGI
-    PRIVATE
-    glfw
+target_link_libraries(vct
+    vct::base
+    vct::app
+    vct::imgui
     glad
-    lib_geomath
-    lib_gl
-    lib_scene_loader
-)
-
-add_executable(convert
-    assimp2json.cpp
-    App.cpp
-    SceneManager.cpp
-    VoxelPass.cpp
-    Camera.cpp
-    MainPass.cpp
-    ShadowPass.cpp
-    VisualizationPass.cpp
-    DebugRenderer.cpp
-)
-
-target_link_libraries(convert
-    PRIVATE
     glfw
-    glad
-    lib_geomath
-    lib_gl
-    lib_scene_loader
+)
+
+target_include_directories(vct PRIVATE
+    ${PROJECT_SOURCE_DIR}/external/glad
+    ${PROJECT_SOURCE_DIR}/external/glfw
+    ${PROJECT_SOURCE_DIR}/source/
 )
