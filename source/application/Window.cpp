@@ -124,6 +124,20 @@ void Window::swapBuffers()
     glfwSwapBuffers(m_pGlfwWindow);
 }
 
+Extent2i Window::getWindowExtent() const
+{
+    Extent2i extent;
+    glfwGetWindowSize(m_pGlfwWindow, &extent.witdh, &extent.height);
+    return extent;
+}
+
+Extent2i Window::getFrameExtent() const
+{
+    Extent2i extent;
+    glfwGetFramebufferSize(m_pGlfwWindow, &extent.witdh, &extent.height);
+    return extent;
+}
+
 void Window::beginFrame()
 {
     ImGuiIO& io = ImGui::GetIO();

@@ -2,9 +2,9 @@
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
 #include "application/Window.h"
+#include "base/GeoMath.h"
 
 #include <glad/glad.h>          // Initialize with gladLoadGL()
-#include <GLFW/glfw3.h>
 
 int main(int, char**)
 {
@@ -77,9 +77,8 @@ int main(int, char**)
 
         // Rendering
         ImGui::Render();
-        int display_w, display_h;
-        glfwGetFramebufferSize(window.getGlfwWindow(), &display_w, &display_h);
-        glViewport(0, 0, display_w, display_h);
+        auto extent = window.getFrameExtent();
+        glViewport(0, 0, extent.witdh, extent.height);
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

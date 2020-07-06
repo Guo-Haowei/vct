@@ -8,15 +8,14 @@ add_executable(vct
 )
 
 target_link_libraries(vct
+    three::math
     vct::base
     vct::app
     vct::imgui
     glad
-    glfw
 )
 
 target_include_directories(vct PRIVATE
-    ${PROJECT_SOURCE_DIR}/external/glad
-    ${PROJECT_SOURCE_DIR}/external/glfw
+    ${PROJECT_SOURCE_DIR}/external/glad/include/
     ${PROJECT_SOURCE_DIR}/source/
 )

@@ -1,4 +1,5 @@
 #pragma once
+#include "base/GeoMath.h"
 #include <array>
 
 struct GLFWwindow;
@@ -18,6 +19,8 @@ public:
     void swapBuffers();
     void beginFrame();
 
+    Extent2i getWindowExtent() const;
+    Extent2i getFrameExtent() const;
     inline double getTime() const { return m_time; }
     inline GLFWwindow* getGlfwWindow() { return m_pGlfwWindow; }
 private:
@@ -30,6 +33,8 @@ private:
     double                                          m_time;
     std::array<bool, MOUSE_BUTTON_COUNT>            m_mouseJustPressed;
     std::array<GLFWcursor*, MOUSE_CURSOR_COUNT>     m_mouseCursors;
+
+    Extent2i                                        m_extent;
 };
 
 } // namespace vct

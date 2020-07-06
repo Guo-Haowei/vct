@@ -8,18 +8,20 @@ message("Configuring glfw...")
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-include_directories(external/glfw/include)
 add_subdirectory(external/glfw)
 
 # glad
 message("Configuring glad...")
-include_directories(external/glad/include)
 add_subdirectory(external/glad)
 
 # glm
 message("Configuring glm...")
 include_directories(external/glm/)
-add_subdirectory(external/glm)
+
+# three.math
+message("Configuring three.math...")
+add_subdirectory(external/three.math)
+include_directories(${PROJECT_SOURCE_DIR}/external/three.math/include/)
 
 # stb
 # message("Configuring stb...")
