@@ -4,17 +4,6 @@
 #include "application/Globals.h"
 #include <unordered_map>
 
-constexpr unsigned int log2(unsigned int x)
-{
-    return x == 1 ? 0 : 1 + log2(x >> 1);
-}
-
-constexpr int ALBEDO_VOXEL_SLOT = 0;
-constexpr int NORMAL_VOXEL_SLOT = 1;
-// constexpr unsigned int VOXEL_TEXTURE_SIZE = 128;
-constexpr unsigned int VOXEL_TEXTURE_SIZE = 64;
-constexpr unsigned int VOXEL_TEXTURE_MIP_LEVEL = log2(VOXEL_TEXTURE_SIZE);
-
 namespace vct {
 
 static std::unordered_map<const Mesh*, PerDrawData> g_meshLUT;
@@ -151,9 +140,12 @@ void MainRenderer::renderVoxels(const Matrix4& PV)
     m_visualizeProgram.use();
     static GLint PVLoation = m_visualizeProgram.getUniformLocation("u_PV");
     m_visualizeProgram.setUniform(PVLoation, PV);
-
     glBindVertexArray(m_box.vao);
-    glDrawElementsInstanced(GL_TRIANGLES, m_box.count, GL_UNSIGNED_INT, 0, VOXEL_TEXTURE_SIZE * VOXEL_TEXTURE_SIZE * VOXEL_TEXTURE_SIZE);
+
+    int mipLevel = g_UIControls.voxelMipLevel;
+    m_albedoVoxel.bindImageTexture(0, mipLevel);
+    int size = VOXEL_TEXTURE_SIZE >> mipLevel;
+    glDrawElementsInstanced(GL_TRIANGLES, m_box.count, GL_UNSIGNED_INT, 0, size * size * size);
 }
 
 void MainRenderer::renderVoxelTexture()

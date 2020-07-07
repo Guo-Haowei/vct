@@ -30,7 +30,7 @@ void main()
         float voxel_size = u_world.w / float(voxel_texture_size);
         vec3 coord_pos = vec3(float(x), float(y), float(z)) / float(voxel_texture_size); // [0, 1]
         coord_pos = 2.0 * coord_pos - vec3(1.0); // [-1, 1]
-        vec3 offset = 0.5 * u_world.w * coord_pos + u_world.xyz;
+        vec3 offset = 0.5 * u_world.w * coord_pos + u_world.xyz + 0.5 * vec3(voxel_size);
         vec3 world_position = voxel_size * in_position + offset;
         gl_Position = u_PV * vec4(world_position, 1.0);
 

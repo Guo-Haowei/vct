@@ -105,6 +105,8 @@ void Application::userInterface()
     ImGui::RadioButton("Voxel GI", &g_UIControls.renderStrategy, 1); ImGui::SameLine();
     ImGui::RadioButton("Visualization", &g_UIControls.renderStrategy, 2);
 
+    ImGui::SliderInt("Voxel Mipmap Level", &g_UIControls.voxelMipLevel, 0, VOXEL_TEXTURE_MIP_LEVEL - 1);
+
     if (ImGui::Checkbox("Force voxel texture update", &g_UIControls.forceUpdateVoxelTexture))
     {
         g_scene.dirty = true;

@@ -43,13 +43,13 @@ void GpuTexture::destroy()
     m_handle = NULL_HANDLE;
 }
 
-void GpuTexture::bindImageTexture(int i)
+void GpuTexture::bindImageTexture(int i, int mipLevel)
 {
     ASSERT( m_type == GL_TEXTURE_3D );
     /// FIXME: are these two calls necessary?
     glActiveTexture(GL_TEXTURE0 + i);
     glBindTexture(m_type, m_handle);
-    glBindImageTexture(i, m_handle, 0, GL_TRUE, 0, GL_WRITE_ONLY, m_format);
+    glBindImageTexture(i, m_handle, mipLevel, GL_TRUE, 0, GL_WRITE_ONLY, m_format);
 }
 
 void GpuTexture::clear()

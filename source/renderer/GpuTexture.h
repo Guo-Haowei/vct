@@ -17,7 +17,7 @@ class GpuTexture : public GpuResource
 public:
     void create3DImage(const Texture3DCreateInfo& info);
     void destroy();
-    void bindImageTexture(int i);
+    void bindImageTexture(int i, int mipLevel = 0);
     void clear();
     void bind();
     void unbind();
