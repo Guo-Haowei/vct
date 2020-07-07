@@ -6,18 +6,22 @@ namespace vct {
 
 void createDefaultScene()
 {
-    std::unique_ptr<Mesh> model(SceneLoader::loadMeshFromObj(DATA_DIR "models/dragon.obj"));
-    // std::unique_ptr<Mesh> model(SceneLoader::loadMeshFromObj(DATA_DIR "models/monkey.obj"));
-    g_scene.meshes.push_back(std::move(model));
+    {
+        Matrix4 transform = three::scale(Vector3(0.01f));
+        SceneLoader::loadObj(DATA_DIR "models/CrytekSponza/sponza.obj", g_scene, transform);
+    }
+    {
+        Matrix4 transform = three::translate(Vector3(0, 1, 0)) * three::scale(Vector3(2.0f));
+        SceneLoader::loadObj(DATA_DIR "models/dragon.obj", g_scene, transform);
+    }
 
-    Geometry geometry;
-    geometry.pMesh = g_scene.meshes.back().get();
-    // geometry.boundingBox = Box3();
-    GeometryNode node;
-    node.transform = three::translate(Vector3(0, 0, -1)) * three::rotateY(3.14159f);
-    node.geometries.push_back(geometry);
+    Camera& camera = g_scene.camera;
 
-    g_scene.geometries.push_back(node);
+    camera.fovy = three::radians(50.0f);
+    camera.aspect = 1.0f;
+    camera.zNear = 0.1f;
+    camera.zFar = 100.0f;
+    camera.position = Vector3::UnitZ;
 }
 
 Scene g_scene;

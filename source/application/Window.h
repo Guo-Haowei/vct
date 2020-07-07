@@ -19,6 +19,7 @@ public:
     void swapBuffers();
     void beginFrame();
 
+    bool isKeyDown(int key) const;
     Extent2i getWindowExtent() const;
     Extent2i getFrameExtent() const;
     inline double getTime() const { return m_time; }

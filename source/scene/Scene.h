@@ -1,5 +1,6 @@
 #pragma once
 #include "base/GeoMath.h"
+#include "Camera.h"
 #include <vector>
 #include <memory>
 
@@ -33,8 +34,9 @@ struct GeometryNode
 
 struct Scene
 {
-    std::vector<GeometryNode> geometries;
+    std::vector<GeometryNode> geometryNodes;
     std::vector<std::unique_ptr<Mesh>> meshes;
+    Camera camera;
 };
 
 extern Scene g_scene;

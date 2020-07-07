@@ -1,6 +1,8 @@
 #include "Vector.h"
 #include "Matrix.h"
 #include "Box.h"
+#include "Constants.h"
+#include "Functions.h"
 
 namespace vct {
 

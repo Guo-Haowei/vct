@@ -2,6 +2,7 @@
 #include "base/Exception.h"
 #include "imgui/imgui.h"
 #include "scene/CreateScene.h"
+#include <GLFW/glfw3.h>
 #include <iostream>
 
 namespace vct {
@@ -15,6 +16,8 @@ int Application::run()
         {
             m_window.pollEvents();
             m_window.beginFrame();
+
+            updateCamera();
 
             userInterface();
             m_renderSystem.update();
@@ -54,6 +57,40 @@ void Application::finalize()
     m_window.finalize();
 }
 
+void Application::updateCamera()
+{
+    constexpr float VIEW_SPEED = 2.0f;
+    constexpr float CAMERA_SPEED = 0.1f;
+
+    int x = m_window.isKeyDown(GLFW_KEY_D) - m_window.isKeyDown(GLFW_KEY_A);
+    int z = m_window.isKeyDown(GLFW_KEY_W) - m_window.isKeyDown(GLFW_KEY_S);
+    int y = m_window.isKeyDown(GLFW_KEY_E) - m_window.isKeyDown(GLFW_KEY_Q);
+
+    Camera& cam = g_scene.camera;
+    if (x != 0 || z != 0)
+    {
+        Vector3 w = cam.direction();
+        Vector3 u = three::cross(w, Vector3::UnitY);
+        Vector3 translation = (CAMERA_SPEED * z) * w + (CAMERA_SPEED * x) * u;
+        cam.position += translation;
+    }
+
+    cam.position.y += (CAMERA_SPEED * y);
+
+    int yaw = m_window.isKeyDown(GLFW_KEY_RIGHT) - m_window.isKeyDown(GLFW_KEY_LEFT);
+    int pitch = m_window.isKeyDown(GLFW_KEY_UP) - m_window.isKeyDown(GLFW_KEY_DOWN);
+
+
+    if (yaw)
+        cam.yaw += VIEW_SPEED * yaw;
+
+    if (pitch)
+    {
+        cam.pitch += VIEW_SPEED * pitch;
+        cam.pitch = three::clamp(cam.pitch, -80.0f, 80.0f);
+    }
+}
+
 void Application::userInterface()
 {
     static bool show_demo_window = true;
@@ -64,31 +101,22 @@ void Application::userInterface()
     // if (show_demo_window)
     //     ImGui::ShowDemoWindow(&show_demo_window);
 
-    // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-    {
-        static float f = 0.0f;
-        static int counter = 0;
+    static float f = 0.0f;
+    static int counter = 0;
 
-        ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+    ImGui::Begin("Debug");
 
-        // ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-        // ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-        // ImGui::Checkbox("Another Window", &show_another_window);
-        if (ImGui::Checkbox("Visualize voxels", &show_another_window))
-        {
-            std::cout << "Hello\n";
-        }
+    ImGui::Checkbox("Visualize voxels", &show_another_window);
 
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+    ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
 
-        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-            counter++;
-        ImGui::SameLine();
-        ImGui::Text("counter = %d", counter);
+    if (ImGui::Button("Button"))
+        counter++;
+    ImGui::SameLine();
+    ImGui::Text("counter = %d", counter);
 
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        ImGui::End();
-    }
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    ImGui::End();
 
     // 3. Show another simple window.
     // if (show_another_window)

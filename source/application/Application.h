@@ -10,6 +10,7 @@ public:
     int run();
     void commandLineArgs(int argc, const char** argv);
 private:
+    void updateCamera();
     void initialize();
     void userInterface();
     void finalize();

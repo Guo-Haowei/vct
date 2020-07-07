@@ -10,12 +10,12 @@ using std::vector;
 
 namespace vct {
 
-Mesh* SceneLoader::loadMeshFromObj(const char* path)
+void SceneLoader::loadObj(const char* path, Scene& scene, Matrix4 transform)
 {
     std::cout << "[Log] loading model from [" << path << "]" << std::endl;
     ::Assimp::Importer importer;
-    const aiScene* aiscene = importer.ReadFile(path, 0
-        // aiProcess_Triangulate
+    const aiScene* aiscene = importer.ReadFile(path,
+        aiProcess_Triangulate
         // aiProcess_JoinIdenticalVertices |
         // aiProcess_FlipUVs |
         // aiProcess_GenSmoothNormals |
@@ -32,14 +32,23 @@ Mesh* SceneLoader::loadMeshFromObj(const char* path)
         THROW_EXCEPTION(error);
     }
 
-    assert(aiscene->mMeshes);
+    GeometryNode node;
+    node.transform = transform;
 
-    // only process the first mesh for now
-    return processMesh(aiscene->mMeshes[0]);
+    for (uint32_t i = 0; i < aiscene->mNumMeshes; ++i)
+    {
+        const aiMesh* aimesh = aiscene->mMeshes[i];
+        Mesh* mesh = processMesh(aimesh);
+        Box3 box;
+        node.geometries.push_back({ mesh, box });
+        scene.meshes.push_back(std::move(std::unique_ptr<Mesh>(mesh)));
+    }
+
+    scene.geometryNodes.push_back(node);
 }
 
 
-Mesh* SceneLoader::processMesh(aiMesh* aimesh)
+Mesh* SceneLoader::processMesh(const aiMesh* aimesh)
 {
     string name = aimesh->mName.C_Str();
     Mesh* mesh = new Mesh;

@@ -12,8 +12,8 @@ namespace vct {
 class SceneLoader
 {
 public:
-    static Mesh* loadMeshFromObj(const char* path);
-    static Mesh* processMesh(aiMesh* aimesh);
+    static void loadObj(const char* path, Scene& scene, Matrix4 transform = Matrix4::Identity);
+    static Mesh* processMesh(const aiMesh* aimesh);
 };
 
 } // namespace vct

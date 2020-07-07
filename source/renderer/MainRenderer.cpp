@@ -46,7 +46,7 @@ void MainRenderer::createGpuResources()
 
         //glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
-        data.count = mesh->faces.size() * 3;
+        data.count = 3 * static_cast<unsigned int>(mesh->faces.size());
 
         g_meshLUT.insert({ mesh.get(), data });
     }
@@ -57,7 +57,7 @@ void MainRenderer::render()
 {
     auto extent = m_pWindow->getFrameExtent();
     glViewport(0, 0, extent.witdh, extent.height);
-    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+    // glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_basic.use();
@@ -69,14 +69,13 @@ void MainRenderer::render()
     static const GLint MLocation = m_basic.getUniformLocation("u_M");
 
     float aspect = (float)extent.witdh / (float)extent.height;
+    g_scene.camera.aspect = aspect;
 
-    Matrix4 V = three::lookAt(Vector3::UnitZ, Vector3::Zero, Vector3::UnitY);
-    Matrix4 P = three::perspectiveRH_NO(1.0f, aspect, 0.1f, 100.0f);
-    Matrix4 PV = P * V;
+    Matrix4 PV = g_scene.camera.perspective() * g_scene.camera.view();
 
     m_basic.setUniform(PVLocation, PV);
 
-    for (const GeometryNode& node : g_scene.geometries)
+    for (const GeometryNode& node : g_scene.geometryNodes)
     {
         m_basic.setUniform(MLocation, node.transform);
         for (const Geometry& geom : node.geometries)

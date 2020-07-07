@@ -234,4 +234,10 @@ void Window::charCallback(GLFWwindow* window, unsigned int c)
     io.AddInputCharacter(c);
 }
 
+bool Window::isKeyDown(int key) const
+{
+    ImGuiIO& io = ImGui::GetIO();
+    return io.KeysDown[key];
+}
+
 } // namespace vct
