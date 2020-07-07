@@ -2,6 +2,7 @@
 #include "base/Exception.h"
 #include "imgui/imgui.h"
 #include "scene/CreateScene.h"
+#include "Globals.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
 
@@ -60,7 +61,7 @@ void Application::finalize()
 void Application::updateCamera()
 {
     constexpr float VIEW_SPEED = 2.0f;
-    constexpr float CAMERA_SPEED = 0.1f;
+    constexpr float CAMERA_SPEED = 0.2f;
 
     int x = m_window.isKeyDown(GLFW_KEY_D) - m_window.isKeyDown(GLFW_KEY_A);
     int z = m_window.isKeyDown(GLFW_KEY_W) - m_window.isKeyDown(GLFW_KEY_S);
@@ -93,9 +94,6 @@ void Application::updateCamera()
 
 void Application::userInterface()
 {
-    static bool show_demo_window = true;
-    static bool show_another_window = false;
-
     ImGui::NewFrame();
 
     // if (show_demo_window)
@@ -106,7 +104,8 @@ void Application::userInterface()
 
     ImGui::Begin("Debug");
 
-    ImGui::Checkbox("Visualize voxels", &show_another_window);
+    ImGui::Checkbox("Show Object Bounding Box", &g_UIControls.showObjectBoundingBox);
+    ImGui::Checkbox("Show World Bounding Box", &g_UIControls.showWorldBoundingBox);
 
     ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
 
@@ -131,5 +130,7 @@ void Application::userInterface()
     // Rendering
     ImGui::Render();
 }
+
+UIControlls g_UIControls;
 
 } // namespace vct

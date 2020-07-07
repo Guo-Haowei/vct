@@ -3,6 +3,7 @@
 #include "Box.h"
 #include "Constants.h"
 #include "Functions.h"
+#include "geometries/BoxGeometry.h"
 
 namespace vct {
 

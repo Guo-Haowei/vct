@@ -36,6 +36,7 @@ struct Scene
 {
     std::vector<GeometryNode> geometryNodes;
     std::vector<std::unique_ptr<Mesh>> meshes;
+    Box3 boundingBox;
     Camera camera;
 };
 

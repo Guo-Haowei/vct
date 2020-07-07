@@ -40,13 +40,16 @@ void SceneLoader::loadObj(const char* path, Scene& scene, Matrix4 transform)
         const aiMesh* aimesh = aiscene->mMeshes[i];
         Mesh* mesh = processMesh(aimesh);
         Box3 box;
+        box.expandPoints(mesh->positions.size(), mesh->positions.data());
+        box.applyMatrix(transform);
         node.geometries.push_back({ mesh, box });
         scene.meshes.push_back(std::move(std::unique_ptr<Mesh>(mesh)));
+
+        scene.boundingBox.mergeBox(box);
     }
 
     scene.geometryNodes.push_back(node);
 }
-
 
 Mesh* SceneLoader::processMesh(const aiMesh* aimesh)
 {
