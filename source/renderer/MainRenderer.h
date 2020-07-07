@@ -34,6 +34,7 @@ private:
     GlslProgram m_visualizeProgram;
     GlslProgram m_basicProgram;
     GlslProgram m_boxWireframeProgram;
+    GlslProgram m_voxelPostProgram;
 
     /// vertex arrays
     PerDrawData m_boxWireframe;

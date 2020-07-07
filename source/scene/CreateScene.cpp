@@ -7,8 +7,8 @@ namespace vct {
 void createDefaultScene()
 {
     {
-        // Matrix4 transform = three::scale(Vector3(0.01f));
-        // SceneLoader::loadObj(DATA_DIR "models/CrytekSponza/sponza.obj", g_scene, transform);
+        Matrix4 transform = three::scale(Vector3(0.01f));
+        SceneLoader::loadObj(DATA_DIR "models/CrytekSponza/sponza.obj", g_scene, transform);
     }
     {
         Matrix4 transform = three::translate(Vector3(0, 1, 0)) * three::rotateY(three::pi<float>()) * three::scale(Vector3(2.0f));

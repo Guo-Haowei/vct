@@ -11,6 +11,29 @@ namespace vct {
 
 static GLuint createShaderFromFile(const char* file, GLenum shaderType);
 
+void GlslProgram::linkProgram(const char* file)
+{
+    // check link error
+    glLinkProgram(m_handle);
+    GLint status = GL_FALSE, logLength = 0;
+    glGetProgramiv(m_handle, GL_LINK_STATUS, &status);
+    glGetProgramiv(m_handle, GL_INFO_LOG_LENGTH, &logLength);
+
+    if (logLength > 1)
+    {
+        vector<char> buffer(logLength + 1);
+        glGetProgramInfoLog(m_handle, logLength, NULL, buffer.data());
+        std::cout << "[Log]: when linking program [" << file << "]\n";
+        std::cout << buffer.data() << std::endl;
+    }
+
+    if (status == GL_FALSE)
+    {
+        destroy();
+        THROW_EXCEPTION("Failed to link program");
+    }
+}
+
 void GlslProgram::createFromFiles(const char* vert, const char* frag, const char* geom)
 {
     GLuint vertHandle = createShaderFromFile(vert, GL_VERTEX_SHADER);
@@ -28,30 +51,25 @@ void GlslProgram::createFromFiles(const char* vert, const char* frag, const char
         glAttachShader(m_handle, geomHandle);
     }
 
-    // check link error
-    glLinkProgram(m_handle);
-    GLint status = GL_FALSE, logLength = 0;
-    glGetProgramiv(m_handle, GL_LINK_STATUS, &status);
-    glGetProgramiv(m_handle, GL_INFO_LOG_LENGTH, &logLength);
-
-    if (logLength > 1)
-    {
-        vector<char> buffer(logLength + 1);
-        glGetProgramInfoLog(m_handle, logLength, NULL, buffer.data());
-        std::cout << "[Log]: when linking program [" << vert << "]\n";
-        std::cout << buffer.data() << std::endl;
-    }
-
-    if (status == GL_FALSE)
-    {
-        destroy();
-        THROW_EXCEPTION("Failed to link program");
-    }
+    linkProgram(vert);
 
     glDeleteShader(vertHandle);
     glDeleteShader(fragHandle);
     if (geomHandle != GpuResource::NULL_HANDLE)
         glDeleteShader(geomHandle);
+}
+
+void GlslProgram::createFromFile(const char* comp)
+{
+    GLuint compHandle = createShaderFromFile(comp, GL_COMPUTE_SHADER);
+
+    m_handle = glCreateProgram();
+
+    glAttachShader(m_handle, compHandle);
+
+    linkProgram(comp);
+
+    glDeleteShader(compHandle);
 }
 
 void GlslProgram::destroy()

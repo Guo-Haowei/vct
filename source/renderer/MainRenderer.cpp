@@ -47,6 +47,10 @@ void MainRenderer::createGpuResources()
         m_voxelProgram.stop();
     }
 
+    m_voxelPostProgram.createFromFile(DATA_DIR "shaders/voxel/post.comp");
+    {
+    }
+
     // create box wireframe
     {
         std::vector<Vector3> points;
@@ -178,6 +182,18 @@ void MainRenderer::renderVoxelTexture()
     m_albedoVoxel.unbind();
 
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+    // post process
+    m_voxelPostProgram.use();
+
+    constexpr GLuint workGroupX = 512;
+    constexpr GLuint workGroupY = 512;
+    constexpr GLuint workGroupZ =
+        (VOXEL_TEXTURE_SIZE * VOXEL_TEXTURE_SIZE * VOXEL_TEXTURE_SIZE) /
+        (workGroupX * workGroupY);
+
+    glDispatchCompute(workGroupX, workGroupY, workGroupZ);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 }
 
 void MainRenderer::renderSceneNoGI(const Matrix4& PV)

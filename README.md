@@ -1,9 +1,13 @@
 # Voxel GI
 
 ## Todo
-- [ ] shadow map (for a thing mesh, both sides will be rendered and a supposingly dark pixel will be illuminated)
-- [ ] fix the voxel artifact
+- [ ] material system
 - [ ] sky box
-- [x] stretch the triangle in geometry shader so there's fewer gaps in the voxelized scene
+<!-- - [ ] shadow map (for a thing mesh, both sides will be rendered and a supposingly dark pixel will be illuminated) -->
+- [ ] diffuse cone
+- [ ] specular cone
+- [ ] shadow cone
+- [x] accumulate color atomically
+- [x] stretch triangle to fill small gaps
 - [x] visualize 3d texture
-- [x] draw bbox to see if it's accurate
+- [x] visualize bounding box

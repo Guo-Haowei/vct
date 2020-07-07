@@ -9,8 +9,10 @@ constexpr unsigned int log2(unsigned int x)
 
 constexpr int ALBEDO_VOXEL_SLOT = 0;
 constexpr int NORMAL_VOXEL_SLOT = 1;
-constexpr unsigned int VOXEL_TEXTURE_SIZE = 64;
+constexpr unsigned int VOXEL_TEXTURE_SIZE = 128;
 constexpr unsigned int VOXEL_TEXTURE_MIP_LEVEL = log2(VOXEL_TEXTURE_SIZE);
+
+static_assert(VOXEL_TEXTURE_SIZE <= 256);
 
 struct UIControlls
 {

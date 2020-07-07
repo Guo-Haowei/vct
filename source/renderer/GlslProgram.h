@@ -8,6 +8,7 @@ class GlslProgram : public GpuResource
 {
 public:
     void createFromFiles(const char* vert, const char* frag, const char* geom = nullptr);
+    void createFromFile(const char* comp);
     void use();
     void stop();
     void destroy();
@@ -18,6 +19,8 @@ public:
     void setUniform(GLint location, const Vector3& val);
     void setUniform(GLint location, const Vector4& val);
     void setUniform(GLint location, const Matrix4& val);
+private:
+    void linkProgram(const char* file);
 };
 
 } // namespace vct

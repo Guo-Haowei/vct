@@ -26,7 +26,6 @@ void main()
     }
     else
     {
-        color /= color.a;
         float voxel_size = u_world.w / float(voxel_texture_size);
         vec3 coord_pos = vec3(float(x), float(y), float(z)) / float(voxel_texture_size); // [0, 1]
         coord_pos = 2.0 * coord_pos - vec3(1.0); // [-1, 1]
