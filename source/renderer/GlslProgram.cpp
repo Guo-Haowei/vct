@@ -66,6 +66,11 @@ void GlslProgram::use()
     glUseProgram(m_handle);
 }
 
+void GlslProgram::stop()
+{
+    glUseProgram(NULL_HANDLE);
+}
+
 GLint GlslProgram::getUniformLocation(const char* name)
 {
     GLint location = glGetUniformLocation(m_handle, name);
@@ -77,6 +82,11 @@ GLint GlslProgram::getUniformLocation(const char* name)
 void GlslProgram::setUniform(GLint location, const int& val)
 {
     glUniform1i(location, val);
+}
+
+void GlslProgram::setUniform(GLint location, const float& val)
+{
+    glUniform1f(location, val);
 }
 
 void GlslProgram::setUniform(GLint location, const Vector2& val)

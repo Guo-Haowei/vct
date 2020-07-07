@@ -38,6 +38,7 @@ struct Scene
     std::vector<std::unique_ptr<Mesh>> meshes;
     Box3 boundingBox;
     Camera camera;
+    bool dirty = true;
 };
 
 extern Scene g_scene;

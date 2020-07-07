@@ -96,36 +96,24 @@ void Application::userInterface()
 {
     ImGui::NewFrame();
 
-    // if (show_demo_window)
-    //     ImGui::ShowDemoWindow(&show_demo_window);
-
     static float f = 0.0f;
-    static int counter = 0;
 
     ImGui::Begin("Debug");
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+    ImGui::RadioButton("Direct Light", &g_UIControls.renderStrategy, 0); ImGui::SameLine();
+    ImGui::RadioButton("Voxel GI", &g_UIControls.renderStrategy, 1); ImGui::SameLine();
+    ImGui::RadioButton("Visualization", &g_UIControls.renderStrategy, 2);
+
+    if (ImGui::Checkbox("Force voxel texture update", &g_UIControls.forceUpdateVoxelTexture))
+    {
+        g_scene.dirty = true;
+    }
 
     ImGui::Checkbox("Show Object Bounding Box", &g_UIControls.showObjectBoundingBox);
     ImGui::Checkbox("Show World Bounding Box", &g_UIControls.showWorldBoundingBox);
 
-    ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-
-    if (ImGui::Button("Button"))
-        counter++;
-    ImGui::SameLine();
-    ImGui::Text("counter = %d", counter);
-
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::End();
-
-    // 3. Show another simple window.
-    // if (show_another_window)
-    // {
-    //     ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-    //     ImGui::Text("Hello from another window!");
-    //     if (ImGui::Button("Close Me"))
-    //         show_another_window = false;
-    //     ImGui::End();
-    // }
 
     // Rendering
     ImGui::Render();

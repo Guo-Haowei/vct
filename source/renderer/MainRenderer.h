@@ -1,5 +1,6 @@
 #pragma once
 #include "GlslProgram.h"
+#include "GpuTexture.h"
 #include "application/Window.h"
 
 namespace vct {
@@ -20,16 +21,26 @@ public:
     void createGpuResources();
     void render();
     void renderBoundingBox(const Matrix4& PV);
+    void renderVoxels(const Matrix4& PV);
+    void renderSceneNoGI(const Matrix4& PV);
+    void renderVoxelTexture();
     void destroyGpuResources();
     inline void setWindow(Window* pWindow) { m_pWindow = pWindow; }
 private:
     Window* m_pWindow;
 
-    // TODO: rename
+    /// shader programs
+    GlslProgram m_voxelProgram;
+    GlslProgram m_visualizeProgram;
     GlslProgram m_basicProgram;
     GlslProgram m_boxWireframeProgram;
 
+    /// vertex arrays
     PerDrawData m_boxWireframe;
+    PerDrawData m_box; // no normals
+
+    /// textures
+    GpuTexture m_albedoVoxel;
 };
 
 } // namespace vct
