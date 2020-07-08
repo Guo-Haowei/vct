@@ -2,6 +2,7 @@
 #include "GlslProgram.h"
 #include "GpuTexture.h"
 #include "GpuBuffer.h"
+#include "FrameBuffer.h"
 #include "application/Window.h"
 
 namespace vct {
@@ -33,6 +34,7 @@ struct LightBufferCache
 {
     Vector3 position;
     float padding;
+    Matrix4 lightSpacePV;
 };
 
 struct MaterialCache
@@ -48,11 +50,14 @@ class MainRenderer
 {
 public:
     void createGpuResources();
+    void createFrameBuffers();
     void render();
+    void renderToShadowMap();
+    void renderFrameBufferTextures(const Extent2i& extent);
+    void renderToVoxelTexture();
     void renderBoundingBox();
     void visualizeVoxels();
     void renderSceneNoGI();
-    void renderVoxelTexture();
     void destroyGpuResources();
     inline void setWindow(Window* pWindow) { m_pWindow = pWindow; }
 private:
@@ -64,10 +69,13 @@ private:
     GlslProgram m_basicProgram;
     GlslProgram m_boxWireframeProgram;
     GlslProgram m_voxelPostProgram;
+    GlslProgram m_shadowProgram;
+    GlslProgram m_debugDepthProgram;
 
     /// vertex arrays
     MeshData m_boxWireframe;
     MeshData m_box; // no normals
+    MeshData m_quad;
 
     /// textures
     GpuTexture m_albedoVoxel;
@@ -77,6 +85,10 @@ private:
     UniformBuffer<CameraBufferCache>    m_cameraBuffer;
     UniformBuffer<LightBufferCache>     m_lightBuffer;
     UniformBuffer<MaterialCache>        m_materialBuffer;
+
+    /// framebuffer
+    DepthBuffer m_earlyZBuffer;
+    DepthBuffer m_shadowBuffer;
 };
 
 } // namespace vct

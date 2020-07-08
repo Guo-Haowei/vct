@@ -2,6 +2,7 @@ add_library(renderer
     RenderSystem.cpp
     GlslProgram.cpp
     GpuTexture.cpp
+    FrameBuffer.cpp
     MasterRenderer.cpp
     MainRenderer.cpp
     ImguiRenderer.cpp

@@ -20,10 +20,17 @@ int Application::run()
 
             updateCamera();
 
+            auto extent = m_window.getFrameExtent();
+            float aspect = (float)extent.witdh / (float)extent.height;
+            g_scene.camera.aspect = aspect;
+
             userInterface();
             m_renderSystem.update();
 
             m_window.swapBuffers();
+
+            g_scene.dirty = false;
+            g_scene.lightDirty = false;
         }
 
         finalize();
@@ -114,6 +121,21 @@ void Application::userInterface()
                 g_UIControls.showWorldBoundingBox = false;
             if (ImGui::Checkbox("Show World Bounding Box", &g_UIControls.showWorldBoundingBox))
                 g_UIControls.showObjectBoundingBox = false;
+
+            ImGui::Separator();
+            ImGui::Checkbox("Show shadow map", &g_UIControls.showShadowMap);
+
+            ImGui::EndMenu();
+        }
+
+        ImGui::Separator();
+
+        if (ImGui::BeginMenu("Light"))
+        {
+            g_scene.lightDirty |= ImGui::SliderFloat("position x", &g_scene.light.position.x, -30.0f, 30.0f);
+            g_scene.lightDirty |= ImGui::SliderFloat("position y", &g_scene.light.position.y,  40.0f, 50.0f);
+            g_scene.lightDirty |= ImGui::SliderFloat("position z", &g_scene.light.position.z, -30.0f, 30.0f);
+            g_scene.dirty |= g_scene.lightDirty;
             ImGui::EndMenu();
         }
 

@@ -12,6 +12,8 @@ struct Texture3DCreateInfo
     int mipLevel;
 };
 
+class DepthBuffer;
+
 class GpuTexture : public GpuResource
 {
 public:
@@ -27,6 +29,8 @@ public:
 protected:
     GLenum m_type;
     GLenum m_format;
+
+    friend class DepthBuffer;
 };
 
 } // namespace vct

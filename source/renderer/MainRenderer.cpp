@@ -22,15 +22,16 @@ void MainRenderer::createGpuResources()
     m_cameraBuffer.createAndBind(UNIFORM_BUFFER_CAMERA_SLOT);
 
     m_lightBuffer.createAndBind(UNIFORM_BUFFER_LIGHT_SLOT);
-    m_lightBuffer.cache.position = Vector3(0.0f, 100.0f, 2.0f);
+    m_lightBuffer.cache.position = g_scene.light.position;
+    m_lightBuffer.cache.lightSpacePV = lightSpaceMatrix(g_scene.light.position, g_scene.boundingBox);
     m_lightBuffer.update();
 
     m_materialBuffer.createAndBind(UNIFORM_BUFFER_MATERIAL_SLOT);
 
     // create shader
     m_boxWireframeProgram.createFromFiles(
-        DATA_DIR "shaders/box_wireframe.vert",
-        DATA_DIR "shaders/box_wireframe.frag");
+        DATA_DIR "shaders/debug/box_wireframe.vert",
+        DATA_DIR "shaders/debug/box_wireframe.frag");
 
     m_basicProgram.createFromFiles(
         DATA_DIR "shaders/basic.vert",
@@ -38,7 +39,21 @@ void MainRenderer::createGpuResources()
     {
         m_basicProgram.use();
         m_basicProgram.setUniform(m_basicProgram.getUniformLocation("u_albedo_map"), ALBEDO_MAP_SLOT);
+        m_basicProgram.setUniform(m_basicProgram.getUniformLocation("u_shadow_map"), SHADOW_MAP_SLOT);
         m_basicProgram.stop();
+    }
+
+    m_shadowProgram.createFromFiles(
+        DATA_DIR "shaders/shadow.vert",
+        DATA_DIR "shaders/depth.frag");
+
+    m_debugDepthProgram.createFromFiles(
+        DATA_DIR "shaders/debug/depth_texture.vert",
+        DATA_DIR "shaders/debug/depth_texture.frag");
+    {
+        m_debugDepthProgram.use();
+        m_debugDepthProgram.setUniform(m_debugDepthProgram.getUniformLocation("u_depth_map"), SHADOW_MAP_SLOT);
+        m_debugDepthProgram.stop();
     }
 
     m_voxelProgram.createFromFiles(
@@ -51,6 +66,7 @@ void MainRenderer::createGpuResources()
         m_voxelProgram.setUniform(m_voxelProgram.getUniformLocation("u_world"), world);
         m_voxelProgram.setUniform(m_voxelProgram.getUniformLocation("u_voxel_texture_size"), (int)VOXEL_TEXTURE_SIZE);
         m_voxelProgram.setUniform(m_voxelProgram.getUniformLocation("u_albedo_map"), ALBEDO_MAP_SLOT);
+        m_voxelProgram.setUniform(m_voxelProgram.getUniformLocation("u_shadow_map"), SHADOW_MAP_SLOT);
         m_voxelProgram.stop();
     }
 
@@ -65,6 +81,9 @@ void MainRenderer::createGpuResources()
     }
 
     m_voxelPostProgram.createFromFile(DATA_DIR "shaders/voxel/post.comp");
+
+    // frame buffers
+    createFrameBuffers();
 
     // create box wireframe
     {
@@ -85,6 +104,28 @@ void MainRenderer::createGpuResources()
         glEnableVertexAttribArray(0);
 
         m_boxWireframe.count = static_cast<unsigned int>(indices.size());
+    }
+
+    // create box quad
+    {
+        float points[] =
+        {
+            -1.0f, +1.0f,
+            -1.0f, -1.0f,
+            +1.0f, +1.0f,
+            +1.0f, +1.0f,
+            -1.0f, -1.0f,
+            +1.0f, -1.0f,
+        };
+
+        glGenVertexArrays(1, &m_quad.vao);
+        glGenBuffers(1, m_quad.vbos);
+        glBindVertexArray(m_quad.vao);
+
+        glBindBuffer(GL_ARRAY_BUFFER, m_quad.vbos[0]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
+        glEnableVertexAttribArray(0);
     }
 
     {
@@ -171,6 +212,9 @@ void MainRenderer::createGpuResources()
         g_matLUT.insert({ mat.get(), matData });
     }
 
+    glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SLOT);
+    m_shadowBuffer.getDepthTexture().bind();
+
     glClearColor(0.3f, 0.4f, 0.3f, 1.0f);
 }
 
@@ -194,11 +238,43 @@ void MainRenderer::visualizeVoxels()
     glDrawElementsInstanced(GL_TRIANGLES, m_box.count, GL_UNSIGNED_INT, 0, size * size * size);
 }
 
-void MainRenderer::renderVoxelTexture()
+void MainRenderer::renderToShadowMap()
 {
-    // TODO:
-    // skip rendering if scene didn't update
+    m_shadowBuffer.bind();
 
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
+
+    glViewport(0, 0, SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    // render scene
+    m_shadowProgram.use();
+
+    static GLint PVMLocation = m_shadowProgram.getUniformLocation("u_PVM");
+
+    for (const GeometryNode& node : g_scene.geometryNodes)
+    {
+        Matrix4 PVM = m_lightBuffer.cache.lightSpacePV * node.transform;
+        m_shadowProgram.setUniform(PVMLocation, PVM);
+        for (const Geometry& geom : node.geometries)
+        {
+            const auto& meshPair = g_meshLUT.find(geom.pMesh);
+            ASSERT(meshPair != g_meshLUT.end());
+            const MeshData& drawData = meshPair->second;
+
+            glBindVertexArray(drawData.vao);
+            glDrawElements(GL_TRIANGLES, drawData.count, GL_UNSIGNED_INT, 0);
+        }
+    }
+
+    m_shadowBuffer.unbind();
+
+    glCullFace(GL_BACK);
+}
+
+void MainRenderer::renderToVoxelTexture()
+{
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
@@ -317,23 +393,42 @@ void MainRenderer::renderBoundingBox()
     }
 }
 
+void MainRenderer::renderFrameBufferTextures(const Extent2i& extent)
+{
+    if (!g_UIControls.showShadowMap)
+        return;
+    m_debugDepthProgram.use();
+    constexpr float scale = 0.2f;
+    int width = static_cast<int>(scale * extent.witdh);
+    int height = static_cast<int>(scale * extent.height);
+    glViewport(0, 0, width, height);
+    glBindVertexArray(m_quad.vao);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+
 void MainRenderer::render()
 {
-    // TODO: refactor this
-    if (g_scene.dirty || g_UIControls.forceUpdateVoxelTexture)
+    if (g_scene.lightDirty)
     {
-        renderVoxelTexture();
-        g_scene.dirty = false;
+        m_lightBuffer.cache.position = g_scene.light.position;
+        m_lightBuffer.cache.lightSpacePV = lightSpaceMatrix(g_scene.light.position, g_scene.boundingBox);
+        m_lightBuffer.update();
+        renderToShadowMap();
     }
 
+    if (g_scene.dirty || g_UIControls.forceUpdateVoxelTexture)
+    {
+        m_albedoVoxel.clear();
+        m_normalVoxel.clear();
+        renderToVoxelTexture();
+    }
 
     auto extent = m_pWindow->getFrameExtent();
 
     if (extent.witdh * extent.height > 0)
     {
         // skip rendering if minimized
-        float aspect = (float)extent.witdh / (float)extent.height;
-        g_scene.camera.aspect = aspect;
         Matrix4 PV = g_scene.camera.perspective() * g_scene.camera.view();
         m_cameraBuffer.cache.PV = PV;
         m_cameraBuffer.update();
@@ -352,12 +447,14 @@ void MainRenderer::render()
 
         if (g_UIControls.showObjectBoundingBox || g_UIControls.showWorldBoundingBox)
             renderBoundingBox();
+
+        renderFrameBufferTextures(extent);
     }
+}
 
-
-    // clear voxel
-    if (g_scene.dirty || g_UIControls.forceUpdateVoxelTexture)
-        m_albedoVoxel.clear();
+void MainRenderer::createFrameBuffers()
+{
+    m_shadowBuffer.create(SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION);
 }
 
 void MainRenderer::destroyGpuResources()
