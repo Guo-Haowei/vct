@@ -2,28 +2,35 @@
 #include "MainRenderer.h"
 #include "scene/Scene.h"
 #include "application/Globals.h"
+#include "base/Assertion.h"
 #include <unordered_map>
+#include <iostream>
 
 namespace vct {
 
-static std::unordered_map<const Mesh*, PerDrawData> g_meshLUT;
+static std::unordered_map<const Mesh*, MeshData> g_meshLUT;
+static std::unordered_map<const Material*, MaterialData> g_matLUT;
 
 void MainRenderer::createGpuResources()
 {
-    // create shader
-    m_basicProgram.createFromFiles(
-        DATA_DIR "shaders/basic.vert",
-        DATA_DIR "shaders/basic.frag");
-
-    m_boxWireframeProgram.createFromFiles(
-        DATA_DIR "shaders/box_wireframe.vert",
-        DATA_DIR "shaders/box_wireframe.frag");
-
-
     Vector3 center = g_scene.boundingBox.getCenter();
     Vector3 size = g_scene.boundingBox.getSize();
     float sizeMax = std::max(size.x, std::max(size.y, size.z));
     Vector4 world(center, sizeMax);
+
+    // create shader
+    m_boxWireframeProgram.createFromFiles(
+        DATA_DIR "shaders/box_wireframe.vert",
+        DATA_DIR "shaders/box_wireframe.frag");
+
+    m_basicProgram.createFromFiles(
+        DATA_DIR "shaders/basic.vert",
+        DATA_DIR "shaders/basic.frag");
+    {
+        m_basicProgram.use();
+        m_basicProgram.setUniform(m_basicProgram.getUniformLocation("u_albedo_map"), ALBEDO_MAP_SLOT);
+        m_basicProgram.stop();
+    }
 
     m_voxelProgram.createFromFiles(
         DATA_DIR "shaders/voxel/voxelization.vert",
@@ -34,6 +41,7 @@ void MainRenderer::createGpuResources()
         m_voxelProgram.use();
         m_voxelProgram.setUniform(m_voxelProgram.getUniformLocation("u_world"), world);
         m_voxelProgram.setUniform(m_voxelProgram.getUniformLocation("u_voxel_texture_size"), (int)VOXEL_TEXTURE_SIZE);
+        m_voxelProgram.setUniform(m_voxelProgram.getUniformLocation("u_albedo_map"), ALBEDO_MAP_SLOT);
         m_voxelProgram.stop();
     }
 
@@ -48,8 +56,6 @@ void MainRenderer::createGpuResources()
     }
 
     m_voxelPostProgram.createFromFile(DATA_DIR "shaders/voxel/post.comp");
-    {
-    }
 
     // create box wireframe
     {
@@ -64,7 +70,7 @@ void MainRenderer::createGpuResources()
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_boxWireframe.ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), indices.data(), GL_STATIC_DRAW);
 
-        glBindBuffer(GL_ARRAY_BUFFER, m_boxWireframe.vbo1);
+        glBindBuffer(GL_ARRAY_BUFFER, m_boxWireframe.vbos[0]);
         glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3) * points.size(), points.data(), GL_STATIC_DRAW);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), 0);
         glEnableVertexAttribArray(0);
@@ -84,7 +90,7 @@ void MainRenderer::createGpuResources()
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_box.ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), indices.data(), GL_STATIC_DRAW);
 
-        glBindBuffer(GL_ARRAY_BUFFER, m_box.vbo1);
+        glBindBuffer(GL_ARRAY_BUFFER, m_box.vbos[0]);
         glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3) * points.size(), points.data(), GL_STATIC_DRAW);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), 0);
         glEnableVertexAttribArray(0);
@@ -107,30 +113,54 @@ void MainRenderer::createGpuResources()
     }
 
     // load scene
+    // create mesh
     for (const std::unique_ptr<Mesh>& mesh : g_scene.meshes)
     {
-        PerDrawData data;
+        MeshData data;
         glGenVertexArrays(1, &data.vao);
-        glGenBuffers(3, &data.ebo);
+        glGenBuffers(4, &data.ebo);
         glBindVertexArray(data.vao);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data.ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Vector3u) * mesh->faces.size(), mesh->faces.data(), GL_STATIC_DRAW);
 
-        glBindBuffer(GL_ARRAY_BUFFER, data.vbo1);
+        glBindBuffer(GL_ARRAY_BUFFER, data.vbos[0]);
         glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3) * mesh->positions.size(), mesh->positions.data(), GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), (void*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), 0);
         glEnableVertexAttribArray(0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, data.vbo2);
+        glBindBuffer(GL_ARRAY_BUFFER, data.vbos[1]);
         glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3) * mesh->normals.size(), mesh->normals.data(), GL_STATIC_DRAW);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), (void*)0);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), 0);
         glEnableVertexAttribArray(1);
+
+        glBindBuffer(GL_ARRAY_BUFFER, data.vbos[2]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Vector2) * mesh->uvs.size(), mesh->uvs.data(), GL_STATIC_DRAW);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vector2), 0);
+        glEnableVertexAttribArray(2);
 
         //glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
         data.count = 3 * static_cast<unsigned int>(mesh->faces.size());
 
         g_meshLUT.insert({ mesh.get(), data });
+    }
+
+    // create material
+    for (const std::unique_ptr<Material>& mat : g_scene.materials)
+    {
+        MaterialData matData;
+        matData.hasAlbedoMap = mat->hasAlbedoMap;
+        if (matData.hasAlbedoMap)
+        {
+            matData.albedoMap.create2DImageFromFile(mat->albedoMapPath.c_str());
+            matData.albedoColor = Vector4::Zero;
+        }
+        else
+        {
+            matData.albedoColor = Vector4(mat->albedoColor, 1.0f);
+        }
+
+        g_matLUT.insert({ mat.get(), matData });
     }
 
     glClearColor(0.3f, 0.4f, 0.3f, 1.0f);
@@ -172,15 +202,28 @@ void MainRenderer::renderVoxelTexture()
     m_albedoVoxel.bindImageTexture(ALBEDO_VOXEL_SLOT);
     m_normalVoxel.bindImageTexture(NORMAL_VOXEL_SLOT);
     m_voxelProgram.use();
-    static GLint MLocation = m_voxelProgram.getUniformLocation("u_M");
+    static GLint mLocation = m_voxelProgram.getUniformLocation("u_M");
+    static GLint albedoLocation = m_voxelProgram.getUniformLocation("u_material.albedo");
 
     for (const GeometryNode& node : g_scene.geometryNodes)
     {
-        m_voxelProgram.setUniform(MLocation, node.transform);
+        m_voxelProgram.setUniform(mLocation, node.transform);
         for (const Geometry& geom : node.geometries)
         {
-            const PerDrawData& drawData = g_meshLUT.find(geom.pMesh)->second;
+            const auto& meshPair = g_meshLUT.find(geom.pMesh);
+            ASSERT(meshPair != g_meshLUT.end());
+            const MeshData& drawData = meshPair->second;
+
+            const auto& matPair = g_matLUT.find(geom.pMaterial);
+            ASSERT(matPair != g_matLUT.end());
+            const MaterialData& matData = matPair->second;
+
             glBindVertexArray(drawData.vao);
+            glActiveTexture(GL_TEXTURE0 + ALBEDO_MAP_SLOT);
+            matData.albedoMap.bind();
+
+            m_voxelProgram.setUniform(albedoLocation, matData.albedoColor);
+
             glDrawElements(GL_TRIANGLES, drawData.count, GL_UNSIGNED_INT, 0);
         }
     }
@@ -212,6 +255,7 @@ void MainRenderer::renderSceneNoGI(const Matrix4& PV)
     m_basicProgram.use();
     static const GLint pvLocation = m_basicProgram.getUniformLocation("u_PV");
     static const GLint mLocation = m_basicProgram.getUniformLocation("u_M");
+    static const GLint albedoLocation = m_basicProgram.getUniformLocation("u_material.albedo");
     m_basicProgram.setUniform(pvLocation, PV);
 
     for (const GeometryNode& node : g_scene.geometryNodes)
@@ -219,8 +263,20 @@ void MainRenderer::renderSceneNoGI(const Matrix4& PV)
         m_basicProgram.setUniform(mLocation, node.transform);
         for (const Geometry& geom : node.geometries)
         {
-            const PerDrawData& drawData = g_meshLUT.find(geom.pMesh)->second;
+            const auto& meshPair = g_meshLUT.find(geom.pMesh);
+            ASSERT(meshPair != g_meshLUT.end());
+            const MeshData& drawData = meshPair->second;
+
+            const auto& matPair = g_matLUT.find(geom.pMaterial);
+            ASSERT(matPair != g_matLUT.end());
+            const MaterialData& matData = matPair->second;
+
             glBindVertexArray(drawData.vao);
+            glActiveTexture(GL_TEXTURE0 + ALBEDO_MAP_SLOT);
+            matData.albedoMap.bind();
+
+            m_basicProgram.setUniform(albedoLocation, matData.albedoColor);
+
             glDrawElements(GL_TRIANGLES, drawData.count, GL_UNSIGNED_INT, 0);
         }
     }

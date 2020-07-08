@@ -5,14 +5,21 @@
 
 namespace vct {
 
-struct PerDrawData
+struct MeshData
 {
-    GLuint vao;
-    // TODO: refactor
-    GLuint ebo;
-    GLuint vbo1;
-    GLuint vbo2;
-    unsigned int count;
+    GLuint vao          = 0;
+    GLuint ebo          = 0;
+    GLuint vbos[3]      = { 0, 0, 0 };
+    unsigned int count  = 0;
+};
+
+struct MaterialData
+{
+    Vector4 albedoColor;
+    GpuTexture albedoMap;
+    bool hasAlbedoMap;
+    // specular...
+    // normal...
 };
 
 class MainRenderer
@@ -37,8 +44,8 @@ private:
     GlslProgram m_voxelPostProgram;
 
     /// vertex arrays
-    PerDrawData m_boxWireframe;
-    PerDrawData m_box; // no normals
+    MeshData m_boxWireframe;
+    MeshData m_box; // no normals
 
     /// textures
     GpuTexture m_albedoVoxel;

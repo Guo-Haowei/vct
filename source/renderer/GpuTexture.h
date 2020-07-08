@@ -16,11 +16,12 @@ class GpuTexture : public GpuResource
 {
 public:
     void create3DImage(const Texture3DCreateInfo& info);
+    void create2DImageFromFile(const char* path);
     void destroy();
     void bindImageTexture(int i, int mipLevel = 0);
     void clear();
-    void bind();
-    void unbind();
+    void bind() const;
+    void unbind() const;
     void genMipMap();
     inline GLenum getFormat() const { return m_format; }
 protected:

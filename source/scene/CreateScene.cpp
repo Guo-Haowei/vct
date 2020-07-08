@@ -6,13 +6,15 @@ namespace vct {
 
 void createDefaultScene()
 {
+    SceneLoader loader;
     {
         Matrix4 transform = three::scale(Vector3(0.01f));
-        SceneLoader::loadObj(DATA_DIR "models/CrytekSponza/sponza.obj", g_scene, transform);
+        loader.loadObj(DATA_DIR "models/CrytekSponza/sponza.obj", g_scene, transform);
     }
     {
+        Material* mat = new Material(Vector3(0.9f));
         Matrix4 transform = three::translate(Vector3(0, 1, 0)) * three::rotateY(three::pi<float>()) * three::scale(Vector3(2.0f));
-        SceneLoader::loadObj(DATA_DIR "models/dragon.obj", g_scene, transform);
+        loader.loadObj(DATA_DIR "models/dragon.obj", g_scene, transform, mat);
     }
 
     Camera& camera = g_scene.camera;

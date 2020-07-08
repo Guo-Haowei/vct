@@ -10,7 +10,7 @@ using std::vector;
 
 namespace vct {
 
-void SceneLoader::loadObj(const char* path, Scene& scene, Matrix4 transform)
+void SceneLoader::loadObj(const char* path, Scene& scene, Matrix4 transform, Material* customMaterial)
 {
     std::cout << "[Log] loading model from [" << path << "]" << std::endl;
     ::Assimp::Importer importer;
@@ -32,6 +32,27 @@ void SceneLoader::loadObj(const char* path, Scene& scene, Matrix4 transform)
         THROW_EXCEPTION(error);
     }
 
+    // set base path
+    m_currentPath = path;
+    auto found = m_currentPath.find_last_of("/\\");
+    m_currentPath = m_currentPath.substr(0, found + 1);
+
+    size_t materialOffset = scene.materials.size();
+
+    if (customMaterial)
+    {
+        scene.materials.push_back(std::move(std::unique_ptr<Material>(customMaterial)));
+    }
+    else
+    {
+        for (uint32_t i = 0; i < aiscene->mNumMaterials; ++i)
+        {
+            const aiMaterial* aimat = aiscene->mMaterials[i];
+            Material* mat = processMaterial(aimat);
+            scene.materials.push_back(std::move(std::unique_ptr<Material>(mat)));
+        }
+    }
+
     GeometryNode node;
     node.transform = transform;
 
@@ -39,10 +60,12 @@ void SceneLoader::loadObj(const char* path, Scene& scene, Matrix4 transform)
     {
         const aiMesh* aimesh = aiscene->mMeshes[i];
         Mesh* mesh = processMesh(aimesh);
+        size_t index = materialOffset + mesh->materialIndex;
+        Material* mat = customMaterial ? customMaterial : scene.materials.at(index).get();
         Box3 box;
         box.expandPoints(mesh->positions.size(), mesh->positions.data());
         box.applyMatrix(transform);
-        node.geometries.push_back({ mesh, box });
+        node.geometries.push_back({ mesh, mat, box });
         scene.meshes.push_back(std::move(std::unique_ptr<Mesh>(mesh)));
 
         scene.boundingBox.mergeBox(box);
@@ -51,15 +74,35 @@ void SceneLoader::loadObj(const char* path, Scene& scene, Matrix4 transform)
     scene.geometryNodes.push_back(node);
 }
 
+Material* SceneLoader::processMaterial(const aiMaterial* aimaterial)
+{
+    Material* mat = new Material;
+
+    aiString albedoPath;
+    aiColor3D color;
+    if (aimaterial->GetTexture(aiTextureType_AMBIENT, 0, &albedoPath, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS)
+    {
+        mat->albedoMapPath = m_currentPath;
+        mat->albedoMapPath.append(albedoPath.C_Str());
+        mat->hasAlbedoMap = true;
+    }
+    else if (aimaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color))
+    {
+        mat->albedoColor = Vector3(color.r, color.g, color.b);
+        mat->hasAlbedoMap = false;
+    }
+
+    return mat;
+}
+
 Mesh* SceneLoader::processMesh(const aiMesh* aimesh)
 {
     string name = aimesh->mName.C_Str();
     Mesh* mesh = new Mesh;
     mesh->positions.reserve(aimesh->mNumVertices);
     mesh->normals.reserve(aimesh->mNumVertices);
+    mesh->uvs.reserve(aimesh->mNumVertices);
     bool hasUv = aimesh->mTextureCoords[0];
-    if (hasUv)
-        mesh->uvs.reserve(aimesh->mNumVertices);
 
     for (uint32_t i = 0; i < aimesh->mNumVertices; ++i)
     {
@@ -72,6 +115,8 @@ Mesh* SceneLoader::processMesh(const aiMesh* aimesh)
             auto& uv = aimesh->mTextureCoords[0][i];
             mesh->uvs.push_back(Vector2(uv.x, uv.y));
         }
+        else
+            mesh->uvs.push_back(Vector2::Zero);
     }
 
     mesh->faces.reserve(aimesh->mNumFaces);
@@ -80,7 +125,8 @@ Mesh* SceneLoader::processMesh(const aiMesh* aimesh)
         aiFace& face = aimesh->mFaces[i];
         mesh->faces.push_back(Vector3u(face.mIndices[0], face.mIndices[1], face.mIndices[2]));
     }
-    // mesh.materialIndex = aimesh->mMaterialIndex;
+
+    mesh->materialIndex = aimesh->mMaterialIndex;
 
     return mesh;
 }

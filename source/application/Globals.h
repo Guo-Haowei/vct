@@ -9,6 +9,8 @@ constexpr unsigned int log2(unsigned int x)
 
 constexpr int ALBEDO_VOXEL_SLOT = 0;
 constexpr int NORMAL_VOXEL_SLOT = 1;
+constexpr int ALBEDO_MAP_SLOT = 4;
+// constexpr int NORMAL_MAP_SLOT = 5;
 constexpr unsigned int VOXEL_TEXTURE_SIZE = 128;
 constexpr unsigned int VOXEL_TEXTURE_MIP_LEVEL = log2(VOXEL_TEXTURE_SIZE);
 

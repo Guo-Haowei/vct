@@ -122,6 +122,8 @@ void Application::userInterface()
         ImGui::EndMenuBar();
     }
 
+    ImGui::End();
+
     // Rendering
     ImGui::Render();
 }

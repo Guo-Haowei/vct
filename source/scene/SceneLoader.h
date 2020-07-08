@@ -12,8 +12,12 @@ namespace vct {
 class SceneLoader
 {
 public:
-    static void loadObj(const char* path, Scene& scene, Matrix4 transform = Matrix4::Identity);
-    static Mesh* processMesh(const aiMesh* aimesh);
+    void loadObj(const char* path, Scene& scene, Matrix4 transform, Material* customMaterial = nullptr);
+private:
+    Mesh* processMesh(const aiMesh* aimesh);
+    Material* processMaterial(const aiMaterial* aimaterial);
+private:
+    std::string m_currentPath;
 };
 
 } // namespace vct

@@ -15,6 +15,7 @@ target_link_libraries(renderer PRIVATE
 target_include_directories(renderer PRIVATE
     ${PROJECT_SOURCE_DIR}/source/
     ${PROJECT_SOURCE_DIR}/external/glad/include/
+    ${PROJECT_SOURCE_DIR}/external/stb/
 )
 
 add_library(vct::renderer ALIAS renderer)

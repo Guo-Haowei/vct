@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include <vector>
 #include <memory>
+#include <string>
 
 namespace vct {
 
@@ -17,13 +18,28 @@ struct Mesh
     NormalBuffer    normals;
     UvBuffer        uvs;
     FaceBuffer      faces;
+    unsigned int    materialIndex;
+};
+
+struct Material
+{
+    /// only support albedo color for now
+    std::string albedoMapPath;
+    Vector3 albedoColor = Vector3::One;
+    bool hasAlbedoMap = false;
+    // bool hasNormalMap;
+
+    Material() = default;
+    Material(const Vector3& albedoColor)
+        : albedoColor(albedoColor), hasAlbedoMap(false)
+    {}
 };
 
 struct Geometry
 {
-    Mesh* pMesh;
-    // material
-    Box3 boundingBox;
+    Mesh*       pMesh;
+    Material*   pMaterial;
+    Box3        boundingBox;
 };
 
 struct GeometryNode
@@ -34,8 +50,9 @@ struct GeometryNode
 
 struct Scene
 {
-    std::vector<GeometryNode> geometryNodes;
-    std::vector<std::unique_ptr<Mesh>> meshes;
+    std::vector<GeometryNode>               geometryNodes;
+    std::vector<std::unique_ptr<Mesh>>      meshes;
+    std::vector<std::unique_ptr<Material>>  materials;
     Box3 boundingBox;
     Camera camera;
     bool dirty = true;

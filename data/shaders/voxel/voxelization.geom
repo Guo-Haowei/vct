@@ -4,11 +4,11 @@ layout(triangle_strip, max_vertices = 3) out;
 
 in vec3 pass_positions[];
 in vec3 pass_normals[];
-// in vec2 pass_uvs[];
+in vec2 pass_uvs[];
 
 out vec3 pass_position; // fragment world position
 out vec3 pass_normal; // fragment normal
-// out vec2 pass_uv;
+out vec2 pass_uv;
 
 uniform vec4 u_world; // xyz : world center; w : world size
 uniform int u_voxel_texture_size;
@@ -51,7 +51,7 @@ void main(){
     {
         pass_position = pass_positions[i];
         pass_normal = pass_normals[i];
-        // pass_uv = pass_uvs[i];
+        pass_uv = pass_uvs[i];
         gl_Position = vec4(output_positions[i], 1.0);
         EmitVertex();
     }

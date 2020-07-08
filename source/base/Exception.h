@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <iostream>
 
 namespace vct {
 
@@ -14,4 +15,8 @@ protected:
 
 } // namespace vct
 
-#define THROW_EXCEPTION( error ) throw ::vct::Exception(__LINE__, __FILE__, error);
+#ifdef _DEBUG
+#   define THROW_EXCEPTION( error ) { std::cout << error << std::endl; __debugbreak(); }
+#else
+#   define THROW_EXCEPTION( error ) throw ::vct::Exception(__LINE__, __FILE__, error);
+#endif
