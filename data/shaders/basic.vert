@@ -7,7 +7,11 @@ out vec3 pass_position;
 out vec3 pass_normal;
 out vec2 pass_uv;
 
-uniform mat4 u_PV;
+layout (std140, binding = 0) uniform Camera
+{
+    mat4 PV;
+};
+
 uniform mat4 u_M;
 
 void main()
@@ -16,5 +20,5 @@ void main()
     pass_position = world_position.xyz;
     pass_normal = mat3(u_M) * in_normal;
     pass_uv = in_uv;
-    gl_Position = u_PV * world_position;
+    gl_Position = PV * world_position;
 }

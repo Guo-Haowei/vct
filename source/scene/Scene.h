@@ -25,7 +25,7 @@ struct Material
 {
     /// only support albedo color for now
     std::string albedoMapPath;
-    Vector3 albedoColor = Vector3::One;
+    Vector3 albedoColor = Vector3::Zero;
     bool hasAlbedoMap = false;
     // bool hasNormalMap;
 

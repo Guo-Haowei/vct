@@ -100,6 +100,8 @@ void Application::userInterface()
     {
         if (ImGui::BeginMenu("Debug"))
         {
+            ImGui::Text("Voxel Texture Size: %d", VOXEL_TEXTURE_SIZE);
+            ImGui::Text("Voxel Mip Level: %d", VOXEL_TEXTURE_MIP_LEVEL);
             if (ImGui::Checkbox("Force voxel texture update", &g_UIControls.forceUpdateVoxelTexture))
                 g_scene.dirty = true;
             ImGui::Separator();

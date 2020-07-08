@@ -8,7 +8,11 @@ uniform vec4 u_world;
 // per frame
 layout (rgba16f, binding = 0) uniform image3D u_voxel_texture;
 
-uniform mat4 u_PV;
+layout (std140, binding = 0) uniform Camera
+{
+    mat4 PV;
+};
+
 uniform int u_toggle;
 
 out vec4 pass_color;
@@ -32,7 +36,7 @@ void main()
         coord_pos = 2.0 * coord_pos - vec3(1.0); // [-1, 1]
         vec3 offset = 0.5 * u_world.w * coord_pos + u_world.xyz + 0.5 * vec3(voxel_size);
         vec3 world_position = voxel_size * in_position + offset;
-        gl_Position = u_PV * vec4(world_position, 1.0);
+        gl_Position = PV * vec4(world_position, 1.0);
 
         pass_color = color;
     }

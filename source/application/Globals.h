@@ -14,6 +14,10 @@ constexpr int ALBEDO_MAP_SLOT = 4;
 constexpr unsigned int VOXEL_TEXTURE_SIZE = 128;
 constexpr unsigned int VOXEL_TEXTURE_MIP_LEVEL = log2(VOXEL_TEXTURE_SIZE);
 
+constexpr int UNIFORM_BUFFER_CAMERA_SLOT = 0;
+constexpr int UNIFORM_BUFFER_LIGHT_SLOT = 1;
+constexpr int UNIFORM_BUFFER_MATERIAL_SLOT = 2;
+
 static_assert(VOXEL_TEXTURE_SIZE <= 256);
 
 struct UIControlls

@@ -15,9 +15,6 @@ struct Camera
     float zFar;
     float yaw = -90.0f;
     float pitch = 0.0f;
-    // Vector3 front   = -Vector3::UnitZ;
-    // Vector3 right   = Vector3::UnitX;
-    // Vector3 up      = Vector3::UnitY;
     Vector3 position  = Vector3::Zero;
 };
 

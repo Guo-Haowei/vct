@@ -11,17 +11,24 @@ layout (rgba16f, binding = 0) uniform image3D u_albedo_texture;
 layout (rgba16f, binding = 1) uniform image3D u_normal_texture;
 
 uniform vec4 u_world; // xyz : world center; w : world size
-uniform vec3 u_light_pos;
 
-// TODO: config light
-const vec3 light_position = vec3(0.0, 100.0, 2.0);
-
-struct Material
+layout (std140, binding = 1) uniform Light
 {
-    vec4 albedo;
+    vec3 light_position;
+    float padding;
 };
 
-uniform Material u_material;
+// struct Material
+// {
+//     vec4 albedo;
+// };
+
+layout (std140, binding = 2) uniform Material
+{
+    vec4 albedo_color;
+};
+
+// uniform Material u_material;
 uniform sampler2D u_albedo_map;
 
 void main()
@@ -31,11 +38,7 @@ void main()
     float diffuse = max(dot(N, L), 0.0);
     vec3 color = (diffuse) * vec3(1.0);
 
-    vec4 albedo;
-    if (u_material.albedo.a > 0.001)
-        albedo = u_material.albedo;
-    else
-        albedo = texture(u_albedo_map, pass_uv);
+    vec4 albedo = mix(texture(u_albedo_map, pass_uv), albedo_color, albedo_color.a);
 
     if (albedo.a < 0.001)
         discard;

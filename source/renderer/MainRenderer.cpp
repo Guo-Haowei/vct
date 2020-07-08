@@ -18,6 +18,15 @@ void MainRenderer::createGpuResources()
     float sizeMax = std::max(size.x, std::max(size.y, size.z));
     Vector4 world(center, sizeMax);
 
+    // create uniform buffer
+    m_cameraBuffer.createAndBind(UNIFORM_BUFFER_CAMERA_SLOT);
+
+    m_lightBuffer.createAndBind(UNIFORM_BUFFER_LIGHT_SLOT);
+    m_lightBuffer.cache.position = Vector3(0.0f, 100.0f, 2.0f);
+    m_lightBuffer.update();
+
+    m_materialBuffer.createAndBind(UNIFORM_BUFFER_MATERIAL_SLOT);
+
     // create shader
     m_boxWireframeProgram.createFromFiles(
         DATA_DIR "shaders/box_wireframe.vert",
@@ -149,8 +158,7 @@ void MainRenderer::createGpuResources()
     for (const std::unique_ptr<Material>& mat : g_scene.materials)
     {
         MaterialData matData;
-        matData.hasAlbedoMap = mat->hasAlbedoMap;
-        if (matData.hasAlbedoMap)
+        if (mat->hasAlbedoMap)
         {
             matData.albedoMap.create2DImageFromFile(mat->albedoMapPath.c_str());
             matData.albedoColor = Vector4::Zero;
@@ -166,15 +174,13 @@ void MainRenderer::createGpuResources()
     glClearColor(0.3f, 0.4f, 0.3f, 1.0f);
 }
 
-void MainRenderer::visualizeVoxels(const Matrix4& PV)
+void MainRenderer::visualizeVoxels()
 {
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
 
     m_visualizeProgram.use();
-    static GLint PVLoation = m_visualizeProgram.getUniformLocation("u_PV");
-    m_visualizeProgram.setUniform(PVLoation, PV);
     glBindVertexArray(m_box.vao);
 
     int mipLevel = g_UIControls.voxelMipLevel;
@@ -203,7 +209,6 @@ void MainRenderer::renderVoxelTexture()
     m_normalVoxel.bindImageTexture(NORMAL_VOXEL_SLOT);
     m_voxelProgram.use();
     static GLint mLocation = m_voxelProgram.getUniformLocation("u_M");
-    static GLint albedoLocation = m_voxelProgram.getUniformLocation("u_material.albedo");
 
     for (const GeometryNode& node : g_scene.geometryNodes)
     {
@@ -218,17 +223,16 @@ void MainRenderer::renderVoxelTexture()
             ASSERT(matPair != g_matLUT.end());
             const MaterialData& matData = matPair->second;
 
+            m_materialBuffer.cache.albedoColor = matData.albedoColor;
+            m_materialBuffer.update();
+
             glBindVertexArray(drawData.vao);
             glActiveTexture(GL_TEXTURE0 + ALBEDO_MAP_SLOT);
             matData.albedoMap.bind();
 
-            m_voxelProgram.setUniform(albedoLocation, matData.albedoColor);
-
             glDrawElements(GL_TRIANGLES, drawData.count, GL_UNSIGNED_INT, 0);
         }
     }
-
-    // m_albedoVoxel.unbind();
 
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
@@ -250,13 +254,10 @@ void MainRenderer::renderVoxelTexture()
     m_normalVoxel.genMipMap();
 }
 
-void MainRenderer::renderSceneNoGI(const Matrix4& PV)
+void MainRenderer::renderSceneNoGI()
 {
     m_basicProgram.use();
-    static const GLint pvLocation = m_basicProgram.getUniformLocation("u_PV");
     static const GLint mLocation = m_basicProgram.getUniformLocation("u_M");
-    static const GLint albedoLocation = m_basicProgram.getUniformLocation("u_material.albedo");
-    m_basicProgram.setUniform(pvLocation, PV);
 
     for (const GeometryNode& node : g_scene.geometryNodes)
     {
@@ -271,27 +272,26 @@ void MainRenderer::renderSceneNoGI(const Matrix4& PV)
             ASSERT(matPair != g_matLUT.end());
             const MaterialData& matData = matPair->second;
 
+            m_materialBuffer.cache.albedoColor = matData.albedoColor;
+            m_materialBuffer.update();
+
             glBindVertexArray(drawData.vao);
             glActiveTexture(GL_TEXTURE0 + ALBEDO_MAP_SLOT);
             matData.albedoMap.bind();
-
-            m_basicProgram.setUniform(albedoLocation, matData.albedoColor);
 
             glDrawElements(GL_TRIANGLES, drawData.count, GL_UNSIGNED_INT, 0);
         }
     }
 }
 
-void MainRenderer::renderBoundingBox(const Matrix4& PV)
+void MainRenderer::renderBoundingBox()
 {
     /// TODO: refactor
     m_boxWireframeProgram.use();
-    static const GLint pvLocation = m_boxWireframeProgram.getUniformLocation("u_PV");
     static const GLint centerLocation = m_boxWireframeProgram.getUniformLocation("u_center");
     static const GLint sizeLocation = m_boxWireframeProgram.getUniformLocation("u_size");
     static const GLint colorLocation = m_boxWireframeProgram.getUniformLocation("u_color");
 
-    m_boxWireframeProgram.setUniform(pvLocation, PV);
     glBindVertexArray(m_boxWireframe.vao);
 
     if (g_UIControls.showObjectBoundingBox)
@@ -326,26 +326,34 @@ void MainRenderer::render()
         g_scene.dirty = false;
     }
 
+
     auto extent = m_pWindow->getFrameExtent();
-    glViewport(0, 0, extent.witdh, extent.height);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glDisable(GL_SCISSOR_TEST);
+    if (extent.witdh * extent.height > 0)
+    {
+        // skip rendering if minimized
+        float aspect = (float)extent.witdh / (float)extent.height;
+        g_scene.camera.aspect = aspect;
+        Matrix4 PV = g_scene.camera.perspective() * g_scene.camera.view();
+        m_cameraBuffer.cache.PV = PV;
+        m_cameraBuffer.update();
 
-    float aspect = (float)extent.witdh / (float)extent.height;
-    g_scene.camera.aspect = aspect;
+        glViewport(0, 0, extent.witdh, extent.height);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    Matrix4 PV = g_scene.camera.perspective() * g_scene.camera.view();
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+        glDisable(GL_SCISSOR_TEST);
 
-    if (g_UIControls.renderVoxel == 0)
-        renderSceneNoGI(PV);
-    else
-        visualizeVoxels(PV);
+        if (g_UIControls.renderVoxel == 0)
+            renderSceneNoGI();
+        else
+            visualizeVoxels();
 
-    if (g_UIControls.showObjectBoundingBox || g_UIControls.showWorldBoundingBox)
-        renderBoundingBox(PV);
+        if (g_UIControls.showObjectBoundingBox || g_UIControls.showWorldBoundingBox)
+            renderBoundingBox();
+    }
+
 
     // clear voxel
     if (g_scene.dirty || g_UIControls.forceUpdateVoxelTexture)

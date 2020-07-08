@@ -13,7 +13,7 @@ void createDefaultScene()
     }
     {
         Material* mat = new Material(Vector3(0.9f));
-        Matrix4 transform = three::translate(Vector3(0, 1, 0)) * three::rotateY(three::pi<float>()) * three::scale(Vector3(2.0f));
+        Matrix4 transform = three::translate(Vector3(0, 1, 0)) * three::rotateY(three::radians(180.0f)) * three::scale(Vector3(2.0f));
         loader.loadObj(DATA_DIR "models/dragon.obj", g_scene, transform, mat);
     }
 
@@ -23,7 +23,8 @@ void createDefaultScene()
     camera.aspect = 1.0f;
     camera.zNear = 0.1f;
     camera.zFar = 100.0f;
-    camera.position = Vector3::UnitZ;
+    camera.yaw = three::radians(180.0f);
+    camera.position = Vector3(-5, 2, 0);
 }
 
 Scene g_scene;
