@@ -229,7 +229,7 @@ void MainRenderer::visualizeVoxels()
 
     int mipLevel = g_UIControls.voxelMipLevel;
     m_albedoVoxel.bindImageTexture(0, mipLevel);
-    GpuTexture& voxelTexture = g_UIControls.renderVoxel == 1 ? m_albedoVoxel : m_normalVoxel;
+    GpuTexture& voxelTexture = g_UIControls.renderVoxel == RenderStrategy::VoxelAlbedo ? m_albedoVoxel : m_normalVoxel;
 
     glBindImageTexture(0, voxelTexture.getHandle(), mipLevel, GL_TRUE, 0,
                        GL_READ_ONLY, voxelTexture.getFormat());
@@ -375,6 +375,22 @@ void MainRenderer::renderBoundingBox()
         m_boxWireframeProgram.setUniform(colorLocation, Vector3::UnitY);
         for (const GeometryNode& node : g_scene.geometryNodes)
         {
+            // TODO: frustum culling
+            // https://stackoverflow.com/questions/12836967/extracting-view-frustum-planes-hartmann-gribbs-method
+            /*
+            void extract_planes_from_projmat(
+                const float mat[4][4],
+                float left[4], float right[4], float top[4], float bottom[4],
+                float near[4], float far[4])
+                {
+                    for (int i = 4; i--; ) left[i]      = mat[i][3] + mat[i][0];
+                    for (int i = 4; i--; ) right[i]     = mat[i][3] - mat[i][0];
+                    for (int i = 4; i--; ) bottom[i]    = mat[i][3] + mat[i][1];
+                    for (int i = 4; i--; ) top[i]       = mat[i][3] - mat[i][1];
+                    for (int i = 4; i--; ) near[i]      = mat[i][3] + mat[i][2];
+                    for (int i = 4; i--; ) far[i]       = mat[i][3] - mat[i][2];
+                }
+            */
             for (const Geometry& geom : node.geometries)
             {
                 m_boxWireframeProgram.setUniform(centerLocation, geom.boundingBox.getCenter());
@@ -440,7 +456,7 @@ void MainRenderer::render()
         glEnable(GL_CULL_FACE);
         glDisable(GL_SCISSOR_TEST);
 
-        if (g_UIControls.renderVoxel == 0)
+        if (g_UIControls.renderVoxel == RenderStrategy::NoGI)
             renderSceneNoGI();
         else
             visualizeVoxels();

@@ -112,9 +112,9 @@ void Application::userInterface()
             if (ImGui::Checkbox("Force voxel texture update", &g_UIControls.forceUpdateVoxelTexture))
                 g_scene.dirty = true;
             ImGui::Separator();
-            ImGui::RadioButton("None", &g_UIControls.renderVoxel, 0);
-            ImGui::RadioButton("Albedo Voxel Texture", &g_UIControls.renderVoxel, 1);
-            ImGui::RadioButton("Normal Voxel Texture", &g_UIControls.renderVoxel, 2);
+            ImGui::RadioButton("No Global Illumination", &g_UIControls.renderVoxel, RenderStrategy::NoGI);
+            ImGui::RadioButton("Albedo Voxel Texture", &g_UIControls.renderVoxel, RenderStrategy::VoxelAlbedo);
+            ImGui::RadioButton("Normal Voxel Texture", &g_UIControls.renderVoxel, RenderStrategy::VoxelNormal);
             ImGui::SliderInt("Voxel Mipmap Level", &g_UIControls.voxelMipLevel, 0, VOXEL_TEXTURE_MIP_LEVEL - 1);
             ImGui::Separator();
             if (ImGui::Checkbox("Show Object Bounding Box", &g_UIControls.showObjectBoundingBox))

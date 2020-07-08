@@ -31,6 +31,13 @@ constexpr int UNIFORM_BUFFER_MATERIAL_SLOT = 2;
 
 static_assert(VOXEL_TEXTURE_SIZE <= 256);
 
+enum RenderStrategy
+{
+    NoGI,
+    VoxelAlbedo,
+    VoxelNormal,
+};
+
 struct UIControlls
 {
     int renderVoxel                 = 0;

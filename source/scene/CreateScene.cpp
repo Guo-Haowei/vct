@@ -26,7 +26,7 @@ void createDefaultScene()
     camera.yaw = three::radians(180.0f);
     camera.position = Vector3(-5, 2, 0);
 
-    g_scene.light.position = Vector3(0, 40, 0);
+    g_scene.light.position = Vector3(-20, 40, -5);
 }
 
 Scene g_scene;
