@@ -9,6 +9,7 @@ uniform vec4 u_world;
 layout (rgba16f, binding = 0) uniform image3D u_voxel_texture;
 
 uniform mat4 u_PV;
+uniform int u_toggle;
 
 out vec4 pass_color;
 

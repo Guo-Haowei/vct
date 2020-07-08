@@ -16,8 +16,9 @@ static_assert(VOXEL_TEXTURE_SIZE <= 256);
 
 struct UIControlls
 {
-    int renderStrategy              = 0;
+    int renderVoxel                 = 0;
     int voxelMipLevel               = 0;
+    int showVoxelTexture            = -1;
     bool showObjectBoundingBox      = false;
     bool showWorldBoundingBox       = false;
     bool forceUpdateVoxelTexture    = false;

@@ -22,6 +22,7 @@ public:
     void bind();
     void unbind();
     void genMipMap();
+    inline GLenum getFormat() const { return m_format; }
 protected:
     GLenum m_type;
     GLenum m_format;

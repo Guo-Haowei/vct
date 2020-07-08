@@ -103,6 +103,7 @@ void MainRenderer::createGpuResources()
         info.format = GL_RGBA16F;
 
         m_albedoVoxel.create3DImage(info);
+        m_normalVoxel.create3DImage(info);
     }
 
     // load scene
@@ -135,7 +136,7 @@ void MainRenderer::createGpuResources()
     glClearColor(0.3f, 0.4f, 0.3f, 1.0f);
 }
 
-void MainRenderer::renderVoxels(const Matrix4& PV)
+void MainRenderer::visualizeVoxels(const Matrix4& PV)
 {
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
@@ -148,6 +149,11 @@ void MainRenderer::renderVoxels(const Matrix4& PV)
 
     int mipLevel = g_UIControls.voxelMipLevel;
     m_albedoVoxel.bindImageTexture(0, mipLevel);
+    GpuTexture& voxelTexture = g_UIControls.renderVoxel == 1 ? m_albedoVoxel : m_normalVoxel;
+
+    glBindImageTexture(0, voxelTexture.getHandle(), mipLevel, GL_TRUE, 0,
+                       GL_READ_ONLY, voxelTexture.getFormat());
+
     int size = VOXEL_TEXTURE_SIZE >> mipLevel;
     glDrawElementsInstanced(GL_TRIANGLES, m_box.count, GL_UNSIGNED_INT, 0, size * size * size);
 }
@@ -164,6 +170,7 @@ void MainRenderer::renderVoxelTexture()
     glViewport(0, 0, VOXEL_TEXTURE_SIZE, VOXEL_TEXTURE_SIZE);
 
     m_albedoVoxel.bindImageTexture(ALBEDO_VOXEL_SLOT);
+    m_normalVoxel.bindImageTexture(NORMAL_VOXEL_SLOT);
     m_voxelProgram.use();
     static GLint MLocation = m_voxelProgram.getUniformLocation("u_M");
 
@@ -178,8 +185,7 @@ void MainRenderer::renderVoxelTexture()
         }
     }
 
-    m_albedoVoxel.genMipMap();
-    m_albedoVoxel.unbind();
+    // m_albedoVoxel.unbind();
 
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
@@ -194,6 +200,11 @@ void MainRenderer::renderVoxelTexture()
 
     glDispatchCompute(workGroupX, workGroupY, workGroupZ);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+
+    m_albedoVoxel.bind();
+    m_albedoVoxel.genMipMap();
+    m_normalVoxel.bind();
+    m_normalVoxel.genMipMap();
 }
 
 void MainRenderer::renderSceneNoGI(const Matrix4& PV)
@@ -272,12 +283,10 @@ void MainRenderer::render()
 
     Matrix4 PV = g_scene.camera.perspective() * g_scene.camera.view();
 
-    if (g_UIControls.renderStrategy == 0)
+    if (g_UIControls.renderVoxel == 0)
         renderSceneNoGI(PV);
-    else if (g_UIControls.renderStrategy == 1)
-        renderSceneNoGI(PV);
-    else if (g_UIControls.renderStrategy == 2)
-        renderVoxels(PV);
+    else
+        visualizeVoxels(PV);
 
     if (g_UIControls.showObjectBoundingBox || g_UIControls.showWorldBoundingBox)
         renderBoundingBox(PV);

@@ -21,7 +21,7 @@ public:
     void createGpuResources();
     void render();
     void renderBoundingBox(const Matrix4& PV);
-    void renderVoxels(const Matrix4& PV);
+    void visualizeVoxels(const Matrix4& PV);
     void renderSceneNoGI(const Matrix4& PV);
     void renderVoxelTexture();
     void destroyGpuResources();
@@ -42,6 +42,7 @@ private:
 
     /// textures
     GpuTexture m_albedoVoxel;
+    GpuTexture m_normalVoxel;
 };
 
 } // namespace vct

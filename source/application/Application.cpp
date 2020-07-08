@@ -96,26 +96,31 @@ void Application::userInterface()
 {
     ImGui::NewFrame();
 
-    static float f = 0.0f;
-
-    ImGui::Begin("Debug");
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-
-    ImGui::RadioButton("Direct Light", &g_UIControls.renderStrategy, 0); ImGui::SameLine();
-    ImGui::RadioButton("Voxel GI", &g_UIControls.renderStrategy, 1); ImGui::SameLine();
-    ImGui::RadioButton("Visualization", &g_UIControls.renderStrategy, 2);
-
-    ImGui::SliderInt("Voxel Mipmap Level", &g_UIControls.voxelMipLevel, 0, VOXEL_TEXTURE_MIP_LEVEL - 1);
-
-    if (ImGui::Checkbox("Force voxel texture update", &g_UIControls.forceUpdateVoxelTexture))
+    if (ImGui::BeginMainMenuBar())
     {
-        g_scene.dirty = true;
+        if (ImGui::BeginMenu("Debug"))
+        {
+            if (ImGui::Checkbox("Force voxel texture update", &g_UIControls.forceUpdateVoxelTexture))
+                g_scene.dirty = true;
+            ImGui::Separator();
+            ImGui::RadioButton("None", &g_UIControls.renderVoxel, 0);
+            ImGui::RadioButton("Albedo Voxel Texture", &g_UIControls.renderVoxel, 1);
+            ImGui::RadioButton("Normal Voxel Texture", &g_UIControls.renderVoxel, 2);
+            ImGui::SliderInt("Voxel Mipmap Level", &g_UIControls.voxelMipLevel, 0, VOXEL_TEXTURE_MIP_LEVEL - 1);
+            ImGui::Separator();
+            if (ImGui::Checkbox("Show Object Bounding Box", &g_UIControls.showObjectBoundingBox))
+                g_UIControls.showWorldBoundingBox = false;
+            if (ImGui::Checkbox("Show World Bounding Box", &g_UIControls.showWorldBoundingBox))
+                g_UIControls.showObjectBoundingBox = false;
+            ImGui::EndMenu();
+        }
+
+        ImGui::Separator();
+
+        ImGui::Text("FPS: %.2f FPS", ImGui::GetIO().Framerate);
+
+        ImGui::EndMenuBar();
     }
-
-    ImGui::Checkbox("Show Object Bounding Box", &g_UIControls.showObjectBoundingBox);
-    ImGui::Checkbox("Show World Bounding Box", &g_UIControls.showWorldBoundingBox);
-
-    ImGui::End();
 
     // Rendering
     ImGui::Render();

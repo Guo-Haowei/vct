@@ -1,12 +1,13 @@
 # Voxel GI
 
 ## Todo
+- [ ] normal voxel
 - [ ] material system
 - [ ] sky box
-<!-- - [ ] shadow map (for a thing mesh, both sides will be rendered and a supposingly dark pixel will be illuminated) -->
-- [ ] diffuse cone
-- [ ] specular cone
-- [ ] shadow cone
+- [ ] diffuse light
+- [ ] specular light
+- [ ] ambient occlusion
+- [ ] soft shadow
 - [x] accumulate color atomically
 - [x] stretch triangle to fill small gaps
 - [x] visualize 3d texture
