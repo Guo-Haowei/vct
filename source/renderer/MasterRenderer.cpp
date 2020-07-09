@@ -48,8 +48,8 @@ void MasterRenderer::initialize(Window* pWindow)
 #endif
 
     /// initialize renderers
-    m_mainRenderer.createGpuResources();
     m_mainRenderer.setWindow(m_pWindow);
+    m_mainRenderer.createGpuResources();
 
     m_imguiRenderer.createGpuResources();
 }

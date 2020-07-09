@@ -53,6 +53,7 @@ public:
     void createFrameBuffers();
     void render();
     void renderToShadowMap();
+    // void renderToEarlyZ(const Matrix4& PV);
     void renderFrameBufferTextures(const Extent2i& extent);
     void renderToVoxelTexture();
     void renderBoundingBox();
@@ -69,7 +70,7 @@ private:
     GlslProgram m_basicProgram;
     GlslProgram m_boxWireframeProgram;
     GlslProgram m_voxelPostProgram;
-    GlslProgram m_shadowProgram;
+    GlslProgram m_depthProgram;
     GlslProgram m_debugDepthProgram;
 
     /// vertex arrays

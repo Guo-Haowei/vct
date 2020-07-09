@@ -43,18 +43,13 @@ void MainRenderer::createGpuResources()
         m_basicProgram.stop();
     }
 
-    m_shadowProgram.createFromFiles(
-        DATA_DIR "shaders/shadow.vert",
+    m_depthProgram.createFromFiles(
+        DATA_DIR "shaders/depth.vert",
         DATA_DIR "shaders/depth.frag");
 
     m_debugDepthProgram.createFromFiles(
         DATA_DIR "shaders/debug/depth_texture.vert",
         DATA_DIR "shaders/debug/depth_texture.frag");
-    {
-        m_debugDepthProgram.use();
-        m_debugDepthProgram.setUniform(m_debugDepthProgram.getUniformLocation("u_depth_map"), SHADOW_MAP_SLOT);
-        m_debugDepthProgram.stop();
-    }
 
     m_voxelProgram.createFromFiles(
         DATA_DIR "shaders/voxel/voxelization.vert",
@@ -215,6 +210,9 @@ void MainRenderer::createGpuResources()
     glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SLOT);
     m_shadowBuffer.getDepthTexture().bind();
 
+    glActiveTexture(GL_TEXTURE0 + EARLY_Z_SLOT);
+    m_earlyZBuffer.getDepthTexture().bind();
+
     glClearColor(0.3f, 0.4f, 0.3f, 1.0f);
 }
 
@@ -222,7 +220,7 @@ void MainRenderer::visualizeVoxels()
 {
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
+    // glEnable(GL_BLEND);
 
     m_visualizeProgram.use();
     glBindVertexArray(m_box.vao);
@@ -238,6 +236,33 @@ void MainRenderer::visualizeVoxels()
     glDrawElementsInstanced(GL_TRIANGLES, m_box.count, GL_UNSIGNED_INT, 0, size * size * size);
 }
 
+// void MainRenderer::renderToEarlyZ(const Matrix4& PV)
+// {
+//     m_earlyZBuffer.bind();
+
+//     glClear(GL_DEPTH_BUFFER_BIT);
+
+//     m_depthProgram.use();
+//     static const GLint pvmLocation = m_depthProgram.getUniformLocation("u_PVM");
+
+//     for (const GeometryNode& node : g_scene.geometryNodes)
+//     {
+//         m_depthProgram.setUniform(pvmLocation, m_cameraBuffer.cache.PV * node.transform);
+//         for (const Geometry& geom : node.geometries)
+//         {
+//             const auto& meshPair = g_meshLUT.find(geom.pMesh);
+//             ASSERT(meshPair != g_meshLUT.end());
+//             const MeshData& drawData = meshPair->second;
+
+//             glBindVertexArray(drawData.vao);
+
+//             glDrawElements(GL_TRIANGLES, drawData.count, GL_UNSIGNED_INT, 0);
+//         }
+//     }
+
+//     m_earlyZBuffer.unbind();
+// }
+
 void MainRenderer::renderToShadowMap()
 {
     m_shadowBuffer.bind();
@@ -249,14 +274,14 @@ void MainRenderer::renderToShadowMap()
     glViewport(0, 0, SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION);
     glClear(GL_DEPTH_BUFFER_BIT);
     // render scene
-    m_shadowProgram.use();
+    m_depthProgram.use();
 
-    static GLint PVMLocation = m_shadowProgram.getUniformLocation("u_PVM");
+    static GLint PVMLocation = m_depthProgram.getUniformLocation("u_PVM");
 
     for (const GeometryNode& node : g_scene.geometryNodes)
     {
         Matrix4 PVM = m_lightBuffer.cache.lightSpacePV * node.transform;
-        m_shadowProgram.setUniform(PVMLocation, PVM);
+        m_depthProgram.setUniform(PVMLocation, PVM);
         for (const Geometry& geom : node.geometries)
         {
             const auto& meshPair = g_meshLUT.find(geom.pMesh);
@@ -340,6 +365,12 @@ void MainRenderer::renderSceneNoGI()
         m_basicProgram.setUniform(mLocation, node.transform);
         for (const Geometry& geom : node.geometries)
         {
+            if (!g_scene.camera.frustum.intersectsBox(geom.boundingBox))
+            {
+                ++g_UIControls.objectOccluded;
+                continue;
+            }
+
             const auto& meshPair = g_meshLUT.find(geom.pMesh);
             ASSERT(meshPair != g_meshLUT.end());
             const MeshData& drawData = meshPair->second;
@@ -375,22 +406,6 @@ void MainRenderer::renderBoundingBox()
         m_boxWireframeProgram.setUniform(colorLocation, Vector3::UnitY);
         for (const GeometryNode& node : g_scene.geometryNodes)
         {
-            // TODO: frustum culling
-            // https://stackoverflow.com/questions/12836967/extracting-view-frustum-planes-hartmann-gribbs-method
-            /*
-            void extract_planes_from_projmat(
-                const float mat[4][4],
-                float left[4], float right[4], float top[4], float bottom[4],
-                float near[4], float far[4])
-                {
-                    for (int i = 4; i--; ) left[i]      = mat[i][3] + mat[i][0];
-                    for (int i = 4; i--; ) right[i]     = mat[i][3] - mat[i][0];
-                    for (int i = 4; i--; ) bottom[i]    = mat[i][3] + mat[i][1];
-                    for (int i = 4; i--; ) top[i]       = mat[i][3] - mat[i][1];
-                    for (int i = 4; i--; ) near[i]      = mat[i][3] + mat[i][2];
-                    for (int i = 4; i--; ) far[i]       = mat[i][3] - mat[i][2];
-                }
-            */
             for (const Geometry& geom : node.geometries)
             {
                 m_boxWireframeProgram.setUniform(centerLocation, geom.boundingBox.getCenter());
@@ -411,15 +426,29 @@ void MainRenderer::renderBoundingBox()
 
 void MainRenderer::renderFrameBufferTextures(const Extent2i& extent)
 {
-    if (!g_UIControls.showShadowMap)
+    if (!g_UIControls.showDepthBuffers)
         return;
     m_debugDepthProgram.use();
+
+    glDisable(GL_DEPTH_TEST);
+
+    static GLint textureLocation = m_debugDepthProgram.getUniformLocation("u_depth_map");
+
     constexpr float scale = 0.2f;
     int width = static_cast<int>(scale * extent.witdh);
     int height = static_cast<int>(scale * extent.height);
-    glViewport(0, 0, width, height);
+
     glBindVertexArray(m_quad.vao);
+
+    m_debugDepthProgram.setUniform(textureLocation, SHADOW_MAP_SLOT);
+    glViewport(0, 0, width, height);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    // m_debugDepthProgram.setUniform(textureLocation, EARLY_Z_SLOT);
+    // glViewport(0, static_cast<int>(1.2f * height), width, height);
+    // glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    m_debugDepthProgram.stop();
 }
 
 
@@ -446,6 +475,9 @@ void MainRenderer::render()
     {
         // skip rendering if minimized
         Matrix4 PV = g_scene.camera.perspective() * g_scene.camera.view();
+        // TODO: move this code to somewhere else
+        g_scene.camera.frustum.setFromProjectionView(PV);
+
         m_cameraBuffer.cache.PV = PV;
         m_cameraBuffer.update();
 
@@ -457,9 +489,14 @@ void MainRenderer::render()
         glDisable(GL_SCISSOR_TEST);
 
         if (g_UIControls.renderVoxel == RenderStrategy::NoGI)
+        {
+            // renderToEarlyZ(PV);
             renderSceneNoGI();
+        }
         else
+        {
             visualizeVoxels();
+        }
 
         if (g_UIControls.showObjectBoundingBox || g_UIControls.showWorldBoundingBox)
             renderBoundingBox();
@@ -471,12 +508,19 @@ void MainRenderer::render()
 void MainRenderer::createFrameBuffers()
 {
     m_shadowBuffer.create(SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION);
+    auto extent = m_pWindow->getFrameExtent();
+    m_earlyZBuffer.create(extent.witdh, extent.height);
 }
 
 void MainRenderer::destroyGpuResources()
 {
+    m_voxelProgram.destroy();
+    m_visualizeProgram.destroy();
     m_basicProgram.destroy();
     m_boxWireframeProgram.destroy();
+    m_voxelPostProgram.destroy();
+    m_depthProgram.destroy();
+    m_debugDepthProgram.destroy();
 }
 
 } // namespace vct

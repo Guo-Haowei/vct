@@ -16,6 +16,7 @@ struct Camera
     float yaw = -90.0f;
     float pitch = 0.0f;
     Vector3 position  = Vector3::Zero;
+    Frustum frustum;
 };
 
 } // namespace vct

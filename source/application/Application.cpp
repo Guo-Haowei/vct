@@ -25,6 +25,9 @@ int Application::run()
             g_scene.camera.aspect = aspect;
 
             userInterface();
+
+            g_UIControls.objectOccluded = 0;
+
             m_renderSystem.update();
 
             m_window.swapBuffers();
@@ -68,7 +71,10 @@ void Application::finalize()
 void Application::updateCamera()
 {
     constexpr float VIEW_SPEED = 2.0f;
-    constexpr float CAMERA_SPEED = 0.2f;
+    float CAMERA_SPEED = 0.2f;
+
+    if (m_window.isKeyDown(GLFW_KEY_LEFT_SHIFT))
+        CAMERA_SPEED *= 3.f;
 
     int x = m_window.isKeyDown(GLFW_KEY_D) - m_window.isKeyDown(GLFW_KEY_A);
     int z = m_window.isKeyDown(GLFW_KEY_W) - m_window.isKeyDown(GLFW_KEY_S);
@@ -123,7 +129,7 @@ void Application::userInterface()
                 g_UIControls.showObjectBoundingBox = false;
 
             ImGui::Separator();
-            ImGui::Checkbox("Show shadow map", &g_UIControls.showShadowMap);
+            ImGui::Checkbox("Show shadow map & early Z", &g_UIControls.showDepthBuffers);
 
             ImGui::EndMenu();
         }
@@ -140,11 +146,15 @@ void Application::userInterface()
         }
 
         ImGui::Separator();
-
-        ImGui::Text("FPS: %.2f FPS", ImGui::GetIO().Framerate);
-
         ImGui::EndMenuBar();
+
     }
+
+    ImGui::Begin("Log");
+    ImGui::Text("FPS: %.2f FPS", ImGui::GetIO().Framerate);
+    ImGui::Text("Object occluded: %.d", g_UIControls.objectOccluded);
+
+    ImGui::End();
 
     ImGui::End();
 

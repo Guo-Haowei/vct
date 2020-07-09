@@ -21,7 +21,7 @@ void createDefaultScene()
 
     camera.fovy = three::radians(50.0f);
     camera.aspect = 1.0f;
-    camera.zNear = 0.1f;
+    camera.zNear = 1.0f;
     camera.zFar = 100.0f;
     camera.yaw = three::radians(180.0f);
     camera.position = Vector3(-5, 2, 0);

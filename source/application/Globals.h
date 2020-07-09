@@ -18,8 +18,11 @@ static_assert(isPowerOf2(SHADOW_MAP_RESOLUTION));
 
 constexpr int ALBEDO_VOXEL_SLOT = 0;
 constexpr int NORMAL_VOXEL_SLOT = 1;
+constexpr int EARLY_Z_SLOT = 2;
 constexpr int SHADOW_MAP_SLOT = 3;
 constexpr int ALBEDO_MAP_SLOT = 4;
+constexpr int SPECULAR_MAP_SLOT = 5;
+constexpr int NORMAL_MAP_SLOT = 6;
 // constexpr int NORMAL_MAP_SLOT = 5;
 // constexpr unsigned int VOXEL_TEXTURE_SIZE = 256;
 constexpr unsigned int VOXEL_TEXTURE_SIZE = 128;
@@ -46,7 +49,8 @@ struct UIControlls
     bool showObjectBoundingBox      = false;
     bool showWorldBoundingBox       = false;
     bool forceUpdateVoxelTexture    = false;
-    bool showShadowMap              = true;
+    bool showDepthBuffers           = true;
+    int objectOccluded              = 0;
 };
 
 extern UIControlls g_UIControls;
