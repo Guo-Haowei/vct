@@ -2,7 +2,7 @@
 #include "GlslProgram.h"
 #include "GpuTexture.h"
 #include "GpuBuffer.h"
-#include "FrameBuffer.h"
+#include "RenderTarget.h"
 #include "application/Window.h"
 
 namespace vct {
@@ -17,10 +17,11 @@ struct MeshData
 
 struct MaterialData
 {
-    Vector4 albedoColor;
     GpuTexture albedoMap;
-    Vector3 specularColor;
-    float shininess;
+    GpuTexture materialMap;
+    Vector4 albedoColor;
+    float metallic;
+    float roughness;
     // specular...
     // normal...
 };
@@ -42,8 +43,20 @@ struct LightBufferCache
 struct MaterialCache
 {
     Vector4 albedoColor; // if it doesn't have albedo color, then it's alpha is 0.0f
-    Vector3 specularColor;
-    float shininess;
+    float metallic;
+    float roughness;
+    float hasMaterialMap;
+    float padding;
+
+    MaterialCache() {}
+
+    MaterialCache(const MaterialData& mat)
+    {
+        albedoColor = mat.albedoColor;
+        roughness = mat.roughness;
+        metallic = mat.metallic;
+        hasMaterialMap = mat.materialMap.getHandle() == 0 ? 0.0f : 1.0f;
+    }
 };
 
 static_assert(sizeof(CameraBufferCache) % 16 == 0);
@@ -56,7 +69,6 @@ public:
     void createGpuResources();
     void createFrameBuffers();
     void render();
-    void renderToShadowMap();
     // void renderToEarlyZ(const Matrix4& PV);
     void renderFrameBufferTextures(const Extent2i& extent);
     void renderToVoxelTexture();
@@ -65,6 +77,10 @@ public:
     void renderSceneNoGI();
     void renderSceneVCT();
     void destroyGpuResources();
+
+    void gbufferPass();
+    void shadowPass();
+
     inline void setWindow(Window* pWindow) { m_pWindow = pWindow; }
 private:
     Window* m_pWindow;
@@ -77,7 +93,9 @@ private:
     GlslProgram m_boxWireframeProgram;
     GlslProgram m_voxelPostProgram;
     GlslProgram m_depthProgram;
-    GlslProgram m_debugDepthProgram;
+    GlslProgram m_debugTextureProgram;
+
+    GlslProgram m_gbufferProgram;
 
     /// vertex arrays
     MeshData m_boxWireframe;
@@ -93,9 +111,9 @@ private:
     UniformBuffer<LightBufferCache>     m_lightBuffer;
     UniformBuffer<MaterialCache>        m_materialBuffer;
 
-    /// framebuffer
-    DepthBuffer m_earlyZBuffer;
-    DepthBuffer m_shadowBuffer;
+    /// render targets
+    DepthRenderTarget                   m_shadowBuffer;
+    GBuffer                             m_gbuffer;
 };
 
 } // namespace vct

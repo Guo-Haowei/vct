@@ -3,6 +3,19 @@
 
 namespace vct {
 
+struct Texture2DCreateInfo
+{
+    GLenum wrapS = 0;
+    GLenum wrapT = 0;
+    GLenum minFilter = 0;
+    GLenum magFilter = 0;
+    GLenum internalFormat;
+    GLenum format;
+    GLenum dataType;
+    int width;
+    int height;
+};
+
 struct Texture3DCreateInfo
 {
     GLenum wrapS, wrapT, wrapR;
@@ -12,13 +25,13 @@ struct Texture3DCreateInfo
     int mipLevel;
 };
 
-class DepthBuffer;
-
 class GpuTexture : public GpuResource
 {
 public:
-    void create3DImage(const Texture3DCreateInfo& info);
+    void create2DEmpty(const Texture2DCreateInfo& info);
+    void create3DEmpty(const Texture3DCreateInfo& info);
     void create2DImageFromFile(const char* path);
+
     void destroy();
     void bindImageTexture(int i, int mipLevel = 0);
     void clear();
@@ -30,7 +43,8 @@ protected:
     GLenum m_type;
     GLenum m_format;
 
-    friend class DepthBuffer;
+    friend class DepthRenderTarget;
+    friend class GBuffer;
 };
 
 } // namespace vct

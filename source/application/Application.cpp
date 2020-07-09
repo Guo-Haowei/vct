@@ -130,7 +130,7 @@ void Application::userInterface()
                 g_UIControls.showObjectBoundingBox = false;
 
             ImGui::Separator();
-            ImGui::Checkbox("Show shadow map & early Z", &g_UIControls.showDepthBuffers);
+            ImGui::Checkbox("Debug Frame Buffers", &g_UIControls.debugFramebuffers);
 
             ImGui::EndMenu();
         }

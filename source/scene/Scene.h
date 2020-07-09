@@ -28,8 +28,8 @@ struct Material
     std::string albedoTexture;
     std::string metallicRoughnessTexture;
     Vector3 albedo = Vector3::Zero;
-    float metallic = 0.5f;
-    float roughness = 0.5f;
+    float metallic = 0.0f;
+    float roughness = 0.0f;
 
     Material() = default;
     Material(const Vector3& albedo, float metallic, float roughness)

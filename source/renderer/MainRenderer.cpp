@@ -29,6 +29,16 @@ void MainRenderer::createGpuResources()
     m_materialBuffer.createAndBind(UNIFORM_BUFFER_MATERIAL_SLOT);
 
     // create shader
+    m_gbufferProgram.createFromFiles(
+        DATA_DIR "shaders/gbuffer.vert",
+        DATA_DIR "shaders/gbuffer.frag");
+    {
+        m_gbufferProgram.use();
+        m_gbufferProgram.setUniform(m_gbufferProgram.getUniformLocation("u_albedo_map"), ALBEDO_MAP_SLOT);
+        m_gbufferProgram.setUniform(m_gbufferProgram.getUniformLocation("u_metallic_roughness_map"), METALLIC_ROUGHNESS_SLOT);
+        m_gbufferProgram.stop();
+    }
+
     m_boxWireframeProgram.createFromFiles(
         DATA_DIR "shaders/debug/box_wireframe.vert",
         DATA_DIR "shaders/debug/box_wireframe.frag");
@@ -38,6 +48,7 @@ void MainRenderer::createGpuResources()
         DATA_DIR "shaders/basic.frag");
     {
         m_basicProgram.use();
+        // TODO: set in shader
         m_basicProgram.setUniform(m_basicProgram.getUniformLocation("u_albedo_map"), ALBEDO_MAP_SLOT);
         m_basicProgram.setUniform(m_basicProgram.getUniformLocation("u_shadow_map"), SHADOW_MAP_SLOT);
         m_basicProgram.stop();
@@ -57,9 +68,9 @@ void MainRenderer::createGpuResources()
         DATA_DIR "shaders/depth.vert",
         DATA_DIR "shaders/depth.frag");
 
-    m_debugDepthProgram.createFromFiles(
-        DATA_DIR "shaders/debug/depth_texture.vert",
-        DATA_DIR "shaders/debug/depth_texture.frag");
+    m_debugTextureProgram.createFromFiles(
+        DATA_DIR "shaders/debug/texture.vert",
+        DATA_DIR "shaders/debug/texture.frag");
 
     m_voxelProgram.createFromFiles(
         DATA_DIR "shaders/voxel/voxelization.vert",
@@ -163,8 +174,8 @@ void MainRenderer::createGpuResources()
         info.mipLevel = VOXEL_TEXTURE_MIP_LEVEL;
         info.format = GL_RGBA16F;
 
-        m_albedoVoxel.create3DImage(info);
-        m_normalVoxel.create3DImage(info);
+        m_albedoVoxel.create3DEmpty(info);
+        m_normalVoxel.create3DEmpty(info);
     }
 
     // load scene
@@ -214,16 +225,30 @@ void MainRenderer::createGpuResources()
             matData.albedoColor = Vector4(mat->albedo, 1.0f);
         }
 
+        if (!mat->metallicRoughnessTexture.empty())
+        {
+            matData.materialMap.create2DImageFromFile(mat->metallicRoughnessTexture.c_str());
+        }
+        else
+        {
+            matData.metallic = mat->metallic;
+            matData.roughness = mat->roughness;
+        }
+
         g_matLUT.insert({ mat.get(), matData });
     }
 
     glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SLOT);
     m_shadowBuffer.getDepthTexture().bind();
 
-    glActiveTexture(GL_TEXTURE0 + EARLY_Z_SLOT);
-    m_earlyZBuffer.getDepthTexture().bind();
+    glActiveTexture(GL_TEXTURE0 + GBUFFER_POSITION_METALLIC);
+    m_gbuffer.getColorAttachment(0).bind();
 
-    glClearColor(0.3f, 0.4f, 0.3f, 1.0f);
+    glActiveTexture(GL_TEXTURE0 + GBUFFER_NORMAL_ROUGHNESS);
+    m_gbuffer.getColorAttachment(1).bind();
+
+    glActiveTexture(GL_TEXTURE0 + GBUFFER_ALBEDO);
+    m_gbuffer.getColorAttachment(2).bind();
 }
 
 void MainRenderer::visualizeVoxels()
@@ -246,34 +271,58 @@ void MainRenderer::visualizeVoxels()
     glDrawElementsInstanced(GL_TRIANGLES, m_box.count, GL_UNSIGNED_INT, 0, size * size * size);
 }
 
-// void MainRenderer::renderToEarlyZ(const Matrix4& PV)
-// {
-//     m_earlyZBuffer.bind();
+void MainRenderer::gbufferPass()
+{
+    GlslProgram& program = m_gbufferProgram;
 
-//     glClear(GL_DEPTH_BUFFER_BIT);
+    m_gbuffer.bind();
+    program.use();
 
-//     m_depthProgram.use();
-//     static const GLint pvmLocation = m_depthProgram.getUniformLocation("u_PVM");
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 
-//     for (const GeometryNode& node : g_scene.geometryNodes)
-//     {
-//         m_depthProgram.setUniform(pvmLocation, m_cameraBuffer.cache.PV * node.transform);
-//         for (const Geometry& geom : node.geometries)
-//         {
-//             const auto& meshPair = g_meshLUT.find(geom.pMesh);
-//             ASSERT(meshPair != g_meshLUT.end());
-//             const MeshData& drawData = meshPair->second;
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-//             glBindVertexArray(drawData.vao);
+    static GLint location_M = program.getUniformLocation("M");
+    // TODO: refactor draw scene
+    for (const GeometryNode& node : g_scene.geometryNodes)
+    {
+        program.setUniform(location_M, node.transform);
 
-//             glDrawElements(GL_TRIANGLES, drawData.count, GL_UNSIGNED_INT, 0);
-//         }
-//     }
+        for (const Geometry& geom : node.geometries)
+        {
+            if (!g_scene.camera.frustum.intersectsBox(geom.boundingBox))
+            {
+                ++g_UIControls.objectOccluded;
+                continue;
+            }
 
-//     m_earlyZBuffer.unbind();
-// }
+            const auto& meshPair = g_meshLUT.find(geom.pMesh);
+            ASSERT(meshPair != g_meshLUT.end());
+            const MeshData& drawData = meshPair->second;
 
-void MainRenderer::renderToShadowMap()
+            const auto& matPair = g_matLUT.find(geom.pMaterial);
+            ASSERT(matPair != g_matLUT.end());
+            const MaterialData& matData = matPair->second;
+
+            m_materialBuffer.cache = matData;
+            m_materialBuffer.update();
+
+            glBindVertexArray(drawData.vao);
+            glActiveTexture(GL_TEXTURE0 + ALBEDO_MAP_SLOT);
+            matData.albedoMap.bind();
+            glActiveTexture(GL_TEXTURE0 + METALLIC_ROUGHNESS_SLOT);
+            matData.materialMap.bind();
+
+            glDrawElements(GL_TRIANGLES, drawData.count, GL_UNSIGNED_INT, 0);
+        }
+    }
+
+    m_gbufferProgram.stop();
+    m_gbuffer.unbind();
+}
+
+void MainRenderer::shadowPass()
 {
     m_shadowBuffer.bind();
 
@@ -335,7 +384,6 @@ void MainRenderer::renderToVoxelTexture()
             const MaterialData& matData = matPair->second;
 
             m_materialBuffer.cache.albedoColor = matData.albedoColor;
-            m_materialBuffer.cache.shininess = matData.shininess;
             m_materialBuffer.update();
 
             glBindVertexArray(drawData.vao);
@@ -391,7 +439,6 @@ void MainRenderer::renderSceneVCT()
             const MaterialData& matData = matPair->second;
 
             m_materialBuffer.cache.albedoColor = matData.albedoColor;
-            m_materialBuffer.cache.shininess = matData.shininess;
             m_materialBuffer.update();
 
             glBindVertexArray(drawData.vao);
@@ -432,7 +479,6 @@ void MainRenderer::renderSceneNoGI()
             const MaterialData& matData = matPair->second;
 
             m_materialBuffer.cache.albedoColor = matData.albedoColor;
-            m_materialBuffer.cache.shininess = matData.shininess;
             m_materialBuffer.update();
 
             glBindVertexArray(drawData.vao);
@@ -479,29 +525,61 @@ void MainRenderer::renderBoundingBox()
 
 void MainRenderer::renderFrameBufferTextures(const Extent2i& extent)
 {
-    if (!g_UIControls.showDepthBuffers)
+    if (!g_UIControls.debugFramebuffers)
         return;
-    m_debugDepthProgram.use();
+
+    GlslProgram& program = m_debugTextureProgram;
+
+    program.use();
 
     glDisable(GL_DEPTH_TEST);
 
-    static GLint textureLocation = m_debugDepthProgram.getUniformLocation("u_depth_map");
+    static GLint location_texture = program.getUniformLocation("u_texture");
+    static GLint location_type = program.getUniformLocation("u_type");
 
-    constexpr float scale = 0.2f;
+    constexpr float scale = 0.13f;
     int width = static_cast<int>(scale * extent.witdh);
     int height = static_cast<int>(scale * extent.height);
 
+    int xOffset = extent.witdh - width;
+
     glBindVertexArray(m_quad.vao);
 
-    m_debugDepthProgram.setUniform(textureLocation, SHADOW_MAP_SLOT);
-    glViewport(0, 0, width, height);
+    // albedo
+    program.setUniform(location_texture, GBUFFER_ALBEDO);
+    program.setUniform(location_type, 1);
+    glViewport(0 * width, 0, width, height);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
-    // m_debugDepthProgram.setUniform(textureLocation, EARLY_Z_SLOT);
-    // glViewport(0, static_cast<int>(1.2f * height), width, height);
-    // glDrawArrays(GL_TRIANGLES, 0, 6);
+    // position
+    program.setUniform(location_texture, GBUFFER_POSITION_METALLIC);
+    glViewport(1 * width, 0, width, height);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 
-    m_debugDepthProgram.stop();
+    // normal
+    program.setUniform(location_texture, GBUFFER_NORMAL_ROUGHNESS);
+    program.setUniform(location_type, 2);
+    glViewport(2 * width, 0, width, height);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    // metallic
+    program.setUniform(location_texture, GBUFFER_POSITION_METALLIC);
+    program.setUniform(location_type, 3);
+    glViewport(3 * width, 0, width, height);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    // roughness
+    program.setUniform(location_texture, GBUFFER_NORMAL_ROUGHNESS);
+    glViewport(4 * width, 0, width, height);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    // ao
+
+    // shadow
+    program.setUniform(location_texture, SHADOW_MAP_SLOT);
+    program.setUniform(location_type, 0);
+    glViewport(6 * width, 0, width, height);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    program.stop();
 }
 
 
@@ -512,7 +590,7 @@ void MainRenderer::render()
         m_lightBuffer.cache.position = g_scene.light.position;
         m_lightBuffer.cache.lightSpacePV = lightSpaceMatrix(g_scene.light.position, g_scene.boundingBox);
         m_lightBuffer.update();
-        renderToShadowMap();
+        shadowPass();
     }
 
     if (g_scene.dirty || g_UIControls.forceUpdateVoxelTexture)
@@ -547,7 +625,8 @@ void MainRenderer::render()
         }
         else if (g_UIControls.renderStrategy == RenderStrategy::NoGI)
         {
-            renderSceneNoGI();
+            // renderSceneNoGI();
+            gbufferPass();
         }
         else
         {
@@ -563,20 +642,28 @@ void MainRenderer::render()
 
 void MainRenderer::createFrameBuffers()
 {
-    m_shadowBuffer.create(SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION);
     auto extent = m_pWindow->getFrameExtent();
-    m_earlyZBuffer.create(extent.witdh, extent.height);
+
+    m_shadowBuffer.create(SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION);
+    // m_earlyZBuffer.create(extent.witdh, extent.height);
+
+    m_gbuffer.create(extent.witdh, extent.height);
 }
 
 void MainRenderer::destroyGpuResources()
 {
+    // gpu resource
     m_voxelProgram.destroy();
     m_visualizeProgram.destroy();
     m_basicProgram.destroy();
     m_boxWireframeProgram.destroy();
     m_voxelPostProgram.destroy();
     m_depthProgram.destroy();
-    m_debugDepthProgram.destroy();
+    m_debugTextureProgram.destroy();
+
+    // render targets
+    m_shadowBuffer.destroy();
+    m_gbuffer.destroy();
 }
 
 } // namespace vct

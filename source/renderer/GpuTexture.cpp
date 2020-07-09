@@ -24,13 +24,35 @@ void GpuTexture::genMipMap()
     glGenerateMipmap(m_type);
 }
 
-void GpuTexture::create3DImage(const Texture3DCreateInfo& info)
+void GpuTexture::create2DEmpty(const Texture2DCreateInfo& info)
+{
+    m_type = GL_TEXTURE_2D;
+    m_format = info.internalFormat;
+
+    glGenTextures(1, &m_handle);
+
+    bind();
+    glTexImage2D(m_type, 0, info.internalFormat, info.width, info.height, 0, info.format, info.dataType, 0);
+
+    if (info.wrapS)
+        glTexParameteri(m_type, GL_TEXTURE_WRAP_S, info.wrapS);
+    if (info.wrapT)
+        glTexParameteri(m_type, GL_TEXTURE_WRAP_T, info.wrapT);
+    if (info.minFilter)
+        glTexParameteri(m_type, GL_TEXTURE_MIN_FILTER, info.minFilter);
+    if (info.magFilter)
+        glTexParameteri(m_type, GL_TEXTURE_MAG_FILTER, info.magFilter);
+
+    unbind();
+}
+
+void GpuTexture::create3DEmpty(const Texture3DCreateInfo& info)
 {
     m_type = GL_TEXTURE_3D;
     m_format = info.format;
 
     glGenTextures(1, &m_handle);
-    glBindTexture(m_type, m_handle);
+    bind();
     glTexParameteri(m_type, GL_TEXTURE_WRAP_S, info.wrapS);
     glTexParameteri(m_type, GL_TEXTURE_WRAP_T, info.wrapT);
     glTexParameteri(m_type, GL_TEXTURE_WRAP_R, info.wrapR);

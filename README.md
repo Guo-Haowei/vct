@@ -1,6 +1,7 @@
 # Voxel GI
 
 ## Todo
+- [ ] do deferred rendering first
 - [x] shadow mapping
 - [ ] cascaded shadow mapping
 - [ ] diffuse light bounce

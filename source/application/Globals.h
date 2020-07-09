@@ -21,9 +21,15 @@ constexpr int NORMAL_VOXEL_SLOT = 1;
 constexpr int EARLY_Z_SLOT = 2;
 constexpr int SHADOW_MAP_SLOT = 3;
 constexpr int ALBEDO_MAP_SLOT = 4;
-constexpr int SPECULAR_MAP_SLOT = 5;
 constexpr int NORMAL_MAP_SLOT = 6;
-constexpr unsigned int VOXEL_TEXTURE_SIZE = 256;
+constexpr int METALLIC_ROUGHNESS_SLOT = 7;
+
+constexpr int GBUFFER_ALBEDO = 10;
+constexpr int GBUFFER_NORMAL_ROUGHNESS = 11;
+constexpr int GBUFFER_POSITION_METALLIC = 12;
+constexpr int GBUFFER_AO = 13;
+
+constexpr unsigned int VOXEL_TEXTURE_SIZE = 64;
 // constexpr unsigned int VOXEL_TEXTURE_SIZE = 128;
 constexpr unsigned int VOXEL_TEXTURE_MIP_LEVEL = log2(VOXEL_TEXTURE_SIZE);
 
@@ -43,13 +49,13 @@ enum RenderStrategy
 
 struct UIControlls
 {
-    int renderStrategy              = VCT;
+    int renderStrategy              = NoGI;
     int voxelMipLevel               = 0;
     int showVoxelTexture            = -1;
     bool showObjectBoundingBox      = false;
     bool showWorldBoundingBox       = false;
     bool forceUpdateVoxelTexture    = false;
-    bool showDepthBuffers           = true;
+    bool debugFramebuffers          = true;
     int objectOccluded              = 0;
 };
 
