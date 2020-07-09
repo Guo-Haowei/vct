@@ -25,14 +25,15 @@ struct Mesh
 struct Material
 {
     /// only support albedo color for now
-    std::string albedoMapPath;
-    Vector3 albedoColor = Vector3::Zero;
-    bool hasAlbedoMap = false;
-    // bool hasNormalMap;
+    std::string albedoTexture;
+    std::string metallicRoughnessTexture;
+    Vector3 albedo = Vector3::Zero;
+    float metallic = 0.5f;
+    float roughness = 0.5f;
 
     Material() = default;
-    Material(const Vector3& albedoColor)
-        : albedoColor(albedoColor), hasAlbedoMap(false)
+    Material(const Vector3& albedo, float metallic, float roughness)
+        : albedo(albedo), metallic(metallic), roughness(roughness)
     {}
 };
 

@@ -43,6 +43,16 @@ void MainRenderer::createGpuResources()
         m_basicProgram.stop();
     }
 
+    m_vctProgram.createFromFiles(
+        DATA_DIR "shaders/vct.vert",
+        DATA_DIR "shaders/vct.frag");
+    {
+        m_vctProgram.use();
+        m_vctProgram.setUniform(m_vctProgram.getUniformLocation("u_albedo_map"), ALBEDO_MAP_SLOT);
+        m_vctProgram.setUniform(m_vctProgram.getUniformLocation("u_shadow_map"), SHADOW_MAP_SLOT);
+        m_vctProgram.stop();
+    }
+
     m_depthProgram.createFromFiles(
         DATA_DIR "shaders/depth.vert",
         DATA_DIR "shaders/depth.frag");
@@ -194,14 +204,14 @@ void MainRenderer::createGpuResources()
     for (const std::unique_ptr<Material>& mat : g_scene.materials)
     {
         MaterialData matData;
-        if (mat->hasAlbedoMap)
+        if (!mat->albedoTexture.empty())
         {
-            matData.albedoMap.create2DImageFromFile(mat->albedoMapPath.c_str());
+            matData.albedoMap.create2DImageFromFile(mat->albedoTexture.c_str());
             matData.albedoColor = Vector4::Zero;
         }
         else
         {
-            matData.albedoColor = Vector4(mat->albedoColor, 1.0f);
+            matData.albedoColor = Vector4(mat->albedo, 1.0f);
         }
 
         g_matLUT.insert({ mat.get(), matData });
@@ -227,7 +237,7 @@ void MainRenderer::visualizeVoxels()
 
     int mipLevel = g_UIControls.voxelMipLevel;
     m_albedoVoxel.bindImageTexture(0, mipLevel);
-    GpuTexture& voxelTexture = g_UIControls.renderVoxel == RenderStrategy::VoxelAlbedo ? m_albedoVoxel : m_normalVoxel;
+    GpuTexture& voxelTexture = g_UIControls.renderStrategy == RenderStrategy::VoxelAlbedo ? m_albedoVoxel : m_normalVoxel;
 
     glBindImageTexture(0, voxelTexture.getHandle(), mipLevel, GL_TRUE, 0,
                        GL_READ_ONLY, voxelTexture.getFormat());
@@ -325,6 +335,7 @@ void MainRenderer::renderToVoxelTexture()
             const MaterialData& matData = matPair->second;
 
             m_materialBuffer.cache.albedoColor = matData.albedoColor;
+            m_materialBuffer.cache.shininess = matData.shininess;
             m_materialBuffer.update();
 
             glBindVertexArray(drawData.vao);
@@ -355,10 +366,51 @@ void MainRenderer::renderToVoxelTexture()
     m_normalVoxel.genMipMap();
 }
 
+void MainRenderer::renderSceneVCT()
+{
+    m_vctProgram.use();
+    static const GLint mLocation = m_vctProgram.getUniformLocation("u_M");
+
+    for (const GeometryNode& node : g_scene.geometryNodes)
+    {
+        m_vctProgram.setUniform(mLocation, node.transform);
+        for (const Geometry& geom : node.geometries)
+        {
+            if (!g_scene.camera.frustum.intersectsBox(geom.boundingBox))
+            {
+                ++g_UIControls.objectOccluded;
+                continue;
+            }
+
+            const auto& meshPair = g_meshLUT.find(geom.pMesh);
+            ASSERT(meshPair != g_meshLUT.end());
+            const MeshData& drawData = meshPair->second;
+
+            const auto& matPair = g_matLUT.find(geom.pMaterial);
+            ASSERT(matPair != g_matLUT.end());
+            const MaterialData& matData = matPair->second;
+
+            m_materialBuffer.cache.albedoColor = matData.albedoColor;
+            m_materialBuffer.cache.shininess = matData.shininess;
+            m_materialBuffer.update();
+
+            glBindVertexArray(drawData.vao);
+            glActiveTexture(GL_TEXTURE0 + ALBEDO_MAP_SLOT);
+            matData.albedoMap.bind();
+
+            glDrawElements(GL_TRIANGLES, drawData.count, GL_UNSIGNED_INT, 0);
+        }
+    }
+}
+
 void MainRenderer::renderSceneNoGI()
 {
     m_basicProgram.use();
+    // TODO: clean up uniforms
     static const GLint mLocation = m_basicProgram.getUniformLocation("u_M");
+    static const GLint camPosLocation = m_basicProgram.getUniformLocation("u_camera_position");
+
+    m_basicProgram.setUniform(camPosLocation, g_scene.camera.position);
 
     for (const GeometryNode& node : g_scene.geometryNodes)
     {
@@ -380,6 +432,7 @@ void MainRenderer::renderSceneNoGI()
             const MaterialData& matData = matPair->second;
 
             m_materialBuffer.cache.albedoColor = matData.albedoColor;
+            m_materialBuffer.cache.shininess = matData.shininess;
             m_materialBuffer.update();
 
             glBindVertexArray(drawData.vao);
@@ -488,9 +541,12 @@ void MainRenderer::render()
         glEnable(GL_CULL_FACE);
         glDisable(GL_SCISSOR_TEST);
 
-        if (g_UIControls.renderVoxel == RenderStrategy::NoGI)
+        if (g_UIControls.renderStrategy == RenderStrategy::VCT)
         {
-            // renderToEarlyZ(PV);
+            renderSceneVCT();
+        }
+        else if (g_UIControls.renderStrategy == RenderStrategy::NoGI)
+        {
             renderSceneNoGI();
         }
         else

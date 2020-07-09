@@ -3,12 +3,67 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <assimp/pbrmaterial.h>
 #include <iostream>
 #include <assert.h>
 using std::string;
 using std::vector;
 
 namespace vct {
+
+void SceneLoader::loadGltf(const char* path, Scene& scene, Matrix4 transform)
+{
+    std::cout << "[Log] loading model from [" << path << "]" << std::endl;
+    ::Assimp::Importer importer;
+    const aiScene* aiscene = importer.ReadFile(path,
+        aiProcess_Triangulate
+    );
+
+    // check for errors
+    if(!aiscene || aiscene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !aiscene->mRootNode) // if is Not Zero
+    {
+        std::cout << "[ERROR] assimp failed to load.";
+        std::cout << importer.GetErrorString() << std::endl;
+        string error("assimp: failed to load scene [");
+        error.append(path).append("]\n\t").append(importer.GetErrorString());
+        THROW_EXCEPTION(error);
+    }
+
+    // set base path
+    m_currentPath = path;
+    auto found = m_currentPath.find_last_of("/\\");
+    m_currentPath = m_currentPath.substr(0, found + 1);
+
+    size_t materialOffset = scene.materials.size();
+
+    for (uint32_t i = 0; i < aiscene->mNumMaterials; ++i)
+    {
+        const aiMaterial* aimat = aiscene->mMaterials[i];
+        Material* mat = processMaterial(aimat);
+        scene.materials.push_back(std::move(std::unique_ptr<Material>(mat)));
+    }
+
+    GeometryNode node;
+    node.transform = transform;
+
+    for (uint32_t i = 0; i < aiscene->mNumMeshes; ++i)
+    {
+        const aiMesh* aimesh = aiscene->mMeshes[i];
+        Mesh* mesh = processMesh(aimesh);
+        size_t index = materialOffset + mesh->materialIndex;
+        Material* mat = scene.materials.at(index).get();
+        Box3 box;
+        box.expandPoints(mesh->positions.size(), mesh->positions.data());
+        box.applyMatrix(transform);
+        node.geometries.push_back({ mesh, mat, box });
+        scene.meshes.push_back(std::move(std::unique_ptr<Mesh>(mesh)));
+
+        scene.boundingBox.mergeBox(box);
+    }
+
+    scene.geometryNodes.push_back(node);
+
+}
 
 void SceneLoader::loadObj(const char* path, Scene& scene, Matrix4 transform, Material* customMaterial)
 {
@@ -39,19 +94,7 @@ void SceneLoader::loadObj(const char* path, Scene& scene, Matrix4 transform, Mat
 
     size_t materialOffset = scene.materials.size();
 
-    if (customMaterial)
-    {
-        scene.materials.push_back(std::move(std::unique_ptr<Material>(customMaterial)));
-    }
-    else
-    {
-        for (uint32_t i = 0; i < aiscene->mNumMaterials; ++i)
-        {
-            const aiMaterial* aimat = aiscene->mMaterials[i];
-            Material* mat = processMaterial(aimat);
-            scene.materials.push_back(std::move(std::unique_ptr<Material>(mat)));
-        }
-    }
+    scene.materials.push_back(std::move(std::unique_ptr<Material>(customMaterial)));
 
     GeometryNode node;
     node.transform = transform;
@@ -61,7 +104,7 @@ void SceneLoader::loadObj(const char* path, Scene& scene, Matrix4 transform, Mat
         const aiMesh* aimesh = aiscene->mMeshes[i];
         Mesh* mesh = processMesh(aimesh);
         size_t index = materialOffset + mesh->materialIndex;
-        Material* mat = customMaterial ? customMaterial : scene.materials.at(index).get();
+        Material* mat = customMaterial;
         Box3 box;
         box.expandPoints(mesh->positions.size(), mesh->positions.data());
         box.applyMatrix(transform);
@@ -78,18 +121,29 @@ Material* SceneLoader::processMaterial(const aiMaterial* aimaterial)
 {
     Material* mat = new Material;
 
-    aiString albedoPath;
+    aiString baseColorTexturePath, normalTexturePath, metallicRoughnessTexturePath;
     aiColor3D color;
-    if (aimaterial->GetTexture(aiTextureType_AMBIENT, 0, &albedoPath, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS)
+
+    /// base color
+    if (aimaterial->GetTexture(AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_BASE_COLOR_TEXTURE, &baseColorTexturePath) == AI_SUCCESS)
     {
-        mat->albedoMapPath = m_currentPath;
-        mat->albedoMapPath.append(albedoPath.C_Str());
-        mat->hasAlbedoMap = true;
+        mat->albedoTexture = m_currentPath;
+        mat->albedoTexture.append(baseColorTexturePath.C_Str());
     }
-    else if (aimaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color))
+    else
     {
-        mat->albedoColor = Vector3(color.r, color.g, color.b);
-        mat->hasAlbedoMap = false;
+        std::cout << "[Warning] Base Color Texture not found" << std::endl;
+    }
+
+    /// metallic roughness
+    if (aimaterial->GetTexture(AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE, &metallicRoughnessTexturePath) == AI_SUCCESS)
+    {
+        mat->metallicRoughnessTexture = m_currentPath;
+        mat->metallicRoughnessTexture.append(baseColorTexturePath.C_Str());
+    }
+    else
+    {
+        std::cout << "[Warning] Metallic Roughness Texture not found" << std::endl;
     }
 
     return mat;

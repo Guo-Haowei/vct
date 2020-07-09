@@ -23,9 +23,8 @@ constexpr int SHADOW_MAP_SLOT = 3;
 constexpr int ALBEDO_MAP_SLOT = 4;
 constexpr int SPECULAR_MAP_SLOT = 5;
 constexpr int NORMAL_MAP_SLOT = 6;
-// constexpr int NORMAL_MAP_SLOT = 5;
-// constexpr unsigned int VOXEL_TEXTURE_SIZE = 256;
-constexpr unsigned int VOXEL_TEXTURE_SIZE = 128;
+constexpr unsigned int VOXEL_TEXTURE_SIZE = 256;
+// constexpr unsigned int VOXEL_TEXTURE_SIZE = 128;
 constexpr unsigned int VOXEL_TEXTURE_MIP_LEVEL = log2(VOXEL_TEXTURE_SIZE);
 
 constexpr int UNIFORM_BUFFER_CAMERA_SLOT = 0;
@@ -37,13 +36,14 @@ static_assert(VOXEL_TEXTURE_SIZE <= 256);
 enum RenderStrategy
 {
     NoGI,
+    VCT,
     VoxelAlbedo,
     VoxelNormal,
 };
 
 struct UIControlls
 {
-    int renderVoxel                 = 0;
+    int renderStrategy              = VCT;
     int voxelMipLevel               = 0;
     int showVoxelTexture            = -1;
     bool showObjectBoundingBox      = false;

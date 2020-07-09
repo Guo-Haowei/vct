@@ -12,6 +12,7 @@ namespace vct {
 class SceneLoader
 {
 public:
+    void loadGltf(const char* path, Scene& scene, Matrix4 transform = Matrix4::Identity);
     void loadObj(const char* path, Scene& scene, Matrix4 transform, Material* customMaterial = nullptr);
 private:
     Mesh* processMesh(const aiMesh* aimesh);

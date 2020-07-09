@@ -9,12 +9,12 @@ void createDefaultScene()
     SceneLoader loader;
     {
         Matrix4 transform = three::scale(Vector3(0.01f));
-        loader.loadObj(DATA_DIR "models/CrytekSponza/sponza.obj", g_scene, transform);
+        loader.loadGltf(DATA_DIR "models/Sponza/Sponza.gltf", g_scene, transform);
     }
     {
-        Material* mat = new Material(Vector3(0.9f));
-        Matrix4 transform = three::translate(Vector3(0, 1, 0)) * three::rotateY(three::radians(180.0f)) * three::scale(Vector3(2.0f));
-        loader.loadObj(DATA_DIR "models/dragon.obj", g_scene, transform, mat);
+        // Material* mat = new Material(Vector3(0.9f), 32.0f);
+        // Matrix4 transform = three::translate(Vector3(0, 1, 0)) * three::rotateY(three::radians(180.0f)) * three::scale(Vector3(2.0f));
+        // loader.loadObj(DATA_DIR "models/dragon.obj", g_scene, transform, mat);
     }
 
     Camera& camera = g_scene.camera;

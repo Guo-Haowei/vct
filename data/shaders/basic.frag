@@ -9,6 +9,8 @@ layout (location = 0) out vec4 out_color;
 uniform sampler2D u_albedo_map;
 uniform sampler2D u_shadow_map;
 
+uniform vec3 u_camera_position;
+
 layout (std140, binding = 1) uniform Light
 {
     vec3 light_position;
@@ -19,6 +21,8 @@ layout (std140, binding = 1) uniform Light
 layout (std140, binding = 2) uniform Material
 {
     vec4 albedo_color;
+    vec3 specular_color;
+    float shininess;
 };
 
 float in_shadow(vec4 position_light)
@@ -34,17 +38,31 @@ float in_shadow(vec4 position_light)
 
 void main()
 {
-    vec3 N = normalize(pass_normal);
-    vec3 L = normalize(light_position - pass_position_world);
-
     vec4 albedo = mix(texture(u_albedo_map, pass_uv), albedo_color, albedo_color.a);
 
     if (albedo.a < 0.001)
         discard;
 
-    float shadow = in_shadow(pass_position_light);
+    vec3 N = normalize(pass_normal);
+    vec3 L = normalize(light_position - pass_position_world);
+    vec3 V = normalize(u_camera_position - pass_position_world);
+    vec3 R = reflect(-L, N);
+
+    float shadow = 0.0;
+    // float shadow = in_shadow(pass_position_light);
+
     float diffuse = max(dot(N, L), 0.0);
-    vec3 color = (1.0 - shadow) * (diffuse) * albedo.rgb;
+
+    float specular = pow(max(dot(V, R), 0.0), shininess);
+
+    vec3 light_color = vec3(0.5);
+
+    vec3 color = (1.0 - shadow) * light_color * (specular + diffuse) * albedo.rgb;
+
+    // gamma correction
+    float gamma = 2.2;
+    color = color / (color + 1.0);
+    color = pow(color, vec3(1.0 / gamma));
 
     out_color = vec4(color, 1.0);
 }

@@ -19,6 +19,8 @@ struct MaterialData
 {
     Vector4 albedoColor;
     GpuTexture albedoMap;
+    Vector3 specularColor;
+    float shininess;
     // specular...
     // normal...
 };
@@ -40,6 +42,8 @@ struct LightBufferCache
 struct MaterialCache
 {
     Vector4 albedoColor; // if it doesn't have albedo color, then it's alpha is 0.0f
+    Vector3 specularColor;
+    float shininess;
 };
 
 static_assert(sizeof(CameraBufferCache) % 16 == 0);
@@ -59,6 +63,7 @@ public:
     void renderBoundingBox();
     void visualizeVoxels();
     void renderSceneNoGI();
+    void renderSceneVCT();
     void destroyGpuResources();
     inline void setWindow(Window* pWindow) { m_pWindow = pWindow; }
 private:
@@ -68,6 +73,7 @@ private:
     GlslProgram m_voxelProgram;
     GlslProgram m_visualizeProgram;
     GlslProgram m_basicProgram;
+    GlslProgram m_vctProgram;
     GlslProgram m_boxWireframeProgram;
     GlslProgram m_voxelPostProgram;
     GlslProgram m_depthProgram;
