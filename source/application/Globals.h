@@ -24,10 +24,10 @@ constexpr int ALBEDO_MAP_SLOT = 4;
 constexpr int NORMAL_MAP_SLOT = 6;
 constexpr int METALLIC_ROUGHNESS_SLOT = 7;
 
-constexpr int GBUFFER_ALBEDO = 10;
-constexpr int GBUFFER_NORMAL_ROUGHNESS = 11;
-constexpr int GBUFFER_POSITION_METALLIC = 12;
-constexpr int GBUFFER_AO = 13;
+constexpr int GBUFFER_ALBEDO_SLOT = 10;
+constexpr int GBUFFER_NORMAL_ROUGHNESS_SLOT = 11;
+constexpr int GBUFFER_POSITION_METALLIC_SLOT = 12;
+constexpr int GBUFFER_AO_SLOT = 13;
 
 constexpr unsigned int VOXEL_TEXTURE_SIZE = 64;
 // constexpr unsigned int VOXEL_TEXTURE_SIZE = 128;
@@ -47,16 +47,31 @@ enum RenderStrategy
     VoxelNormal,
 };
 
+enum GBufferIndex
+{
+    GBUFFER_INDEX_NONE,
+    GBUFFER_INDEX_ALBEDO,
+    GBUFFER_INDEX_NORMAL,
+    GBUFFER_INDEX_METALLIC,
+    GBUFFER_INDEX_ROUGHNESS,
+    GBUFFER_INDEX_DEPTH,
+    GBUFFER_INDEX_SHADOW,
+};
+
 struct UIControlls
 {
-    int renderStrategy              = NoGI;
-    int voxelMipLevel               = 0;
-    int showVoxelTexture            = -1;
-    bool showObjectBoundingBox      = false;
-    bool showWorldBoundingBox       = false;
-    bool forceUpdateVoxelTexture    = false;
-    bool debugFramebuffers          = true;
-    int objectOccluded              = 0;
+    int     renderStrategy              = NoGI;
+    int     voxelMipLevel               = 0;
+    int     showVoxelTexture            = -1;
+    bool    showObjectBoundingBox       = false;
+    bool    showWorldBoundingBox        = false;
+    bool    forceUpdateVoxelTexture     = false;
+    bool    debugFramebuffers           = true;
+
+    int     objectOccluded              = 0;
+    int     totalMaterials              = 0;
+    int     totalMeshes                 = 0;
+    int     gbuffer                     = GBUFFER_INDEX_ALBEDO;
 };
 
 extern UIControlls g_UIControls;

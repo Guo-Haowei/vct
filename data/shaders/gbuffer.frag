@@ -4,8 +4,8 @@ layout (location = 1) out vec4 out_normal_roughness;
 layout (location = 2) out vec4 out_albedo;
 
 layout (location = 0) in vec3 pass_position;
-layout (location = 1) in vec3 pass_normal;
-layout (location = 2) in vec2 pass_uv;
+layout (location = 1) in vec2 pass_uv;
+layout (location = 2) in mat3 pass_TBN;
 
 layout (std140, binding = 2) uniform Material
 {
@@ -17,6 +17,7 @@ layout (std140, binding = 2) uniform Material
 };
 
 uniform sampler2D u_albedo_map;
+uniform sampler2D u_normal_map;
 uniform sampler2D u_metallic_roughness_map;
 
 void main()
@@ -34,7 +35,15 @@ void main()
     out_position_metallic.xyz = pass_position;
     out_position_metallic.w = metallic_roughness.r;
 
-    out_normal_roughness.xyz = normalize(pass_normal);
+    // TODO: get rid of branching
+    vec3 N;
+    if (has_normal_texture > 0.0)
+        N = normalize(pass_TBN * (2.0 * texture(u_normal_map, pass_uv).xyz - 1.0));
+    else
+        N = pass_TBN[2];
+    // N = mix(pass_TBN[2], N, has_normal_texture);
+
+    out_normal_roughness.xyz = N;
     out_normal_roughness.w = metallic_roughness.g;
 
     out_albedo.rgb = albedo.rgb;

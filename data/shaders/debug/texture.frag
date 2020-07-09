@@ -10,10 +10,12 @@ void main()
 {
     if (u_type == 0) // depth
         out_color = vec4(texture(u_texture, pass_uv).rrr, 1.0);
-    if (u_type == 1) // albedo, position
+    else if (u_type == 1) // albedo, position
         out_color = vec4(texture(u_texture, pass_uv).rgb, 1.0);
-    if (u_type == 2) // normal
+    else if (u_type == 2) // normal
         out_color = vec4(0.5 * texture(u_texture, pass_uv).rgb + 0.5, 1.0);
-    if (u_type == 3) // roughness metallic
+    else if (u_type == 3) // roughness metallic
         out_color = vec4(texture(u_texture, pass_uv).aaa, 1.0);
+    else
+        return;
 }

@@ -16,7 +16,8 @@ void SceneLoader::loadGltf(const char* path, Scene& scene, Matrix4 transform)
     std::cout << "[Log] loading model from [" << path << "]" << std::endl;
     ::Assimp::Importer importer;
     const aiScene* aiscene = importer.ReadFile(path,
-        aiProcess_Triangulate
+        aiProcess_Triangulate |
+        aiProcess_CalcTangentSpace
     );
 
     // check for errors
@@ -121,29 +122,40 @@ Material* SceneLoader::processMaterial(const aiMaterial* aimaterial)
 {
     Material* mat = new Material;
 
-    aiString baseColorTexturePath, normalTexturePath, metallicRoughnessTexturePath;
-    aiColor3D color;
-
-    /// base color
-    if (aimaterial->GetTexture(AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_BASE_COLOR_TEXTURE, &baseColorTexturePath) == AI_SUCCESS)
+    /// albedo
     {
-        mat->albedoTexture = m_currentPath;
-        mat->albedoTexture.append(baseColorTexturePath.C_Str());
-    }
-    else
-    {
-        std::cout << "[Warning] Base Color Texture not found" << std::endl;
+        aiString path;
+        if (aimaterial->GetTexture(AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_BASE_COLOR_TEXTURE, &path) == AI_SUCCESS)
+        {
+            mat->albedoTexture = m_currentPath;
+            mat->albedoTexture.append(path.C_Str());
+        }
+        else
+            std::cout << "[Warning] Base Color Texture not found" << std::endl;
     }
 
     /// metallic roughness
-    if (aimaterial->GetTexture(AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE, &metallicRoughnessTexturePath) == AI_SUCCESS)
     {
-        mat->metallicRoughnessTexture = m_currentPath;
-        mat->metallicRoughnessTexture.append(baseColorTexturePath.C_Str());
+        aiString path;
+        if (aimaterial->GetTexture(AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE, &path) == AI_SUCCESS)
+        {
+            mat->metallicRoughnessTexture = m_currentPath;
+            mat->metallicRoughnessTexture.append(path.C_Str());
+        }
+        else
+            std::cout << "[Warning] Metallic Roughness Texture not found" << std::endl;
     }
-    else
+
+    /// normal texture
     {
-        std::cout << "[Warning] Metallic Roughness Texture not found" << std::endl;
+        aiString path;
+        if (aimaterial->GetTexture(aiTextureType_NORMALS, 0, &path) == AI_SUCCESS)
+        {
+            mat->normalTexture = m_currentPath;
+            mat->normalTexture.append(path.C_Str());
+        }
+        else
+            std::cout << "[Warning] Normal Texture not found" << std::endl;
     }
 
     return mat;
@@ -156,6 +168,7 @@ Mesh* SceneLoader::processMesh(const aiMesh* aimesh)
     mesh->positions.reserve(aimesh->mNumVertices);
     mesh->normals.reserve(aimesh->mNumVertices);
     mesh->uvs.reserve(aimesh->mNumVertices);
+
     bool hasUv = aimesh->mTextureCoords[0];
 
     for (uint32_t i = 0; i < aimesh->mNumVertices; ++i)
@@ -164,13 +177,30 @@ Mesh* SceneLoader::processMesh(const aiMesh* aimesh)
         mesh->positions.push_back(Vector3(position.x, position.y, position.z));
         auto& normal = aimesh->mNormals[i];
         mesh->normals.push_back(Vector3(normal.x, normal.y, normal.z));
+
         if (hasUv)
         {
             auto& uv = aimesh->mTextureCoords[0][i];
             mesh->uvs.push_back(Vector2(uv.x, uv.y));
         }
         else
+        {
             mesh->uvs.push_back(Vector2::Zero);
+        }
+    }
+
+    bool hasTangent = aimesh->mTangents != nullptr;
+    if (aimesh->mTangents)
+    {
+        mesh->tangents.reserve(aimesh->mNumVertices);
+        mesh->bitangents.reserve(aimesh->mNumVertices);
+        for (uint32_t i = 0; i < aimesh->mNumVertices; ++i)
+        {
+            auto& tangent = aimesh->mTangents[i];
+            mesh->tangents.push_back(Vector3(tangent.x, tangent.y, tangent.z));
+            auto& bitangent = aimesh->mBitangents[i];
+            mesh->bitangents.push_back(Vector3(bitangent.x, bitangent.y, bitangent.z));
+        }
     }
 
     mesh->faces.reserve(aimesh->mNumFaces);

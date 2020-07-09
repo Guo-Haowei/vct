@@ -11,7 +11,7 @@ struct MeshData
 {
     GLuint vao          = 0;
     GLuint ebo          = 0;
-    GLuint vbos[3]      = { 0, 0, 0 };
+    GLuint vbos[5]      = { 0, 0, 0, 0, 0 };
     unsigned int count  = 0;
 };
 
@@ -19,6 +19,7 @@ struct MaterialData
 {
     GpuTexture albedoMap;
     GpuTexture materialMap;
+    GpuTexture normalMap;
     Vector4 albedoColor;
     float metallic;
     float roughness;
@@ -42,20 +43,21 @@ struct LightBufferCache
 
 struct MaterialCache
 {
-    Vector4 albedoColor; // if it doesn't have albedo color, then it's alpha is 0.0f
-    float metallic;
-    float roughness;
-    float hasMaterialMap;
-    float padding;
+    Vector4 albedo_color; // if it doesn't have albedo color, then it's alpha is 0.0f
+    float metallic = 0.0f;
+    float roughness = 0.0f;
+    float has_metallic_roughness_texture = 0.0f;
+    float has_normal_texture = 0.0f;
 
-    MaterialCache() {}
-
-    MaterialCache(const MaterialData& mat)
+    MaterialCache& operator=(const MaterialData& mat)
     {
-        albedoColor = mat.albedoColor;
+        albedo_color = mat.albedoColor;
         roughness = mat.roughness;
         metallic = mat.metallic;
-        hasMaterialMap = mat.materialMap.getHandle() == 0 ? 0.0f : 1.0f;
+        has_metallic_roughness_texture = mat.materialMap.getHandle() == 0 ? 0.0f : 1.0f;
+        has_normal_texture = mat.normalMap.getHandle() == 0 ? 0.0f : 1.0f;
+
+        return *this;
     }
 };
 

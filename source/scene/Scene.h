@@ -8,17 +8,14 @@
 
 namespace vct {
 
-using PositionBuffer    = std::vector<Vector3>;
-using NormalBuffer      = std::vector<Vector3>;
-using UvBuffer          = std::vector<Vector2>;
-using FaceBuffer        = std::vector<Vector3u>;
-
 struct Mesh
 {
-    PositionBuffer  positions;
-    NormalBuffer    normals;
-    UvBuffer        uvs;
-    FaceBuffer      faces;
+    std::vector<Vector3>    positions;
+    std::vector<Vector3>    normals;
+    std::vector<Vector3>    tangents;
+    std::vector<Vector3>    bitangents;
+    std::vector<Vector2>    uvs;
+    std::vector<Vector3u>   faces;
     unsigned int    materialIndex;
 };
 
@@ -27,6 +24,7 @@ struct Material
     /// only support albedo color for now
     std::string albedoTexture;
     std::string metallicRoughnessTexture;
+    std::string normalTexture;
     Vector3 albedo = Vector3::Zero;
     float metallic = 0.0f;
     float roughness = 0.0f;

@@ -129,9 +129,19 @@ void Application::userInterface()
             if (ImGui::Checkbox("Show World Bounding Box", &g_UIControls.showWorldBoundingBox))
                 g_UIControls.showObjectBoundingBox = false;
 
-            ImGui::Separator();
-            ImGui::Checkbox("Debug Frame Buffers", &g_UIControls.debugFramebuffers);
+            ImGui::EndMenu();
+        }
 
+        ImGui::Separator();
+
+        if (ImGui::BeginMenu("GBuffer"))
+        {
+            ImGui::RadioButton("None",      &g_UIControls.gbuffer, GBufferIndex::GBUFFER_INDEX_NONE);
+            ImGui::RadioButton("Albedo",    &g_UIControls.gbuffer, GBufferIndex::GBUFFER_INDEX_ALBEDO);
+            ImGui::RadioButton("Normal",    &g_UIControls.gbuffer, GBufferIndex::GBUFFER_INDEX_NORMAL);
+            ImGui::RadioButton("Metallic",  &g_UIControls.gbuffer, GBufferIndex::GBUFFER_INDEX_METALLIC);
+            ImGui::RadioButton("Roughness", &g_UIControls.gbuffer, GBufferIndex::GBUFFER_INDEX_ROUGHNESS);
+            ImGui::RadioButton("Shadow",    &g_UIControls.gbuffer, GBufferIndex::GBUFFER_INDEX_SHADOW);
             ImGui::EndMenu();
         }
 
@@ -152,7 +162,9 @@ void Application::userInterface()
     }
 
     ImGui::Begin("Log");
-    ImGui::Text("FPS: %.2f FPS", ImGui::GetIO().Framerate);
+    ImGui::Text("FPS            : %.2f FPS", ImGui::GetIO().Framerate);
+    ImGui::Text("Total meshes   : %.d", g_UIControls.totalMeshes);
+    ImGui::Text("Total Materials: %.d", g_UIControls.totalMaterials);
     ImGui::Text("Object occluded: %.d", g_UIControls.objectOccluded);
 
     ImGui::End();

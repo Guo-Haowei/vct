@@ -35,6 +35,7 @@ void MainRenderer::createGpuResources()
     {
         m_gbufferProgram.use();
         m_gbufferProgram.setUniform(m_gbufferProgram.getUniformLocation("u_albedo_map"), ALBEDO_MAP_SLOT);
+        m_gbufferProgram.setUniform(m_gbufferProgram.getUniformLocation("u_normal_map"), NORMAL_MAP_SLOT);
         m_gbufferProgram.setUniform(m_gbufferProgram.getUniformLocation("u_metallic_roughness_map"), METALLIC_ROUGHNESS_SLOT);
         m_gbufferProgram.stop();
     }
@@ -182,29 +183,44 @@ void MainRenderer::createGpuResources()
     // create mesh
     for (const std::unique_ptr<Mesh>& mesh : g_scene.meshes)
     {
+        // TODO: buffer storage
         MeshData data;
         glGenVertexArrays(1, &data.vao);
         glGenBuffers(4, &data.ebo);
         glBindVertexArray(data.vao);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data.ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Vector3u) * mesh->faces.size(), mesh->faces.data(), GL_STATIC_DRAW);
+        glNamedBufferStorage(data.ebo, sizeof(Vector3u) * mesh->faces.size(), mesh->faces.data(), 0);
 
         glBindBuffer(GL_ARRAY_BUFFER, data.vbos[0]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3) * mesh->positions.size(), mesh->positions.data(), GL_STATIC_DRAW);
+        glNamedBufferStorage(data.vbos[0], sizeof(Vector3) * mesh->positions.size(), mesh->positions.data(), 0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), 0);
         glEnableVertexAttribArray(0);
 
         glBindBuffer(GL_ARRAY_BUFFER, data.vbos[1]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3) * mesh->normals.size(), mesh->normals.data(), GL_STATIC_DRAW);
+        glNamedBufferStorage(data.vbos[1], sizeof(Vector3) * mesh->normals.size(), mesh->normals.data(), 0);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), 0);
         glEnableVertexAttribArray(1);
 
         glBindBuffer(GL_ARRAY_BUFFER, data.vbos[2]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(Vector2) * mesh->uvs.size(), mesh->uvs.data(), GL_STATIC_DRAW);
+        glNamedBufferStorage(data.vbos[2], sizeof(Vector2) * mesh->uvs.size(), mesh->uvs.data(), 0);
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vector2), 0);
         glEnableVertexAttribArray(2);
 
-        //glBindBuffer(GL_ARRAY_BUFFER, 0);
+        if (mesh->tangents.size() != 0)
+        {
+            glGenBuffers(2, &data.vbos[3]);
+
+            glBindBuffer(GL_ARRAY_BUFFER, data.vbos[3]);
+            glNamedBufferStorage(data.vbos[3], sizeof(Vector3) * mesh->tangents.size(), mesh->tangents.data(), 0);
+            glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), 0);
+            glEnableVertexAttribArray(3);
+
+            glBindBuffer(GL_ARRAY_BUFFER, data.vbos[4]);
+            glNamedBufferStorage(data.vbos[4], sizeof(Vector3) * mesh->bitangents.size(), mesh->bitangents.data(), 0);
+            glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), 0);
+            glEnableVertexAttribArray(4);
+        }
+
         glBindVertexArray(0);
         data.count = 3 * static_cast<unsigned int>(mesh->faces.size());
 
@@ -235,19 +251,24 @@ void MainRenderer::createGpuResources()
             matData.roughness = mat->roughness;
         }
 
+        if (!mat->normalTexture.empty())
+        {
+            matData.normalMap.create2DImageFromFile(mat->normalTexture.c_str());
+        }
+
         g_matLUT.insert({ mat.get(), matData });
     }
 
     glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SLOT);
     m_shadowBuffer.getDepthTexture().bind();
 
-    glActiveTexture(GL_TEXTURE0 + GBUFFER_POSITION_METALLIC);
+    glActiveTexture(GL_TEXTURE0 + GBUFFER_POSITION_METALLIC_SLOT);
     m_gbuffer.getColorAttachment(0).bind();
 
-    glActiveTexture(GL_TEXTURE0 + GBUFFER_NORMAL_ROUGHNESS);
+    glActiveTexture(GL_TEXTURE0 + GBUFFER_NORMAL_ROUGHNESS_SLOT);
     m_gbuffer.getColorAttachment(1).bind();
 
-    glActiveTexture(GL_TEXTURE0 + GBUFFER_ALBEDO);
+    glActiveTexture(GL_TEXTURE0 + GBUFFER_ALBEDO_SLOT);
     m_gbuffer.getColorAttachment(2).bind();
 }
 
@@ -313,6 +334,8 @@ void MainRenderer::gbufferPass()
             matData.albedoMap.bind();
             glActiveTexture(GL_TEXTURE0 + METALLIC_ROUGHNESS_SLOT);
             matData.materialMap.bind();
+            glActiveTexture(GL_TEXTURE0 + NORMAL_MAP_SLOT);
+            matData.normalMap.bind();
 
             glDrawElements(GL_TRIANGLES, drawData.count, GL_UNSIGNED_INT, 0);
         }
@@ -383,7 +406,7 @@ void MainRenderer::renderToVoxelTexture()
             ASSERT(matPair != g_matLUT.end());
             const MaterialData& matData = matPair->second;
 
-            m_materialBuffer.cache.albedoColor = matData.albedoColor;
+            m_materialBuffer.cache = matData;
             m_materialBuffer.update();
 
             glBindVertexArray(drawData.vao);
@@ -438,7 +461,7 @@ void MainRenderer::renderSceneVCT()
             ASSERT(matPair != g_matLUT.end());
             const MaterialData& matData = matPair->second;
 
-            m_materialBuffer.cache.albedoColor = matData.albedoColor;
+            m_materialBuffer.cache = matData;
             m_materialBuffer.update();
 
             glBindVertexArray(drawData.vao);
@@ -478,7 +501,7 @@ void MainRenderer::renderSceneNoGI()
             ASSERT(matPair != g_matLUT.end());
             const MaterialData& matData = matPair->second;
 
-            m_materialBuffer.cache.albedoColor = matData.albedoColor;
+            m_materialBuffer.cache = matData;
             m_materialBuffer.update();
 
             glBindVertexArray(drawData.vao);
@@ -525,7 +548,7 @@ void MainRenderer::renderBoundingBox()
 
 void MainRenderer::renderFrameBufferTextures(const Extent2i& extent)
 {
-    if (!g_UIControls.debugFramebuffers)
+    if (g_UIControls.gbuffer == GBufferIndex::GBUFFER_INDEX_NONE)
         return;
 
     GlslProgram& program = m_debugTextureProgram;
@@ -544,31 +567,65 @@ void MainRenderer::renderFrameBufferTextures(const Extent2i& extent)
     int xOffset = extent.witdh - width;
 
     glBindVertexArray(m_quad.vao);
+    glViewport(0, 0, extent.witdh, extent.height);
 
+    int textureSlot = 0;
+    int type = -1;
+    // normal
+    switch (g_UIControls.gbuffer)
+    {
+    case GBufferIndex::GBUFFER_INDEX_ALBEDO:
+        textureSlot = GBUFFER_ALBEDO_SLOT;
+        type = 1;
+        break;
+    case GBufferIndex::GBUFFER_INDEX_NORMAL:
+        textureSlot = GBUFFER_NORMAL_ROUGHNESS_SLOT;
+        type = 2;
+        break;
+    case GBufferIndex::GBUFFER_INDEX_METALLIC:
+        textureSlot = GBUFFER_POSITION_METALLIC_SLOT;
+        type = 3;
+        break;
+    case GBufferIndex::GBUFFER_INDEX_ROUGHNESS:
+        textureSlot = GBUFFER_NORMAL_ROUGHNESS_SLOT;
+        type = 3;
+        break;
+    case GBufferIndex::GBUFFER_INDEX_SHADOW:
+        textureSlot = SHADOW_MAP_SLOT;
+        type = 0;
+        break;
+    default: break;
+    }
+
+    program.setUniform(location_texture, textureSlot);
+    program.setUniform(location_type, type);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+#if 0
     // albedo
-    program.setUniform(location_texture, GBUFFER_ALBEDO);
+    program.setUniform(location_texture, GBUFFER_ALBEDO_SLOT);
     program.setUniform(location_type, 1);
     glViewport(0 * width, 0, width, height);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     // position
-    program.setUniform(location_texture, GBUFFER_POSITION_METALLIC);
+    program.setUniform(location_texture, GBUFFER_POSITION_METALLIC_SLOT);
     glViewport(1 * width, 0, width, height);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     // normal
-    program.setUniform(location_texture, GBUFFER_NORMAL_ROUGHNESS);
+    program.setUniform(location_texture, GBUFFER_NORMAL_ROUGHNESS_SLOT);
     program.setUniform(location_type, 2);
     glViewport(2 * width, 0, width, height);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     // metallic
-    program.setUniform(location_texture, GBUFFER_POSITION_METALLIC);
+    program.setUniform(location_texture, GBUFFER_POSITION_METALLIC_SLOT);
     program.setUniform(location_type, 3);
     glViewport(3 * width, 0, width, height);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     // roughness
-    program.setUniform(location_texture, GBUFFER_NORMAL_ROUGHNESS);
+    program.setUniform(location_texture, GBUFFER_NORMAL_ROUGHNESS_SLOT);
     glViewport(4 * width, 0, width, height);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     // ao
@@ -578,10 +635,10 @@ void MainRenderer::renderFrameBufferTextures(const Extent2i& extent)
     program.setUniform(location_type, 0);
     glViewport(6 * width, 0, width, height);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+#endif
 
     program.stop();
 }
-
 
 void MainRenderer::render()
 {
@@ -593,12 +650,12 @@ void MainRenderer::render()
         shadowPass();
     }
 
-    if (g_scene.dirty || g_UIControls.forceUpdateVoxelTexture)
-    {
-        m_albedoVoxel.clear();
-        m_normalVoxel.clear();
-        renderToVoxelTexture();
-    }
+    // if (g_scene.dirty || g_UIControls.forceUpdateVoxelTexture)
+    // {
+    //     m_albedoVoxel.clear();
+    //     m_normalVoxel.clear();
+    //     renderToVoxelTexture();
+    // }
 
     auto extent = m_pWindow->getFrameExtent();
 
