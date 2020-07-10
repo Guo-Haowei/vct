@@ -11,6 +11,23 @@ namespace vct {
 static std::unordered_map<const Mesh*, MeshData> g_meshLUT;
 static std::unordered_map<const Material*, MaterialData> g_matLUT;
 
+constexpr int UNIFORM_BUFFER_VS_PER_FRAME_SLOT = 0;
+constexpr int UNIFORM_BUFFER_FS_PER_FRAME_SLOT = 1;
+constexpr int UNIFORM_BUFFER_MATERIAL_SLOT = 2;
+
+constexpr int ALBEDO_VOXEL_SLOT = 0;
+constexpr int NORMAL_VOXEL_SLOT = 1;
+constexpr int ALBEDO_MAP_SLOT = 4;
+constexpr int NORMAL_MAP_SLOT = 6;
+constexpr int METALLIC_ROUGHNESS_SLOT = 7;
+
+constexpr int TEXTURE_SHADOW_MAP_SLOT = 3;
+constexpr int TEXTURE_GBUFFER_DEPTH_SLOT = 9;
+constexpr int TEXTURE_GBUFFER_ALBEDO_SLOT = 10;
+constexpr int TEXTURE_GBUFFER_NORMAL_ROUGHNESS_SLOT = 11;
+constexpr int TEXTURE_GBUFFER_POSITION_METALLIC_SLOT = 12;
+constexpr int TEXTURE_GBUFFER_AO_SLOT = 13;
+
 void MainRenderer::createGpuResources()
 {
     Vector3 center = g_scene.boundingBox.getCenter();
@@ -19,14 +36,17 @@ void MainRenderer::createGpuResources()
     Vector4 world(center, sizeMax);
 
     // create uniform buffer
-    m_cameraBuffer.createAndBind(UNIFORM_BUFFER_CAMERA_SLOT);
+    m_vsPerFrameBuffer.createAndBind(UNIFORM_BUFFER_VS_PER_FRAME_SLOT);
+    m_vsPerFrameBuffer.cache.lightSpace = lightSpaceMatrix(g_scene.light.position, g_scene.shadowBox);
+    m_vsPerFrameBuffer.update();
 
-    m_lightBuffer.createAndBind(UNIFORM_BUFFER_LIGHT_SLOT);
-    m_lightBuffer.cache.position = g_scene.light.position;
-    m_lightBuffer.cache.lightSpacePV = lightSpaceMatrix(g_scene.light.position, g_scene.shadowBox);
-    m_lightBuffer.update();
+    m_fsPerFrameBuffer.createAndBind(UNIFORM_BUFFER_FS_PER_FRAME_SLOT);
+    m_fsPerFrameBuffer.cache.light_position = g_scene.light.position;
+    m_fsPerFrameBuffer.cache.light_color = g_scene.light.color;
+    m_fsPerFrameBuffer.cache.camera_position = g_scene.camera.position;
+    m_fsPerFrameBuffer.update();
 
-    m_materialBuffer.createAndBind(UNIFORM_BUFFER_MATERIAL_SLOT);
+    m_fsMaterialBuffer.createAndBind(UNIFORM_BUFFER_MATERIAL_SLOT);
 
     // create shader
     m_gbufferProgram.createFromFiles(
@@ -51,17 +71,19 @@ void MainRenderer::createGpuResources()
         m_basicProgram.use();
         // TODO: set in shader
         m_basicProgram.setUniform(m_basicProgram.getUniformLocation("u_albedo_map"), ALBEDO_MAP_SLOT);
-        m_basicProgram.setUniform(m_basicProgram.getUniformLocation("u_shadow_map"), SHADOW_MAP_SLOT);
+        m_basicProgram.setUniform(m_basicProgram.getUniformLocation("u_shadow_map"), TEXTURE_SHADOW_MAP_SLOT);
         m_basicProgram.stop();
     }
 
     m_vctProgram.createFromFiles(
-        DATA_DIR "shaders/vct.vert",
-        DATA_DIR "shaders/vct.frag");
+        DATA_DIR "shaders/fullscreen.vert",
+        DATA_DIR "shaders/vct_deferred.frag");
     {
         m_vctProgram.use();
-        m_vctProgram.setUniform(m_vctProgram.getUniformLocation("u_albedo_map"), ALBEDO_MAP_SLOT);
-        m_vctProgram.setUniform(m_vctProgram.getUniformLocation("u_shadow_map"), SHADOW_MAP_SLOT);
+        m_vctProgram.setUniform(m_vctProgram.getUniformLocation("u_gbuffer_depth"), TEXTURE_GBUFFER_DEPTH_SLOT);
+        m_vctProgram.setUniform(m_vctProgram.getUniformLocation("u_gbuffer_albedo"), TEXTURE_GBUFFER_ALBEDO_SLOT);
+        m_vctProgram.setUniform(m_vctProgram.getUniformLocation("u_gbuffer_position_metallic"), TEXTURE_GBUFFER_POSITION_METALLIC_SLOT);
+        m_vctProgram.setUniform(m_vctProgram.getUniformLocation("u_gbuffer_normal_roughness"), TEXTURE_GBUFFER_NORMAL_ROUGHNESS_SLOT);
         m_vctProgram.stop();
     }
 
@@ -70,7 +92,7 @@ void MainRenderer::createGpuResources()
         DATA_DIR "shaders/depth.frag");
 
     m_debugTextureProgram.createFromFiles(
-        DATA_DIR "shaders/debug/texture.vert",
+        DATA_DIR "shaders/fullscreen.vert",
         DATA_DIR "shaders/debug/texture.frag");
 
     m_voxelProgram.createFromFiles(
@@ -83,7 +105,7 @@ void MainRenderer::createGpuResources()
         m_voxelProgram.setUniform(m_voxelProgram.getUniformLocation("u_world"), world);
         m_voxelProgram.setUniform(m_voxelProgram.getUniformLocation("u_voxel_texture_size"), (int)VOXEL_TEXTURE_SIZE);
         m_voxelProgram.setUniform(m_voxelProgram.getUniformLocation("u_albedo_map"), ALBEDO_MAP_SLOT);
-        m_voxelProgram.setUniform(m_voxelProgram.getUniformLocation("u_shadow_map"), SHADOW_MAP_SLOT);
+        m_voxelProgram.setUniform(m_voxelProgram.getUniformLocation("u_shadow_map"), TEXTURE_SHADOW_MAP_SLOT);
         m_voxelProgram.stop();
     }
 
@@ -259,16 +281,19 @@ void MainRenderer::createGpuResources()
         g_matLUT.insert({ mat.get(), matData });
     }
 
-    glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SLOT);
+    glActiveTexture(GL_TEXTURE0 + TEXTURE_SHADOW_MAP_SLOT);
     m_shadowBuffer.getDepthTexture().bind();
 
-    glActiveTexture(GL_TEXTURE0 + GBUFFER_POSITION_METALLIC_SLOT);
+    glActiveTexture(GL_TEXTURE0 + TEXTURE_GBUFFER_DEPTH_SLOT);
+    m_gbuffer.getDepthTexture().bind();
+
+    glActiveTexture(GL_TEXTURE0 + TEXTURE_GBUFFER_POSITION_METALLIC_SLOT);
     m_gbuffer.getColorAttachment(0).bind();
 
-    glActiveTexture(GL_TEXTURE0 + GBUFFER_NORMAL_ROUGHNESS_SLOT);
+    glActiveTexture(GL_TEXTURE0 + TEXTURE_GBUFFER_NORMAL_ROUGHNESS_SLOT);
     m_gbuffer.getColorAttachment(1).bind();
 
-    glActiveTexture(GL_TEXTURE0 + GBUFFER_ALBEDO_SLOT);
+    glActiveTexture(GL_TEXTURE0 + TEXTURE_GBUFFER_ALBEDO_SLOT);
     m_gbuffer.getColorAttachment(2).bind();
 }
 
@@ -326,8 +351,8 @@ void MainRenderer::gbufferPass()
             ASSERT(matPair != g_matLUT.end());
             const MaterialData& matData = matPair->second;
 
-            m_materialBuffer.cache = matData;
-            m_materialBuffer.update();
+            m_fsMaterialBuffer.cache = matData;
+            m_fsMaterialBuffer.update();
 
             glBindVertexArray(drawData.vao);
             glActiveTexture(GL_TEXTURE0 + ALBEDO_MAP_SLOT);
@@ -362,7 +387,7 @@ void MainRenderer::shadowPass()
 
     for (const GeometryNode& node : g_scene.geometryNodes)
     {
-        Matrix4 PVM = m_lightBuffer.cache.lightSpacePV * node.transform;
+        Matrix4 PVM = m_vsPerFrameBuffer.cache.lightSpace * node.transform;
         m_depthProgram.setUniform(PVMLocation, PVM);
         for (const Geometry& geom : node.geometries)
         {
@@ -406,8 +431,8 @@ void MainRenderer::renderToVoxelTexture()
             ASSERT(matPair != g_matLUT.end());
             const MaterialData& matData = matPair->second;
 
-            m_materialBuffer.cache = matData;
-            m_materialBuffer.update();
+            m_fsMaterialBuffer.cache = matData;
+            m_fsMaterialBuffer.update();
 
             glBindVertexArray(drawData.vao);
             glActiveTexture(GL_TEXTURE0 + ALBEDO_MAP_SLOT);
@@ -437,40 +462,17 @@ void MainRenderer::renderToVoxelTexture()
     m_normalVoxel.genMipMap();
 }
 
-void MainRenderer::renderSceneVCT()
+void MainRenderer::vctPass()
 {
-    m_vctProgram.use();
-    static const GLint mLocation = m_vctProgram.getUniformLocation("u_M");
+    GlslProgram& program = m_vctProgram;
 
-    for (const GeometryNode& node : g_scene.geometryNodes)
-    {
-        m_vctProgram.setUniform(mLocation, node.transform);
-        for (const Geometry& geom : node.geometries)
-        {
-            if (!g_scene.camera.frustum.intersectsBox(geom.boundingBox))
-            {
-                ++g_UIControls.objectOccluded;
-                continue;
-            }
+    program.use();
+    // static GLint location_texture = program.getUniformLocation("u_texture");
+    // static GLint location_type = program.getUniformLocation("u_type");
+    glBindVertexArray(m_quad.vao);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 
-            const auto& meshPair = g_meshLUT.find(geom.pMesh);
-            ASSERT(meshPair != g_meshLUT.end());
-            const MeshData& drawData = meshPair->second;
-
-            const auto& matPair = g_matLUT.find(geom.pMaterial);
-            ASSERT(matPair != g_matLUT.end());
-            const MaterialData& matData = matPair->second;
-
-            m_materialBuffer.cache = matData;
-            m_materialBuffer.update();
-
-            glBindVertexArray(drawData.vao);
-            glActiveTexture(GL_TEXTURE0 + ALBEDO_MAP_SLOT);
-            matData.albedoMap.bind();
-
-            glDrawElements(GL_TRIANGLES, drawData.count, GL_UNSIGNED_INT, 0);
-        }
-    }
+    program.stop();
 }
 
 void MainRenderer::renderSceneNoGI()
@@ -501,8 +503,8 @@ void MainRenderer::renderSceneNoGI()
             ASSERT(matPair != g_matLUT.end());
             const MaterialData& matData = matPair->second;
 
-            m_materialBuffer.cache = matData;
-            m_materialBuffer.update();
+            m_fsMaterialBuffer.cache = matData;
+            m_fsMaterialBuffer.update();
 
             glBindVertexArray(drawData.vao);
             glActiveTexture(GL_TEXTURE0 + ALBEDO_MAP_SLOT);
@@ -571,25 +573,29 @@ void MainRenderer::renderFrameBufferTextures(const Extent2i& extent)
     // normal
     switch (g_UIControls.drawTexture)
     {
+    case DrawTexture::TEXTURE_GBUFFER_SHADOW:
+        textureSlot = TEXTURE_SHADOW_MAP_SLOT;
+        type = 0;
+        break;
+    case DrawTexture::TEXTURE_GBUFFER_DEPTH:
+        textureSlot = TEXTURE_GBUFFER_DEPTH_SLOT;
+        type = 0;
+        break;
     case DrawTexture::TEXTURE_GBUFFER_ALBEDO:
-        textureSlot = GBUFFER_ALBEDO_SLOT;
+        textureSlot = TEXTURE_GBUFFER_ALBEDO_SLOT;
         type = 1;
         break;
     case DrawTexture::TEXTURE_GBUFFER_NORMAL:
-        textureSlot = GBUFFER_NORMAL_ROUGHNESS_SLOT;
+        textureSlot = TEXTURE_GBUFFER_NORMAL_ROUGHNESS_SLOT;
         type = 2;
         break;
     case DrawTexture::TEXTURE_GBUFFER_METALLIC:
-        textureSlot = GBUFFER_POSITION_METALLIC_SLOT;
+        textureSlot = TEXTURE_GBUFFER_POSITION_METALLIC_SLOT;
         type = 3;
         break;
     case DrawTexture::TEXTURE_GBUFFER_ROUGHNESS:
-        textureSlot = GBUFFER_NORMAL_ROUGHNESS_SLOT;
+        textureSlot = TEXTURE_GBUFFER_NORMAL_ROUGHNESS_SLOT;
         type = 3;
-        break;
-    case DrawTexture::TEXTURE_GBUFFER_SHADOW:
-        textureSlot = SHADOW_MAP_SLOT;
-        type = 0;
         break;
     default: break;
     }
@@ -639,11 +645,18 @@ void MainRenderer::renderFrameBufferTextures(const Extent2i& extent)
 
 void MainRenderer::render()
 {
+    // update perframe cache
+    m_fsPerFrameBuffer.cache.light_position = g_scene.light.position;
+    m_fsPerFrameBuffer.cache.camera_position = g_scene.camera.position;
+    m_fsPerFrameBuffer.update();
+
+    const Matrix4 PV = g_scene.camera.perspective() * g_scene.camera.view();
+    m_vsPerFrameBuffer.cache.PV = PV;
+    m_vsPerFrameBuffer.cache.lightSpace = lightSpaceMatrix(g_scene.light.position, g_scene.shadowBox);
+    m_vsPerFrameBuffer.update();
+
     if (g_scene.lightDirty)
     {
-        m_lightBuffer.cache.position = g_scene.light.position;
-        m_lightBuffer.cache.lightSpacePV = lightSpaceMatrix(g_scene.light.position, g_scene.shadowBox);
-        m_lightBuffer.update();
         shadowPass();
     }
 
@@ -659,12 +672,7 @@ void MainRenderer::render()
     if (extent.witdh * extent.height > 0)
     {
         // skip rendering if minimized
-        Matrix4 PV = g_scene.camera.perspective() * g_scene.camera.view();
-        // TODO: move this code to somewhere else
         g_scene.camera.frustum.setFromProjectionView(PV);
-
-        m_cameraBuffer.cache.PV = PV;
-        m_cameraBuffer.update();
 
         glViewport(0, 0, extent.witdh, extent.height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -676,7 +684,7 @@ void MainRenderer::render()
 
         if (g_UIControls.drawTexture == DrawTexture::TEXTURE_NO_GI)
         {
-            renderSceneNoGI();
+            vctPass();
         }
         else if (g_UIControls.drawTexture < DrawTexture::TEXTURE_GBUFFER_NONE)
         {

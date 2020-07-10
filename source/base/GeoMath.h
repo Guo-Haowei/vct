@@ -25,6 +25,11 @@ using three::Frustum;
 
 using Extent2i = Vector2i;
 
+using vec2 = Vector3;
+using vec3 = Vector3;
+using vec4 = Vector4;
+using mat4 = Matrix4;
+
 static_assert(sizeof(Vector2) == 2 * sizeof(float));
 
 } // namespace vct

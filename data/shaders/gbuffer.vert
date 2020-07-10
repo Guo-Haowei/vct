@@ -9,9 +9,10 @@ layout (location = 0) out vec3 pass_position;
 layout (location = 1) out vec2 pass_uv;
 layout (location = 2) out mat3 pass_TBN;
 
-layout (std140, binding = 0) uniform Camera
+layout (std140, binding = 0) uniform VSPerFrame
 {
     mat4 PV;
+    mat4 lightSpace;
 };
 
 uniform mat4 M;

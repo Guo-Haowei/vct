@@ -133,6 +133,7 @@ void Application::userInterface()
             ImGui::RadioButton("No GI",             &g_UIControls.drawTexture, DrawTexture::TEXTURE_NO_GI);
             ImGui::RadioButton("Voxel Albedo",      &g_UIControls.drawTexture, DrawTexture::TEXTURE_VOXEL_ALBEDO);
             ImGui::RadioButton("Voxel Normal",      &g_UIControls.drawTexture, DrawTexture::TEXTURE_VOXEL_NORMAL);
+            ImGui::RadioButton("Gbuffer Depth",     &g_UIControls.drawTexture, DrawTexture::TEXTURE_GBUFFER_DEPTH);
             ImGui::RadioButton("Gbuffer Albedo",    &g_UIControls.drawTexture, DrawTexture::TEXTURE_GBUFFER_ALBEDO);
             ImGui::RadioButton("Gbuffer Normal",    &g_UIControls.drawTexture, DrawTexture::TEXTURE_GBUFFER_NORMAL);
             ImGui::RadioButton("Gbuffer Metallic",  &g_UIControls.drawTexture, DrawTexture::TEXTURE_GBUFFER_METALLIC);
@@ -147,9 +148,9 @@ void Application::userInterface()
 
         if (ImGui::BeginMenu("Light"))
         {
-            g_scene.lightDirty |= ImGui::SliderFloat("position x", &g_scene.light.position.x, -30.0f, 30.0f);
-            g_scene.lightDirty |= ImGui::SliderFloat("position y", &g_scene.light.position.y,  40.0f, 50.0f);
-            g_scene.lightDirty |= ImGui::SliderFloat("position z", &g_scene.light.position.z, -30.0f, 30.0f);
+            g_scene.lightDirty |= ImGui::SliderFloat("position x", &g_scene.light.position.x, -10.0f, 10.0f);
+            g_scene.lightDirty |= ImGui::SliderFloat("position y", &g_scene.light.position.y,  20.0f, 30.0f);
+            g_scene.lightDirty |= ImGui::SliderFloat("position z", &g_scene.light.position.z, -10.0f, 10.0f);
             g_scene.dirty |= g_scene.lightDirty;
             ImGui::EndMenu();
         }

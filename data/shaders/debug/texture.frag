@@ -1,7 +1,7 @@
 #version 450 core
 layout (location = 0) out vec4 out_color;
 
-in vec2 pass_uv;
+layout (location = 0) in vec2 pass_uv;
 
 uniform sampler2D u_texture;
 uniform int u_type;

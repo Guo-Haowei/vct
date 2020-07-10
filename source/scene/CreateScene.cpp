@@ -27,7 +27,9 @@ void createDefaultScene()
     camera.yaw = three::radians(180.0f);
     camera.position = Vector3(-5, 2, 0);
 
-    g_scene.light.position = Vector3(-20, 40, -5);
+    g_scene.light.position = Vector3(0, 20, 0);
+    g_scene.light.color = Vector3(500.0f);
+
     Vector3 center = g_scene.boundingBox.getCenter();
     Vector3 size = g_scene.boundingBox.getSize();
 

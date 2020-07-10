@@ -23,9 +23,18 @@ void RenderTarget::destroy()
     glDeleteFramebuffers(1, &m_handle);
 }
 
-void RenderTarget::createAttachment(GpuTexture& texture, int attachment, const Texture2DCreateInfo& info)
+void RenderTarget::createDepthAttachment()
 {
-    // texture.create2DEmpty();
+    Texture2DCreateInfo info {};
+    info.width = m_width;
+    info.height = m_height;
+    info.dataType = GL_FLOAT;
+    info.format = info.internalFormat = GL_DEPTH_COMPONENT;
+    info.minFilter = info.magFilter = GL_NEAREST;
+    info.wrapS = info.wrapT = GL_CLAMP_TO_EDGE;
+
+    m_depthAttachment.create2DEmpty(info);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthAttachment.m_handle, 0);
 }
 
 void RenderTarget::create(int width, int height)
@@ -39,18 +48,8 @@ void DepthRenderTarget::create(int width, int height)
 {
     RenderTarget::create(width, height);
 
-    Texture2DCreateInfo info {};
-    info.width = width;
-    info.height = height;
-    info.dataType = GL_FLOAT;
-    info.format = info.internalFormat = GL_DEPTH_COMPONENT;
-    info.minFilter = info.magFilter = GL_NEAREST;
-    info.wrapS = info.wrapT = GL_CLAMP_TO_EDGE;
-
-    m_depthAttachment.create2DEmpty(info);
-
     bind();
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthAttachment.m_handle, 0);
+    RenderTarget::createDepthAttachment();
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
 
@@ -116,12 +115,8 @@ void GBuffer::create(int width, int height)
     GLuint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
     glDrawBuffers(3, attachments);
 
-    ASSERT(m_depthAttachment.getHandle() == 0);
-
-    glGenRenderbuffers(1, &m_rboDepth);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_rboDepth);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_rboDepth);
+    // depth
+    createDepthAttachment();
 
     checkError();
     unbind();

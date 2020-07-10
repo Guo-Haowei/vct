@@ -43,7 +43,7 @@ protected:
     GLenum m_type;
     GLenum m_format;
 
-    friend class DepthRenderTarget;
+    friend class RenderTarget;
     friend class GBuffer;
 };
 

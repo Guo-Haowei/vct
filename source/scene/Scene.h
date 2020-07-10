@@ -52,6 +52,7 @@ struct GeometryNode
 struct Light
 {
     Vector3 position;
+    Vector3 color;
 };
 
 /// TODO: refactor

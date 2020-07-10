@@ -27,18 +27,20 @@ struct MaterialData
     // normal...
 };
 
-struct CameraBufferCache
+struct VSPerFrame
 {
-    Matrix4 PV;
-    // Vector3 position;
-    // float padding1;
+    mat4 PV;
+    mat4 lightSpace;
 };
 
-struct LightBufferCache
+struct FSPerFrame
 {
-    Vector3 position;
-    float padding;
-    Matrix4 lightSpacePV;
+    vec3 light_position; // direction
+    float _per_frame_pad0;
+    vec3 light_color;
+    float _per_frame_pad1;
+    vec3 camera_position;
+    float _per_frame_pad2;
 };
 
 struct MaterialCache
@@ -61,8 +63,8 @@ struct MaterialCache
     }
 };
 
-static_assert(sizeof(CameraBufferCache) % 16 == 0);
-static_assert(sizeof(LightBufferCache) % 16 == 0);
+static_assert(sizeof(VSPerFrame) % 16 == 0);
+static_assert(sizeof(FSPerFrame) % 16 == 0);
 static_assert(sizeof(MaterialCache) % 16 == 0);
 
 class MainRenderer
@@ -71,17 +73,16 @@ public:
     void createGpuResources();
     void createFrameBuffers();
     void render();
-    // void renderToEarlyZ(const Matrix4& PV);
     void renderFrameBufferTextures(const Extent2i& extent);
     void renderToVoxelTexture();
     void renderBoundingBox();
     void visualizeVoxels();
     void renderSceneNoGI();
-    void renderSceneVCT();
     void destroyGpuResources();
 
     void gbufferPass();
     void shadowPass();
+    void vctPass();
 
     inline void setWindow(Window* pWindow) { m_pWindow = pWindow; }
 private:
@@ -109,9 +110,9 @@ private:
     GpuTexture m_normalVoxel;
 
     /// uniform buffers
-    UniformBuffer<CameraBufferCache>    m_cameraBuffer;
-    UniformBuffer<LightBufferCache>     m_lightBuffer;
-    UniformBuffer<MaterialCache>        m_materialBuffer;
+    UniformBuffer<VSPerFrame>           m_vsPerFrameBuffer; // global binding 0
+    UniformBuffer<FSPerFrame>           m_fsPerFrameBuffer; // global binding 1
+    UniformBuffer<MaterialCache>        m_fsMaterialBuffer; // global binding 2
 
     /// render targets
     DepthRenderTarget                   m_shadowBuffer;

@@ -13,7 +13,7 @@ public:
     void bind();
     void unbind();
     void destroy();
-    void createAttachment(GpuTexture& texture, int attachment, const Texture2DCreateInfo& info);
+    void createDepthAttachment();
     void checkError();
 
     const GpuTexture& getDepthTexture() const { return m_depthAttachment; }
@@ -25,7 +25,6 @@ protected:
     int         m_colorAttachmentCount = 0;
     int         m_width = 0;
     int         m_height = 0;
-    GLuint      m_rboDepth = 0;
 };
 
 class DepthRenderTarget : public RenderTarget

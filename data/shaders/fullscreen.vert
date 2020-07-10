@@ -1,7 +1,6 @@
 #version 450 core
 layout (location = 0) in vec2 in_position;
-
-out vec2 pass_uv;
+layout (location = 0) out vec2 pass_uv;
 
 void main()
 {
