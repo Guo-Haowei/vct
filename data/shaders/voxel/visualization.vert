@@ -24,7 +24,7 @@ void main()
     int y = (gl_InstanceID / voxel_texture_size) % voxel_texture_size;
     int z = gl_InstanceID / (voxel_texture_size * voxel_texture_size);
     vec4 color = imageLoad(u_voxel_texture, ivec3(x, y, z));
-    if (color.a == 0.0)
+    if (color.a < 0.0001)
     {
         // move the voxel outside the clipping space
         gl_Position = vec4(vec3(-99999), 1.0);

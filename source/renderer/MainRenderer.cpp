@@ -23,7 +23,7 @@ void MainRenderer::createGpuResources()
 
     m_lightBuffer.createAndBind(UNIFORM_BUFFER_LIGHT_SLOT);
     m_lightBuffer.cache.position = g_scene.light.position;
-    m_lightBuffer.cache.lightSpacePV = lightSpaceMatrix(g_scene.light.position, g_scene.boundingBox);
+    m_lightBuffer.cache.lightSpacePV = lightSpaceMatrix(g_scene.light.position, g_scene.shadowBox);
     m_lightBuffer.update();
 
     m_materialBuffer.createAndBind(UNIFORM_BUFFER_MATERIAL_SLOT);
@@ -283,7 +283,7 @@ void MainRenderer::visualizeVoxels()
 
     int mipLevel = g_UIControls.voxelMipLevel;
     m_albedoVoxel.bindImageTexture(0, mipLevel);
-    GpuTexture& voxelTexture = g_UIControls.renderStrategy == RenderStrategy::VoxelAlbedo ? m_albedoVoxel : m_normalVoxel;
+    GpuTexture& voxelTexture = g_UIControls.drawTexture == DrawTexture::TEXTURE_VOXEL_ALBEDO ? m_albedoVoxel : m_normalVoxel;
 
     glBindImageTexture(0, voxelTexture.getHandle(), mipLevel, GL_TRUE, 0,
                        GL_READ_ONLY, voxelTexture.getFormat());
@@ -548,9 +548,6 @@ void MainRenderer::renderBoundingBox()
 
 void MainRenderer::renderFrameBufferTextures(const Extent2i& extent)
 {
-    if (g_UIControls.gbuffer == GBufferIndex::GBUFFER_INDEX_NONE)
-        return;
-
     GlslProgram& program = m_debugTextureProgram;
 
     program.use();
@@ -572,25 +569,25 @@ void MainRenderer::renderFrameBufferTextures(const Extent2i& extent)
     int textureSlot = 0;
     int type = -1;
     // normal
-    switch (g_UIControls.gbuffer)
+    switch (g_UIControls.drawTexture)
     {
-    case GBufferIndex::GBUFFER_INDEX_ALBEDO:
+    case DrawTexture::TEXTURE_GBUFFER_ALBEDO:
         textureSlot = GBUFFER_ALBEDO_SLOT;
         type = 1;
         break;
-    case GBufferIndex::GBUFFER_INDEX_NORMAL:
+    case DrawTexture::TEXTURE_GBUFFER_NORMAL:
         textureSlot = GBUFFER_NORMAL_ROUGHNESS_SLOT;
         type = 2;
         break;
-    case GBufferIndex::GBUFFER_INDEX_METALLIC:
+    case DrawTexture::TEXTURE_GBUFFER_METALLIC:
         textureSlot = GBUFFER_POSITION_METALLIC_SLOT;
         type = 3;
         break;
-    case GBufferIndex::GBUFFER_INDEX_ROUGHNESS:
+    case DrawTexture::TEXTURE_GBUFFER_ROUGHNESS:
         textureSlot = GBUFFER_NORMAL_ROUGHNESS_SLOT;
         type = 3;
         break;
-    case GBufferIndex::GBUFFER_INDEX_SHADOW:
+    case DrawTexture::TEXTURE_GBUFFER_SHADOW:
         textureSlot = SHADOW_MAP_SLOT;
         type = 0;
         break;
@@ -645,17 +642,17 @@ void MainRenderer::render()
     if (g_scene.lightDirty)
     {
         m_lightBuffer.cache.position = g_scene.light.position;
-        m_lightBuffer.cache.lightSpacePV = lightSpaceMatrix(g_scene.light.position, g_scene.boundingBox);
+        m_lightBuffer.cache.lightSpacePV = lightSpaceMatrix(g_scene.light.position, g_scene.shadowBox);
         m_lightBuffer.update();
         shadowPass();
     }
 
-    // if (g_scene.dirty || g_UIControls.forceUpdateVoxelTexture)
-    // {
-    //     m_albedoVoxel.clear();
-    //     m_normalVoxel.clear();
-    //     renderToVoxelTexture();
-    // }
+    if (g_scene.dirty || g_UIControls.forceUpdateVoxelTexture)
+    {
+        m_albedoVoxel.clear();
+        m_normalVoxel.clear();
+        renderToVoxelTexture();
+    }
 
     auto extent = m_pWindow->getFrameExtent();
 
@@ -674,26 +671,25 @@ void MainRenderer::render()
 
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
-        glDisable(GL_SCISSOR_TEST);
 
-        if (g_UIControls.renderStrategy == RenderStrategy::VCT)
+        gbufferPass();
+
+        if (g_UIControls.drawTexture == DrawTexture::TEXTURE_NO_GI)
         {
-            renderSceneVCT();
+            renderSceneNoGI();
         }
-        else if (g_UIControls.renderStrategy == RenderStrategy::NoGI)
+        else if (g_UIControls.drawTexture < DrawTexture::TEXTURE_GBUFFER_NONE)
         {
-            // renderSceneNoGI();
-            gbufferPass();
+            visualizeVoxels();
         }
         else
         {
-            visualizeVoxels();
+            renderFrameBufferTextures(extent);
         }
 
         if (g_UIControls.showObjectBoundingBox || g_UIControls.showWorldBoundingBox)
             renderBoundingBox();
 
-        renderFrameBufferTextures(extent);
     }
 }
 

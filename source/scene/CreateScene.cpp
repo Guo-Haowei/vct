@@ -13,9 +13,9 @@ void createDefaultScene()
         loader.loadGltf(DATA_DIR "models/Sponza/Sponza.gltf", g_scene, transform);
     }
     {
-        Material* mat = new Material(Vector3(0.9f), 0.5f, 0.5f);
-        Matrix4 transform = three::translate(Vector3(0, 1, 0)) * three::rotateY(three::radians(180.0f)) * three::scale(Vector3(2.0f));
-        loader.loadObj(DATA_DIR "models/dragon.obj", g_scene, transform, mat);
+        // Material* mat = new Material(Vector3(0.9f), 0.5f, 0.5f);
+        // Matrix4 transform = three::translate(Vector3(0, 1, 0)) * three::rotateY(three::radians(180.0f)) * three::scale(Vector3(2.0f));
+        // loader.loadObj(DATA_DIR "models/dragon.obj", g_scene, transform, mat);
     }
 
     Camera& camera = g_scene.camera;
@@ -28,6 +28,13 @@ void createDefaultScene()
     camera.position = Vector3(-5, 2, 0);
 
     g_scene.light.position = Vector3(-20, 40, -5);
+    Vector3 center = g_scene.boundingBox.getCenter();
+    Vector3 size = g_scene.boundingBox.getSize();
+
+    size.x *= 0.7f;
+    size.z *= 0.7f;
+
+    g_scene.shadowBox.setFromCenterSize(center, size);
 
     g_UIControls.totalMeshes = static_cast<int>(g_scene.meshes.size());
     g_UIControls.totalMaterials = static_cast<int>(g_scene.materials.size());

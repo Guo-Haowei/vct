@@ -99,6 +99,7 @@ struct Scene
     std::vector<std::unique_ptr<Material>>  materials;
     Light                                   light;
     Box3 boundingBox;
+    Box3 shadowBox;
     Camera camera;
     bool dirty = true;
     bool lightDirty = true;

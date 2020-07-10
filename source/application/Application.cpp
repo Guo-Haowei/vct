@@ -118,32 +118,30 @@ void Application::userInterface()
             if (ImGui::Checkbox("Force voxel texture update", &g_UIControls.forceUpdateVoxelTexture))
                 g_scene.dirty = true;
             ImGui::Separator();
-            ImGui::RadioButton("Voxel GI", &g_UIControls.renderStrategy, RenderStrategy::VCT);
-            ImGui::RadioButton("No Global Illumination", &g_UIControls.renderStrategy, RenderStrategy::NoGI);
-            ImGui::RadioButton("Albedo Voxel Texture", &g_UIControls.renderStrategy, RenderStrategy::VoxelAlbedo);
-            ImGui::RadioButton("Normal Voxel Texture", &g_UIControls.renderStrategy, RenderStrategy::VoxelNormal);
             ImGui::SliderInt("Voxel Mipmap Level", &g_UIControls.voxelMipLevel, 0, VOXEL_TEXTURE_MIP_LEVEL - 1);
             ImGui::Separator();
+
+            ImGui::Text("Debug Bounding Box");
             if (ImGui::Checkbox("Show Object Bounding Box", &g_UIControls.showObjectBoundingBox))
                 g_UIControls.showWorldBoundingBox = false;
             if (ImGui::Checkbox("Show World Bounding Box", &g_UIControls.showWorldBoundingBox))
                 g_UIControls.showObjectBoundingBox = false;
 
+            ImGui::Separator();
+
+            ImGui::Text("Debug Texture");
+            ImGui::RadioButton("No GI",             &g_UIControls.drawTexture, DrawTexture::TEXTURE_NO_GI);
+            ImGui::RadioButton("Voxel Albedo",      &g_UIControls.drawTexture, DrawTexture::TEXTURE_VOXEL_ALBEDO);
+            ImGui::RadioButton("Voxel Normal",      &g_UIControls.drawTexture, DrawTexture::TEXTURE_VOXEL_NORMAL);
+            ImGui::RadioButton("Gbuffer Albedo",    &g_UIControls.drawTexture, DrawTexture::TEXTURE_GBUFFER_ALBEDO);
+            ImGui::RadioButton("Gbuffer Normal",    &g_UIControls.drawTexture, DrawTexture::TEXTURE_GBUFFER_NORMAL);
+            ImGui::RadioButton("Gbuffer Metallic",  &g_UIControls.drawTexture, DrawTexture::TEXTURE_GBUFFER_METALLIC);
+            ImGui::RadioButton("Gbuffer Roughness", &g_UIControls.drawTexture, DrawTexture::TEXTURE_GBUFFER_ROUGHNESS);
+            ImGui::RadioButton("Gbuffer Shadow",    &g_UIControls.drawTexture, DrawTexture::TEXTURE_GBUFFER_SHADOW);
+
             ImGui::EndMenu();
         }
 
-        ImGui::Separator();
-
-        if (ImGui::BeginMenu("GBuffer"))
-        {
-            ImGui::RadioButton("None",      &g_UIControls.gbuffer, GBufferIndex::GBUFFER_INDEX_NONE);
-            ImGui::RadioButton("Albedo",    &g_UIControls.gbuffer, GBufferIndex::GBUFFER_INDEX_ALBEDO);
-            ImGui::RadioButton("Normal",    &g_UIControls.gbuffer, GBufferIndex::GBUFFER_INDEX_NORMAL);
-            ImGui::RadioButton("Metallic",  &g_UIControls.gbuffer, GBufferIndex::GBUFFER_INDEX_METALLIC);
-            ImGui::RadioButton("Roughness", &g_UIControls.gbuffer, GBufferIndex::GBUFFER_INDEX_ROUGHNESS);
-            ImGui::RadioButton("Shadow",    &g_UIControls.gbuffer, GBufferIndex::GBUFFER_INDEX_SHADOW);
-            ImGui::EndMenu();
-        }
 
         ImGui::Separator();
 

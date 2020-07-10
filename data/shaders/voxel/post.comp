@@ -16,7 +16,7 @@ void main()
     ivec3 coord = ivec3(coord_x, coord_y, coord_z);
     vec4 color = imageLoad(u_albedo_texture, coord);
     vec4 normal = imageLoad(u_normal_texture, coord);
-    if (color.a == 0.0)
+    if (color.a < 0.0001)
         return;
 
     color /= color.a;

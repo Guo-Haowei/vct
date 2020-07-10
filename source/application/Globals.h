@@ -29,7 +29,7 @@ constexpr int GBUFFER_NORMAL_ROUGHNESS_SLOT = 11;
 constexpr int GBUFFER_POSITION_METALLIC_SLOT = 12;
 constexpr int GBUFFER_AO_SLOT = 13;
 
-constexpr unsigned int VOXEL_TEXTURE_SIZE = 64;
+constexpr unsigned int VOXEL_TEXTURE_SIZE = 256;
 // constexpr unsigned int VOXEL_TEXTURE_SIZE = 128;
 constexpr unsigned int VOXEL_TEXTURE_MIP_LEVEL = log2(VOXEL_TEXTURE_SIZE);
 
@@ -47,20 +47,22 @@ enum RenderStrategy
     VoxelNormal,
 };
 
-enum GBufferIndex
+enum DrawTexture
 {
-    GBUFFER_INDEX_NONE,
-    GBUFFER_INDEX_ALBEDO,
-    GBUFFER_INDEX_NORMAL,
-    GBUFFER_INDEX_METALLIC,
-    GBUFFER_INDEX_ROUGHNESS,
-    GBUFFER_INDEX_DEPTH,
-    GBUFFER_INDEX_SHADOW,
+    TEXTURE_NO_GI,
+    TEXTURE_VOXEL_ALBEDO,
+    TEXTURE_VOXEL_NORMAL,
+    TEXTURE_GBUFFER_NONE,
+    TEXTURE_GBUFFER_ALBEDO,
+    TEXTURE_GBUFFER_NORMAL,
+    TEXTURE_GBUFFER_METALLIC,
+    TEXTURE_GBUFFER_ROUGHNESS,
+    TEXTURE_GBUFFER_DEPTH,
+    TEXTURE_GBUFFER_SHADOW,
 };
 
 struct UIControlls
 {
-    int     renderStrategy              = NoGI;
     int     voxelMipLevel               = 0;
     int     showVoxelTexture            = -1;
     bool    showObjectBoundingBox       = false;
@@ -71,7 +73,7 @@ struct UIControlls
     int     objectOccluded              = 0;
     int     totalMaterials              = 0;
     int     totalMeshes                 = 0;
-    int     gbuffer                     = GBUFFER_INDEX_ALBEDO;
+    int     drawTexture                 = TEXTURE_NO_GI;
 };
 
 extern UIControlls g_UIControls;

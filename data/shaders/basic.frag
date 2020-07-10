@@ -21,8 +21,8 @@ layout (std140, binding = 1) uniform Light
 layout (std140, binding = 2) uniform Material
 {
     vec4 albedo_color;
-    vec3 specular_color;
-    float shininess;
+    // vec3 specular_color;
+    // float shininess;
 };
 
 float in_shadow(vec4 position_light)
@@ -48,16 +48,14 @@ void main()
     vec3 V = normalize(u_camera_position - pass_position_world);
     vec3 R = reflect(-L, N);
 
-    float shadow = 0.0;
-    // float shadow = in_shadow(pass_position_light);
+    // float shadow = 0.0;
+    float shadow = in_shadow(pass_position_light);
 
     float diffuse = max(dot(N, L), 0.0);
 
-    float specular = pow(max(dot(V, R), 0.0), shininess);
-
     vec3 light_color = vec3(0.5);
 
-    vec3 color = (1.0 - shadow) * light_color * (specular + diffuse) * albedo.rgb;
+    vec3 color = (1.0 - shadow) * light_color * (diffuse) * albedo.rgb;
 
     // gamma correction
     float gamma = 2.2;

@@ -26,6 +26,6 @@ void main()
     vec3 N = normalize(rotation * in_normal);
 
     gl_Position = PV * world_position;
-    pass_uv = vec2(in_uv.x, 1.0 - in_uv.y);
+    pass_uv = in_uv;
     pass_TBN = mat3(T, B, N);
 }

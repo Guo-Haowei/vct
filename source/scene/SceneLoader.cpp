@@ -11,14 +11,15 @@ using std::vector;
 
 namespace vct {
 
-void SceneLoader::loadGltf(const char* path, Scene& scene, Matrix4 transform)
+void SceneLoader::loadGltf(const char* path, Scene& scene, const Matrix4& transform, bool flipUVs)
 {
     std::cout << "[Log] loading model from [" << path << "]" << std::endl;
-    ::Assimp::Importer importer;
-    const aiScene* aiscene = importer.ReadFile(path,
-        aiProcess_Triangulate |
-        aiProcess_CalcTangentSpace
-    );
+    Assimp::Importer importer;
+
+    unsigned int flag = aiProcess_CalcTangentSpace | aiProcess_Triangulate;
+    flag |= flipUVs ? aiProcess_FlipUVs : 0;
+
+    const aiScene* aiscene = importer.ReadFile(path, flag);
 
     // check for errors
     if(!aiscene || aiscene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !aiscene->mRootNode) // if is Not Zero
@@ -66,7 +67,7 @@ void SceneLoader::loadGltf(const char* path, Scene& scene, Matrix4 transform)
 
 }
 
-void SceneLoader::loadObj(const char* path, Scene& scene, Matrix4 transform, Material* customMaterial)
+void SceneLoader::loadObj(const char* path, Scene& scene, const Matrix4& transform, Material* customMaterial)
 {
     std::cout << "[Log] loading model from [" << path << "]" << std::endl;
     ::Assimp::Importer importer;
