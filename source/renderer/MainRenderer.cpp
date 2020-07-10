@@ -64,17 +64,6 @@ void MainRenderer::createGpuResources()
         DATA_DIR "shaders/debug/box_wireframe.vert",
         DATA_DIR "shaders/debug/box_wireframe.frag");
 
-    m_basicProgram.createFromFiles(
-        DATA_DIR "shaders/basic.vert",
-        DATA_DIR "shaders/basic.frag");
-    {
-        m_basicProgram.use();
-        // TODO: set in shader
-        m_basicProgram.setUniform(m_basicProgram.getUniformLocation("u_albedo_map"), ALBEDO_MAP_SLOT);
-        m_basicProgram.setUniform(m_basicProgram.getUniformLocation("u_shadow_map"), TEXTURE_SHADOW_MAP_SLOT);
-        m_basicProgram.stop();
-    }
-
     m_vctProgram.createFromFiles(
         DATA_DIR "shaders/fullscreen.vert",
         DATA_DIR "shaders/vct_deferred.frag");
@@ -84,6 +73,7 @@ void MainRenderer::createGpuResources()
         m_vctProgram.setUniform(m_vctProgram.getUniformLocation("u_gbuffer_albedo"), TEXTURE_GBUFFER_ALBEDO_SLOT);
         m_vctProgram.setUniform(m_vctProgram.getUniformLocation("u_gbuffer_position_metallic"), TEXTURE_GBUFFER_POSITION_METALLIC_SLOT);
         m_vctProgram.setUniform(m_vctProgram.getUniformLocation("u_gbuffer_normal_roughness"), TEXTURE_GBUFFER_NORMAL_ROUGHNESS_SLOT);
+        m_vctProgram.setUniform(m_vctProgram.getUniformLocation("u_shadow_map"), TEXTURE_SHADOW_MAP_SLOT);
         m_vctProgram.stop();
     }
 
@@ -301,20 +291,27 @@ void MainRenderer::visualizeVoxels()
 {
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
-    // glEnable(GL_BLEND);
 
-    m_visualizeProgram.use();
+    GlslProgram& program = m_visualizeProgram;
+
     glBindVertexArray(m_box.vao);
+    program.use();
+    static const GLint location_type = program.getUniformLocation("u_is_albedo");
+    int isAlbedo = g_UIControls.drawTexture == DrawTexture::TEXTURE_VOXEL_ALBEDO;
+
+    program.setUniform(location_type, isAlbedo);
 
     int mipLevel = g_UIControls.voxelMipLevel;
-    m_albedoVoxel.bindImageTexture(0, mipLevel);
-    GpuTexture& voxelTexture = g_UIControls.drawTexture == DrawTexture::TEXTURE_VOXEL_ALBEDO ? m_albedoVoxel : m_normalVoxel;
+
+    GpuTexture& voxelTexture = isAlbedo ? m_albedoVoxel : m_normalVoxel;
 
     glBindImageTexture(0, voxelTexture.getHandle(), mipLevel, GL_TRUE, 0,
                        GL_READ_ONLY, voxelTexture.getFormat());
 
     int size = VOXEL_TEXTURE_SIZE >> mipLevel;
     glDrawElementsInstanced(GL_TRIANGLES, m_box.count, GL_UNSIGNED_INT, 0, size * size * size);
+
+    program.stop();
 }
 
 void MainRenderer::gbufferPass()
@@ -473,46 +470,6 @@ void MainRenderer::vctPass()
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     program.stop();
-}
-
-void MainRenderer::renderSceneNoGI()
-{
-    m_basicProgram.use();
-    // TODO: clean up uniforms
-    static const GLint mLocation = m_basicProgram.getUniformLocation("u_M");
-    static const GLint camPosLocation = m_basicProgram.getUniformLocation("u_camera_position");
-
-    m_basicProgram.setUniform(camPosLocation, g_scene.camera.position);
-
-    for (const GeometryNode& node : g_scene.geometryNodes)
-    {
-        m_basicProgram.setUniform(mLocation, node.transform);
-        for (const Geometry& geom : node.geometries)
-        {
-            if (!g_scene.camera.frustum.intersectsBox(geom.boundingBox))
-            {
-                ++g_UIControls.objectOccluded;
-                continue;
-            }
-
-            const auto& meshPair = g_meshLUT.find(geom.pMesh);
-            ASSERT(meshPair != g_meshLUT.end());
-            const MeshData& drawData = meshPair->second;
-
-            const auto& matPair = g_matLUT.find(geom.pMaterial);
-            ASSERT(matPair != g_matLUT.end());
-            const MaterialData& matData = matPair->second;
-
-            m_fsMaterialBuffer.cache = matData;
-            m_fsMaterialBuffer.update();
-
-            glBindVertexArray(drawData.vao);
-            glActiveTexture(GL_TEXTURE0 + ALBEDO_MAP_SLOT);
-            matData.albedoMap.bind();
-
-            glDrawElements(GL_TRIANGLES, drawData.count, GL_UNSIGNED_INT, 0);
-        }
-    }
 }
 
 void MainRenderer::renderBoundingBox()
@@ -716,7 +673,6 @@ void MainRenderer::destroyGpuResources()
     // gpu resource
     m_voxelProgram.destroy();
     m_visualizeProgram.destroy();
-    m_basicProgram.destroy();
     m_boxWireframeProgram.destroy();
     m_voxelPostProgram.destroy();
     m_depthProgram.destroy();

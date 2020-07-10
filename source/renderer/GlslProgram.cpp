@@ -4,8 +4,10 @@
 #include "base/File.h"
 #include <vector>
 #include <iostream>
+#include <sstream>
 using std::string;
 using std::vector;
+using std::stringstream;
 
 namespace vct {
 
@@ -127,11 +129,35 @@ void GlslProgram::setUniform(GLint location, const Matrix4& val)
     glUniformMatrix4fv(location, 1, GL_FALSE, &val.a11);
 }
 
+string processShader(const char* file)
+{
+    const string source = utility::readAsciiFile(file);
+    string out, line;
+    stringstream ss(source);
+    while (std::getline(ss, line, '\n'))
+    {
+        const string pattern { "/// #include " };
+        if (line.find(pattern) == 0)
+        {
+            string file = line.substr(pattern.length());
+            string path(DATA_DIR "shaders/");
+            path.append(file);
+            out.append(utility::readAsciiFile(path));
+        }
+        else
+            out.append(line);
+
+        out.push_back('\n');
+    }
+
+    return out;
+}
+
 GLuint createShaderFromFile(const char* file, GLenum shaderType)
 {
     GLuint handle = glCreateShader(shaderType);
 
-    string source = utility::readAsciiFile(file);
+    string source = processShader(file);
     const char* sources[1] = { source.c_str() };
     glShaderSource(handle, 1, sources, NULL);
     glCompileShader(handle);

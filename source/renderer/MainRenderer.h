@@ -77,7 +77,6 @@ public:
     void renderToVoxelTexture();
     void renderBoundingBox();
     void visualizeVoxels();
-    void renderSceneNoGI();
     void destroyGpuResources();
 
     void gbufferPass();
@@ -91,7 +90,6 @@ private:
     /// shader programs
     GlslProgram m_voxelProgram;
     GlslProgram m_visualizeProgram;
-    GlslProgram m_basicProgram;
     GlslProgram m_vctProgram;
     GlslProgram m_boxWireframeProgram;
     GlslProgram m_voxelPostProgram;

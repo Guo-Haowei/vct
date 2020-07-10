@@ -64,7 +64,6 @@ void SceneLoader::loadGltf(const char* path, Scene& scene, const Matrix4& transf
     }
 
     scene.geometryNodes.push_back(node);
-
 }
 
 void SceneLoader::loadObj(const char* path, Scene& scene, const Matrix4& transform, Material* customMaterial)
@@ -131,8 +130,10 @@ Material* SceneLoader::processMaterial(const aiMaterial* aimaterial)
             mat->albedoTexture = m_currentPath;
             mat->albedoTexture.append(path.C_Str());
         }
+#ifdef _DEBUG
         else
             std::cout << "[Warning] Base Color Texture not found" << std::endl;
+#endif
     }
 
     /// metallic roughness
@@ -143,8 +144,10 @@ Material* SceneLoader::processMaterial(const aiMaterial* aimaterial)
             mat->metallicRoughnessTexture = m_currentPath;
             mat->metallicRoughnessTexture.append(path.C_Str());
         }
+#ifdef _DEBUG
         else
             std::cout << "[Warning] Metallic Roughness Texture not found" << std::endl;
+#endif
     }
 
     /// normal texture
@@ -155,8 +158,10 @@ Material* SceneLoader::processMaterial(const aiMaterial* aimaterial)
             mat->normalTexture = m_currentPath;
             mat->normalTexture.append(path.C_Str());
         }
+#ifdef _DEBUG
         else
             std::cout << "[Warning] Normal Texture not found" << std::endl;
+#endif
     }
 
     return mat;

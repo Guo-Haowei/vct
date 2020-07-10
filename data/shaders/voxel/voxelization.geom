@@ -5,10 +5,12 @@ layout(triangle_strip, max_vertices = 3) out;
 in vec3 pass_positions[];
 in vec3 pass_normals[];
 in vec2 pass_uvs[];
+in vec4 pass_light_space_positions[];
 
 out vec3 pass_position;
 out vec3 pass_normal;
 out vec2 pass_uv;
+out vec4 pass_light_space_position;
 
 uniform vec4 u_world; // xyz : world center; w : world size
 uniform int u_voxel_texture_size;
@@ -49,6 +51,7 @@ void main(){
         pass_position = pass_positions[i];
         pass_normal = pass_normals[i];
         pass_uv = pass_uvs[i];
+        pass_light_space_position = pass_light_space_positions[i];
         gl_Position = vec4(output_positions[i].xy, 1.0, 1.0);
         EmitVertex();
     }

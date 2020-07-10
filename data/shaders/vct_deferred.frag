@@ -1,13 +1,22 @@
 #version 450 core
+
 #define PI 3.14159265359
 
 layout (location = 0) out vec4 out_color;
 layout (location = 0) in vec2 pass_uv;
 
+uniform sampler2D u_shadow_map;
+
 uniform sampler2D u_gbuffer_albedo;
 uniform sampler2D u_gbuffer_position_metallic;
 uniform sampler2D u_gbuffer_normal_roughness;
 uniform sampler2D u_gbuffer_depth;
+
+layout (std140, binding = 0) uniform VSPerFrame
+{
+    mat4 PV;
+    mat4 lightSpace;
+};
 
 layout (std140, binding = 1) uniform FSPerFrame
 {
@@ -19,40 +28,11 @@ layout (std140, binding = 1) uniform FSPerFrame
     float _per_frame_pad2;
 };
 
-float distributionGGX(float NdotH, float roughness)
-{
-    float a = roughness * roughness;
-    float a2 = a * a;
-    float NdotH2 = NdotH * NdotH;
-
-    float nom = a2;
-    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
-    denom = PI * denom * denom;
-
-    return nom / denom;
-}
-
-float geometrySchlickGGX(float NdotV, float roughness)
-{
-    float r = roughness + 1.0;
-    float k = (r * r) / 8.0;
-
-    float nom = NdotV;
-    float denom = NdotV * (1.0 - k) + k;
-
-    return nom / denom;
-}
-
-float geometrySmith(float NdotV, float NdotL, float roughness)
-{
-    return geometrySchlickGGX(NdotV, roughness) *
-           geometrySchlickGGX(NdotL, roughness);
-}
-
-vec3 fresnelSchlick(float cosTheta, const in vec3 F0)
-{
-    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
-}
+float distributionGGX(float NdotH, float roughness);
+float geometrySchlickGGX(float NdotV, float roughness);
+float geometrySmith(float NdotV, float NdotL, float roughness);
+vec3 fresnelSchlick(float cosTheta, const in vec3 F0);
+float inShadow(const in vec4 position_light, float NdotL);
 
 void main()
 {
@@ -69,23 +49,20 @@ void main()
     float roughness = normal_roughness.w;
     float metallic = position_metallic.w;
 
+    vec4 light_space_position = lightSpace * vec4(world_position, 1.0);
+
     vec4 albedo = texture(u_gbuffer_albedo, pass_uv);
-
-    // if (albedo.a < 0.001)
-    //     discard;
-
     vec3 F0 = mix(vec3(0.04), albedo.rgb, metallic);
-
     vec3 Lo = vec3(0.0);
 
     vec3 N = normal_roughness.xyz;
-    vec3 V = normalize(camera_position - world_position);
     vec3 L = normalize(light_position - world_position);
+    vec3 V = normalize(camera_position - world_position);
     vec3 H = normalize(V + L);
 
+    // TODO: fix attenuation function
     float dist_to_light = length(light_position - world_position);
     float attenuation = 1.0 / (dist_to_light);
-    // vec3 radiance = light_color;
     vec3 radiance = attenuation * light_color;
 
     float NdotL = max(dot(N, L), 0.0);
@@ -111,7 +88,9 @@ void main()
     float ao = 1.0;
     vec3 ambient = vec3(0.03) * albedo.rgb * ao;
 
-    vec3 color = ambient + Lo;
+    float shadow = inShadow(light_space_position, NdotL);
+
+    vec3 color = ambient + (1.0 - shadow) * Lo;
 
     float gamma = 2.2;
     color = color / (color + 1.0);
@@ -120,3 +99,4 @@ void main()
     out_color = vec4(color, 1.0);
 }
 
+/// #include common.glsl

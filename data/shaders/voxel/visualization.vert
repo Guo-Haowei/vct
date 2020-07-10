@@ -8,12 +8,11 @@ uniform vec4 u_world;
 // per frame
 layout (rgba16f, binding = 0) uniform image3D u_voxel_texture;
 
-layout (std140, binding = 0) uniform Camera
+layout (std140, binding = 0) uniform VSPerFrame
 {
     mat4 PV;
+    mat4 lightSpace;
 };
-
-uniform int u_toggle;
 
 out vec4 pass_color;
 

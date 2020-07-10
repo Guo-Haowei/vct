@@ -31,9 +31,15 @@ void RenderTarget::createDepthAttachment()
     info.dataType = GL_FLOAT;
     info.format = info.internalFormat = GL_DEPTH_COMPONENT;
     info.minFilter = info.magFilter = GL_NEAREST;
-    info.wrapS = info.wrapT = GL_CLAMP_TO_EDGE;
+    info.wrapS = info.wrapT = GL_CLAMP_TO_BORDER;
 
     m_depthAttachment.create2DEmpty(info);
+
+    m_depthAttachment.bind();
+    float border[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border);
+    m_depthAttachment.unbind();
+
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthAttachment.m_handle, 0);
 }
 
