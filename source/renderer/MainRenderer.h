@@ -27,13 +27,13 @@ struct MaterialData
     // normal...
 };
 
-struct VSPerFrame
+struct VSPerFrameCache
 {
     mat4 PV;
     mat4 lightSpace;
 };
 
-struct FSPerFrame
+struct FSPerFrameCache
 {
     vec3 light_position; // direction
     float _per_frame_pad0;
@@ -63,9 +63,19 @@ struct MaterialCache
     }
 };
 
-static_assert(sizeof(VSPerFrame) % 16 == 0);
-static_assert(sizeof(FSPerFrame) % 16 == 0);
+struct ConstantCache
+{
+    vec3 world_center;
+    float world_size_half;
+    float texel_size;
+    float voxel_size;
+    float padding[2];
+};
+
+static_assert(sizeof(VSPerFrameCache) % 16 == 0);
+static_assert(sizeof(FSPerFrameCache) % 16 == 0);
 static_assert(sizeof(MaterialCache) % 16 == 0);
+static_assert(sizeof(ConstantCache) % 16 == 0);
 
 class MainRenderer
 {
@@ -108,9 +118,10 @@ private:
     GpuTexture m_normalVoxel;
 
     /// uniform buffers
-    UniformBuffer<VSPerFrame>           m_vsPerFrameBuffer; // global binding 0
-    UniformBuffer<FSPerFrame>           m_fsPerFrameBuffer; // global binding 1
+    UniformBuffer<VSPerFrameCache>      m_vsPerFrameBuffer; // global binding 0
+    UniformBuffer<FSPerFrameCache>      m_fsPerFrameBuffer; // global binding 1
     UniformBuffer<MaterialCache>        m_fsMaterialBuffer; // global binding 2
+    UniformBuffer<ConstantCache>        m_constantBuffer;   // global binding 3
 
     /// render targets
     DepthRenderTarget                   m_shadowBuffer;

@@ -12,8 +12,14 @@ out vec3 pass_normal;
 out vec2 pass_uv;
 out vec4 pass_light_space_position;
 
-uniform vec4 u_world; // xyz : world center; w : world size
 uniform int u_voxel_texture_size;
+
+layout (std140, binding = 3) uniform Constant
+{
+    vec3 world_center;
+    float world_size_half;
+    float texel_size;
+};
 
 void main(){
     vec3 triangle_normal = abs(pass_normals[0] + pass_normals[1] + pass_normals[2]);
@@ -25,7 +31,7 @@ void main(){
 
     for(uint i = 0; i < 3; ++i)
     {
-        output_positions[i] = (pass_positions[i] - u_world.xyz) / (0.5 * u_world.w);
+        output_positions[i] = (pass_positions[i] - world_center) / world_size_half;
         if (dominant == 0)
         {
             output_positions[i].xyz = output_positions[i].zyx;
@@ -41,10 +47,9 @@ void main(){
     vec2 side1N = normalize(output_positions[2].xy - output_positions[1].xy);
     vec2 side2N = normalize(output_positions[0].xy - output_positions[2].xy);
 
-    const float texelSize = 1.0 / float(u_voxel_texture_size);
-    output_positions[0].xy += normalize(side2N - side0N) * texelSize;
-    output_positions[1].xy += normalize(side0N - side1N) * texelSize;
-    output_positions[2].xy += normalize(side1N - side2N) * texelSize;
+    output_positions[0].xy += normalize(side2N - side0N) * texel_size;
+    output_positions[1].xy += normalize(side0N - side1N) * texel_size;
+    output_positions[2].xy += normalize(side1N - side2N) * texel_size;
 
     for (uint i = 0; i < 3; ++i)
     {

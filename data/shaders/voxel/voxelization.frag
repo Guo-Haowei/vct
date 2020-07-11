@@ -13,8 +13,6 @@ in vec4 pass_light_space_position;
 layout (rgba16f, binding = 0) uniform image3D u_albedo_texture;
 layout (rgba16f, binding = 1) uniform image3D u_normal_texture;
 
-uniform vec4 u_world; // xyz : world center; w : world size
-
 layout (std140, binding = 1) uniform FSPerFrame
 {
     vec3 light_position; // direction
@@ -32,6 +30,13 @@ layout (std140, binding = 2) uniform Material
     float roughness;
     float has_metallic_roughness_texture;
     float has_normal_texture;
+};
+
+layout (std140, binding = 3) uniform Constant
+{
+    vec3 world_center;
+    float world_size_half;
+    float texel_size;
 };
 
 uniform sampler2D u_shadow_map;
@@ -103,7 +108,7 @@ void main()
     ///////////////////////////////////////////////////////////////////////////
 
     // write lighting information to texel
-    vec3 voxel = (pass_position - u_world.xyz) / (0.5 * u_world.w); // normalize it to [-1, 1]
+    vec3 voxel = (pass_position - world_center) / world_size_half; // normalize it to [-1, 1]
     voxel = 0.5 * voxel + vec3(0.5); // normalize to [0, 1]
     ivec3 dim = imageSize(u_albedo_texture);
     ivec3 coord = ivec3(dim * voxel);

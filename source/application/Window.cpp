@@ -25,10 +25,13 @@ void Window::initialize()
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 #endif
 
-    // hard code width height for now
-    constexpr int WIDTH = 1280;
-    constexpr int HEIGHT = 720;
-    m_pGlfwWindow = glfwCreateWindow(WIDTH, HEIGHT, "Voxel Cone Tracing", 0, 0);
+    const GLFWvidmode* vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+    const float scale = 0.9f;
+    const int width = static_cast<int>(scale * vidmode->width);
+    const int height = static_cast<int>(scale * vidmode->height);
+
+    m_pGlfwWindow = glfwCreateWindow(width, height, "Voxel Cone Tracing", 0, 0);
 
     if (m_pGlfwWindow == nullptr)
         THROW_EXCEPTION("glfw error: failed to create window");

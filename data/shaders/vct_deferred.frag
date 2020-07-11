@@ -12,6 +12,11 @@ uniform sampler2D u_gbuffer_position_metallic;
 uniform sampler2D u_gbuffer_normal_roughness;
 uniform sampler2D u_gbuffer_depth;
 
+uniform sampler3D u_voxel_albedo;
+uniform sampler3D u_voxel_normal;
+
+uniform int u_gi_mode;
+
 layout (std140, binding = 0) uniform VSPerFrame
 {
     mat4 PV;
@@ -28,11 +33,90 @@ layout (std140, binding = 1) uniform FSPerFrame
     float _per_frame_pad2;
 };
 
+layout (std140, binding = 3) uniform Constant
+{
+    vec3 world_center;
+    float world_size_half;
+    float texel_size;
+    float voxel_size;
+};
+
+struct DiffuseCone
+{
+    vec3 direction;
+    float weight;
+};
+
+const DiffuseCone g_diffuseCones[6] = DiffuseCone[6]
+(
+    DiffuseCone(vec3(0.0, 1.0, 0.0), PI / 4.0),
+    DiffuseCone(vec3(0.0, 0.5, 0.866025), 3.0 * PI / 20.0),
+    DiffuseCone(vec3(0.823639, 0.5, 0.267617), 3.0 * PI / 20.0),
+    DiffuseCone(vec3(0.509037, 0.5, -0.7006629), 3.0 * PI / 20.0),
+    DiffuseCone(vec3(-0.50937, 0.5, -0.7006629), 3.0 * PI / 20.0),
+    DiffuseCone(vec3(-0.823639, 0.5, 0.267617), 3.0 * PI / 20.0)
+);
+
 float distributionGGX(float NdotH, float roughness);
 float geometrySchlickGGX(float NdotV, float roughness);
 float geometrySmith(float NdotV, float NdotL, float roughness);
 vec3 fresnelSchlick(float cosTheta, const in vec3 F0);
 float inShadow(const in vec4 position_light, float NdotL);
+
+vec3 traceCone(vec3 from, vec3 direction)
+{
+    const float aperture = 0.57735;
+
+    vec4 acc = vec4(0.0);
+    float offset = 2.0 * voxel_size;
+    float dist = offset + voxel_size;
+    float max_dist = 2.0 * world_size_half;
+
+    while (acc.a < 1.0 && dist < max_dist)
+    {
+        vec3 conePosition = from + direction * dist;
+        float diameter = 2.0 * aperture * dist;
+        float mipLevel = log2(diameter / voxel_size);
+
+        vec3 coords = (conePosition - world_center) / world_size_half;
+        coords = 0.5 * coords + 0.5;
+
+        vec4 voxel = textureLod(u_voxel_albedo, coords, mipLevel);
+        acc += (1.0 - acc.a) * voxel;
+
+        dist += 0.5 * diameter;
+    }
+
+    return acc.rgb;
+}
+
+vec3 indirectDiffuse(vec3 position, vec3 N)
+{
+    vec3 diffuse = vec3(0.0);
+
+    vec3 up = vec3(0.0, 1.0, 0.0);
+
+    // TODO: eliminate branch
+    if (abs(dot(N, up)) > 0.999)
+    {
+        up = vec3(0.0, 0.0, 1.0);
+    }
+
+    vec3 T = normalize(up - dot(N, up) * N);
+    vec3 B = cross(T, N);
+
+    for (int i = 0; i < 6; ++i)
+    {
+        vec3 direction = T * g_diffuseCones[i].direction.x +
+                         B * g_diffuseCones[i].direction.z +
+                         N;
+        direction = normalize(direction);
+
+        diffuse += g_diffuseCones[i].weight * traceCone(position, direction);
+    }
+
+    return diffuse;
+}
 
 void main()
 {
@@ -91,6 +175,10 @@ void main()
     float shadow = inShadow(light_space_position, NdotL);
 
     vec3 color = ambient + (1.0 - shadow) * Lo;
+
+    // indirect diffuse
+    if (u_gi_mode == 1)
+        color += albedo.rgb * indirectDiffuse(world_position, N);
 
     float gamma = 2.2;
     color = color / (color + 1.0);

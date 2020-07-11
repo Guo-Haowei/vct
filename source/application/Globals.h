@@ -16,8 +16,8 @@ constexpr unsigned int SHADOW_MAP_RESOLUTION = 4096u;
 
 static_assert(isPowerOf2(SHADOW_MAP_RESOLUTION));
 
-constexpr unsigned int VOXEL_TEXTURE_SIZE = 256;
-// constexpr unsigned int VOXEL_TEXTURE_SIZE = 128;
+// constexpr unsigned int VOXEL_TEXTURE_SIZE = 256;
+constexpr unsigned int VOXEL_TEXTURE_SIZE = 128;
 constexpr unsigned int VOXEL_TEXTURE_MIP_LEVEL = log2(VOXEL_TEXTURE_SIZE);
 
 static_assert(VOXEL_TEXTURE_SIZE <= 256);
@@ -32,7 +32,7 @@ enum RenderStrategy
 
 enum DrawTexture
 {
-    TEXTURE_NO_GI,
+    TEXTURE_FINAL_IMAGE,
     TEXTURE_VOXEL_ALBEDO,
     TEXTURE_VOXEL_NORMAL,
     TEXTURE_GBUFFER_NONE,
@@ -49,15 +49,17 @@ struct UIControlls
 {
     int     voxelMipLevel               = 0;
     int     showVoxelTexture            = -1;
-    bool    showObjectBoundingBox       = false;
-    bool    showWorldBoundingBox        = false;
-    bool    forceUpdateVoxelTexture     = false;
-    bool    debugFramebuffers           = true;
 
     int     objectOccluded              = 0;
     int     totalMaterials              = 0;
     int     totalMeshes                 = 0;
-    int     drawTexture                 = TEXTURE_NO_GI;
+    int     drawTexture                 = TEXTURE_FINAL_IMAGE;
+    int     voxelGiMode                 = 1;
+
+    bool    showObjectBoundingBox       = false;
+    bool    showWorldBoundingBox        = false;
+    bool    forceUpdateVoxelTexture     = false;
+    bool    debugFramebuffers           = true;
 };
 
 extern UIControlls g_UIControls;

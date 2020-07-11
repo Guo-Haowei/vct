@@ -113,6 +113,11 @@ void Application::userInterface()
     {
         if (ImGui::BeginMenu("Debug"))
         {
+            ImGui::Text("Voxel GI"); ImGui::SameLine();
+            ImGui::RadioButton("On", &g_UIControls.voxelGiMode, 1); ImGui::SameLine();
+            ImGui::RadioButton("Off", &g_UIControls.voxelGiMode, 0);
+            ImGui::Separator();
+
             ImGui::Text("Voxel Texture Size: %d", VOXEL_TEXTURE_SIZE);
             ImGui::Text("Voxel Mip Level: %d", VOXEL_TEXTURE_MIP_LEVEL);
             if (ImGui::Checkbox("Force voxel texture update", &g_UIControls.forceUpdateVoxelTexture))
@@ -130,7 +135,7 @@ void Application::userInterface()
             ImGui::Separator();
 
             ImGui::Text("Debug Texture");
-            ImGui::RadioButton("No GI",             &g_UIControls.drawTexture, DrawTexture::TEXTURE_NO_GI);
+            ImGui::RadioButton("Voxel GI",          &g_UIControls.drawTexture, DrawTexture::TEXTURE_FINAL_IMAGE);
             ImGui::RadioButton("Voxel Albedo",      &g_UIControls.drawTexture, DrawTexture::TEXTURE_VOXEL_ALBEDO);
             ImGui::RadioButton("Voxel Normal",      &g_UIControls.drawTexture, DrawTexture::TEXTURE_VOXEL_NORMAL);
             ImGui::RadioButton("Gbuffer Depth",     &g_UIControls.drawTexture, DrawTexture::TEXTURE_GBUFFER_DEPTH);
@@ -142,7 +147,6 @@ void Application::userInterface()
 
             ImGui::EndMenu();
         }
-
 
         ImGui::Separator();
 
@@ -156,17 +160,20 @@ void Application::userInterface()
         }
 
         ImGui::Separator();
+
+        if (ImGui::BeginMenu("Log"))
+        {
+            ImGui::Text("FPS            : %.2f FPS", ImGui::GetIO().Framerate);
+            ImGui::Text("Total meshes   : %.d", g_UIControls.totalMeshes);
+            ImGui::Text("Total Materials: %.d", g_UIControls.totalMaterials);
+            ImGui::Text("Object occluded: %.d", g_UIControls.objectOccluded);
+            ImGui::EndMenu();
+        }
+
+        ImGui::Separator();
+
         ImGui::EndMenuBar();
-
     }
-
-    ImGui::Begin("Log");
-    ImGui::Text("FPS            : %.2f FPS", ImGui::GetIO().Framerate);
-    ImGui::Text("Total meshes   : %.d", g_UIControls.totalMeshes);
-    ImGui::Text("Total Materials: %.d", g_UIControls.totalMaterials);
-    ImGui::Text("Object occluded: %.d", g_UIControls.objectOccluded);
-
-    ImGui::End();
 
     ImGui::End();
 

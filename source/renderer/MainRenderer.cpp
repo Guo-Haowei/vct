@@ -14,9 +14,13 @@ static std::unordered_map<const Material*, MaterialData> g_matLUT;
 constexpr int UNIFORM_BUFFER_VS_PER_FRAME_SLOT = 0;
 constexpr int UNIFORM_BUFFER_FS_PER_FRAME_SLOT = 1;
 constexpr int UNIFORM_BUFFER_MATERIAL_SLOT = 2;
+constexpr int UNIFORM_BUFFER_CONSTANT_SLOT = 3;
 
-constexpr int ALBEDO_VOXEL_SLOT = 0;
-constexpr int NORMAL_VOXEL_SLOT = 1;
+constexpr int IMAGE_VOXEL_ALBEDO_SLOT = 0;
+constexpr int IMAGE_VOXEL_NORMAL_SLOT = 1;
+constexpr int TEXTURE_VOXEL_ALBEDO_SLOT = 2;
+constexpr int TEXTURE_VOXEL_NORMAL_SLOT = 3;
+
 constexpr int ALBEDO_MAP_SLOT = 4;
 constexpr int NORMAL_MAP_SLOT = 6;
 constexpr int METALLIC_ROUGHNESS_SLOT = 7;
@@ -32,10 +36,18 @@ void MainRenderer::createGpuResources()
 {
     Vector3 center = g_scene.boundingBox.getCenter();
     Vector3 size = g_scene.boundingBox.getSize();
-    float sizeMax = std::max(size.x, std::max(size.y, size.z));
-    Vector4 world(center, sizeMax);
+    float worldSize = std::max(size.x, std::max(size.y, size.z));
+    float texelSize = 1.0f / static_cast<float>(VOXEL_TEXTURE_SIZE);
+    float voxelSize = worldSize * texelSize;
 
     // create uniform buffer
+    m_constantBuffer.createAndBind(UNIFORM_BUFFER_CONSTANT_SLOT);
+    m_constantBuffer.cache.world_center = center;
+    m_constantBuffer.cache.world_size_half = 0.5f * worldSize;
+    m_constantBuffer.cache.texel_size = texelSize;
+    m_constantBuffer.cache.voxel_size = voxelSize;
+    m_constantBuffer.update();
+
     m_vsPerFrameBuffer.createAndBind(UNIFORM_BUFFER_VS_PER_FRAME_SLOT);
     m_vsPerFrameBuffer.cache.lightSpace = lightSpaceMatrix(g_scene.light.position, g_scene.shadowBox);
     m_vsPerFrameBuffer.update();
@@ -74,6 +86,8 @@ void MainRenderer::createGpuResources()
         m_vctProgram.setUniform(m_vctProgram.getUniformLocation("u_gbuffer_position_metallic"), TEXTURE_GBUFFER_POSITION_METALLIC_SLOT);
         m_vctProgram.setUniform(m_vctProgram.getUniformLocation("u_gbuffer_normal_roughness"), TEXTURE_GBUFFER_NORMAL_ROUGHNESS_SLOT);
         m_vctProgram.setUniform(m_vctProgram.getUniformLocation("u_shadow_map"), TEXTURE_SHADOW_MAP_SLOT);
+        m_vctProgram.setUniform(m_vctProgram.getUniformLocation("u_voxel_albedo"), TEXTURE_VOXEL_ALBEDO_SLOT);
+        m_vctProgram.setUniform(m_vctProgram.getUniformLocation("u_voxel_normal"), TEXTURE_VOXEL_NORMAL_SLOT);
         m_vctProgram.stop();
     }
 
@@ -92,8 +106,6 @@ void MainRenderer::createGpuResources()
     {
         // set one time uniforms
         m_voxelProgram.use();
-        m_voxelProgram.setUniform(m_voxelProgram.getUniformLocation("u_world"), world);
-        m_voxelProgram.setUniform(m_voxelProgram.getUniformLocation("u_voxel_texture_size"), (int)VOXEL_TEXTURE_SIZE);
         m_voxelProgram.setUniform(m_voxelProgram.getUniformLocation("u_albedo_map"), ALBEDO_MAP_SLOT);
         m_voxelProgram.setUniform(m_voxelProgram.getUniformLocation("u_shadow_map"), TEXTURE_SHADOW_MAP_SLOT);
         m_voxelProgram.stop();
@@ -102,12 +114,6 @@ void MainRenderer::createGpuResources()
     m_visualizeProgram.createFromFiles(
         DATA_DIR "shaders/voxel/visualization.vert",
         DATA_DIR "shaders/voxel/visualization.frag");
-    {
-        // set one time uniforms
-        m_visualizeProgram.use();
-        m_visualizeProgram.setUniform(m_visualizeProgram.getUniformLocation("u_world"), world);
-        m_voxelProgram.stop();
-    }
 
     m_voxelPostProgram.createFromFile(DATA_DIR "shaders/voxel/post.comp");
 
@@ -285,6 +291,13 @@ void MainRenderer::createGpuResources()
 
     glActiveTexture(GL_TEXTURE0 + TEXTURE_GBUFFER_ALBEDO_SLOT);
     m_gbuffer.getColorAttachment(2).bind();
+
+    // voxels
+    glActiveTexture(GL_TEXTURE0 + TEXTURE_VOXEL_ALBEDO_SLOT);
+    m_albedoVoxel.bind();
+
+    glActiveTexture(GL_TEXTURE0 + TEXTURE_VOXEL_NORMAL_SLOT);
+    m_normalVoxel.bind();
 }
 
 void MainRenderer::visualizeVoxels()
@@ -410,8 +423,8 @@ void MainRenderer::renderToVoxelTexture()
     glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
     glViewport(0, 0, VOXEL_TEXTURE_SIZE, VOXEL_TEXTURE_SIZE);
 
-    m_albedoVoxel.bindImageTexture(ALBEDO_VOXEL_SLOT);
-    m_normalVoxel.bindImageTexture(NORMAL_VOXEL_SLOT);
+    m_albedoVoxel.bindImageTexture(IMAGE_VOXEL_ALBEDO_SLOT);
+    m_normalVoxel.bindImageTexture(IMAGE_VOXEL_NORMAL_SLOT);
     m_voxelProgram.use();
     static GLint mLocation = m_voxelProgram.getUniformLocation("u_M");
 
@@ -465,7 +478,10 @@ void MainRenderer::vctPass()
 
     program.use();
     // static GLint location_texture = program.getUniformLocation("u_texture");
-    // static GLint location_type = program.getUniformLocation("u_type");
+
+    static GLint location_gi_mode = program.getUniformLocation("u_gi_mode");
+    program.setUniform(location_gi_mode, g_UIControls.voxelGiMode);
+
     glBindVertexArray(m_quad.vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -639,7 +655,7 @@ void MainRenderer::render()
 
         gbufferPass();
 
-        if (g_UIControls.drawTexture == DrawTexture::TEXTURE_NO_GI)
+        if (g_UIControls.drawTexture == DrawTexture::TEXTURE_FINAL_IMAGE)
         {
             vctPass();
         }
