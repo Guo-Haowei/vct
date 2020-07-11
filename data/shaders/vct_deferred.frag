@@ -63,14 +63,18 @@ float geometrySmith(float NdotV, float NdotL, float roughness);
 vec3 fresnelSchlick(float cosTheta, const in vec3 F0);
 float inShadow(const in vec4 position_light, float NdotL);
 
-vec3 traceCone(vec3 from, vec3 direction)
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 {
-    const float aperture = 0.57735;
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
+}
 
+vec3 traceCone(vec3 from, vec3 direction, float aperture)
+{
+    float max_dist = 2.0 * world_size_half;
     vec4 acc = vec4(0.0);
+
     float offset = 2.0 * voxel_size;
     float dist = offset + voxel_size;
-    float max_dist = 2.0 * world_size_half;
 
     while (acc.a < 1.0 && dist < max_dist)
     {
@@ -92,15 +96,14 @@ vec3 traceCone(vec3 from, vec3 direction)
 
 vec3 indirectDiffuse(vec3 position, vec3 N)
 {
+    const float aperture = 0.57735;
+
     vec3 diffuse = vec3(0.0);
 
     vec3 up = vec3(0.0, 1.0, 0.0);
 
-    // TODO: eliminate branch
     if (abs(dot(N, up)) > 0.999)
-    {
         up = vec3(0.0, 0.0, 1.0);
-    }
 
     vec3 T = normalize(up - dot(N, up) * N);
     vec3 B = cross(T, N);
@@ -112,10 +115,22 @@ vec3 indirectDiffuse(vec3 position, vec3 N)
                          N;
         direction = normalize(direction);
 
-        diffuse += g_diffuseCones[i].weight * traceCone(position, direction);
+        diffuse += g_diffuseCones[i].weight * traceCone(position, direction, aperture);
     }
 
     return diffuse;
+}
+
+vec3 indirectSpecular(vec3 position, vec3 direction, float roughness)
+{
+    // TODO: brdf lookup
+    float aperture = 0.0174533;
+
+    aperture = clamp(tan(0.5 * PI * roughness), aperture, 0.5 * PI);
+
+    vec3 specular = traceCone(position, direction, aperture);
+
+    return specular;
 }
 
 void main()
@@ -153,32 +168,47 @@ void main()
     float NdotH = max(dot(N, H), 0.0);
     float NdotV = max(dot(N, V), 0.0);
 
-    // cook-torrance brdf
-    float NDF = distributionGGX(NdotH, roughness);
-    float G = geometrySmith(NdotV, NdotL, roughness);
-    vec3 F = fresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0);
+    // direct
+    {
+        // cook-torrance brdf
+        float NDF = distributionGGX(NdotH, roughness);
+        float G = geometrySmith(NdotV, NdotL, roughness);
+        vec3 F = fresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0);
 
-    vec3 nom = NDF * G * F;
-    float denom = 4 * NdotV * NdotL;
+        vec3 nom = NDF * G * F;
+        float denom = 4 * NdotV * NdotL;
 
-    vec3 specular = nom / max(denom, 0.001);
+        vec3 specular = nom / max(denom, 0.001);
 
-    vec3 kS = F;
-    vec3 kD = vec3(1.0) - kS;
-    kD *= 1.0 - metallic;
+        vec3 kS = F;
+        vec3 kD = vec3(1.0) - kS;
+        kD *= 1.0 - metallic;
 
-    Lo += (kD * albedo.rgb / PI + specular) * radiance * NdotL;
+        float shadow = inShadow(light_space_position, NdotL);
 
-    float ao = 1.0;
-    vec3 ambient = vec3(0.03) * albedo.rgb * ao;
+        vec3 directLight = (kD * albedo.rgb / PI + specular) * radiance * NdotL;
+        Lo += (1.0 - shadow) * directLight;
+    }
 
-    float shadow = inShadow(light_space_position, NdotL);
+    vec3 color = Lo;
 
-    vec3 color = ambient + (1.0 - shadow) * Lo;
-
-    // indirect diffuse
+    // indirect light
     if (u_gi_mode == 1)
-        color += albedo.rgb * indirectDiffuse(world_position, N);
+    {
+        vec3 F = fresnelSchlickRoughness(NdotV, F0, roughness);
+        vec3 kS = F;
+        vec3 kD = 1.0 - kS;
+        kD *= 1.0 - metallic;
+
+        // indirect diffuse
+        vec3 diffuse = albedo.rgb * indirectDiffuse(world_position, N);
+
+        // specular cone
+        vec3 coneDirection = reflect(-V, N);
+        vec3 specular = 0.5 * indirectSpecular(world_position, coneDirection, roughness);
+
+        color += (kD * diffuse + specular);
+    }
 
     float gamma = 2.2;
     color = color / (color + 1.0);

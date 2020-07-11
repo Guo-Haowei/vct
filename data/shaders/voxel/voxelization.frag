@@ -98,12 +98,9 @@ void main()
 
     Lo += (kD * albedo.rgb / PI + specular) * radiance * NdotL;
 
-    float ao = 1.0;
-    vec3 ambient = vec3(0.03) * albedo.rgb * ao;
-
     float shadow = inShadow(pass_light_space_position, NdotL);
 
-    vec3 color = ambient + (1.0 - shadow) * Lo;
+    vec3 color = (1.0 - shadow) * Lo;
 
     ///////////////////////////////////////////////////////////////////////////
 
@@ -114,14 +111,12 @@ void main()
     ivec3 coord = ivec3(dim * voxel);
 
     f16vec4 final_color = f16vec4(color.r, color.g, color.b, 1.0);
-    // imageAtomicAdd(u_albedo_texture, coord, final_color);
-    imageAtomicMax(u_albedo_texture, coord, final_color);
-    // imageStore(u_albedo_texture, coord, final_color);
+    imageAtomicAdd(u_albedo_texture, coord, final_color);
+    // imageAtomicMax(u_albedo_texture, coord, final_color);
 
     // TODO: average normal
     f16vec4 normal_color = f16vec4(N.r, N.g, N.b, 1.0);
     imageAtomicAdd(u_normal_texture, coord, normal_color);
-    // imageAtomicMax(u_normal_texture, coord, normal_color);
 }
 
 /// #include common.glsl

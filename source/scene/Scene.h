@@ -55,6 +55,21 @@ struct Light
     Vector3 color;
 };
 
+struct Scene
+{
+    std::vector<GeometryNode>               geometryNodes;
+    std::vector<std::unique_ptr<Mesh>>      meshes;
+    std::vector<std::unique_ptr<Material>>  materials;
+    Light                                   light;
+    Box3 boundingBox;
+    Box3 shadowBox;
+    Camera camera;
+    bool dirty = true;
+    bool lightDirty = true;
+};
+
+extern Scene g_scene;
+
 /// TODO: refactor
 // B is light position
 static Matrix4 lightSpaceMatrix(const Vector3& B, const Box3& box)
@@ -92,20 +107,5 @@ static Matrix4 lightSpaceMatrix(const Vector3& B, const Box3& box)
     Matrix4 P = three::perspectiveTanHalfRH_NO(largestTanHalf, 1.0f, zNear, zFar);
     return P * V;
 }
-
-struct Scene
-{
-    std::vector<GeometryNode>               geometryNodes;
-    std::vector<std::unique_ptr<Mesh>>      meshes;
-    std::vector<std::unique_ptr<Material>>  materials;
-    Light                                   light;
-    Box3 boundingBox;
-    Box3 shadowBox;
-    Camera camera;
-    bool dirty = true;
-    bool lightDirty = true;
-};
-
-extern Scene g_scene;
 
 } // namespace vct

@@ -13,8 +13,13 @@ void createDefaultScene()
         loader.loadGltf(DATA_DIR "models/Sponza/Sponza.gltf", g_scene, transform);
     }
     {
-        Material* mat = new Material(Vector3(0.6f), 0.2f, 0.8f);
-        Matrix4 transform = three::translate(Vector3(0, 6, 0)) * three::rotateY(three::radians(180.0f)) * three::scale(Vector3(3));
+        Material* mat = new Material(Vector3(0.9f), 0.5f, 0.03f);
+        Matrix4 transform = three::translate(Vector3(-2, 6, 0)) * three::scale(Vector3(0.03f));
+        loader.loadObj(DATA_DIR "models/sphere.obj", g_scene, transform, mat);
+    }
+    {
+        Material* mat = new Material(Vector3(0.1f, 0.5f, 0.6f), 0.3f, 0.8f);
+        Matrix4 transform = three::translate(Vector3(2, 6, 0)) * three::rotateY(three::radians(180.0f)) * three::scale(Vector3(3));
         loader.loadObj(DATA_DIR "models/dragon.obj", g_scene, transform, mat);
     }
 
@@ -27,7 +32,7 @@ void createDefaultScene()
     camera.yaw = three::radians(180.0f);
     camera.position = Vector3(-7, 2, 0);
 
-    g_scene.light.position = Vector3(-5, 25, -5);
+    g_scene.light.position = Vector3(-5, 25, -4);
     g_scene.light.color = Vector3(400.0f);
 
     Vector3 center = g_scene.boundingBox.getCenter();
