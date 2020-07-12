@@ -10,9 +10,17 @@
 
 ## Screenshots
 
-| direct light only | direct light + indirect diffuse |
-| --------- | ------------- |
-| <img src="https://github.com/Guo-Haowei/VCT/blob/master/data/images/direct-light-only.png" width="500"> | <img src="https://github.com/Guo-Haowei/VCT/blob/master/data/images/direct-and-diffuse.png" width="500">
+Indirect diffuse light
+
+<img src="https://github.com/Guo-Haowei/VCT/blob/master/data/images/diffuse.png" width="70%">
+
+Indirect specular light
+
+<img src="https://github.com/Guo-Haowei/VCT/blob/master/data/images/specular.png" width="70%">
+
+Direct light only
+
+<img src="https://github.com/Guo-Haowei/VCT/blob/master/data/images/direct.png" width="70%">
 
 ## Reference
 

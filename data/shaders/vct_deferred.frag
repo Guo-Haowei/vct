@@ -124,9 +124,9 @@ vec3 indirectDiffuse(vec3 position, vec3 N)
 vec3 indirectSpecular(vec3 position, vec3 direction, float roughness)
 {
     // TODO: brdf lookup
-    float aperture = 0.0174533;
+    float aperture = 0.0374533;
 
-    aperture = clamp(tan(0.5 * PI * roughness), aperture, 0.5 * PI);
+    // aperture = clamp(tan(0.5 * PI * roughness), aperture, 0.5 * PI);
 
     vec3 specular = traceCone(position, direction, aperture);
 
@@ -206,6 +206,7 @@ void main()
         // specular cone
         vec3 coneDirection = reflect(-V, N);
         vec3 specular = 0.5 * indirectSpecular(world_position, coneDirection, roughness);
+        specular = vec3(0.0);
 
         color += (kD * diffuse + specular);
     }

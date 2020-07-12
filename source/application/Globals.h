@@ -12,7 +12,7 @@ constexpr bool isPowerOf2(unsigned int x)
     return (x & (x - 1)) == 0;
 }
 
-constexpr unsigned int SHADOW_MAP_RESOLUTION = 4096u;
+constexpr unsigned int SHADOW_MAP_RESOLUTION = 2 * 4096u;
 
 static_assert(isPowerOf2(SHADOW_MAP_RESOLUTION));
 
@@ -21,14 +21,6 @@ constexpr unsigned int VOXEL_TEXTURE_SIZE = 128;
 constexpr unsigned int VOXEL_TEXTURE_MIP_LEVEL = log2(VOXEL_TEXTURE_SIZE);
 
 static_assert(VOXEL_TEXTURE_SIZE <= 256);
-
-enum RenderStrategy
-{
-    NoGI,
-    VCT,
-    VoxelAlbedo,
-    VoxelNormal,
-};
 
 enum DrawTexture
 {
