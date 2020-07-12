@@ -18,7 +18,7 @@ void createDefaultScene()
         // loader.loadObj(DATA_DIR "models/sphere.obj", g_scene, transform, mat);
     }
     {
-        Material* mat = new Material(Vector3(0.9f), 0.3f, 0.1f);
+        Material* mat = new Material(Vector3(0.9f), 0.3f, 0.8f);
         Matrix4 transform = three::translate(Vector3(-0, 5, 4)) * three::rotateY(three::radians(45.0f)) * three::scale(Vector3(3));
         loader.loadObj(DATA_DIR "models/dragon.obj", g_scene, transform, mat);
     }
