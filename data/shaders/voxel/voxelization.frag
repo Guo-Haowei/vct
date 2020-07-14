@@ -73,10 +73,7 @@ void main()
     vec3 V = normalize(camera_position - world_position);
     vec3 H = normalize(V + L);
 
-    // TODO: fix attenuation function
-    float dist_to_light = length(light_position - world_position);
-    float attenuation = 1.0 / (dist_to_light);
-    vec3 radiance = attenuation * light_color;
+    vec3 radiance = light_color;
 
     float NdotL = max(dot(N, L), 0.0);
     float NdotH = max(dot(N, H), 0.0);
@@ -113,8 +110,8 @@ void main()
     ivec3 coord = ivec3(dim * voxel);
 
     f16vec4 final_color = f16vec4(color.r, color.g, color.b, 1.0);
-    imageAtomicAdd(u_albedo_texture, coord, final_color);
-    // imageAtomicMax(u_albedo_texture, coord, final_color);
+    // imageAtomicAdd(u_albedo_texture, coord, final_color);
+    imageAtomicMax(u_albedo_texture, coord, final_color);
 
     // TODO: average normal
     f16vec4 normal_color = f16vec4(N.r, N.g, N.b, 1.0);

@@ -71,7 +71,7 @@ void Application::finalize()
 void Application::updateCamera()
 {
     constexpr float VIEW_SPEED = 2.0f;
-    float CAMERA_SPEED = 0.2f;
+    float CAMERA_SPEED = 0.15f;
 
     if (m_window.isKeyDown(GLFW_KEY_LEFT_SHIFT))
         CAMERA_SPEED *= 3.f;

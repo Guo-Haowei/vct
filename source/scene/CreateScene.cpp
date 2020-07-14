@@ -19,7 +19,7 @@ void createDefaultScene()
     }
     {
         Material* mat = new Material(Vector3(0.9f), 0.3f, 0.8f);
-        Matrix4 transform = three::translate(Vector3(-0, 5, 4)) * three::rotateY(three::radians(45.0f)) * three::scale(Vector3(3));
+        Matrix4 transform = three::translate(Vector3(1, 5, 4)) * three::rotateY(three::radians(170.0f)) * three::scale(Vector3(3));
         loader.loadObj(DATA_DIR "models/dragon.obj", g_scene, transform, mat);
     }
 
@@ -34,7 +34,7 @@ void createDefaultScene()
     camera.position = Vector3(-7, 6, 4);
 
     g_scene.light.position = Vector3(-5.f, 25.f, -8.5f);
-    g_scene.light.color = Vector3(400.0f);
+    g_scene.light.color = Vector3(15.0f);
 
     Vector3 center = g_scene.boundingBox.getCenter();
     Vector3 size = g_scene.boundingBox.getSize();

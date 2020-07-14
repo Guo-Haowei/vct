@@ -159,10 +159,7 @@ void main()
     vec3 V = normalize(camera_position - world_position);
     vec3 H = normalize(V + L);
 
-    // TODO: fix attenuation function
-    float dist_to_light = length(light_position - world_position);
-    float attenuation = 1.0 / (dist_to_light);
-    vec3 radiance = attenuation * light_color;
+    vec3 radiance = light_color;
 
     float NdotL = max(dot(N, L), 0.0);
     float NdotH = max(dot(N, H), 0.0);
@@ -208,6 +205,7 @@ void main()
         // specular cone
         vec3 coneDirection = reflect(-V, N);
         vec3 specular = 0.5 * indirectSpecular(world_position, coneDirection, roughness);
+        specular = vec3(0.0);
 
         color += (kD * diffuse + specular);
     }
@@ -216,6 +214,7 @@ void main()
     color = color / (color + 1.0);
     color = pow(color, vec3(gamma));
 
+    color = mix(color, vec3(0.9, 0.9, 0.8), 0.05);
     out_color = vec4(color, 1.0);
 }
 
