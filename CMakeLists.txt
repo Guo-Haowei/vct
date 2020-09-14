@@ -23,18 +23,6 @@ message("Configuring three.math...")
 add_subdirectory(external/three.math)
 include_directories(${PROJECT_SOURCE_DIR}/external/three.math/include/)
 
-# stb
-# message("Configuring stb...")
-# include_directories(external/stb/)
-
-# assimp
-# set(lib_assimp_debug "${PROJECT_SOURCE_DIR}/external/assimp/build/lib/Debug/assimp-vc142-mtd.lib" CACHE STRING "assimp Debug")
-# set(lib_irrxmld_debug "${PROJECT_SOURCE_DIR}/external/assimp/build/lib/Debug/IrrXMLd.lib" CACHE STRING "IrrXMLd Debug")
-# set(lib_zlib_debug "${PROJECT_SOURCE_DIR}/external/assimp/build/lib/Debug/zlibstaticd.lib" CACHE STRING "zlib static Debug")
-
-# rapid json
-# include_directories(external/rapidjson/include)
-
 add_definitions(-DDATA_DIR="${CMAKE_SOURCE_DIR}/data/")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
