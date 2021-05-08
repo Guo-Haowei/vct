@@ -14,16 +14,12 @@ add_subdirectory(external/glfw)
 message("Configuring glad...")
 add_subdirectory(external/glad)
 
-# glm
-message("Configuring glm...")
-include_directories(external/glm/)
-
-# three.math
-message("Configuring three.math...")
-add_subdirectory(external/three.math)
-include_directories(${PROJECT_SOURCE_DIR}/external/three.math/include/)
+include_directories(${PROJECT_SOURCE_DIR}/source/)
+include_directories(${PROJECT_SOURCE_DIR}/external/glm/)
 
 add_definitions(-DDATA_DIR="${CMAKE_SOURCE_DIR}/data/")
+add_definitions(-DROOT_FOLDER="${CMAKE_SOURCE_DIR}/")
+add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 

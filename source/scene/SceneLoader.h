@@ -9,16 +9,16 @@ struct aiAnimation;
 
 namespace vct {
 
-class SceneLoader
-{
-public:
-    void loadGltf(const char* path, Scene& scene, const Matrix4& transform, bool flipUVs = true);
-    void loadObj(const char* path, Scene& scene, const Matrix4& transform, Material* customMaterial = nullptr);
-private:
-    Mesh* processMesh(const aiMesh* aimesh);
-    Material* processMaterial(const aiMaterial* aimaterial);
-private:
+class SceneLoader {
+   public:
+    void loadGltf( const char* path, Scene& scene, const mat4& transform, bool flipUVs = true );
+
+   private:
+    Mesh* processMesh( const aiMesh* aimesh );
+    Material* processMaterial( const aiMaterial* aimaterial );
+
+   private:
     std::string m_currentPath;
 };
 
-} // namespace vct
+}  // namespace vct

@@ -2,23 +2,22 @@
 
 namespace vct {
 
-Matrix4 Camera::view() const
+mat4 Camera::view() const
 {
-    return three::lookAt(position, position + direction(), Vector3::UnitY);
+    return glm::lookAt( position, position + direction(), vec3( 0, 1, 0 ) );
 }
 
-Vector3 Camera::direction() const
+vec3 Camera::direction() const
 {
-    return Vector3(
-        std::cos(three::radians(yaw)) * std::cos(three::radians(pitch)),
-        std::sin(three::radians(pitch)),
-        std::sin(three::radians(yaw)) * std::cos(three::radians(pitch))
-    );
+    return vec3(
+        glm::cos( glm::radians( yaw ) ) * std::cos( glm::radians( pitch ) ),
+        glm::sin( glm::radians( pitch ) ),
+        glm::sin( glm::radians( yaw ) ) * std::cos( glm::radians( pitch ) ) );
 }
 
-Matrix4 Camera::perspective() const
+mat4 Camera::perspective() const
 {
-    return three::perspectiveRH_NO(fovy, aspect, zNear, zFar);
+    return glm::perspectiveRH_NO( fovy, aspect, zNear, zFar );
 }
 
-} // namespace vct
+}  // namespace vct

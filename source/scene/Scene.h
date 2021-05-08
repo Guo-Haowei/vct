@@ -1,70 +1,66 @@
 #pragma once
-#include "base/GeoMath.h"
-#include "Camera.h"
-#include <vector>
+#include <array>
 #include <memory>
 #include <string>
-#include <array>
+#include <vector>
+
+#include "Camera.h"
+#include "universal/core_math.h"
 
 namespace vct {
 
-struct Mesh
-{
-    std::vector<Vector3>    positions;
-    std::vector<Vector3>    normals;
-    std::vector<Vector3>    tangents;
-    std::vector<Vector3>    bitangents;
-    std::vector<Vector2>    uvs;
-    std::vector<Vector3u>   faces;
-    unsigned int    materialIndex;
+struct Mesh {
+    std::vector<vec3> positions;
+    std::vector<vec3> normals;
+    std::vector<vec3> tangents;
+    std::vector<vec3> bitangents;
+    std::vector<vec2> uvs;
+    std::vector<uvec3> faces;
+    unsigned int materialIndex;
 };
 
-struct Material
-{
+struct Material {
     /// only support albedo color for now
     std::string albedoTexture;
     std::string metallicRoughnessTexture;
     std::string normalTexture;
-    Vector3 albedo = Vector3::Zero;
-    float metallic = 0.0f;
+    vec3 albedo{ 0 };
+    float metallic  = 0.0f;
     float roughness = 0.0f;
 
     Material() = default;
-    Material(const Vector3& albedo, float metallic, float roughness)
-        : albedo(albedo), metallic(metallic), roughness(roughness)
-    {}
+    Material( const vec3& albedo, float metallic, float roughness )
+        : albedo( albedo ), metallic( metallic ), roughness( roughness )
+    {
+    }
 };
 
-struct Geometry
-{
-    Mesh*       pMesh;
-    Material*   pMaterial;
-    Box3        boundingBox;
+struct Geometry {
+    Mesh* pMesh;
+    Material* pMaterial;
+    Box3 boundingBox;
 };
 
-struct GeometryNode
-{
-    Matrix4 transform;
+struct GeometryNode {
+    mat4 transform;
     std::vector<Geometry> geometries;
 };
 
 // TODO: light
-struct Light
-{
-    Vector3 position;
-    Vector3 color;
+struct Light {
+    vec3 position;
+    vec3 color;
 };
 
-struct Scene
-{
-    std::vector<GeometryNode>               geometryNodes;
-    std::vector<std::unique_ptr<Mesh>>      meshes;
-    std::vector<std::unique_ptr<Material>>  materials;
-    Light                                   light;
+struct Scene {
+    std::vector<GeometryNode> geometryNodes;
+    std::vector<std::unique_ptr<Mesh>> meshes;
+    std::vector<std::unique_ptr<Material>> materials;
+    Light light;
     Box3 boundingBox;
     Box3 shadowBox;
     Camera camera;
-    bool dirty = true;
+    bool dirty      = true;
     bool lightDirty = true;
 };
 
@@ -72,40 +68,42 @@ extern Scene g_scene;
 
 /// TODO: refactor
 // B is light position
-static Matrix4 lightSpaceMatrix(const Vector3& B, const Box3& box)
+static mat4 lightSpaceMatrix( const vec3& B, const Box3& box )
 {
-    std::array<Vector3, 8> points = {
-        Vector3(box.min.x, box.min.y, box.min.z),
-        Vector3(box.min.x, box.min.y, box.max.z),
-        Vector3(box.min.x, box.max.y, box.min.z),
-        Vector3(box.min.x, box.max.y, box.max.z),
-        Vector3(box.max.x, box.min.y, box.min.z),
-        Vector3(box.max.x, box.min.y, box.max.z),
-        Vector3(box.max.x, box.max.y, box.min.z),
-        Vector3(box.max.x, box.max.y, box.max.z)
+    std::array<vec3, 8> points = {
+        vec3( box.min.x, box.min.y, box.min.z ),
+        vec3( box.min.x, box.min.y, box.max.z ),
+        vec3( box.min.x, box.max.y, box.min.z ),
+        vec3( box.min.x, box.max.y, box.max.z ),
+        vec3( box.max.x, box.min.y, box.min.z ),
+        vec3( box.max.x, box.min.y, box.max.z ),
+        vec3( box.max.x, box.max.y, box.min.z ),
+        vec3( box.max.x, box.max.y, box.max.z )
     };
 
-    const Vector3 C = box.getCenter();
-    float zNear = std::numeric_limits<float>::infinity();
-    float zFar = -std::numeric_limits<float>::infinity();
+    const vec3 C         = box.Center();
+    float zNear          = std::numeric_limits<float>::infinity();
+    float zFar           = -std::numeric_limits<float>::infinity();
     float largestTanHalf = -std::numeric_limits<float>::infinity();
 
-    Vector3 unitBC = three::normalize(C - B);
+    vec3 unitBC = glm::normalize( C - B );
 
-    for (const Vector3& A : points)
+    for ( const vec3& A : points )
     {
-        Vector3 BA = A - B;
-        Vector3 BP = three::dot(unitBC, BA) * unitBC; // P is the projection of A on BC
-        float lengthBP = three::length(BP);
-        Vector3 P = B + BP; // P is the projection of A on BC
-        zNear = std::min(zNear, lengthBP);
-        zFar = std::max(zFar, lengthBP);
-        largestTanHalf = std::max(largestTanHalf, three::length(P - A) / lengthBP);
+        vec3 BA        = A - B;
+        vec3 BP        = glm::dot( unitBC, BA ) * unitBC;  // P is the projection of A on BC
+        float lengthBP = glm::length( BP );
+        vec3 P         = B + BP;  // P is the projection of A on BC
+        zNear          = glm::min( zNear, lengthBP );
+        zFar           = glm::max( zFar, lengthBP );
+        largestTanHalf = glm::max( largestTanHalf, glm::length( P - A ) / lengthBP );
     }
 
-    Matrix4 V = three::lookAt(B, C, Vector3::UnitX);
-    Matrix4 P = three::perspectiveTanHalfRH_NO(largestTanHalf, 1.0f, zNear, zFar);
+    // const float fov = glm::atan( largestTanHalf ) * 2.0f;
+
+    mat4 V = glm::lookAt( B, C, vec3( 1, 0, 0 ) );
+    mat4 P = glm::perspectiveRH_NO( glm::radians( 90.0f ), 1.0f, zNear, zFar );
     return P * V;
 }
 
-} // namespace vct
+}  // namespace vct
