@@ -1,6 +1,5 @@
 add_library(scene
     SceneLoader.cpp
-    CreateScene.cpp
     Camera.cpp
 )
 

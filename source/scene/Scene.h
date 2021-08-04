@@ -54,8 +54,8 @@ struct Light {
 
 struct Scene {
     std::vector<GeometryNode> geometryNodes;
-    std::vector<std::unique_ptr<Mesh>> meshes;
-    std::vector<std::unique_ptr<Material>> materials;
+    std::vector<std::shared_ptr<Mesh>> meshes;
+    std::vector<std::shared_ptr<Material>> materials;
     Light light;
     Box3 boundingBox;
     Box3 shadowBox;
@@ -63,8 +63,6 @@ struct Scene {
     bool dirty      = true;
     bool lightDirty = true;
 };
-
-extern Scene g_scene;
 
 /// TODO: refactor
 // B is light position

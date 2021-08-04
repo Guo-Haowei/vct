@@ -1,6 +1,8 @@
 add_library(common
     Window.cpp
-    Application.cpp
+    com_cmdline.cpp
+    com_filesystem.cpp
+    com_system.cpp
     main.cpp
 )
 

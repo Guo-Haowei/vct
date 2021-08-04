@@ -24,3 +24,8 @@
 #else
 #define IF_TEST( ... ) ( (void)0 )
 #endif
+#if USING( FINAL_BUILD )
+#define IF_FINAL( ... ) ( __VA_ARGS__ )
+#else
+#define IF_FINAL( ... ) ( (void)0 )
+#endif

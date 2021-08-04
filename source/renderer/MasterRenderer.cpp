@@ -5,6 +5,8 @@
 #include "GLPrerequisites.h"
 #include "ImguiRenderer.h"
 #include "common/Window.h"
+#include "common/com_dvars.h"
+#include "universal/dvar_api.h"
 #include "universal/print.h"
 
 using std::cout;
@@ -34,24 +36,22 @@ void MasterRenderer::initialize( Window *pWindow )
         Com_PrintFatal( "[glad] failed to load gl functions" );
     }
 
-#if USING( TEST_BUILD )
-    cout << "[Log]\n";
-    cout << "Vendor:          " << glGetString( GL_VENDOR ) << endl;
-    cout << "Renderer:        " << glGetString( GL_RENDERER ) << endl;
-    cout << "Version OpenGL:  " << glGetString( GL_VERSION ) << endl;
-    cout << "Version GLSL:    " << glGetString( GL_SHADING_LANGUAGE_VERSION ) << endl;
+    Com_Printf( "[opengl] renderer: %s", glGetString( GL_RENDERER ) );
+    Com_Printf( "[opengl] version: %s", glGetString( GL_VERSION ) );
 
-    int flags;
-    glGetIntegerv( GL_CONTEXT_FLAGS, &flags );
-    if ( flags & GL_CONTEXT_FLAG_DEBUG_BIT )
+    if ( Dvar_GetBool( r_debug ) )
     {
-        cout << "[Log] enabling debug callback" << endl;
-        glEnable( GL_DEBUG_OUTPUT );
-        glEnable( GL_DEBUG_OUTPUT_SYNCHRONOUS );
-        glDebugMessageCallback( glDebugOutput, nullptr );
-        glDebugMessageControl( GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE );
+        int flags;
+        glGetIntegerv( GL_CONTEXT_FLAGS, &flags );
+        if ( flags & GL_CONTEXT_FLAG_DEBUG_BIT )
+        {
+            Com_Printf( "[opengl] debug callback enabled" );
+            glEnable( GL_DEBUG_OUTPUT );
+            glEnable( GL_DEBUG_OUTPUT_SYNCHRONOUS );
+            glDebugMessageCallback( glDebugOutput, nullptr );
+            glDebugMessageControl( GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE );
+        }
     }
-#endif
 
     /// initialize renderers
     m_mainRenderer.setWindow( m_pWindow );

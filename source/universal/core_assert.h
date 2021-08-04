@@ -9,9 +9,11 @@
 #if USING( TEST_BUILD )
 #define core_assert( expr )              (void)( ( !!( expr ) ) || ( detail::Assert( __FILE__, __LINE__, #expr ), 0 ) )
 #define core_assertfmt( expr, fmt, ... ) (void)( ( !!( expr ) ) || ( detail::Assertfmt( __FILE__, __LINE__, #expr, fmt, ##__VA_ARGS__ ), 0 ) )
+#define core_assertrange( expr, a, b )   core_assert( ( ( expr >= a ) && ( expr <= b ) ) )
 #else
-#define core_assert( expr )   ( (void)0 )
-#define core_assertfmt( ... ) ( (void)0 )
+#define core_assert( expr )              ( (void)0 )
+#define core_assertfmt( expr, fmt, ... ) ( (void)0 )
+#define core_assertrange( expr, a, b )   ( (void)0 )
 #endif
 
 #define panic( ... )  detail::Panic( __FILE__, __LINE__, __VA_ARGS__ )

@@ -2,28 +2,28 @@
 
 namespace vct {
 
-constexpr unsigned int log2(unsigned int x)
+constexpr unsigned int log2( unsigned int x )
 {
-    return x == 1 ? 0 : 1 + log2(x >> 1);
+    return x == 1 ? 0 : 1 + log2( x >> 1 );
 }
 
-constexpr bool isPowerOf2(unsigned int x)
+constexpr bool isPowerOf2( unsigned int x )
 {
-    return (x & (x - 1)) == 0;
+    return ( x & ( x - 1 ) ) == 0;
 }
 
 constexpr unsigned int SHADOW_MAP_RESOLUTION = 2 * 4096u;
 
-static_assert(isPowerOf2(SHADOW_MAP_RESOLUTION));
+static_assert( isPowerOf2( SHADOW_MAP_RESOLUTION ) );
 
 // constexpr unsigned int VOXEL_TEXTURE_SIZE = 256;
-constexpr unsigned int VOXEL_TEXTURE_SIZE = 128;
-constexpr unsigned int VOXEL_TEXTURE_MIP_LEVEL = log2(VOXEL_TEXTURE_SIZE);
+constexpr unsigned int VOXEL_TEXTURE_SIZE      = 128;
+constexpr unsigned int VOXEL_TEXTURE_MIP_LEVEL = log2( VOXEL_TEXTURE_SIZE );
 
-static_assert(VOXEL_TEXTURE_SIZE <= 256);
+static_assert( VOXEL_TEXTURE_SIZE <= 256 );
 
-enum DrawTexture
-{
+}  // namespace vct
+enum DrawTexture {
     TEXTURE_FINAL_IMAGE,
     TEXTURE_VOXEL_ALBEDO,
     TEXTURE_VOXEL_NORMAL,
@@ -36,24 +36,19 @@ enum DrawTexture
     // TODO: rename
     TEXTURE_GBUFFER_SHADOW,
 };
+struct UIControlls {
+    int voxelMipLevel    = 0;
+    int showVoxelTexture = -1;
 
-struct UIControlls
-{
-    int     voxelMipLevel               = 0;
-    int     showVoxelTexture            = -1;
+    int objectOccluded = 0;
+    int totalMaterials = 0;
+    int totalMeshes    = 0;
+    int drawTexture    = TEXTURE_FINAL_IMAGE;
+    int voxelGiMode    = 1;
 
-    int     objectOccluded              = 0;
-    int     totalMaterials              = 0;
-    int     totalMeshes                 = 0;
-    int     drawTexture                 = TEXTURE_FINAL_IMAGE;
-    int     voxelGiMode                 = 1;
-
-    bool    showObjectBoundingBox       = false;
-    bool    showWorldBoundingBox        = false;
-    bool    forceUpdateVoxelTexture     = false;
-    bool    debugFramebuffers           = true;
+    bool showObjectBoundingBox   = false;
+    bool showWorldBoundingBox    = false;
+    bool forceUpdateVoxelTexture = false;
+    bool debugFramebuffers       = true;
 };
-
 extern UIControlls g_UIControls;
-
-} // namespace vct

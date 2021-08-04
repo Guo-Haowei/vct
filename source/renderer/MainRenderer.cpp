@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include "common/Globals.h"
+#include "common/com_system.h"
 #include "scene/Scene.h"
 #include "universal/core_assert.h"
 
@@ -178,8 +179,10 @@ constexpr int TEXTURE_GBUFFER_AO_SLOT                = 13;
 
 void MainRenderer::createGpuResources()
 {
-    vec3 center     = g_scene.boundingBox.Center();
-    vec3 size       = g_scene.boundingBox.Size();
+    Scene scene = Com_GetScene();
+
+    vec3 center     = scene.boundingBox.Center();
+    vec3 size       = scene.boundingBox.Size();
     float worldSize = std::max( size.x, std::max( size.y, size.z ) );
     float texelSize = 1.0f / static_cast<float>( VOXEL_TEXTURE_SIZE );
     float voxelSize = worldSize * texelSize;
@@ -193,13 +196,13 @@ void MainRenderer::createGpuResources()
     m_constantBuffer.update();
 
     m_vsPerFrameBuffer.createAndBind( UNIFORM_BUFFER_VS_PER_FRAME_SLOT );
-    m_vsPerFrameBuffer.cache.lightSpace = lightSpaceMatrix( g_scene.light.position, g_scene.shadowBox );
+    m_vsPerFrameBuffer.cache.lightSpace = lightSpaceMatrix( scene.light.position, scene.shadowBox );
     m_vsPerFrameBuffer.update();
 
     m_fsPerFrameBuffer.createAndBind( UNIFORM_BUFFER_FS_PER_FRAME_SLOT );
-    m_fsPerFrameBuffer.cache.light_position  = g_scene.light.position;
-    m_fsPerFrameBuffer.cache.light_color     = g_scene.light.color;
-    m_fsPerFrameBuffer.cache.camera_position = g_scene.camera.position;
+    m_fsPerFrameBuffer.cache.light_position  = scene.light.position;
+    m_fsPerFrameBuffer.cache.light_color     = scene.light.color;
+    m_fsPerFrameBuffer.cache.camera_position = scene.camera.position;
     m_fsPerFrameBuffer.update();
 
     m_fsMaterialBuffer.createAndBind( UNIFORM_BUFFER_MATERIAL_SLOT );
@@ -348,7 +351,7 @@ void MainRenderer::createGpuResources()
 
     // load scene
     // create mesh
-    for ( const std::unique_ptr<Mesh>& mesh : g_scene.meshes )
+    for ( const auto& mesh : scene.meshes )
     {
         // TODO: buffer storage
         MeshData data;
@@ -395,7 +398,7 @@ void MainRenderer::createGpuResources()
     }
 
     // create material
-    for ( const std::unique_ptr<Material>& mat : g_scene.materials )
+    for ( const auto& mat : scene.materials )
     {
         MaterialData matData;
         if ( !mat->albedoTexture.empty() )
@@ -478,6 +481,7 @@ void MainRenderer::visualizeVoxels()
 
 void MainRenderer::gbufferPass()
 {
+    Scene scene = Com_GetScene();
     GlslProgram& program = m_gbufferProgram;
 
     m_gbuffer.bind();
@@ -490,13 +494,13 @@ void MainRenderer::gbufferPass()
 
     static GLint location_M = program.getUniformLocation( "M" );
     // TODO: refactor draw scene
-    for ( const GeometryNode& node : g_scene.geometryNodes )
+    for ( const GeometryNode& node : scene.geometryNodes )
     {
         program.setUniform( location_M, node.transform );
 
         for ( const Geometry& geom : node.geometries )
         {
-            if ( !g_scene.camera.frustum.Intersect( geom.boundingBox ) )
+            if ( !scene.camera.frustum.Intersect( geom.boundingBox ) )
             {
                 ++g_UIControls.objectOccluded;
                 continue;
@@ -531,6 +535,7 @@ void MainRenderer::gbufferPass()
 
 void MainRenderer::shadowPass()
 {
+    Scene scene = Com_GetScene();
     m_shadowBuffer.bind();
 
     glEnable( GL_DEPTH_TEST );
@@ -544,7 +549,7 @@ void MainRenderer::shadowPass()
 
     static GLint PVMLocation = m_depthProgram.getUniformLocation( "u_PVM" );
 
-    for ( const GeometryNode& node : g_scene.geometryNodes )
+    for ( const GeometryNode& node : scene.geometryNodes )
     {
         mat4 PVM = m_vsPerFrameBuffer.cache.lightSpace * node.transform;
         m_depthProgram.setUniform( PVMLocation, PVM );
@@ -566,6 +571,8 @@ void MainRenderer::shadowPass()
 
 void MainRenderer::renderToVoxelTexture()
 {
+    Scene scene = Com_GetScene();
+
     glDisable( GL_CULL_FACE );
     glDisable( GL_DEPTH_TEST );
     glDisable( GL_BLEND );
@@ -577,7 +584,7 @@ void MainRenderer::renderToVoxelTexture()
     m_voxelProgram.use();
     static GLint mLocation = m_voxelProgram.getUniformLocation( "u_M" );
 
-    for ( const GeometryNode& node : g_scene.geometryNodes )
+    for ( const GeometryNode& node : scene.geometryNodes )
     {
         m_voxelProgram.setUniform( mLocation, node.transform );
         for ( const Geometry& geom : node.geometries )
@@ -639,6 +646,8 @@ void MainRenderer::vctPass()
 
 void MainRenderer::renderBoundingBox()
 {
+    Scene scene = Com_GetScene();
+
     /// TODO: refactor
     m_boxWireframeProgram.use();
     static const GLint centerLocation = m_boxWireframeProgram.getUniformLocation( "u_center" );
@@ -650,7 +659,7 @@ void MainRenderer::renderBoundingBox()
     if ( g_UIControls.showObjectBoundingBox )
     {
         m_boxWireframeProgram.setUniform( colorLocation, vec3( 0, 1, 0 ) );
-        for ( const GeometryNode& node : g_scene.geometryNodes )
+        for ( const GeometryNode& node : scene.geometryNodes )
         {
             for ( const Geometry& geom : node.geometries )
             {
@@ -664,8 +673,8 @@ void MainRenderer::renderBoundingBox()
     if ( g_UIControls.showWorldBoundingBox )
     {
         m_boxWireframeProgram.setUniform( colorLocation, vec3( 0, 0, 1 ) );
-        m_boxWireframeProgram.setUniform( centerLocation, g_scene.boundingBox.Center() );
-        m_boxWireframeProgram.setUniform( sizeLocation, g_scene.boundingBox.Size() );
+        m_boxWireframeProgram.setUniform( centerLocation, scene.boundingBox.Center() );
+        m_boxWireframeProgram.setUniform( sizeLocation, scene.boundingBox.Size() );
         glDrawElements( GL_LINES, m_boxWireframe.count, GL_UNSIGNED_INT, 0 );
     }
 }
@@ -729,22 +738,24 @@ void MainRenderer::renderFrameBufferTextures( const ivec2& extent )
 
 void MainRenderer::render()
 {
+    Scene scene = Com_GetScene();
+
     // update perframe cache
-    m_fsPerFrameBuffer.cache.light_position  = g_scene.light.position;
-    m_fsPerFrameBuffer.cache.camera_position = g_scene.camera.position;
+    m_fsPerFrameBuffer.cache.light_position  = scene.light.position;
+    m_fsPerFrameBuffer.cache.camera_position = scene.camera.position;
     m_fsPerFrameBuffer.update();
 
-    const mat4 PV                       = g_scene.camera.perspective() * g_scene.camera.view();
+    const mat4 PV                       = scene.camera.perspective() * scene.camera.view();
     m_vsPerFrameBuffer.cache.PV         = PV;
-    m_vsPerFrameBuffer.cache.lightSpace = lightSpaceMatrix( g_scene.light.position, g_scene.shadowBox );
+    m_vsPerFrameBuffer.cache.lightSpace = lightSpaceMatrix( scene.light.position, scene.shadowBox );
     m_vsPerFrameBuffer.update();
 
-    if ( g_scene.lightDirty )
+    if ( scene.lightDirty )
     {
         shadowPass();
     }
 
-    if ( g_scene.dirty || g_UIControls.forceUpdateVoxelTexture )
+    if ( scene.dirty || g_UIControls.forceUpdateVoxelTexture )
     {
         m_albedoVoxel.clear();
         m_normalVoxel.clear();
@@ -757,7 +768,7 @@ void MainRenderer::render()
     if ( extent.x * extent.y > 0 )
     {
         // skip rendering if minimized
-        g_scene.camera.frustum = Frustum( PV );
+        scene.camera.frustum = Frustum( PV );
 
         glViewport( 0, 0, extent.x, extent.y );
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );

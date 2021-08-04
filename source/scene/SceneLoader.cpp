@@ -7,6 +7,7 @@
 
 #include <assimp/Importer.hpp>
 
+#include "common/com_filesystem.h"
 #include "universal/core_assert.h"
 #include "universal/print.h"
 
@@ -17,13 +18,15 @@ namespace vct {
 
 void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transform, bool flipUVs )
 {
-    Com_Printf( "[assimp] loading model from '%s'", path );
+    char fullpath[kMaxOSPath];
+    Com_FsBuildPath( fullpath, kMaxOSPath, path, "data/models" );
+    Com_Printf( "[assimp] loading model from '%s'", fullpath );
+
     Assimp::Importer importer;
 
     unsigned int flag = aiProcess_CalcTangentSpace | aiProcess_Triangulate;
     flag |= flipUVs ? aiProcess_FlipUVs : 0;
-
-    const aiScene* aiscene = importer.ReadFile( path, flag );
+    const aiScene* aiscene = importer.ReadFile( fullpath, flag );
 
     // check for errors
     if ( !aiscene || aiscene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !aiscene->mRootNode )  // if is Not Zero
@@ -37,7 +40,7 @@ void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transfor
     }
 
     // set base path
-    m_currentPath = path;
+    m_currentPath = fullpath;
     auto found    = m_currentPath.find_last_of( "/\\" );
     m_currentPath = m_currentPath.substr( 0, found + 1 );
 
@@ -47,7 +50,7 @@ void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transfor
     {
         const aiMaterial* aimat = aiscene->mMaterials[i];
         Material* mat           = processMaterial( aimat );
-        scene.materials.push_back( std::move( std::unique_ptr<Material>( mat ) ) );
+        scene.materials.emplace_back( std::shared_ptr<Material>( mat ) );
     }
 
     GeometryNode node;
@@ -63,7 +66,7 @@ void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transfor
         box.Expand( mesh->positions.data(), mesh->positions.size() );
         box.ApplyMatrix( transform );
         node.geometries.push_back( { mesh, mat, box } );
-        scene.meshes.push_back( std::move( std::unique_ptr<Mesh>( mesh ) ) );
+        scene.meshes.emplace_back( std::shared_ptr<Mesh>( mesh ) );
 
         scene.boundingBox.Union( box );
     }

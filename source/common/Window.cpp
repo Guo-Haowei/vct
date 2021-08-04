@@ -16,12 +16,6 @@ namespace vct {
 
 void Window::initialize()
 {
-    glfwSetErrorCallback( []( int code, const char* desc ) {
-        Com_PrintFatal( "[glfw] error(%d): %s", code, desc );
-    } );
-
-    glfwInit();
-
     glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
     glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 5 );
     glfwWindowHint( GLFW_RESIZABLE, GLFW_FALSE );
@@ -29,7 +23,7 @@ void Window::initialize()
 
     const GLFWvidmode* vidmode = glfwGetVideoMode( glfwGetPrimaryMonitor() );
 
-    const float scale = 0.9f;
+    const float scale = 0.7f;
     const int width   = static_cast<int>( scale * vidmode->width );
     const int height  = static_cast<int>( scale * vidmode->height );
 
@@ -113,7 +107,6 @@ void Window::finalize()
         glfwDestroyCursor( cursor );
 
     glfwDestroyWindow( m_pGlfwWindow );
-    glfwTerminate();
 }
 
 bool Window::shouldClose()
