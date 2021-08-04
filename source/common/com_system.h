@@ -6,5 +6,5 @@ vct::Scene& Com_GetScene();
 [[nodiscard]] bool Com_RegisterDvars();
 [[nodiscard]] bool Com_LoadScene();
 
-[[nodiscard]] bool Com_InitMainWindow();
-void Com_DestroyMainWindow();
+[[nodiscard]] bool Com_ImGuiInit();
+void Com_ImGuiShutdown();

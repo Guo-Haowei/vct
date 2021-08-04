@@ -11,7 +11,7 @@ add_executable(vct
 target_link_libraries(vct PUBLIC
     universal
     common
-    vct::imgui
+    imgui
     vct::renderer
     vct::scene
 )

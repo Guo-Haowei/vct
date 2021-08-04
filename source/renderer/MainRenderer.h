@@ -3,7 +3,6 @@
 #include "GpuBuffer.h"
 #include "GpuTexture.h"
 #include "RenderTarget.h"
-#include "common/Window.h"
 
 namespace vct {
 
@@ -86,11 +85,7 @@ class MainRenderer {
     void shadowPass();
     void vctPass();
 
-    inline void setWindow( Window* pWindow ) { m_pWindow = pWindow; }
-
    private:
-    Window* m_pWindow;
-
     /// shader programs
     GlslProgram m_voxelProgram;
     GlslProgram m_visualizeProgram;

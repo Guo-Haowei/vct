@@ -1,8 +1,10 @@
 add_library(common
-    Window.cpp
     com_cmdline.cpp
     com_filesystem.cpp
     com_system.cpp
+    editor.cpp
+    imgui_impl_glfw.cpp
+    main_window.cpp
     main.cpp
 )
 

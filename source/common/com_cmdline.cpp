@@ -120,5 +120,6 @@ bool Com_ProcessCmdLine( int argc, const char** argv )
         }
     }
 
+    Com_PrintSuccess( "cmd line processed" );
     return true;
 }

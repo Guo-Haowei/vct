@@ -40,7 +40,6 @@ struct UIControlls {
     int voxelMipLevel    = 0;
     int showVoxelTexture = -1;
 
-    int objectOccluded = 0;
     int totalMaterials = 0;
     int totalMeshes    = 0;
     int drawTexture    = TEXTURE_FINAL_IMAGE;

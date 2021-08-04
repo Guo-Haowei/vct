@@ -6,6 +6,7 @@
 
 #include "common/Globals.h"
 #include "common/com_system.h"
+#include "common/main_window.h"
 #include "scene/Scene.h"
 #include "universal/core_assert.h"
 
@@ -502,7 +503,6 @@ void MainRenderer::gbufferPass()
         {
             if ( !scene.camera.frustum.Intersect( geom.boundingBox ) )
             {
-                ++g_UIControls.objectOccluded;
                 continue;
             }
 
@@ -762,9 +762,7 @@ void MainRenderer::render()
         renderToVoxelTexture();
     }
 
-    ivec2 extent;
-    m_pWindow->getFrameExtent( &extent.x, &extent.y );
-
+    ivec2 extent = MainWindow::FrameSize();
     if ( extent.x * extent.y > 0 )
     {
         // skip rendering if minimized
@@ -798,8 +796,7 @@ void MainRenderer::render()
 
 void MainRenderer::createFrameBuffers()
 {
-    ivec2 extent;
-    m_pWindow->getFrameExtent( &extent.x, &extent.y );
+    const ivec2 extent = MainWindow::FrameSize();
 
     m_shadowBuffer.create( SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION );
 

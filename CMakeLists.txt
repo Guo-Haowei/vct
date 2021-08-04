@@ -16,6 +16,7 @@ add_subdirectory(external/glad)
 
 include_directories(${PROJECT_SOURCE_DIR}/source/)
 include_directories(${PROJECT_SOURCE_DIR}/external/glm/)
+include_directories(${PROJECT_SOURCE_DIR}/external/glad/include/)
 
 add_definitions(-DDATA_DIR="${CMAKE_SOURCE_DIR}/data/")
 add_definitions(-DROOT_FOLDER="${CMAKE_SOURCE_DIR}/")

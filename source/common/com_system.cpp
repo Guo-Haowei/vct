@@ -1,8 +1,10 @@
 #include "com_system.h"
 
-#include <GLFW/glfw3.h>
+#include <filesystem>
 
 #include "Globals.h"
+#include "com_filesystem.h"
+#include "imgui/imgui.h"
 #include "scene/SceneLoader.h"
 #include "universal/core_assert.h"
 #include "universal/print.h"
@@ -57,6 +59,7 @@ bool Com_LoadScene()
     g_UIControls.totalMeshes    = static_cast<int>( scene.meshes.size() );
     g_UIControls.totalMaterials = static_cast<int>( scene.materials.size() );
 
+    Com_PrintSuccess( "Scene '%s' loaded", scenePath );
     return true;
 }
 
@@ -65,25 +68,37 @@ vct::Scene& Com_GetScene()
     return g_scene;
 }
 
-//------------------------------------------------------------------------------
-// Window
-//------------------------------------------------------------------------------
-bool Com_InitMainWindow()
+bool Com_ImGuiInit()
 {
-    glfwSetErrorCallback( []( int code, const char* desc ) {
-        Com_PrintFatal( "[glfw] error(%d): %s", code, desc );
-    } );
+    constexpr char* kDefaultIniFileName   = "imgui.ini";
+    constexpr char kDefaultEditorLayout[] = "default/imgui.ini";
+    static char s_iniFileNameLoad[kMaxOSPath];
 
-    glfwInit();
+    if ( std::filesystem::exists( kDefaultIniFileName ) )
+    {
+        strncpy( s_iniFileNameLoad, kDefaultIniFileName, sizeof( s_iniFileNameLoad ) );
+    }
+    else
+    {
+        Com_FsBuildPath( s_iniFileNameLoad, kMaxOSPath, kDefaultEditorLayout );
+    }
 
-    // glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
-    // glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 5 );
-    // glfwWindowHint( GLFW_RESIZABLE, GLFW_FALSE );
-    // IF_TEST( glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, 1 ) );
+    Com_Printf( "[imgui] loading imgui config from '%s'", s_iniFileNameLoad );
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+
+    ImGuiIO& io        = ImGui::GetIO();
+    io.IniFilenameLoad = s_iniFileNameLoad;
+    io.IniFilenameSave = kDefaultIniFileName;
+    io.FontGlobalScale = 1.5f;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // Enable Docking
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;    // Enable Multi-Viewport / Platform Windows
+
+    Com_PrintSuccess( "ImGui initialized" );
     return true;
 }
 
-void Com_DestroyMainWindow()
+void Com_ImGuiShutdown()
 {
-    glfwTerminate();
 }
