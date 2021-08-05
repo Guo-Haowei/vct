@@ -120,13 +120,6 @@ ComFile::Result ComFile::Read( char* buffer, size_t size )
     return Result::Ok;
 }
 
-ComFile::Result ComFile::Read( std::vector<char>& buffer )
-{
-    const size_t size = Size();
-    buffer.resize( size );
-    return Read( buffer.data(), size );
-}
-
 ComFile::Result ComFile::Write( char* buffer, size_t size )
 {
     core_assert( handle );

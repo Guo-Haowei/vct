@@ -2,20 +2,53 @@
 
 #include "Globals.h"
 #include "common/com_system.h"
+#include "common/main_window.h"
 #include "imgui/imgui.h"
+#include "imgui/imgui_internal.h"
 #include "universal/core_assert.h"
 
 using namespace vct;
 
 UIControlls g_UIControls;
 
-static void EditorConsole();
+class Editor {
+    ImVec2 pos;
+    ImVec2 size;
 
-void EditorSelectObject()
+    void VoxelGIWindow();
+    void LightWindow();
+    void DockSpace();
+
+    Editor() = default;
+
+   public:
+    static Editor& Singleton()
+    {
+        static Editor editor;
+        return editor;
+    }
+
+    void Update();
+};
+
+void Editor::LightWindow()
+{
+    ImGui::Begin( "Light" );
+    Scene& scene = Com_GetScene();
+    if ( ImGui::DragFloat3( "position", &( scene.light.position.x ), 1.f, -100.f, 100.f ) )
+    {
+        scene.lightDirty = true;
+    }
+    ImGui::Separator();
+    ImGui::ColorEdit3( "color", &( scene.light.color.x ) );
+    ImGui::End();
+}
+
+void Editor::VoxelGIWindow()
 {
     Scene& scene = Com_GetScene();
-    ImGui::Begin( "Debug" );
-    ImGui::Text( "Voxel GI" );
+    ImGui::Begin( "Voxel GI" );
+    ImGui::Text( "Enabled: " );
     ImGui::SameLine();
     ImGui::RadioButton( "On", &g_UIControls.voxelGiMode, 1 );
     ImGui::SameLine();
@@ -25,16 +58,22 @@ void EditorSelectObject()
     ImGui::Text( "Voxel Texture Size: %d", VOXEL_TEXTURE_SIZE );
     ImGui::Text( "Voxel Mip Level: %d", VOXEL_TEXTURE_MIP_LEVEL );
     if ( ImGui::Checkbox( "Force voxel texture update", &g_UIControls.forceUpdateVoxelTexture ) )
+    {
         scene.dirty = true;
+    }
     ImGui::Separator();
     ImGui::SliderInt( "Voxel Mipmap Level", &g_UIControls.voxelMipLevel, 0, VOXEL_TEXTURE_MIP_LEVEL - 1 );
     ImGui::Separator();
 
     ImGui::Text( "Debug Bounding Box" );
     if ( ImGui::Checkbox( "Show Object Bounding Box", &g_UIControls.showObjectBoundingBox ) )
+    {
         g_UIControls.showWorldBoundingBox = false;
+    }
     if ( ImGui::Checkbox( "Show World Bounding Box", &g_UIControls.showWorldBoundingBox ) )
+    {
         g_UIControls.showObjectBoundingBox = false;
+    }
 
     ImGui::Separator();
 
@@ -92,7 +131,7 @@ void EditorSelectObject()
     // }
 }
 
-static void EditorDockSpace()
+void Editor::DockSpace()
 {
     ImGui::GetMainViewport();
 
@@ -132,18 +171,20 @@ static void EditorDockSpace()
     ImGuiIO& io          = ImGui::GetIO();
     ImGuiID dockspace_id = ImGui::GetID( "MyDockSpace" );
     ImGui::DockSpace( dockspace_id, ImVec2( 0.0f, 0.0f ), dockspace_flags );
-    // const auto* node = ImGui::DockBuilderGetCentralNode( dockspace_id );
-    // core_assert( node );
 
-    // // viewport
-    // s_glob.vp.topLeftX    = node->Pos.x - viewport->WorkPos.x;
-    // s_glob.vp.topLeftY    = node->Pos.y - viewport->WorkPos.y;
-    // s_glob.vp.bottomLeftY = viewport->WorkSize.y - node->Size.y - ( node->Pos.y - viewport->WorkPos.y );
-    // s_glob.vp.width       = node->Size.x;
-    // s_glob.vp.height      = node->Size.y;
+    const auto* node = ImGui::DockBuilderGetCentralNode( dockspace_id );
+    core_assert( node );
+
+    // viewport
+
+    // vp.topLeftX    = node->Pos.x - viewport->WorkPos.x;
+    // vp.topLeftY    = node->Pos.y - viewport->WorkPos.y;
+    // vp.bottomLeftY = viewport->WorkSize.y - node->Size.y - ( node->Pos.y - viewport->WorkPos.y );
+    // vp.width       = node->Size.x;
+    // vp.height      = node->Size.y;
     // position
-    // s_glob.pos  = node->Pos;
-    // s_glob.size = node->Size;
+    pos  = node->Pos;
+    size = node->Size;
 
     if ( ImGui::BeginMenuBar() )
     {
@@ -167,27 +208,6 @@ static void EditorDockSpace()
             {
             }
             if ( ImGui::MenuItem( "Save As.." ) )
-            {
-            }
-            ImGui::EndMenu();
-        }
-        ImGui::Separator();
-        if ( ImGui::BeginMenu( "Edit" ) )
-        {
-            if ( ImGui::MenuItem( "Undo", "CTRL+Z" ) )
-            {
-            }
-            if ( ImGui::MenuItem( "Redo", "CTRL+Y", false, false ) )
-            {
-            }  // Disabled item
-            ImGui::Separator();
-            if ( ImGui::MenuItem( "Cut", "CTRL+X" ) )
-            {
-            }
-            if ( ImGui::MenuItem( "Copy", "CTRL+C" ) )
-            {
-            }
-            if ( ImGui::MenuItem( "Paste", "CTRL+V" ) )
             {
             }
             ImGui::EndMenu();
@@ -228,50 +248,6 @@ static void EditorDockSpace()
         ImGui::EndMenuBar();
     }
 
-    ImGui::End();
-}
-
-static void EditorDebugWindow()
-{
-    ImGui::Begin( "Debug" );
-    ImGui::Text( "%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate );
-    ImGui::Text( "This is some useful text." );  // Display some text (you can use a format strings too)
-
-    // int w, h;
-    // Com_GetFrameSize( &w, &h );
-    // ImGui::Separator();
-    // ImGui::Text( "Framebuffer size: %d x %d", w, h );
-    // w = int( s_glob.size.x );
-    // h = int( s_glob.size.y );
-    // ImGui::Text( "Viewport size: %d x %d", w, h );
-    ImGui::Separator();
-    if ( ImGui::IsMousePosValid() )
-    {
-        const ImGuiIO& io = ImGui::GetIO();
-        // const float x     = io.MousePos.x - s_glob.pos.x;
-        // const float y     = io.MousePos.y - s_glob.pos.y;
-        const float x = io.MousePos.x;
-        const float y = io.MousePos.y;
-        ImGui::Text( "Mouse Position: (%.3f,%.3f)", x, y );
-    }
-    else
-    {
-        ImGui::Text( "Mouse Position: <invalid>" );
-    }
-
-    ImGui::End();
-}
-
-static void EditorLightWindow()
-{
-    ImGui::Begin( "Selected Light" );
-    // Scene* scene = Com_GetScene();
-    // if ( scene )
-    // {
-    //     ImGui::DragFloat3( "position", &( scene->light.position.x ), 1.f, -100.f, 100.f );
-    //     ImGui::Separator();
-    //     ImGui::ColorEdit3( "color", &( scene->light.color.x ) );
-    // }
     ImGui::End();
 }
 
@@ -343,18 +319,24 @@ static void EditorSceneWindow()
     ImGui::End();
 }
 
-void EditorSetup()
+void Editor::Update()
 {
-    static bool show_demo_window = true;
-    EditorDockSpace();
-    EditorDebugWindow();
-    EditorSelectObject();
+    // if ( MainWindow::IsMouseInScreen() )
+    {
+        DockSpace();
+        VoxelGIWindow();
+        LightWindow();
+    }
     // EditorCameraWindow();
     // EditorMeshWindow();
     // EditorSceneWindow();
-    // EditorLightWindow();
     // EditorConsole();
     // EditorDebugWindow();
+}
+
+void EditorSetup()
+{
+    Editor::Singleton().Update();
 }
 
 void EditorSetupStyle()

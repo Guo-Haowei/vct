@@ -1,23 +1,11 @@
 #pragma once
 #include <array>
 #include <memory>
-#include <string>
-#include <vector>
 
 #include "Camera.h"
-#include "universal/core_math.h"
+#include "common/scene_components.h"
 
 namespace vct {
-
-struct Mesh {
-    std::vector<vec3> positions;
-    std::vector<vec3> normals;
-    std::vector<vec3> tangents;
-    std::vector<vec3> bitangents;
-    std::vector<vec2> uvs;
-    std::vector<uvec3> faces;
-    unsigned int materialIndex;
-};
 
 struct Material {
     /// only support albedo color for now
@@ -36,7 +24,7 @@ struct Material {
 };
 
 struct Geometry {
-    Mesh* pMesh;
+    MeshComponent* pMesh;
     Material* pMaterial;
     Box3 boundingBox;
 };
@@ -54,7 +42,7 @@ struct Light {
 
 struct Scene {
     std::vector<GeometryNode> geometryNodes;
-    std::vector<std::shared_ptr<Mesh>> meshes;
+    std::vector<std::shared_ptr<MeshComponent>> meshes;
     std::vector<std::shared_ptr<Material>> materials;
     Light light;
     Box3 boundingBox;

@@ -6,8 +6,11 @@ namespace vct {
 
 class GlslProgram : public GpuResource {
    public:
-    void createFromFiles( const char* vert, const char* frag, const char* geom = nullptr );
-    void createFromFile( const char* comp );
+    void Create( GLuint program )
+    {
+        m_handle = program;
+    }
+
     void use();
     void stop();
     void destroy();

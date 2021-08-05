@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 
 #include "com_dvars.h"
+#include "imgui/imgui.h"
 #include "universal/core_assert.h"
 #include "universal/print.h"
 
@@ -11,6 +12,7 @@ namespace MainWindow {
 static bool g_initialized;
 static GLFWwindow* g_window;
 static ivec2 g_frameSize;
+static vec2 g_mousePos;
 
 static constexpr const char TITLE[] = "Editor";
 
@@ -71,8 +73,22 @@ void NewFrame()
     ivec2& size = g_frameSize;
     glfwGetFramebufferSize( g_window, &size.x, &size.y );
 
+    // mouse position
+    {
+        double x, y;
+        glfwGetCursorPos( g_window, &x, &y );
+        g_mousePos.x = static_cast<float>( x );
+        g_mousePos.y = static_cast<float>( y );
+    }
+
+    // title
     char buffer[1024];
-    snprintf( buffer, sizeof( buffer ), "%s | %dx%d (OpenGL)", TITLE, size.x, size.y );
+    snprintf( buffer, sizeof( buffer ),
+              "%s | Size: %d x %d | Mouse: %d x %d | FPS: %.1f",
+              TITLE,
+              size.x, size.y,
+              int( g_mousePos.x ), int( g_mousePos.y ),
+              ImGui::GetIO().Framerate );
     glfwSetWindowTitle( g_window, buffer );
 }
 
@@ -84,6 +100,26 @@ ivec2 FrameSize()
 void Present()
 {
     glfwSwapBuffers( g_window );
+}
+
+vec2 MousePos()
+{
+    return g_mousePos;
+}
+
+bool IsKeyDown( int code )
+{
+    return ImGui::IsKeyDown( code );
+}
+
+bool IsMouseInScreen()
+{
+    bool inside = true;
+    inside &= g_mousePos.x >= 0;
+    inside &= g_mousePos.y >= 0;
+    inside &= g_mousePos.x <= g_frameSize.x;
+    inside &= g_mousePos.y <= g_frameSize.y;
+    return inside;
 }
 
 }  // namespace MainWindow

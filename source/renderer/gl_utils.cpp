@@ -2,11 +2,16 @@
 
 #include <glad/glad.h>
 
+#include <filesystem>
 #include <set>
+#include <sstream>
 
 #include "common/com_dvars.h"
+#include "common/com_filesystem.h"
+#include "universal/core_assert.h"
 #include "universal/dvar_api.h"
 #include "universal/print.h"
+#include "universal/universal.h"
 
 namespace gl {
 
@@ -39,6 +44,164 @@ bool Init()
 
     return true;
 }
+
+//------------------------------------------------------------------------------
+// Shader
+//------------------------------------------------------------------------------
+
+static std::string ProcessShader( const std::string &source )
+{
+    std::string result;
+    std::stringstream ss( source );
+    for ( std::string line; std::getline( ss, line ); )
+    {
+        constexpr const char pattern[] = "#include";
+        if ( line.find( pattern ) == 0 )
+        {
+            std::string include = line.substr( line.find( '"' ) );
+            core_assert( include.front() == '"' && include.back() == '"' );
+            include.pop_back();
+            ComFileWrapper fhandle( Com_FsOpenRead( include.c_str() + 1, "shaders" ) );
+            std::vector<char> extra;
+            if ( fhandle.Read( extra ) != ComFile::Result::Ok )
+            {
+                Com_PrintError( "[filesystem] failed to read shader '%s'", include );
+            }
+            result.append( extra.data() );
+        }
+        else
+        {
+            result.append( line );
+        }
+
+        result.push_back( '\n' );
+    }
+
+    return result;
+}
+
+class ShaderHandleWrapper {
+    GLuint handle_ = 0;
+
+   public:
+    ShaderHandleWrapper( GLuint handle )
+        : handle_( handle ) {}
+
+    ~ShaderHandleWrapper()
+    {
+        if ( handle_ )
+        {
+            glDeleteShader( handle_ );
+        }
+    }
+
+    operator GLuint()
+    {
+        core_assert( handle_ );
+        return handle_;
+    }
+};
+
+static GLuint CreateShader( const char *file, GLenum type )
+{
+    ComFileWrapper fhandle( Com_FsOpenRead( file, "shaders" ) );
+    std::string source;
+    const ComFile::Result result = fhandle.Read( source );
+    if ( result != ComFile::Result::Ok )
+    {
+        Com_PrintError( "[filesystem] failed to read shader '%s'", file );
+        return 0;
+    }
+
+    std::string fullsource         = ProcessShader( source );
+    constexpr const char version[] = "#version 460 core\n";
+    const char *sources[]          = { version, fullsource.c_str() };
+
+    GLuint shader = glCreateShader( type );
+    glShaderSource( shader, array_length( sources ), sources, nullptr );
+    glCompileShader( shader );
+
+    GLint status = GL_FALSE, length = 0;
+    glGetShaderiv( shader, GL_COMPILE_STATUS, &status );
+    glGetShaderiv( shader, GL_INFO_LOG_LENGTH, &length );
+    if ( length > 0 )
+    {
+        std::vector<char> buffer( length + 1 );
+        glGetShaderInfoLog( shader, length, nullptr, buffer.data() );
+        Com_PrintError( "[glsl] failed to compile shader '%s'\ndetails:\n%s", file, buffer.data() );
+    }
+
+    if ( status == GL_FALSE )
+    {
+        glDeleteShader( shader );
+        return 0;
+    }
+
+    return shader;
+}
+
+GLuint CreateShaderProgram( const ProgramCreateInfo &info )
+{
+    GLuint program   = 0;
+    const char *name = "<unknown>";
+
+    GLuint vs, ps, gs, cs;
+
+    if ( !info.cs.empty() )
+    {
+        core_assert( info.vs.empty() );
+        core_assert( info.ps.empty() );
+        core_assert( info.gs.empty() );
+
+        Com_PrintInfo( "compiling compute (%s) pipeline", info.cs.c_str() );
+        program = glCreateProgram();
+        name    = info.cs.c_str();
+        cs      = CreateShader( info.cs.c_str(), GL_COMPUTE_SHADER );
+        glAttachShader( program, cs );
+    }
+    else if ( info.vs[0] && info.ps[0] )
+    {
+        Com_PrintInfo( "compiling vertex (%s), geometry(%s), pixel(%s)", info.vs.c_str(), info.gs.c_str(), info.ps.c_str() );
+
+        program = glCreateProgram();
+        name    = info.vs.c_str();
+
+        vs = CreateShader( info.vs.c_str(), GL_VERTEX_SHADER );
+        glAttachShader( program, vs );
+        ps = CreateShader( info.ps.c_str(), GL_FRAGMENT_SHADER );
+        glAttachShader( program, ps );
+        if ( !info.gs.empty() )
+        {
+            gs = CreateShader( info.gs.c_str(), GL_GEOMETRY_SHADER );
+            glAttachShader( program, gs );
+        }
+    }
+
+    core_assert( program );
+
+    glLinkProgram( program );
+    GLint status = GL_FALSE, length = 0;
+    glGetProgramiv( program, GL_LINK_STATUS, &status );
+    glGetProgramiv( program, GL_INFO_LOG_LENGTH, &length );
+    if ( length > 0 )
+    {
+        std::vector<char> buffer( length + 1 );
+        glGetProgramInfoLog( program, length, nullptr, buffer.data() );
+        Com_PrintError( "[glsl] failed to link program '%s'\ndetails:\n%s", name, buffer.data() );
+    }
+
+    if ( status == GL_FALSE )
+    {
+        glDeleteProgram( program );
+        return 0;
+    }
+
+    return program;
+}
+
+//------------------------------------------------------------------------------
+// DebugCallback
+//------------------------------------------------------------------------------
 
 static void APIENTRY DebugCallback(
     GLenum source,
@@ -98,7 +261,7 @@ static void APIENTRY DebugCallback(
 
     if ( sSet.find( id ) == sSet.end() )
     {
-        detail::Print( level, "[opengl] %s\n\t| id: %d| source: %s | type: %s | severity: %s |", message, id, sourceStr, typeStr, severityStr );
+        detail::Print( level, "[opengl] %s\n\t| id: %d | source: %s | type: %s | severity: %s |", message, id, sourceStr, typeStr, severityStr );
         sSet.insert( id );
     }
 

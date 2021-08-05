@@ -31,12 +31,7 @@ void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transfor
     // check for errors
     if ( !aiscene || aiscene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !aiscene->mRootNode )  // if is Not Zero
     {
-        // std::cout << "[ERROR] assimp failed to load.";
-        // std::cout << importer.GetErrorString() << std::endl;
-        // string error( "assimp: failed to load scene [" );
-        // error.append( path ).append( "]\n\t" ).append( importer.GetErrorString() );
-        // THROW_EXCEPTION( error );
-        core_assert( 0 && "TODO: check parsing error" );
+        Com_PrintError( "[assimp] failed to load scene '%s'\n\tdetails: %s", fullpath, importer.GetErrorString() );
     }
 
     // set base path
@@ -59,14 +54,14 @@ void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transfor
     for ( uint32_t i = 0; i < aiscene->mNumMeshes; ++i )
     {
         const aiMesh* aimesh = aiscene->mMeshes[i];
-        Mesh* mesh           = processMesh( aimesh );
-        size_t index         = materialOffset + mesh->materialIndex;
+        MeshComponent* mesh  = processMesh( aimesh );
+        size_t index         = materialOffset + mesh->materialIdx;
         Material* mat        = scene.materials.at( index ).get();
         Box3 box;
         box.Expand( mesh->positions.data(), mesh->positions.size() );
         box.ApplyMatrix( transform );
         node.geometries.push_back( { mesh, mat, box } );
-        scene.meshes.emplace_back( std::shared_ptr<Mesh>( mesh ) );
+        scene.meshes.emplace_back( std::shared_ptr<MeshComponent>( mesh ) );
 
         scene.boundingBox.Union( box );
     }
@@ -111,56 +106,63 @@ Material* SceneLoader::processMaterial( const aiMaterial* aimaterial )
     return mat;
 }
 
-Mesh* SceneLoader::processMesh( const aiMesh* aimesh )
+MeshComponent* SceneLoader::processMesh( const aiMesh* aimesh )
 {
-    string name = aimesh->mName.C_Str();
-    Mesh* mesh  = new Mesh;
+    core_assert( aimesh->mNumVertices );
+
+    string name         = aimesh->mName.C_Str();
+    MeshComponent* mesh = new MeshComponent;
     mesh->positions.reserve( aimesh->mNumVertices );
     mesh->normals.reserve( aimesh->mNumVertices );
     mesh->uvs.reserve( aimesh->mNumVertices );
 
     bool hasUv = aimesh->mTextureCoords[0];
 
+    mesh->flags = MeshComponent::HAS_UV_FLAG | MeshComponent::HAS_NORMAL_FLAG;
+
     for ( uint32_t i = 0; i < aimesh->mNumVertices; ++i )
     {
         auto& position = aimesh->mVertices[i];
-        mesh->positions.push_back( vec3( position.x, position.y, position.z ) );
+        mesh->positions.emplace_back( vec3( position.x, position.y, position.z ) );
         auto& normal = aimesh->mNormals[i];
-        mesh->normals.push_back( vec3( normal.x, normal.y, normal.z ) );
+        mesh->normals.emplace_back( vec3( normal.x, normal.y, normal.z ) );
 
         if ( hasUv )
         {
             auto& uv = aimesh->mTextureCoords[0][i];
-            mesh->uvs.push_back( vec2( uv.x, uv.y ) );
+            mesh->uvs.emplace_back( vec2( uv.x, uv.y ) );
         }
         else
         {
-            mesh->uvs.push_back( vec2( 0 ) );
+            mesh->uvs.emplace_back( vec2( 0 ) );
         }
     }
 
     bool hasTangent = aimesh->mTangents != nullptr;
     if ( aimesh->mTangents )
     {
+        mesh->flags |= MeshComponent::HAS_BITANGENT_FLAG;
         mesh->tangents.reserve( aimesh->mNumVertices );
         mesh->bitangents.reserve( aimesh->mNumVertices );
         for ( uint32_t i = 0; i < aimesh->mNumVertices; ++i )
         {
             auto& tangent = aimesh->mTangents[i];
-            mesh->tangents.push_back( vec3( tangent.x, tangent.y, tangent.z ) );
+            mesh->tangents.emplace_back( vec3( tangent.x, tangent.y, tangent.z ) );
             auto& bitangent = aimesh->mBitangents[i];
-            mesh->bitangents.push_back( vec3( bitangent.x, bitangent.y, bitangent.z ) );
+            mesh->bitangents.emplace_back( vec3( bitangent.x, bitangent.y, bitangent.z ) );
         }
     }
 
-    mesh->faces.reserve( aimesh->mNumFaces );
+    mesh->indices.reserve( aimesh->mNumFaces * 3 );
     for ( uint32_t i = 0; i < aimesh->mNumFaces; ++i )
     {
         aiFace& face = aimesh->mFaces[i];
-        mesh->faces.push_back( uvec3( face.mIndices[0], face.mIndices[1], face.mIndices[2] ) );
+        mesh->indices.emplace_back( face.mIndices[0] );
+        mesh->indices.emplace_back( face.mIndices[1] );
+        mesh->indices.emplace_back( face.mIndices[2] );
     }
 
-    mesh->materialIndex = aimesh->mMaterialIndex;
+    mesh->materialIdx = aimesh->mMaterialIndex;
 
     return mesh;
 }

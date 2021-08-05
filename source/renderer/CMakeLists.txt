@@ -5,6 +5,8 @@ add_library(renderer
     RenderTarget.cpp
     MainRenderer.cpp
     imgui_impl_opengl3.cpp
+    r_cbuffers.cpp
+    r_editor.cpp
     r_graphics.cpp
 )
 

@@ -1,16 +1,17 @@
 #pragma once
 #include "GlslProgram.h"
-#include "GpuBuffer.h"
 #include "GpuTexture.h"
 #include "RenderTarget.h"
+#include "gl_utils.h"
+#include "r_cbuffers.h"
 
 namespace vct {
 
 struct MeshData {
-    GLuint vao         = 0;
-    GLuint ebo         = 0;
-    GLuint vbos[5]     = { 0, 0, 0, 0, 0 };
-    unsigned int count = 0;
+    GLuint vao     = 0;
+    GLuint ebo     = 0;
+    GLuint vbos[5] = { 0, 0, 0, 0, 0 };
+    uint32_t count = 0;
 };
 
 struct MaterialData {
@@ -22,20 +23,6 @@ struct MaterialData {
     float roughness;
     // specular...
     // normal...
-};
-
-struct VSPerFrameCache {
-    mat4 PV;
-    mat4 lightSpace;
-};
-
-struct FSPerFrameCache {
-    vec3 light_position;  // direction
-    float _per_frame_pad0;
-    vec3 light_color;
-    float _per_frame_pad1;
-    vec3 camera_position;
-    float _per_frame_pad2;
 };
 
 struct MaterialCache {
@@ -65,8 +52,6 @@ struct ConstantCache {
     float padding[2];
 };
 
-static_assert( sizeof( VSPerFrameCache ) % 16 == 0 );
-static_assert( sizeof( FSPerFrameCache ) % 16 == 0 );
 static_assert( sizeof( MaterialCache ) % 16 == 0 );
 static_assert( sizeof( ConstantCache ) % 16 == 0 );
 
@@ -77,8 +62,8 @@ class MainRenderer {
     void render();
     void renderFrameBufferTextures( const ivec2& extent );
     void renderToVoxelTexture();
-    void renderBoundingBox();
-    void visualizeVoxels();
+    // void renderBoundingBox();
+    // void visualizeVoxels();
     void destroyGpuResources();
 
     void gbufferPass();
@@ -107,10 +92,8 @@ class MainRenderer {
     GpuTexture m_normalVoxel;
 
     /// uniform buffers
-    UniformBuffer<VSPerFrameCache> m_vsPerFrameBuffer;  // global binding 0
-    UniformBuffer<FSPerFrameCache> m_fsPerFrameBuffer;  // global binding 1
-    UniformBuffer<MaterialCache> m_fsMaterialBuffer;    // global binding 2
-    UniformBuffer<ConstantCache> m_constantBuffer;      // global binding 3
+    gl::ConstantBuffer<MaterialCache> m_fsMaterialBuffer;  // global binding 2
+    gl::ConstantBuffer<ConstantCache> m_constantBuffer;    // global binding 3
 
     /// render targets
     DepthRenderTarget m_shadowBuffer;

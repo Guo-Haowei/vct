@@ -20,7 +20,14 @@ struct ComFile {
     void Close();
     size_t Size();
     Result Read( char* buffer, size_t size );
-    Result Read( std::vector<char>& buffer );
+    template<class T>
+    Result Read( T& buffer )
+    {
+        const size_t size = Size();
+        buffer.resize( size );
+        return Read( buffer.data(), size );
+    }
+
     Result Write( char* buffer, size_t size );
 };
 
@@ -36,12 +43,14 @@ class ComFileWrapper {
 
    public:
     ComFileWrapper( ComFile file )
-        : file( file ) {
+        : file( file )
+    {
     }
 
     ComFileWrapper( const ComFileWrapper& ) = delete;
 
-    ~ComFileWrapper() {
+    ~ComFileWrapper()
+    {
         file.Close();
     }
 
@@ -49,7 +58,11 @@ class ComFileWrapper {
 
     inline size_t Size() { return file.Size(); }
     inline ComFile::Result Read( char* buffer, size_t size ) { return file.Read( buffer, size ); }
-    inline ComFile::Result Read( std::vector<char>& buffer ) { return file.Read( buffer ); }
+    template<class T>
+    inline ComFile::Result Read( T& buffer )
+    {
+        return file.Read<T>( buffer );
+    }
 
     inline ComFile::Result Write( char* buffer, size_t size ) { return file.Write( buffer, size ); }
 };

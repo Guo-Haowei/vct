@@ -14,7 +14,7 @@ class SceneLoader {
     void loadGltf( const char* path, Scene& scene, const mat4& transform, bool flipUVs = true );
 
    private:
-    Mesh* processMesh( const aiMesh* aimesh );
+    MeshComponent* processMesh( const aiMesh* aimesh );
     Material* processMaterial( const aiMaterial* aimaterial );
 
    private:

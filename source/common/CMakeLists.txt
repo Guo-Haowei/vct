@@ -3,6 +3,7 @@ add_library(common
     com_filesystem.cpp
     com_system.cpp
     editor.cpp
+    geometry.cpp
     imgui_impl_glfw.cpp
     main_window.cpp
     main.cpp

@@ -6,155 +6,15 @@
 
 #include "common/Globals.h"
 #include "common/com_system.h"
+#include "common/editor.h"
+#include "common/geometry.h"
 #include "common/main_window.h"
 #include "scene/Scene.h"
 #include "universal/core_assert.h"
 
-namespace three {
-namespace geometry {
-
-// clang-format off
-
-/**
- *        E__________________ H
- *       /|                 /|
- *      / |                / |
- *     /  |               /  |
- *   A/___|______________/D  |
- *    |   |              |   |
- *    |   |              |   |
- *    |   |              |   |
- *    |  F|______________|___|G
- *    |  /               |  /
- *    | /                | /
- *   B|/_________________|C
- *
- */
-void boxWireframe(std::vector<vec3>& outPoints, std::vector<unsigned int>& outIndices, float size)
-{
-    enum VertexIndex  { A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7 };
-
-    outPoints.clear();
-    outPoints = {
-        { -size, +size, +size }, // A
-        { -size, -size, +size }, // B
-        { +size, -size, +size }, // C
-        { +size, +size, +size }, // D
-        { -size, +size, -size }, // E
-        { -size, -size, -size }, // F
-        { +size, -size, -size }, // G
-        { +size, +size, -size }  // H
-    };
-
-    outIndices.clear();
-    outIndices = {
-        A, B, B, C, C, D, D, A,
-        E, F, F, G, G, H, H, E,
-        A, E, B, F, D, H, C, G
-    };
-}
-
-void box(std::vector<vec3>& outPoints, std::vector<unsigned int>& outIndices, float size)
-{
-    enum VertexIndex { A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7 };
-
-    outPoints.clear();
-    outPoints = {
-        { -size, +size, +size }, // A
-        { -size, -size, +size }, // B
-        { +size, -size, +size }, // C
-        { +size, +size, +size }, // D
-        { -size, +size, -size }, // E
-        { -size, -size, -size }, // F
-        { +size, -size, -size }, // G
-        { +size, +size, -size }  // H
-    };
-
-    outIndices.clear();
-    outIndices = {
-        A, B, D, // ABD
-        D, B, C, // DBC
-        E, H, F, // EHF
-        H, G, F, // HGF
-
-        D, C, G, // DCG
-        D, G, H, // DGH
-        A, F, B, // AFB
-        A, E, F, // AEF
-
-        A, D, H, // ADH
-        A, H, E, // AHE
-        B, F, G, // BFG
-        B, G, C, // BGC
-    };
-}
-
-void boxWithNormal(std::vector<vec3>& outPoints, std::vector<vec3>& outNomrals, std::vector<unsigned int>& outIndices, float size)
-{
-    outPoints.clear();
-    outPoints = {
-        { -size, +size, +size }, // A
-        { -size, -size, +size }, // B
-        { +size, -size, +size }, // C
-        { +size, +size, +size }, // D
-
-        { -size, +size, -size }, // E
-        { -size, -size, -size }, // F
-        { +size, -size, -size }, // G
-        { +size, +size, -size }, // H
-
-        { -size, +size, -size }, // E 8
-        { -size, -size, -size }, // F 9
-        { -size, -size, +size }, // B 10
-        { -size, +size, +size }, // A 11
-
-        { +size, +size, -size }, // H 12
-        { +size, -size, -size }, // G 13
-        { +size, -size, +size }, // C 14
-        { +size, +size, +size }, // D 15
-
-        { -size, +size, -size }, // E 16
-        { -size, +size, +size }, // A 17
-        { +size, +size, +size }, // D 18
-        { +size, +size, -size }, // H 19
-
-        { -size, -size, -size }, // F 20
-        { -size, -size, +size }, // B 21
-        { +size, -size, +size }, // C 22
-        { +size, -size, -size }, // G 23
-    };
-
-    constexpr vec3 UnitX(1, 0, 0);
-    constexpr vec3 UnitY(0, 1, 0);
-    constexpr vec3 UnitZ(0, 0, 1);
-
-    outNomrals.clear();
-    outNomrals = {
-        +UnitZ, +UnitZ, +UnitZ, +UnitZ,
-        -UnitZ, -UnitZ, -UnitZ, -UnitZ,
-        -UnitX, -UnitX, -UnitX, -UnitX,
-        +UnitX, +UnitX, +UnitX, +UnitX,
-        +UnitY, +UnitY, +UnitY, +UnitY,
-        -UnitY, -UnitY, -UnitY, -UnitY,
-    };
-
-    outIndices.clear();
-    outIndices = {
-        0, 1, 3, 3, 1, 2,
-        4, 7, 5, 7, 6, 5,
-        8, 9, 11, 9, 10, 11,
-        15, 14, 13, 15, 13, 12,
-        16, 17, 18, 16, 18, 19,
-        21, 20, 22, 20, 23, 22,
-    };
-}
-
-} // namespace geometry
-} // namespace three
-
 namespace vct {
 
-static std::unordered_map<const Mesh*, MeshData> g_meshLUT;
+static std::unordered_map<const MeshComponent*, MeshData> g_meshLUT;
 static std::unordered_map<const Material*, MaterialData> g_matLUT;
 
 constexpr int UNIFORM_BUFFER_VS_PER_FRAME_SLOT = 0;
@@ -178,8 +38,54 @@ constexpr int TEXTURE_GBUFFER_NORMAL_ROUGHNESS_SLOT  = 11;
 constexpr int TEXTURE_GBUFFER_POSITION_METALLIC_SLOT = 12;
 constexpr int TEXTURE_GBUFFER_AO_SLOT                = 13;
 
+// TODO: remove this
+#ifndef DATA_DIR
+#define DATA_DIR ""
+#endif
+
+static MeshData CreateMeshData( const MeshComponent& mesh )
+{
+    MeshData outMesh;
+    const bool hasNormals   = !mesh.normals.empty();
+    const bool hasUVs       = !mesh.uvs.empty();
+    const bool hasTangent   = !mesh.tangents.empty();
+    const bool hasBitangent = !mesh.bitangents.empty();
+
+    glGenVertexArrays( 1, &outMesh.vao );
+    glGenBuffers( 2 + hasNormals + hasUVs + hasTangent + hasBitangent, &outMesh.ebo );
+    glBindVertexArray( outMesh.vao );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, outMesh.ebo );
+    gl::BindToSlot( outMesh.vbos[0], 0, 3 );
+    gl::NamedBufferStorage( outMesh.vbos[0], mesh.positions );
+    if ( hasNormals )
+    {
+        gl::BindToSlot( outMesh.vbos[1], 1, 3 );
+        gl::NamedBufferStorage( outMesh.vbos[1], mesh.normals );
+    }
+    if ( hasUVs )
+    {
+        gl::BindToSlot( outMesh.vbos[2], 2, 2 );
+        gl::NamedBufferStorage( outMesh.vbos[2], mesh.uvs );
+    }
+    if ( hasTangent )
+    {
+        gl::BindToSlot( outMesh.vbos[3], 3, 3 );
+        gl::NamedBufferStorage( outMesh.vbos[3], mesh.tangents );
+        gl::BindToSlot( outMesh.vbos[4], 4, 3 );
+        gl::NamedBufferStorage( outMesh.vbos[4], mesh.bitangents );
+    }
+
+    gl::NamedBufferStorage( outMesh.ebo, mesh.indices );
+    outMesh.count = static_cast<uint32_t>( mesh.indices.size() );
+
+    glBindVertexArray( 0 );
+    return outMesh;
+}
+
 void MainRenderer::createGpuResources()
 {
+    R_Alloc_Cbuffers();
+
     Scene scene = Com_GetScene();
 
     vec3 center     = scene.boundingBox.Center();
@@ -189,29 +95,23 @@ void MainRenderer::createGpuResources()
     float voxelSize = worldSize * texelSize;
 
     // create uniform buffer
-    m_constantBuffer.createAndBind( UNIFORM_BUFFER_CONSTANT_SLOT );
+    g_perframeCache.cache.LightPV    = lightSpaceMatrix( scene.light.position, scene.shadowBox );
+    g_perframeCache.cache.LightPos   = scene.light.position;
+    g_perframeCache.cache.LightColor = scene.light.color;
+    g_perframeCache.cache.CamPos     = scene.camera.position;
+    g_perframeCache.Update();
+
+    m_constantBuffer.CreateAndBind( UNIFORM_BUFFER_CONSTANT_SLOT );
     m_constantBuffer.cache.world_center    = center;
     m_constantBuffer.cache.world_size_half = 0.5f * worldSize;
     m_constantBuffer.cache.texel_size      = texelSize;
     m_constantBuffer.cache.voxel_size      = voxelSize;
-    m_constantBuffer.update();
+    m_constantBuffer.Update();
 
-    m_vsPerFrameBuffer.createAndBind( UNIFORM_BUFFER_VS_PER_FRAME_SLOT );
-    m_vsPerFrameBuffer.cache.lightSpace = lightSpaceMatrix( scene.light.position, scene.shadowBox );
-    m_vsPerFrameBuffer.update();
-
-    m_fsPerFrameBuffer.createAndBind( UNIFORM_BUFFER_FS_PER_FRAME_SLOT );
-    m_fsPerFrameBuffer.cache.light_position  = scene.light.position;
-    m_fsPerFrameBuffer.cache.light_color     = scene.light.color;
-    m_fsPerFrameBuffer.cache.camera_position = scene.camera.position;
-    m_fsPerFrameBuffer.update();
-
-    m_fsMaterialBuffer.createAndBind( UNIFORM_BUFFER_MATERIAL_SLOT );
+    m_fsMaterialBuffer.CreateAndBind( UNIFORM_BUFFER_MATERIAL_SLOT );
 
     // create shader
-    m_gbufferProgram.createFromFiles(
-        DATA_DIR "shaders/gbuffer.vert",
-        DATA_DIR "shaders/gbuffer.frag" );
+    m_gbufferProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "gbuffer" ) ) );
     {
         m_gbufferProgram.use();
         m_gbufferProgram.setUniform( m_gbufferProgram.getUniformLocation( "u_albedo_map" ), ALBEDO_MAP_SLOT );
@@ -220,13 +120,8 @@ void MainRenderer::createGpuResources()
         m_gbufferProgram.stop();
     }
 
-    m_boxWireframeProgram.createFromFiles(
-        DATA_DIR "shaders/debug/box_wireframe.vert",
-        DATA_DIR "shaders/debug/box_wireframe.frag" );
-
-    m_vctProgram.createFromFiles(
-        DATA_DIR "shaders/fullscreen.vert",
-        DATA_DIR "shaders/vct_deferred.frag" );
+    m_boxWireframeProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "debug/box_wireframe" ) ) );
+    m_vctProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "fullscreen", "vct_deferred" ) ) );
     {
         m_vctProgram.use();
         m_vctProgram.setUniform( m_vctProgram.getUniformLocation( "u_gbuffer_depth" ), TEXTURE_GBUFFER_DEPTH_SLOT );
@@ -239,18 +134,10 @@ void MainRenderer::createGpuResources()
         m_vctProgram.stop();
     }
 
-    m_depthProgram.createFromFiles(
-        DATA_DIR "shaders/depth.vert",
-        DATA_DIR "shaders/depth.frag" );
+    m_depthProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "depth" ) ) );
+    m_debugTextureProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "fullscreen", "debug/texture" ) ) );
 
-    m_debugTextureProgram.createFromFiles(
-        DATA_DIR "shaders/fullscreen.vert",
-        DATA_DIR "shaders/debug/texture.frag" );
-
-    m_voxelProgram.createFromFiles(
-        DATA_DIR "shaders/voxel/voxelization.vert",
-        DATA_DIR "shaders/voxel/voxelization.frag",
-        DATA_DIR "shaders/voxel/voxelization.geom" );
+    m_voxelProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSGSPS( "voxel/voxelization" ) ) );
     {
         // set one time uniforms
         m_voxelProgram.use();
@@ -259,35 +146,14 @@ void MainRenderer::createGpuResources()
         m_voxelProgram.stop();
     }
 
-    m_visualizeProgram.createFromFiles(
-        DATA_DIR "shaders/voxel/visualization.vert",
-        DATA_DIR "shaders/voxel/visualization.frag" );
-
-    m_voxelPostProgram.createFromFile( DATA_DIR "shaders/voxel/post.comp" );
+    m_visualizeProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "voxel/visualization" ) ) );
+    m_voxelPostProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::CS( "voxel/post" ) ) );
 
     // frame buffers
     createFrameBuffers();
 
-    // create box wireframe
-    {
-        std::vector<vec3> points;
-        std::vector<unsigned int> indices;
-        three::geometry::boxWireframe( points, indices , 0.5f);
-
-        glGenVertexArrays( 1, &m_boxWireframe.vao );
-        glGenBuffers( 2, &m_boxWireframe.ebo );
-        glBindVertexArray( m_boxWireframe.vao );
-
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_boxWireframe.ebo );
-        glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( unsigned int ) * indices.size(), indices.data(), GL_STATIC_DRAW );
-
-        glBindBuffer( GL_ARRAY_BUFFER, m_boxWireframe.vbos[0] );
-        glBufferData( GL_ARRAY_BUFFER, sizeof( vec3 ) * points.size(), points.data(), GL_STATIC_DRAW );
-        glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( vec3 ), 0 );
-        glEnableVertexAttribArray( 0 );
-
-        m_boxWireframe.count = static_cast<unsigned int>( indices.size() );
-    }
+    m_boxWireframe = CreateMeshData( geometry::MakeBoxWireFrame() );
+    m_box          = CreateMeshData( geometry::MakeBox() );
 
     // create box quad
     {
@@ -316,26 +182,6 @@ void MainRenderer::createGpuResources()
         glEnableVertexAttribArray( 0 );
     }
 
-    {
-        std::vector<vec3> points;
-        std::vector<unsigned int> indices;
-        three::geometry::box( points, indices, 0.5f );
-
-        glGenVertexArrays( 1, &m_box.vao );
-        glGenBuffers( 2, &m_box.ebo );
-        glBindVertexArray( m_box.vao );
-
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_box.ebo );
-        glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( unsigned int ) * indices.size(), indices.data(), GL_STATIC_DRAW );
-
-        glBindBuffer( GL_ARRAY_BUFFER, m_box.vbos[0] );
-        glBufferData( GL_ARRAY_BUFFER, sizeof( vec3 ) * points.size(), points.data(), GL_STATIC_DRAW );
-        glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( vec3 ), 0 );
-        glEnableVertexAttribArray( 0 );
-
-        m_box.count = static_cast<unsigned int>( indices.size() );
-    }
-
     /// create voxel image
     {
         Texture3DCreateInfo info;
@@ -350,51 +196,10 @@ void MainRenderer::createGpuResources()
         m_normalVoxel.create3DEmpty( info );
     }
 
-    // load scene
     // create mesh
     for ( const auto& mesh : scene.meshes )
     {
-        // TODO: buffer storage
-        MeshData data;
-        glGenVertexArrays( 1, &data.vao );
-        glGenBuffers( 4, &data.ebo );
-        glBindVertexArray( data.vao );
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, data.ebo );
-        glNamedBufferStorage( data.ebo, sizeof( uvec3 ) * mesh->faces.size(), mesh->faces.data(), 0 );
-
-        glBindBuffer( GL_ARRAY_BUFFER, data.vbos[0] );
-        glNamedBufferStorage( data.vbos[0], sizeof( vec3 ) * mesh->positions.size(), mesh->positions.data(), 0 );
-        glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( vec3 ), 0 );
-        glEnableVertexAttribArray( 0 );
-
-        glBindBuffer( GL_ARRAY_BUFFER, data.vbos[1] );
-        glNamedBufferStorage( data.vbos[1], sizeof( vec3 ) * mesh->normals.size(), mesh->normals.data(), 0 );
-        glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, sizeof( vec3 ), 0 );
-        glEnableVertexAttribArray( 1 );
-
-        glBindBuffer( GL_ARRAY_BUFFER, data.vbos[2] );
-        glNamedBufferStorage( data.vbos[2], sizeof( vec2 ) * mesh->uvs.size(), mesh->uvs.data(), 0 );
-        glVertexAttribPointer( 2, 2, GL_FLOAT, GL_FALSE, sizeof( vec2 ), 0 );
-        glEnableVertexAttribArray( 2 );
-
-        if ( mesh->tangents.size() != 0 )
-        {
-            glGenBuffers( 2, &data.vbos[3] );
-
-            glBindBuffer( GL_ARRAY_BUFFER, data.vbos[3] );
-            glNamedBufferStorage( data.vbos[3], sizeof( vec3 ) * mesh->tangents.size(), mesh->tangents.data(), 0 );
-            glVertexAttribPointer( 3, 3, GL_FLOAT, GL_FALSE, sizeof( vec3 ), 0 );
-            glEnableVertexAttribArray( 3 );
-
-            glBindBuffer( GL_ARRAY_BUFFER, data.vbos[4] );
-            glNamedBufferStorage( data.vbos[4], sizeof( vec3 ) * mesh->bitangents.size(), mesh->bitangents.data(), 0 );
-            glVertexAttribPointer( 4, 3, GL_FLOAT, GL_FALSE, sizeof( vec3 ), 0 );
-            glEnableVertexAttribArray( 4 );
-        }
-
-        glBindVertexArray( 0 );
-        data.count = 3 * static_cast<unsigned int>( mesh->faces.size() );
-
+        MeshData data = CreateMeshData( *mesh.get() );
         g_meshLUT.insert( { mesh.get(), data } );
     }
 
@@ -453,36 +258,36 @@ void MainRenderer::createGpuResources()
     m_normalVoxel.bind();
 }
 
-void MainRenderer::visualizeVoxels()
-{
-    glEnable( GL_CULL_FACE );
-    glEnable( GL_DEPTH_TEST );
+// void MainRenderer::visualizeVoxels()
+// {
+//     glEnable( GL_CULL_FACE );
+//     glEnable( GL_DEPTH_TEST );
 
-    GlslProgram& program = m_visualizeProgram;
+//     GlslProgram& program = m_visualizeProgram;
 
-    glBindVertexArray( m_box.vao );
-    program.use();
-    static const GLint location_type = program.getUniformLocation( "u_is_albedo" );
-    int isAlbedo                     = g_UIControls.drawTexture == DrawTexture::TEXTURE_VOXEL_ALBEDO;
+//     glBindVertexArray( m_box.vao );
+//     program.use();
+//     static const GLint location_type = program.getUniformLocation( "u_is_albedo" );
+//     int isAlbedo                     = g_UIControls.drawTexture == DrawTexture::TEXTURE_VOXEL_ALBEDO;
 
-    program.setUniform( location_type, isAlbedo );
+//     program.setUniform( location_type, isAlbedo );
 
-    int mipLevel = g_UIControls.voxelMipLevel;
+//     int mipLevel = g_UIControls.voxelMipLevel;
 
-    GpuTexture& voxelTexture = isAlbedo ? m_albedoVoxel : m_normalVoxel;
+//     GpuTexture& voxelTexture = isAlbedo ? m_albedoVoxel : m_normalVoxel;
 
-    glBindImageTexture( 0, voxelTexture.getHandle(), mipLevel, GL_TRUE, 0,
-                        GL_READ_ONLY, voxelTexture.getFormat() );
+//     glBindImageTexture( 0, voxelTexture.getHandle(), mipLevel, GL_TRUE, 0,
+//                         GL_READ_ONLY, voxelTexture.getFormat() );
 
-    int size = VOXEL_TEXTURE_SIZE >> mipLevel;
-    glDrawElementsInstanced( GL_TRIANGLES, m_box.count, GL_UNSIGNED_INT, 0, size * size * size );
+//     int size = VOXEL_TEXTURE_SIZE >> mipLevel;
+//     glDrawElementsInstanced( GL_TRIANGLES, m_box.count, GL_UNSIGNED_INT, 0, size * size * size );
 
-    program.stop();
-}
+//     program.stop();
+// }
 
 void MainRenderer::gbufferPass()
 {
-    Scene scene = Com_GetScene();
+    Scene scene          = Com_GetScene();
     GlslProgram& program = m_gbufferProgram;
 
     m_gbuffer.bind();
@@ -515,7 +320,7 @@ void MainRenderer::gbufferPass()
             const MaterialData& matData = matPair->second;
 
             m_fsMaterialBuffer.cache = matData;
-            m_fsMaterialBuffer.update();
+            m_fsMaterialBuffer.Update();
 
             glBindVertexArray( drawData.vao );
             glActiveTexture( GL_TEXTURE0 + ALBEDO_MAP_SLOT );
@@ -551,7 +356,7 @@ void MainRenderer::shadowPass()
 
     for ( const GeometryNode& node : scene.geometryNodes )
     {
-        mat4 PVM = m_vsPerFrameBuffer.cache.lightSpace * node.transform;
+        mat4 PVM = g_perframeCache.cache.LightPV * node.transform;
         m_depthProgram.setUniform( PVMLocation, PVM );
         for ( const Geometry& geom : node.geometries )
         {
@@ -598,7 +403,7 @@ void MainRenderer::renderToVoxelTexture()
             const MaterialData& matData = matPair->second;
 
             m_fsMaterialBuffer.cache = matData;
-            m_fsMaterialBuffer.update();
+            m_fsMaterialBuffer.Update();
 
             glBindVertexArray( drawData.vao );
             glActiveTexture( GL_TEXTURE0 + ALBEDO_MAP_SLOT );
@@ -644,40 +449,40 @@ void MainRenderer::vctPass()
     program.stop();
 }
 
-void MainRenderer::renderBoundingBox()
-{
-    Scene scene = Com_GetScene();
+// void MainRenderer::renderBoundingBox()
+// {
+//     Scene scene = Com_GetScene();
 
-    /// TODO: refactor
-    m_boxWireframeProgram.use();
-    static const GLint centerLocation = m_boxWireframeProgram.getUniformLocation( "u_center" );
-    static const GLint sizeLocation   = m_boxWireframeProgram.getUniformLocation( "u_size" );
-    static const GLint colorLocation  = m_boxWireframeProgram.getUniformLocation( "u_color" );
+//     /// TODO: refactor
+//     m_boxWireframeProgram.use();
+//     static const GLint centerLocation = m_boxWireframeProgram.getUniformLocation( "u_center" );
+//     static const GLint sizeLocation   = m_boxWireframeProgram.getUniformLocation( "u_size" );
+//     static const GLint colorLocation  = m_boxWireframeProgram.getUniformLocation( "u_color" );
 
-    glBindVertexArray( m_boxWireframe.vao );
+//     glBindVertexArray( m_boxWireframe.vao );
 
-    if ( g_UIControls.showObjectBoundingBox )
-    {
-        m_boxWireframeProgram.setUniform( colorLocation, vec3( 0, 1, 0 ) );
-        for ( const GeometryNode& node : scene.geometryNodes )
-        {
-            for ( const Geometry& geom : node.geometries )
-            {
-                m_boxWireframeProgram.setUniform( centerLocation, geom.boundingBox.Center() );
-                m_boxWireframeProgram.setUniform( sizeLocation, geom.boundingBox.Size() );
-                glDrawElements( GL_LINES, m_boxWireframe.count, GL_UNSIGNED_INT, 0 );
-            }
-        }
-    }
+//     if ( g_UIControls.showObjectBoundingBox )
+//     {
+//         m_boxWireframeProgram.setUniform( colorLocation, vec3( 0, 1, 0 ) );
+//         for ( const GeometryNode& node : scene.geometryNodes )
+//         {
+//             for ( const Geometry& geom : node.geometries )
+//             {
+//                 m_boxWireframeProgram.setUniform( centerLocation, geom.boundingBox.Center() );
+//                 m_boxWireframeProgram.setUniform( sizeLocation, geom.boundingBox.Size() );
+//                 glDrawElements( GL_LINES, m_boxWireframe.count, GL_UNSIGNED_INT, 0 );
+//             }
+//         }
+//     }
 
-    if ( g_UIControls.showWorldBoundingBox )
-    {
-        m_boxWireframeProgram.setUniform( colorLocation, vec3( 0, 0, 1 ) );
-        m_boxWireframeProgram.setUniform( centerLocation, scene.boundingBox.Center() );
-        m_boxWireframeProgram.setUniform( sizeLocation, scene.boundingBox.Size() );
-        glDrawElements( GL_LINES, m_boxWireframe.count, GL_UNSIGNED_INT, 0 );
-    }
-}
+//     if ( g_UIControls.showWorldBoundingBox )
+//     {
+//         m_boxWireframeProgram.setUniform( colorLocation, vec3( 0, 0, 1 ) );
+//         m_boxWireframeProgram.setUniform( centerLocation, scene.boundingBox.Center() );
+//         m_boxWireframeProgram.setUniform( sizeLocation, scene.boundingBox.Size() );
+//         glDrawElements( GL_LINES, m_boxWireframe.count, GL_UNSIGNED_INT, 0 );
+//     }
+// }
 
 void MainRenderer::renderFrameBufferTextures( const ivec2& extent )
 {
@@ -741,14 +546,12 @@ void MainRenderer::render()
     Scene scene = Com_GetScene();
 
     // update perframe cache
-    m_fsPerFrameBuffer.cache.light_position  = scene.light.position;
-    m_fsPerFrameBuffer.cache.camera_position = scene.camera.position;
-    m_fsPerFrameBuffer.update();
-
-    const mat4 PV                       = scene.camera.perspective() * scene.camera.view();
-    m_vsPerFrameBuffer.cache.PV         = PV;
-    m_vsPerFrameBuffer.cache.lightSpace = lightSpaceMatrix( scene.light.position, scene.shadowBox );
-    m_vsPerFrameBuffer.update();
+    const mat4 PV                  = scene.camera.perspective() * scene.camera.view();
+    g_perframeCache.cache.LightPos = scene.light.position;
+    g_perframeCache.cache.CamPos   = scene.camera.position;
+    g_perframeCache.cache.PV       = PV;
+    g_perframeCache.cache.LightPV  = lightSpaceMatrix( scene.light.position, scene.shadowBox );
+    g_perframeCache.Update();
 
     if ( scene.lightDirty )
     {
@@ -775,22 +578,22 @@ void MainRenderer::render()
         glEnable( GL_CULL_FACE );
 
         gbufferPass();
+        vctPass();
 
-        if ( g_UIControls.drawTexture == DrawTexture::TEXTURE_FINAL_IMAGE )
-        {
-            vctPass();
-        }
-        else if ( g_UIControls.drawTexture < DrawTexture::TEXTURE_GBUFFER_NONE )
-        {
-            visualizeVoxels();
-        }
-        else
-        {
-            renderFrameBufferTextures( extent );
-        }
+        // if ( g_UIControls.drawTexture == DrawTexture::TEXTURE_FINAL_IMAGE )
+        // {
+        // }
+        // else if ( g_UIControls.drawTexture < DrawTexture::TEXTURE_GBUFFER_NONE )
+        // {
+        //     visualizeVoxels();
+        // }
+        // else
+        // {
+        //     renderFrameBufferTextures( extent );
+        // }
 
-        if ( g_UIControls.showObjectBoundingBox || g_UIControls.showWorldBoundingBox )
-            renderBoundingBox();
+        // if ( g_UIControls.showObjectBoundingBox || g_UIControls.showWorldBoundingBox )
+        //     renderBoundingBox();
     }
 }
 
@@ -816,6 +619,8 @@ void MainRenderer::destroyGpuResources()
     // render targets
     m_shadowBuffer.destroy();
     m_gbuffer.destroy();
+
+    R_Destroy_Cbuffers();
 }
 
 }  // namespace vct
