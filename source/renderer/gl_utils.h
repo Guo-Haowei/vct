@@ -47,6 +47,13 @@ struct ProgramCreateInfo {
     }
 };
 
+struct MeshData {
+    GLuint vao     = 0;
+    GLuint ebo     = 0;
+    GLuint vbos[5] = { 0, 0, 0, 0, 0 };
+    uint32_t count = 0;
+};
+
 namespace gl {
 
 [[nodiscard]] bool Init();

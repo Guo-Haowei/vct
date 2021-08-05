@@ -196,7 +196,8 @@ struct Ray {
     vec3 direction_;
     float distance_ = kRayMax;
 
-    bool IntersectsTriangle( vec3 A, vec3 B, vec3 C );
+    bool Intersects( vec3 A, vec3 B, vec3 C );
+    bool Intersects( const Box3& box );
 };
 
 // TODO: refactor

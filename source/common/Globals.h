@@ -12,7 +12,7 @@ constexpr bool isPowerOf2( unsigned int x )
     return ( x & ( x - 1 ) ) == 0;
 }
 
-constexpr unsigned int SHADOW_MAP_RESOLUTION = 2 * 4096u;
+constexpr unsigned int SHADOW_MAP_RESOLUTION = 2048;
 
 static_assert( isPowerOf2( SHADOW_MAP_RESOLUTION ) );
 
@@ -45,8 +45,6 @@ struct UIControlls {
     int drawTexture    = TEXTURE_FINAL_IMAGE;
     int voxelGiMode    = 1;
 
-    bool showObjectBoundingBox   = false;
-    bool showWorldBoundingBox    = false;
     bool forceUpdateVoxelTexture = false;
     bool debugFramebuffers       = true;
 };

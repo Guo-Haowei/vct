@@ -9,6 +9,7 @@
 #include "common/editor.h"
 #include "common/geometry.h"
 #include "common/main_window.h"
+#include "r_editor.h"
 #include "scene/Scene.h"
 #include "universal/core_assert.h"
 
@@ -37,11 +38,6 @@ constexpr int TEXTURE_GBUFFER_ALBEDO_SLOT            = 10;
 constexpr int TEXTURE_GBUFFER_NORMAL_ROUGHNESS_SLOT  = 11;
 constexpr int TEXTURE_GBUFFER_POSITION_METALLIC_SLOT = 12;
 constexpr int TEXTURE_GBUFFER_AO_SLOT                = 13;
-
-// TODO: remove this
-#ifndef DATA_DIR
-#define DATA_DIR ""
-#endif
 
 static MeshData CreateMeshData( const MeshComponent& mesh )
 {
@@ -85,6 +81,7 @@ static MeshData CreateMeshData( const MeshComponent& mesh )
 void MainRenderer::createGpuResources()
 {
     R_Alloc_Cbuffers();
+    R_CreateEditorResource();
 
     Scene scene = Com_GetScene();
 
@@ -120,7 +117,6 @@ void MainRenderer::createGpuResources()
         m_gbufferProgram.stop();
     }
 
-    m_boxWireframeProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "debug/box_wireframe" ) ) );
     m_vctProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "fullscreen", "vct_deferred" ) ) );
     {
         m_vctProgram.use();
@@ -152,8 +148,7 @@ void MainRenderer::createGpuResources()
     // frame buffers
     createFrameBuffers();
 
-    m_boxWireframe = CreateMeshData( geometry::MakeBoxWireFrame() );
-    m_box          = CreateMeshData( geometry::MakeBox() );
+    m_box = CreateMeshData( geometry::MakeBox() );
 
     // create box quad
     {
@@ -258,32 +253,32 @@ void MainRenderer::createGpuResources()
     m_normalVoxel.bind();
 }
 
-// void MainRenderer::visualizeVoxels()
-// {
-//     glEnable( GL_CULL_FACE );
-//     glEnable( GL_DEPTH_TEST );
+void MainRenderer::visualizeVoxels()
+{
+    glEnable( GL_CULL_FACE );
+    glEnable( GL_DEPTH_TEST );
 
-//     GlslProgram& program = m_visualizeProgram;
+    GlslProgram& program = m_visualizeProgram;
 
-//     glBindVertexArray( m_box.vao );
-//     program.use();
-//     static const GLint location_type = program.getUniformLocation( "u_is_albedo" );
-//     int isAlbedo                     = g_UIControls.drawTexture == DrawTexture::TEXTURE_VOXEL_ALBEDO;
+    glBindVertexArray( m_box.vao );
+    program.use();
+    static const GLint location_type = program.getUniformLocation( "u_is_albedo" );
+    int isAlbedo                     = g_UIControls.drawTexture == DrawTexture::TEXTURE_VOXEL_ALBEDO;
 
-//     program.setUniform( location_type, isAlbedo );
+    program.setUniform( location_type, isAlbedo );
 
-//     int mipLevel = g_UIControls.voxelMipLevel;
+    int mipLevel = g_UIControls.voxelMipLevel;
 
-//     GpuTexture& voxelTexture = isAlbedo ? m_albedoVoxel : m_normalVoxel;
+    GpuTexture& voxelTexture = isAlbedo ? m_albedoVoxel : m_normalVoxel;
 
-//     glBindImageTexture( 0, voxelTexture.getHandle(), mipLevel, GL_TRUE, 0,
-//                         GL_READ_ONLY, voxelTexture.getFormat() );
+    glBindImageTexture( 0, voxelTexture.getHandle(), mipLevel, GL_TRUE, 0,
+                        GL_READ_ONLY, voxelTexture.getFormat() );
 
-//     int size = VOXEL_TEXTURE_SIZE >> mipLevel;
-//     glDrawElementsInstanced( GL_TRIANGLES, m_box.count, GL_UNSIGNED_INT, 0, size * size * size );
+    int size = VOXEL_TEXTURE_SIZE >> mipLevel;
+    glDrawElementsInstanced( GL_TRIANGLES, m_box.count, GL_UNSIGNED_INT, 0, size * size * size );
 
-//     program.stop();
-// }
+    program.stop();
+}
 
 void MainRenderer::gbufferPass()
 {
@@ -306,6 +301,10 @@ void MainRenderer::gbufferPass()
 
         for ( const Geometry& geom : node.geometries )
         {
+            if ( !geom.visible )
+            {
+                continue;
+            }
             if ( !scene.camera.frustum.Intersect( geom.boundingBox ) )
             {
                 continue;
@@ -360,6 +359,11 @@ void MainRenderer::shadowPass()
         m_depthProgram.setUniform( PVMLocation, PVM );
         for ( const Geometry& geom : node.geometries )
         {
+            if ( !geom.visible )
+            {
+                continue;
+            }
+
             const auto& meshPair = g_meshLUT.find( geom.pMesh );
             core_assert( meshPair != g_meshLUT.end() );
             const MeshData& drawData = meshPair->second;
@@ -394,6 +398,11 @@ void MainRenderer::renderToVoxelTexture()
         m_voxelProgram.setUniform( mLocation, node.transform );
         for ( const Geometry& geom : node.geometries )
         {
+            if ( !geom.visible )
+            {
+                continue;
+            }
+
             const auto& meshPair = g_meshLUT.find( geom.pMesh );
             core_assert( meshPair != g_meshLUT.end() );
             const MeshData& drawData = meshPair->second;
@@ -438,7 +447,6 @@ void MainRenderer::vctPass()
     GlslProgram& program = m_vctProgram;
 
     program.use();
-    // static GLint location_texture = program.getUniformLocation("u_texture");
 
     static GLint location_gi_mode = program.getUniformLocation( "u_gi_mode" );
     program.setUniform( location_gi_mode, g_UIControls.voxelGiMode );
@@ -448,41 +456,6 @@ void MainRenderer::vctPass()
 
     program.stop();
 }
-
-// void MainRenderer::renderBoundingBox()
-// {
-//     Scene scene = Com_GetScene();
-
-//     /// TODO: refactor
-//     m_boxWireframeProgram.use();
-//     static const GLint centerLocation = m_boxWireframeProgram.getUniformLocation( "u_center" );
-//     static const GLint sizeLocation   = m_boxWireframeProgram.getUniformLocation( "u_size" );
-//     static const GLint colorLocation  = m_boxWireframeProgram.getUniformLocation( "u_color" );
-
-//     glBindVertexArray( m_boxWireframe.vao );
-
-//     if ( g_UIControls.showObjectBoundingBox )
-//     {
-//         m_boxWireframeProgram.setUniform( colorLocation, vec3( 0, 1, 0 ) );
-//         for ( const GeometryNode& node : scene.geometryNodes )
-//         {
-//             for ( const Geometry& geom : node.geometries )
-//             {
-//                 m_boxWireframeProgram.setUniform( centerLocation, geom.boundingBox.Center() );
-//                 m_boxWireframeProgram.setUniform( sizeLocation, geom.boundingBox.Size() );
-//                 glDrawElements( GL_LINES, m_boxWireframe.count, GL_UNSIGNED_INT, 0 );
-//             }
-//         }
-//     }
-
-//     if ( g_UIControls.showWorldBoundingBox )
-//     {
-//         m_boxWireframeProgram.setUniform( colorLocation, vec3( 0, 0, 1 ) );
-//         m_boxWireframeProgram.setUniform( centerLocation, scene.boundingBox.Center() );
-//         m_boxWireframeProgram.setUniform( sizeLocation, scene.boundingBox.Size() );
-//         glDrawElements( GL_LINES, m_boxWireframe.count, GL_UNSIGNED_INT, 0 );
-//     }
-// }
 
 void MainRenderer::renderFrameBufferTextures( const ivec2& extent )
 {
@@ -578,22 +551,21 @@ void MainRenderer::render()
         glEnable( GL_CULL_FACE );
 
         gbufferPass();
-        vctPass();
 
-        // if ( g_UIControls.drawTexture == DrawTexture::TEXTURE_FINAL_IMAGE )
-        // {
-        // }
-        // else if ( g_UIControls.drawTexture < DrawTexture::TEXTURE_GBUFFER_NONE )
-        // {
-        //     visualizeVoxels();
-        // }
-        // else
-        // {
-        //     renderFrameBufferTextures( extent );
-        // }
+        if ( g_UIControls.drawTexture == DrawTexture::TEXTURE_FINAL_IMAGE )
+        {
+            vctPass();
+        }
+        else if ( g_UIControls.drawTexture < DrawTexture::TEXTURE_GBUFFER_NONE )
+        {
+            visualizeVoxels();
+        }
+        else
+        {
+            renderFrameBufferTextures( extent );
+        }
 
-        // if ( g_UIControls.showObjectBoundingBox || g_UIControls.showWorldBoundingBox )
-        //     renderBoundingBox();
+        R_DrawEditor();
     }
 }
 
@@ -609,17 +581,17 @@ void MainRenderer::createFrameBuffers()
 void MainRenderer::destroyGpuResources()
 {
     // gpu resource
-    m_voxelProgram.destroy();
-    m_visualizeProgram.destroy();
-    m_boxWireframeProgram.destroy();
-    m_voxelPostProgram.destroy();
-    m_depthProgram.destroy();
-    m_debugTextureProgram.destroy();
+    m_voxelProgram.Destroy();
+    m_visualizeProgram.Destroy();
+    m_voxelPostProgram.Destroy();
+    m_depthProgram.Destroy();
+    m_debugTextureProgram.Destroy();
 
     // render targets
     m_shadowBuffer.destroy();
     m_gbuffer.destroy();
 
+    R_DestroyEditorResource();
     R_Destroy_Cbuffers();
 }
 

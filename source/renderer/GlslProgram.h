@@ -13,7 +13,7 @@ class GlslProgram : public GpuResource {
 
     void use();
     void stop();
-    void destroy();
+    void Destroy();
     GLint getUniformLocation( const char* name );
     void setUniform( GLint location, const int& val );
     void setUniform( GLint location, const float& val );

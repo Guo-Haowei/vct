@@ -7,13 +7,6 @@
 
 namespace vct {
 
-struct MeshData {
-    GLuint vao     = 0;
-    GLuint ebo     = 0;
-    GLuint vbos[5] = { 0, 0, 0, 0, 0 };
-    uint32_t count = 0;
-};
-
 struct MaterialData {
     GpuTexture albedoMap;
     GpuTexture materialMap;
@@ -62,8 +55,7 @@ class MainRenderer {
     void render();
     void renderFrameBufferTextures( const ivec2& extent );
     void renderToVoxelTexture();
-    // void renderBoundingBox();
-    // void visualizeVoxels();
+    void visualizeVoxels();
     void destroyGpuResources();
 
     void gbufferPass();
@@ -75,7 +67,6 @@ class MainRenderer {
     GlslProgram m_voxelProgram;
     GlslProgram m_visualizeProgram;
     GlslProgram m_vctProgram;
-    GlslProgram m_boxWireframeProgram;
     GlslProgram m_voxelPostProgram;
     GlslProgram m_depthProgram;
     GlslProgram m_debugTextureProgram;
@@ -83,7 +74,6 @@ class MainRenderer {
     GlslProgram m_gbufferProgram;
 
     /// vertex arrays
-    MeshData m_boxWireframe;
     MeshData m_box;  // no normals
     MeshData m_quad;
 

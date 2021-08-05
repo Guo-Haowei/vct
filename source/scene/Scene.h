@@ -27,6 +27,7 @@ struct Geometry {
     MeshComponent* pMesh;
     Material* pMaterial;
     Box3 boundingBox;
+    mutable bool visible = true;
 };
 
 struct GeometryNode {
@@ -48,8 +49,9 @@ struct Scene {
     Box3 boundingBox;
     Box3 shadowBox;
     Camera camera;
-    bool dirty      = true;
-    bool lightDirty = true;
+    bool dirty               = true;
+    bool lightDirty          = true;
+    const Geometry* selected = nullptr;
 };
 
 /// TODO: refactor

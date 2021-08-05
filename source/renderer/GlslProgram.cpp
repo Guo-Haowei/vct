@@ -6,7 +6,7 @@
 
 namespace vct {
 
-void GlslProgram::destroy()
+void GlslProgram::Destroy()
 {
     if ( m_handle != NULL_HANDLE )
         glDeleteProgram( m_handle );

@@ -10,7 +10,7 @@
 #include "renderer/r_graphics.h"
 #include "universal/core_math.h"
 
-// include last
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 using namespace vct;

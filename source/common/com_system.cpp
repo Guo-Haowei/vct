@@ -45,7 +45,7 @@ bool Com_LoadScene()
     camera.pitch    = -0.04f;
     camera.position = Dvar_GetVec3( cam_pos );
 
-    scene.light.position = vec3( -5.f, 25.f, -8.5f );
+    scene.light.position = vec3( -.5f, 25.f, -.5f );
     scene.light.color    = vec3( 15.0f );
 
     const vec3 center     = scene.boundingBox.Center();

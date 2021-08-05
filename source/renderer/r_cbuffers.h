@@ -4,6 +4,7 @@
 
 struct PerFrameCB {
     mat4 PV;
+    mat4 PVM;
     mat4 LightPV;
     vec3 CamPos;
     float perframe_pad0;

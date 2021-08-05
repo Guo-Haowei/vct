@@ -49,7 +49,8 @@ void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transfor
     }
 
     GeometryNode node;
-    node.transform = transform;
+    // node.transform = transform;
+    node.transform = mat4( 1 );
 
     for ( uint32_t i = 0; i < aiscene->mNumMeshes; ++i )
     {
@@ -58,8 +59,18 @@ void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transfor
         size_t index         = materialOffset + mesh->materialIdx;
         Material* mat        = scene.materials.at( index ).get();
         Box3 box;
+
+        for ( vec3& position : mesh->positions )
+        {
+            position = transform * vec4( position, 1.0 );
+        }
+        for ( vec3& normal : mesh->normals )
+        {
+            normal = mat3( transform ) * normal;
+        }
+
         box.Expand( mesh->positions.data(), mesh->positions.size() );
-        box.ApplyMatrix( transform );
+        // box.ApplyMatrix( transform );
         node.geometries.push_back( { mesh, mat, box } );
         scene.meshes.emplace_back( std::shared_ptr<MeshComponent>( mesh ) );
 

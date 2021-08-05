@@ -72,7 +72,7 @@ bool Frustum::Intersect( const Box3& box ) const
 //------------------------------------------------------------------------------
 // Ray
 //------------------------------------------------------------------------------
-bool Ray::IntersectsTriangle( vec3 A, vec3 B, vec3 C )
+bool Ray::Intersects( vec3 A, vec3 B, vec3 C )
 {
     // P = A + u(B - A) + v(C - A) => O - A = -tD + u(B - A) + v(C - A)
     // -tD + uAB + vAC = AO
@@ -104,6 +104,30 @@ bool Ray::IntersectsTriangle( vec3 A, vec3 B, vec3 C )
     }
 
     distance_ = t;
+    return true;
+}
+
+bool Ray::Intersects( const Box3& box )
+{
+    using glm::max;
+    using glm::min;
+
+    vec3 invD = vec3( 1 ) / direction_;
+    vec3 t0s  = ( box.min - origin_ ) * invD;
+    vec3 t1s  = ( box.max - origin_ ) * invD;
+
+    vec3 tsmaller = min( t0s, t1s );
+    vec3 tbigger  = max( t0s, t1s );
+
+    float tmin = max( Ray::kRayMin, max( tsmaller.x, max( tsmaller.y, tsmaller.z ) ) );
+    float tmax = min( Ray::kRayMax, min( tbigger.x, min( tbigger.y, tbigger.z ) ) );
+
+    // check bounding box
+    if ( tmin >= tmax || distance_ < tmin )
+    {
+        return false;
+    }
+
     return true;
 }
 

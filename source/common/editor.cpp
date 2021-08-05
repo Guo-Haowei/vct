@@ -1,11 +1,15 @@
 #include "editor.h"
 
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+
 #include "Globals.h"
 #include "common/com_system.h"
 #include "common/main_window.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 #include "universal/core_assert.h"
+#include "universal/print.h"
 
 using namespace vct;
 
@@ -17,6 +21,7 @@ class Editor {
 
     void VoxelGIWindow();
     void LightWindow();
+    void CameraWindow();
     void DockSpace();
 
     Editor() = default;
@@ -30,6 +35,15 @@ class Editor {
 
     void Update();
 };
+
+void Editor::CameraWindow()
+{
+    Camera& camera = Com_GetScene().camera;
+    ImGui::Begin( "Camera" );
+    const vec3& eye = camera.position;
+    ImGui::Text( "eye: %.2f, %.2f, %.2f", eye.x, eye.y, eye.z );
+    ImGui::End();
+}
 
 void Editor::LightWindow()
 {
@@ -66,14 +80,6 @@ void Editor::VoxelGIWindow()
     ImGui::Separator();
 
     ImGui::Text( "Debug Bounding Box" );
-    if ( ImGui::Checkbox( "Show Object Bounding Box", &g_UIControls.showObjectBoundingBox ) )
-    {
-        g_UIControls.showWorldBoundingBox = false;
-    }
-    if ( ImGui::Checkbox( "Show World Bounding Box", &g_UIControls.showWorldBoundingBox ) )
-    {
-        g_UIControls.showObjectBoundingBox = false;
-    }
 
     ImGui::Separator();
 
@@ -99,35 +105,6 @@ void Editor::VoxelGIWindow()
     // {
     //     scene->selected = nullptr;
     //     return;
-    // }
-
-    // ImGuiIO& io = ImGui::GetIO();
-    // if ( ImGui::IsMousePosValid() && ImGui::IsMouseClicked( GLFW_MOUSE_BUTTON_1 ) )
-    // {
-    //     scene->selected = nullptr;
-    //     float x         = io.MousePos.x - s_glob.pos.x;
-    //     float y         = io.MousePos.y - s_glob.pos.y;
-    //     x               = 2.0f * ( x / s_glob.vp.width ) - 1.0f;
-    //     y               = 1.0f - 2.0f * ( y / s_glob.vp.height );
-
-    //     if ( !( x > -1.0f && x < 1.0f && y > -1.0f && y < 1.0f ) )
-    //     {
-    //         return;
-    //     }
-
-    //     const mat4 PV    = s_glob.camera->CalcProj( s_glob.vp.width / s_glob.vp.height ) * s_glob.camera->CalcView();
-    //     const mat4 invPV = glm::inverse( PV );
-
-    //     Ray ray{ s_glob.camera->eye_, glm::normalize( vec3( invPV * vec4( x, y, 1.0f, 1.0f ) ) ) };
-
-    //     for ( uint32_t idx = 0; idx < scene->mesheCache.size(); ++idx )
-    //     {
-    //         const MeshComponent& mesh = scene->mesheCache[idx];
-    //         if ( RayIntersectsMesh( ray, mesh ) )
-    //         {
-    //             scene->selected = &mesh;
-    //         }
-    //     }
     // }
 }
 
@@ -321,17 +298,73 @@ static void EditorSceneWindow()
 
 void Editor::Update()
 {
-    // if ( MainWindow::IsMouseInScreen() )
+    DockSpace();
+    VoxelGIWindow();
+    LightWindow();
+    CameraWindow();
+
+    ImGuiIO& io  = ImGui::GetIO();
+    Scene& scene = Com_GetScene();
+
+    // select object
+    if ( !io.WantCaptureMouse && MainWindow::IsMouseInScreen() )
     {
-        DockSpace();
-        VoxelGIWindow();
-        LightWindow();
+        const vec2 mousePos = MainWindow::MousePos();
+        const ivec2 extent  = MainWindow::FrameSize();
+        if ( ImGui::IsMouseClicked( GLFW_MOUSE_BUTTON_1 ) )
+        {
+            const Camera& camera = scene.camera;
+
+            const mat4 PV    = camera.perspective() * camera.view();
+            const mat4 invPV = glm::inverse( PV );
+            vec2 pos( mousePos.x / extent.x, 1.0f - mousePos.y / extent.y );
+            pos -= 0.5f;
+            pos *= 2.0f;
+
+            Ray ray{ camera.position, glm::normalize( vec3( invPV * vec4( pos.x, pos.y, 1.0f, 1.0f ) ) ) };
+
+            for ( const auto& node : scene.geometryNodes )
+            {
+                for ( const auto& geom : node.geometries )
+                {
+                    if ( !geom.visible )
+                    {
+                        continue;
+                    }
+                    const Box3& box = geom.boundingBox;
+                    const auto mesh = geom.pMesh;
+                    if ( ray.Intersects( box ) )
+                    {
+                        for ( uint32_t idx = 0; idx < mesh->indices.size(); )
+                        {
+                            const vec3& a = mesh->positions[mesh->indices[idx++]];
+                            const vec3& b = mesh->positions[mesh->indices[idx++]];
+                            const vec3& c = mesh->positions[mesh->indices[idx++]];
+                            if ( ray.Intersects( a, b, c ) )
+                            {
+                                scene.selected = &geom;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else if ( ImGui::IsMouseClicked( GLFW_MOUSE_BUTTON_2 ) )
+        {
+            scene.selected = nullptr;
+        }
     }
-    // EditorCameraWindow();
-    // EditorMeshWindow();
-    // EditorSceneWindow();
-    // EditorConsole();
-    // EditorDebugWindow();
+
+    if ( scene.selected && ImGui::IsKeyPressed( GLFW_KEY_DELETE ) )
+    {
+        if ( scene.selected->visible )
+        {
+            scene.selected->visible = false;
+            scene.dirty             = true;
+            scene.lightDirty        = true;
+            scene.selected          = nullptr;
+        }
+    }
 }
 
 void EditorSetup()
