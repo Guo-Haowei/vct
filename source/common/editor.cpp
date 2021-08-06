@@ -49,9 +49,16 @@ void Editor::LightWindow()
 {
     ImGui::Begin( "Light" );
     Scene& scene = Com_GetScene();
-    if ( ImGui::DragFloat3( "position", &( scene.light.position.x ), 1.f, -100.f, 100.f ) )
+
+    bool dirty = false;
+    dirty |= ImGui::DragFloat( "x", &( scene.light.position.x ), 1.f, -50.f, 50.f );
+    dirty |= ImGui::DragFloat( "y", &( scene.light.position.y ), 1.f, 10.f, 100.f );
+    dirty |= ImGui::DragFloat( "z", &( scene.light.position.z ), 1.f, -50.f, 50.f );
+
+    if ( dirty )
     {
         scene.lightDirty = true;
+        scene.dirty      = true;
     }
     ImGui::Separator();
     ImGui::ColorEdit3( "color", &( scene.light.color.x ) );

@@ -56,9 +56,6 @@ bool Com_LoadScene()
     size.z *= scale;
     scene.shadowBox.FromCenterSize( center, size );
 
-    g_UIControls.totalMeshes    = static_cast<int>( scene.meshes.size() );
-    g_UIControls.totalMaterials = static_cast<int>( scene.materials.size() );
-
     Com_PrintSuccess( "Scene '%s' loaded", scenePath );
     return true;
 }

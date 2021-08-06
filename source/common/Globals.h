@@ -1,20 +1,12 @@
 #pragma once
 
+#include "universal/universal.h"
+
 namespace vct {
-
-constexpr unsigned int log2( unsigned int x )
-{
-    return x == 1 ? 0 : 1 + log2( x >> 1 );
-}
-
-constexpr bool isPowerOf2( unsigned int x )
-{
-    return ( x & ( x - 1 ) ) == 0;
-}
 
 constexpr unsigned int SHADOW_MAP_RESOLUTION = 2048;
 
-static_assert( isPowerOf2( SHADOW_MAP_RESOLUTION ) );
+static_assert( is_power_of_two( SHADOW_MAP_RESOLUTION ) );
 
 // constexpr unsigned int VOXEL_TEXTURE_SIZE = 256;
 constexpr unsigned int VOXEL_TEXTURE_SIZE      = 128;
@@ -40,12 +32,31 @@ struct UIControlls {
     int voxelMipLevel    = 0;
     int showVoxelTexture = -1;
 
-    int totalMaterials = 0;
-    int totalMeshes    = 0;
-    int drawTexture    = TEXTURE_FINAL_IMAGE;
-    int voxelGiMode    = 1;
+    int drawTexture = TEXTURE_FINAL_IMAGE;
+    int voxelGiMode = 1;
 
     bool forceUpdateVoxelTexture = false;
     bool debugFramebuffers       = true;
 };
 extern UIControlls g_UIControls;
+
+inline constexpr int UNIFORM_BUFFER_VS_PER_FRAME_SLOT = 0;
+inline constexpr int UNIFORM_BUFFER_FS_PER_FRAME_SLOT = 1;
+inline constexpr int UNIFORM_BUFFER_MATERIAL_SLOT     = 2;
+inline constexpr int UNIFORM_BUFFER_CONSTANT_SLOT     = 3;
+
+inline constexpr int IMAGE_VOXEL_ALBEDO_SLOT   = 0;
+inline constexpr int IMAGE_VOXEL_NORMAL_SLOT   = 1;
+inline constexpr int TEXTURE_VOXEL_ALBEDO_SLOT = 2;
+inline constexpr int TEXTURE_VOXEL_NORMAL_SLOT = 3;
+
+inline constexpr int ALBEDO_MAP_SLOT         = 4;
+inline constexpr int NORMAL_MAP_SLOT         = 6;
+inline constexpr int METALLIC_ROUGHNESS_SLOT = 7;
+
+inline constexpr int TEXTURE_SHADOW_MAP_SLOT                = 3;
+inline constexpr int TEXTURE_GBUFFER_DEPTH_SLOT             = 9;
+inline constexpr int TEXTURE_GBUFFER_ALBEDO_SLOT            = 10;
+inline constexpr int TEXTURE_GBUFFER_NORMAL_ROUGHNESS_SLOT  = 11;
+inline constexpr int TEXTURE_GBUFFER_POSITION_METALLIC_SLOT = 12;
+inline constexpr int TEXTURE_GBUFFER_AO_SLOT                = 13;

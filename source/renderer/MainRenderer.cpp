@@ -18,27 +18,6 @@ namespace vct {
 static std::unordered_map<const MeshComponent*, MeshData> g_meshLUT;
 static std::unordered_map<const Material*, MaterialData> g_matLUT;
 
-constexpr int UNIFORM_BUFFER_VS_PER_FRAME_SLOT = 0;
-constexpr int UNIFORM_BUFFER_FS_PER_FRAME_SLOT = 1;
-constexpr int UNIFORM_BUFFER_MATERIAL_SLOT     = 2;
-constexpr int UNIFORM_BUFFER_CONSTANT_SLOT     = 3;
-
-constexpr int IMAGE_VOXEL_ALBEDO_SLOT   = 0;
-constexpr int IMAGE_VOXEL_NORMAL_SLOT   = 1;
-constexpr int TEXTURE_VOXEL_ALBEDO_SLOT = 2;
-constexpr int TEXTURE_VOXEL_NORMAL_SLOT = 3;
-
-constexpr int ALBEDO_MAP_SLOT         = 4;
-constexpr int NORMAL_MAP_SLOT         = 6;
-constexpr int METALLIC_ROUGHNESS_SLOT = 7;
-
-constexpr int TEXTURE_SHADOW_MAP_SLOT                = 3;
-constexpr int TEXTURE_GBUFFER_DEPTH_SLOT             = 9;
-constexpr int TEXTURE_GBUFFER_ALBEDO_SLOT            = 10;
-constexpr int TEXTURE_GBUFFER_NORMAL_ROUGHNESS_SLOT  = 11;
-constexpr int TEXTURE_GBUFFER_POSITION_METALLIC_SLOT = 12;
-constexpr int TEXTURE_GBUFFER_AO_SLOT                = 13;
-
 static MeshData CreateMeshData( const MeshComponent& mesh )
 {
     MeshData outMesh;
