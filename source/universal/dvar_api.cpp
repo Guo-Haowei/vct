@@ -110,6 +110,11 @@ float Dvar_GetFloat_Internal( const dvar_t& dvar )
     return dvar.float_;
 }
 
+void* Dvar_GetPtr_Internal( dvar_t& dvar )
+{
+    return &dvar.int_;
+}
+
 vec4 Dvar_GetVec_Internal( const dvar_t& dvar, int n )
 {
     core_assert( dvar.type_ == static_cast<dvar_t::Type>( dvar_t::_VecBase + n ) );

@@ -1,8 +1,25 @@
 #pragma once
 #include "universal/universal.h"
 
-inline constexpr int NUM_CASCADES = 3;
+inline constexpr int NUM_CASCADES            = 3;
+inline constexpr int IMAGE_VOXEL_ALBEDO_SLOT = 0;
+inline constexpr int IMAGE_VOXEL_NORMAL_SLOT = 1;
 
-inline constexpr unsigned int SHADOW_MAP_RESOLUTION = 1024 * 4;
+constexpr unsigned int VOXEL_TEXTURE_SIZE      = 128;
+constexpr unsigned int VOXEL_TEXTURE_MIP_LEVEL = log2( VOXEL_TEXTURE_SIZE );
 
-static_assert( is_power_of_two( SHADOW_MAP_RESOLUTION ) );
+static_assert( VOXEL_TEXTURE_SIZE <= 256 );
+
+enum DrawTexture {
+    TEXTURE_FINAL_IMAGE,
+    TEXTURE_VOXEL_ALBEDO,
+    TEXTURE_VOXEL_NORMAL,
+    TEXTURE_VOXEL_COUNT = TEXTURE_VOXEL_NORMAL,
+    TEXTURE_GBUFFER_DEPTH,
+    TEXTURE_GBUFFER_ALBEDO,
+    TEXTURE_GBUFFER_NORMAL,
+    TEXTURE_GBUFFER_METALLIC,
+    TEXTURE_GBUFFER_ROUGHNESS,
+    TEXTURE_GBUFFER_SHADOW,
+    TEXTURE_MAX = TEXTURE_GBUFFER_SHADOW,
+};

@@ -1,4 +1,6 @@
 #pragma once
+#include <memory>
+
 #include "GlslProgram.h"
 #include "GpuTexture.h"
 #include "RenderTarget.h"
@@ -6,36 +8,6 @@
 #include "r_cbuffers.h"
 
 namespace vct {
-
-struct MaterialCache {
-    vec4 albedo_color;  // if it doesn't have albedo color, then it's alpha is 0.0f
-    float metallic                       = 0.0f;
-    float roughness                      = 0.0f;
-    float has_metallic_roughness_texture = 0.0f;
-    float has_normal_texture             = 0.0f;
-
-    MaterialCache& operator=( const MaterialData& mat )
-    {
-        albedo_color                   = mat.albedoColor;
-        roughness                      = mat.roughness;
-        metallic                       = mat.metallic;
-        has_metallic_roughness_texture = mat.materialMap.GetHandle() == 0 ? 0.0f : 1.0f;
-        has_normal_texture             = mat.normalMap.GetHandle() == 0 ? 0.0f : 1.0f;
-
-        return *this;
-    }
-};
-
-struct ConstantCache {
-    vec3 world_center;
-    float world_size_half;
-    float texel_size;
-    float voxel_size;
-    float padding[2];
-};
-
-static_assert( sizeof( MaterialCache ) % 16 == 0 );
-static_assert( sizeof( ConstantCache ) % 16 == 0 );
 
 class MainRenderer {
    public:
@@ -60,16 +32,14 @@ class MainRenderer {
     GlslProgram m_gbufferProgram;
 
     /// vertex arrays
-    MeshData m_box;  // no normals
+    std::shared_ptr<MeshData> m_box;  // no normals
     MeshData m_quad;
 
     /// textures
     GpuTexture m_albedoVoxel;
     GpuTexture m_normalVoxel;
 
-    /// uniform buffers
-    gl::ConstantBuffer<MaterialCache> m_fsMaterialBuffer;  // global binding 2
-    gl::ConstantBuffer<ConstantCache> m_constantBuffer;    // global binding 3
+    GpuTexture m_lightIcons[MAX_LIGHT_ICON];
 
     /// render targets
     GBuffer m_gbuffer;

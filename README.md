@@ -1,12 +1,12 @@
 # Voxel GI
 
-## Todo (ordered by priority)
-
-- [x] indirect diffuse light bounce
+- [x] Indirect diffuse light bounce
+    - [ ] Second light bounce
 - [ ] indirect specular light bounce
-- [x] shadow mapping
-- [ ] soft shadow
-- [ ] sky box
+- [x] Cascaded Shadow Maping (Glitches on edges)
+- [ ] SSAO
+- [ ] SSR
+- [ ] TAA
 
 ## Screenshots
 
@@ -31,3 +31,5 @@ Models from [glTF-Sample-Models](https://github.com/KhronosGroup/glTF-Sample-Mod
 [DEFERRED VOXEL SHADING FOR REAL TIME GLOBAL ILLUMINATION](https://jose-villegas.github.io/post/deferred_voxel_shading/)
 
 [Voxel-based Global Illumination](https://wickedengine.net/2017/08/30/voxel-based-global-illumination/)
+
+[Cascaded Shadow Mapping](https://ogldev.org/www/tutorial49/tutorial49.html)

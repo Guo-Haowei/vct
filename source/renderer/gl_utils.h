@@ -63,8 +63,7 @@ struct MaterialData {
     vec4 albedoColor;
     float metallic;
     float roughness;
-    // specular...
-    // normal...
+    int textureMapIdx;
 };
 
 namespace gl {
@@ -90,37 +89,40 @@ GLuint CreateShaderProgram( const ProgramCreateInfo& info );
 // Constant Buffer
 //------------------------------------------------------------------------------
 
+GLuint CreateAndBindConstantBuffer( int slot, size_t sizeInByte );
+void UpdateConstantBuffer( GLuint handle, const void* ptr, size_t sizeInByte );
+
 template<typename T>
 struct ConstantBuffer {
     void Destroy()
     {
-        if ( handle_ != 0 )
+        if ( mHandle != 0 )
         {
-            Com_Printf( "[opengl] destroy cbuffer %u", handle_ );
-            glDeleteBuffers( 1, &handle_ );
+            Com_Printf( "[opengl] destroy cbuffer %u", mHandle );
+            glDeleteBuffers( 1, &mHandle );
         }
-        handle_ = 0;
+        mHandle = 0;
     }
 
     void CreateAndBind( int slot )
     {
-        glGenBuffers( 1, &handle_ );
-        glBindBuffer( GL_UNIFORM_BUFFER, handle_ );
-        glBufferData( GL_UNIFORM_BUFFER, sizeof( T ), 0, GL_DYNAMIC_DRAW );
-        glBindBuffer( GL_UNIFORM_BUFFER, 0 );
-        glBindBufferBase( GL_UNIFORM_BUFFER, slot, handle_ );
-        Com_Printf( "[opengl] created buffer of size %zu (slot %d)", sizeof( T ), slot );
+        mHandle = CreateAndBindConstantBuffer( slot, sizeof( T ) );
     }
 
     void Update()
     {
-        glBindBuffer( GL_UNIFORM_BUFFER, handle_ );
-        glBufferData( GL_UNIFORM_BUFFER, sizeof( T ), &cache, GL_DYNAMIC_DRAW );
-        glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+        UpdateConstantBuffer( mHandle, &cache, sizeof( T ) );
     }
 
     T cache;
-    GLuint handle_;
+    GLuint mHandle = 0;
 };
+
+static inline GLuint64 MakeTextureResident( GLuint texture )
+{
+    GLuint64 ret = glGetTextureHandleARB( texture );
+    glMakeTextureHandleResidentARB( ret );
+    return ret;
+}
 
 }  // namespace gl

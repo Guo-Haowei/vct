@@ -1,5 +1,5 @@
 #pragma once
-#include "scene/Scene.h"
+#include "scene.h"
 
 Scene& Com_GetScene();
 

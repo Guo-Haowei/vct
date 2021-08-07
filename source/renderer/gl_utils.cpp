@@ -61,7 +61,7 @@ static std::string ProcessShader( const std::string &source )
             std::string include = line.substr( line.find( '"' ) );
             core_assert( include.front() == '"' && include.back() == '"' );
             include.pop_back();
-            ComFileWrapper fhandle( Com_FsOpenRead( include.c_str() + 1, "shaders" ) );
+            ComFileWrapper fhandle( Com_FsOpenRead( include.c_str() + 1, "source/shaders" ) );
             std::vector<char> extra;
             if ( fhandle.Read( extra ) != ComFile::Result::Ok )
             {
@@ -104,7 +104,7 @@ class ShaderHandleWrapper {
 
 static GLuint CreateShader( const char *file, GLenum type )
 {
-    ComFileWrapper fhandle( Com_FsOpenRead( file, "shaders" ) );
+    ComFileWrapper fhandle( Com_FsOpenRead( file, "source/shaders" ) );
     std::string source;
     const ComFile::Result result = fhandle.Read( source );
     if ( result != ComFile::Result::Ok )
@@ -113,9 +113,15 @@ static GLuint CreateShader( const char *file, GLenum type )
         return 0;
     }
 
-    std::string fullsource         = ProcessShader( source );
-    constexpr const char version[] = "#version 460 core\n";
-    const char *sources[]          = { version, fullsource.c_str() };
+    std::string fullsource = ProcessShader( source );
+    constexpr const char extras[] =
+        "#version 460 core\n"
+        "#extension GL_NV_gpu_shader5 : require\n"
+        "#extension GL_NV_shader_atomic_float : enable\n"
+        "#extension GL_NV_shader_atomic_fp16_vector : enable\n"
+        "#extension GL_ARB_bindless_texture : require\n"
+        "";
+    const char *sources[] = { extras, fullsource.c_str() };
 
     GLuint shader = glCreateShader( type );
     glShaderSource( shader, array_length( sources ), sources, nullptr );
@@ -197,6 +203,30 @@ GLuint CreateShaderProgram( const ProgramCreateInfo &info )
     }
 
     return program;
+}
+
+//------------------------------------------------------------------------------
+// Constant Buffer
+//------------------------------------------------------------------------------
+GLuint CreateAndBindConstantBuffer( int slot, size_t sizeInByte )
+{
+    GLuint handle = 0;
+    glGenBuffers( 1, &handle );
+    glBindBuffer( GL_UNIFORM_BUFFER, handle );
+    glBufferData( GL_UNIFORM_BUFFER, sizeInByte, nullptr, GL_DYNAMIC_DRAW );
+    glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+    glBindBufferBase( GL_UNIFORM_BUFFER, slot, handle );
+    Com_Printf( "[opengl] created buffer of size %zu (slot %d)", sizeInByte, slot );
+    glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+    return handle;
+}
+
+void UpdateConstantBuffer( GLuint handle, const void *ptr, size_t sizeInByte )
+{
+    // glMapBuffer( mHandle, 0 );
+    glBindBuffer( GL_UNIFORM_BUFFER, handle );
+    glBufferData( GL_UNIFORM_BUFFER, sizeInByte, ptr, GL_DYNAMIC_DRAW );
+    glBindBuffer( GL_UNIFORM_BUFFER, 0 );
 }
 
 //------------------------------------------------------------------------------

@@ -34,6 +34,11 @@ void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transfor
         Com_PrintError( "[assimp] failed to load scene '%s'\n\tdetails: %s", fullpath, importer.GetErrorString() );
     }
 
+    const uint32_t numMeshes    = aiscene->mNumMeshes;
+    const uint32_t numMaterials = aiscene->mNumMaterials;
+
+    Com_Printf( "scene '%s' has %u meshes, %u materials", path, numMeshes, numMaterials );
+
     // set base path
     m_currentPath = fullpath;
     auto found    = m_currentPath.find_last_of( "/\\" );
@@ -41,7 +46,7 @@ void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transfor
 
     size_t materialOffset = scene.materials.size();
 
-    for ( uint32_t i = 0; i < aiscene->mNumMaterials; ++i )
+    for ( uint32_t i = 0; i < numMaterials; ++i )
     {
         const aiMaterial* aimat = aiscene->mMaterials[i];
         Material* mat           = processMaterial( aimat );
@@ -52,7 +57,7 @@ void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transfor
     // node.transform = transform;
     node.transform = mat4( 1 );
 
-    for ( uint32_t i = 0; i < aiscene->mNumMeshes; ++i )
+    for ( uint32_t i = 0; i < numMeshes; ++i )
     {
         const aiMesh* aimesh = aiscene->mMeshes[i];
         MeshComponent* mesh  = processMesh( aimesh );

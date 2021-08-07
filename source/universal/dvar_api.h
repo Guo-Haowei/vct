@@ -33,6 +33,7 @@ int Dvar_GetInt_Internal( const dvar_t& dvar );
 float Dvar_GetFloat_Internal( const dvar_t& dvar );
 vec4 Dvar_GetVec_Internal( const dvar_t& dvar, int n );
 const char* Dvar_GetString_Internal( const dvar_t& dvar );
+void* Dvar_GetPtr_Internal( dvar_t& dvar );
 
 void Dvar_RegisterInt_Internal( dvar_t& dvar, const char* key, int value );
 void Dvar_RegisterFloat_Internal( dvar_t& dvar, const char* key, float value );
@@ -65,6 +66,7 @@ DvarError Dvar_SetStringByName_Internal( const char* name, const char* value );
 #define Dvar_GetVec3( name )   ( vec3( Dvar_GetVec_Internal( DVAR_##name, 3 ) ) )
 #define Dvar_GetVec4( name )   ( vec4( Dvar_GetVec_Internal( DVAR_##name, 4 ) ) )
 #define Dvar_GetString( name ) Dvar_GetString_Internal( DVAR_##name )
+#define Dvar_GetPtr( name )    Dvar_GetPtr_Internal( DVAR_##name )
 
 #define Dvar_SetInt( name, value )       Dvar_SetInt_Internal( DVAR_##name, value )
 #define Dvar_SetFloat( name, value )     Dvar_SetFloat_Internal( DVAR_##name, value )

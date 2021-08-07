@@ -1,4 +1,5 @@
 add_library(common
+    camera.cpp
     com_cmdline.cpp
     com_filesystem.cpp
     com_misc.cpp

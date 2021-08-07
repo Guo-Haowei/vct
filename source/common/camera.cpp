@@ -1,4 +1,4 @@
-#include "Camera.h"
+#include "camera.h"
 
 vec3 Camera::direction() const
 {

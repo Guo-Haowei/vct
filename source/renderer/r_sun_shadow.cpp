@@ -1,27 +1,20 @@
 #include "r_sun_shadow.h"
 
-#include <unordered_map>
-
 #include "RenderTarget.h"
 #include "common/com_dvars.h"
 #include "common/com_misc.h"
 #include "common/main_window.h"
+#include "common/scene.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"
 #include "r_shader.h"
-#include "scene/Scene.h"
 #include "universal/core_assert.h"
 #include "universal/dvar_api.h"
 #include "universal/print.h"
 
-#pragma optimize( "", off )
-
 #ifdef max
 #undef max
 #endif
-
-extern std::unordered_map<const MeshComponent*, MeshData> g_meshLUT;
-extern std::unordered_map<const Material*, MaterialData> g_matLUT;
 
 extern DepthRenderTarget g_shadowBuffer;
 
@@ -63,18 +56,19 @@ void R_ShadowPass()
     glClear( GL_DEPTH_BUFFER_BIT );
     const GlslProgram& program = R_GetShaderProgram( ProgramType::SHADOW );
     program.Use();
-    static GLint PVMLocation = program.GetUniformLocation( "u_PVM" );
 
+    const int res = Dvar_GetInt( r_shadowRes );
     // render scene 3 times
     for ( int idx = 0; idx < NUM_CASCADES; ++idx )
     {
-        glViewport( idx * SHADOW_MAP_RESOLUTION, 0, SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION );
-        const mat4& PV = g_perframeCache.cache.LightPVs[idx];
+        glViewport( idx * res, 0, res, res );
+        const mat4& PV = g_perFrameCache.cache.LightPVs[idx];
         const Frustum frustum( PV );
         for ( const GeometryNode& node : scene.geometryNodes )
         {
-            const mat4 PVM = PV * node.transform;
-            program.SetUniform( PVMLocation, PVM );
+            g_perBatchCache.cache.PVM   = PV * node.transform;
+            g_perBatchCache.cache.Model = node.transform;
+            g_perBatchCache.Update();
             for ( const Geometry& geom : node.geometries )
             {
                 if ( !geom.visible )
@@ -86,12 +80,9 @@ void R_ShadowPass()
                     continue;
                 }
 
-                const auto& meshPair = g_meshLUT.find( geom.pMesh );
-                core_assert( meshPair != g_meshLUT.end() );
-                const MeshData& drawData = meshPair->second;
-
-                glBindVertexArray( drawData.vao );
-                glDrawElements( GL_TRIANGLES, drawData.count, GL_UNSIGNED_INT, 0 );
+                const MeshData* drawData = reinterpret_cast<const MeshData*>( geom.pMesh->gpuResource );
+                glBindVertexArray( drawData->vao );
+                glDrawElements( GL_TRIANGLES, drawData->count, GL_UNSIGNED_INT, 0 );
             }
         }
     }

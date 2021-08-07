@@ -1,6 +1,5 @@
 add_library(scene
     SceneLoader.cpp
-    Camera.cpp
 )
 
 target_include_directories(scene PRIVATE

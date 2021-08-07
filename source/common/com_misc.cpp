@@ -2,7 +2,6 @@
 
 #include <filesystem>
 
-#include "Globals.h"
 #include "com_filesystem.h"
 #include "imgui/imgui.h"
 #include "main_window.h"
@@ -17,6 +16,10 @@
 
 #define DEFINE_DVAR
 #include "com_dvars.h"
+
+#ifdef max
+#undef max
+#endif
 
 static Scene g_scene;
 
@@ -45,7 +48,6 @@ bool Com_LoadScene()
 
     const vec4 cascades = Dvar_GetVec4( cam_cascades );
 
-    // TODO: config
     camera.fovy  = glm::radians( 60.0f );
     camera.zNear = cascades[0];
     camera.zFar  = cascades[3];
@@ -54,16 +56,19 @@ bool Com_LoadScene()
     camera.pitch    = 0.0f;
     camera.position = Dvar_GetVec3( cam_pos );
 
-    scene.light.direction = glm::normalize( vec3( 4, 25, 4 ) );
-    scene.light.color     = vec3( 15.0f );
+    // TODO: configure
+    scene.light.color = vec3( 15.0f );
 
     const vec3 center     = scene.boundingBox.Center();
-    vec3 size             = scene.boundingBox.Size();
-    constexpr float scale = .6f;
+    const vec3 size       = scene.boundingBox.Size();
+    const float worldSize = glm::max( size.x, glm::max( size.y, size.z ) );
+    const float texelSize = 1.0f / static_cast<float>( VOXEL_TEXTURE_SIZE );
+    const float voxelSize = worldSize * texelSize;
 
-    size.x *= scale;
-    size.z *= scale;
-    scene.shadowBox.FromCenterSize( center, size );
+    g_perFrameCache.cache.WorldCenter   = center;
+    g_perFrameCache.cache.WorldSizeHalf = 0.5f * worldSize;
+    g_perFrameCache.cache.TexelSize     = texelSize;
+    g_perFrameCache.cache.VoxelSize     = voxelSize;
 
     Com_PrintSuccess( "Scene '%s' loaded", scenePath );
     return true;
@@ -113,19 +118,9 @@ void Com_UpdateWorld()
 {
     Scene& scene = Com_GetScene();
 
-    static bool firstFrame = true;
-    if ( firstFrame )
-    {
-        firstFrame = false;
-    }
-    else
-    {
-        scene.dirty = false;
-    }
-
     // update camera
-    const ivec2 size   = MainWindow::FrameSize();
-    const float aspect = (float)size.x / size.y;
+    const ivec2 extent = MainWindow::FrameSize();
+    const float aspect = (float)extent.x / extent.y;
     core_assert( aspect > 0.0f );
 
     Camera& camera = scene.camera;
@@ -139,16 +134,20 @@ void Com_UpdateWorld()
 
     for ( size_t idx = 0; idx < array_length( lightPVs ); ++idx )
     {
-        g_perframeCache.cache.LightPVs[idx] = lightPVs[idx];
+        g_perFrameCache.cache.LightPVs[idx] = lightPVs[idx];
     }
 
     // update constants
-    g_perframeCache.cache.SunDir        = scene.light.direction;
-    g_perframeCache.cache.CamPos        = camera.position;
-    g_perframeCache.cache.View          = camera.View();
-    g_perframeCache.cache.PV            = camera.ProjView();
-    const vec4 cascadedClipZ            = Dvar_GetVec4( cam_cascades );
-    g_perframeCache.cache.CascadedClipZ = cascadedClipZ;
+    g_perFrameCache.cache.SunDir        = scene.light.direction;
+    g_perFrameCache.cache.LightColor    = scene.light.color;
+    g_perFrameCache.cache.CamPos        = camera.position;
+    g_perFrameCache.cache.View          = camera.View();
+    g_perFrameCache.cache.PV            = camera.ProjView();
+    g_perFrameCache.cache.CascadedClipZ = Dvar_GetVec4( cam_cascades );
+    g_perFrameCache.cache.EnableGI      = Dvar_GetBool( r_enableVXGI );
+    g_perFrameCache.cache.DebugCSM      = Dvar_GetBool( r_debugCSM );
+    g_perFrameCache.cache.DebugTexture  = Dvar_GetInt( r_debugTexture );
+    g_perFrameCache.cache.NoTexture     = Dvar_GetBool( r_noTexture );
 }
 
 static void ControlCamera( Camera& camera )

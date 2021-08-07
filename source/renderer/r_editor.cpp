@@ -7,6 +7,7 @@
 #include "gl_utils.h"
 #include "r_cbuffers.h"
 #include "r_shader.h"
+#include "universal/core_assert.h"
 #include "universal/universal.h"
 
 struct VertexPoint3D {
@@ -17,7 +18,6 @@ struct VertexPoint3D {
 static MeshData g_boxWireFrame;
 static MeshData g_gridWireFrame;
 static MeshData g_imageBuffer;
-static GpuTexture g_lightTexture;
 
 struct TextureVertex {
     vec2 pos;
@@ -73,16 +73,10 @@ void R_CreateEditorResource()
 {
     CreateBoxWireFrameData();
     CreateImageBuffer();
-
-    char buffer[kMaxOSPath];
-    Com_FsBuildPath( buffer, kMaxOSPath, "pointlight.png", "data/images" );
-    g_lightTexture.create2DImageFromFile( buffer );
 }
 
 void R_DestroyEditorResource()
 {
-    g_lightTexture.destroy();
-
     glDeleteVertexArrays( 1, &g_boxWireFrame.vao );
     glDeleteBuffers( 2, &g_boxWireFrame.ebo );
 }
@@ -121,8 +115,9 @@ void R_DrawEditor()
 
         R_GetShaderProgram( ProgramType::LINE3D ).Use();
         glBindVertexArray( g_boxWireFrame.vao );
-        g_perframeCache.cache.PVM = g_perframeCache.cache.PV * M;
-        g_perframeCache.Update();
+        g_perBatchCache.cache.PVM   = g_perFrameCache.cache.PV * M;
+        g_perBatchCache.cache.Model = mat4( 1 );
+        g_perBatchCache.Update();
         glDrawElements( GL_LINES, g_boxWireFrame.count, GL_UNSIGNED_INT, 0 );
     }
 
@@ -141,9 +136,6 @@ void R_DrawEditor()
 
         FillTextureIconBuffer( iconBuffer, lightPos2d, camera.GetAspect() );
         glNamedBufferData( g_imageBuffer.vbos[0], sizeof( TextureVertex ) * iconBuffer.size(), iconBuffer.data(), GL_STREAM_DRAW );
-
-        glActiveTexture( GL_TEXTURE0 );
-        g_lightTexture.bind();
 
         R_GetShaderProgram( ProgramType::IMAGE2D ).Use();
         glBindVertexArray( g_imageBuffer.vao );

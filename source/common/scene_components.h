@@ -24,4 +24,24 @@ struct MeshComponent {
     std::vector<uint32_t> indices;
 
     uint32_t materialIdx = static_cast<uint32_t>( -1 );
+
+    mutable void* gpuResource = nullptr;
+};
+
+struct Material {
+    /// only support albedo color for now
+    std::string albedoTexture;
+    std::string metallicRoughnessTexture;
+    std::string normalTexture;
+    vec3 albedo{ 0 };
+    float metallic  = 0.0f;
+    float roughness = 0.0f;
+
+    Material() = default;
+    Material( const vec3& albedo, float metallic, float roughness )
+        : albedo( albedo ), metallic( metallic ), roughness( roughness )
+    {
+    }
+
+    mutable void* gpuResource = nullptr;
 };

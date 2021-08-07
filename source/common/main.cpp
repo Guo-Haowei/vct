@@ -42,11 +42,11 @@ int main( int argc, const char** argv )
         MainWindow::NewFrame();
         ImGui_ImplGlfw_NewFrame();
 
-        Com_UpdateWorld();
-
         ImGui::NewFrame();
         EditorSetup();
         ImGui::Render();
+
+        Com_UpdateWorld();
 
         renderer.render();
         ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
@@ -57,6 +57,8 @@ int main( int argc, const char** argv )
         glfwMakeContextCurrent( backup_current_context );
 
         MainWindow::Present();
+
+        Com_GetScene().dirty = false;
     }
 
     renderer.destroyGpuResources();
