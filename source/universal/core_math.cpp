@@ -1,6 +1,75 @@
 #include "core_math.h"
 
-#include <cstring>
+#include "core_assert.h"
+
+//------------------------------------------------------------------------------
+// AABB
+//------------------------------------------------------------------------------
+
+constexpr AABB::AABB( const vec3& min, const vec3& max )
+    : min( min ), max( max )
+{
+    core_assert( min.x < max.x );
+    core_assert( min.y < max.y );
+    core_assert( min.z < max.z );
+}
+
+bool AABB::Valid() const
+{
+    bool result = ( min.x < max.x );
+    result      = result && ( min.y < max.y );
+    result      = result && ( min.z < max.z );
+    return result;
+}
+
+void AABB::Expand( const vec3& point )
+{
+    min = glm::min( min, point );
+    max = glm::max( max, point );
+}
+
+void AABB::Expand( const vec3* points, size_t count )
+{
+    for ( size_t idx = 0; idx < count; ++idx )
+    {
+        Expand( points[idx] );
+    }
+}
+
+void AABB::Intersection( const AABB& o )
+{
+    min = glm::max( min, o.min );
+    max = glm::min( max, o.max );
+}
+
+void AABB::Union( const AABB& o )
+{
+    min = glm::min( min, o.min );
+    max = glm::max( max, o.max );
+}
+
+void AABB::ApplyMatrix( const mat4& mat4 )
+{
+    vec4 points[8] = {
+        vec4( min.x, min.y, min.z, 1.0f ),
+        vec4( min.x, min.y, max.z, 1.0f ),
+        vec4( min.x, max.y, min.z, 1.0f ),
+        vec4( min.x, max.y, max.z, 1.0f ),
+        vec4( max.x, min.y, min.z, 1.0f ),
+        vec4( max.x, min.y, max.z, 1.0f ),
+        vec4( max.x, max.y, min.z, 1.0f ),
+        vec4( max.x, max.y, max.z, 1.0f )
+    };
+
+    AABB box;
+    for ( int i = 0; i < 8; ++i )
+    {
+        box.Expand( vec3( mat4 * points[i] ) );
+    }
+
+    min = box.min;
+    max = box.max;
+}
 
 //------------------------------------------------------------------------------
 // Plane3
@@ -50,7 +119,7 @@ Frustum::Frustum( const mat4& PV )
     far.d   = PV[3][3] - PV[3][2];
 }
 
-bool Frustum::Intersect( const Box3& box ) const
+bool Frustum::Intersect( const AABB& box ) const
 {
     for ( int i = 0; i < 6; ++i )
     {
@@ -107,7 +176,7 @@ bool Ray::Intersects( vec3 A, vec3 B, vec3 C )
     return true;
 }
 
-bool Ray::Intersects( const Box3& box )
+bool Ray::Intersects( const AABB& box )
 {
     using glm::max;
     using glm::min;
@@ -130,34 +199,3 @@ bool Ray::Intersects( const Box3& box )
 
     return true;
 }
-
-#if 0
-void BoxWireframe( vec3 outPoints[8], uvec2 outIndices[12], float size ) {
-    enum VertexIndex {
-        A = 0,
-        B = 1,
-        C = 2,
-        D = 3,
-        E = 4,
-        F = 5,
-        G = 6,
-        H = 7
-    };
-
-    const vec3 points[] = {
-        { -size, +size, +size },  // A
-        { -size, -size, +size },  // B
-        { +size, -size, +size },  // C
-        { +size, +size, +size },  // D
-        { -size, +size, -size },  // E
-        { -size, -size, -size },  // F
-        { +size, -size, -size },  // G
-        { +size, +size, -size }   // H
-    };
-
-    constexpr uint32_t indices[] = { A, B, B, C, C, D, D, A, E, F, F, G, G, H, H, E, A, E, B, F, D, H, C, G };
-
-    memcpy( outPoints, points, sizeof( points ) );
-    memcpy( outIndices, indices, sizeof( indices ) );
-}
-#endif

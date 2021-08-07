@@ -123,9 +123,10 @@ static inline void FillTextureIconBuffer( std::vector<TextureVertex>& iconBuffer
 void R_DrawEditor()
 {
     const Scene& scene = Com_GetScene();
+
     if ( const Geometry* node = scene.selected )
     {
-        const Box3 box = node->boundingBox;
+        const AABB box = node->boundingBox;
         const mat4 M   = glm::translate( mat4( 1 ), box.Center() ) * glm::scale( mat4( 1 ), box.Size() );
 
         g_lineProgram.use();
@@ -140,7 +141,10 @@ void R_DrawEditor()
     const Camera& camera = scene.camera;
     const mat4 P         = camera.perspective();
     const mat4 V         = camera.view();
-    vec4 lightPos        = P * ( V * vec4( light.position, 1.0 ) );
+
+    constexpr float distance = 10.0f;
+    vec4 lightPos            = vec4( light.direction * distance, 1.0 );
+    lightPos                 = P * ( V * lightPos );
     if ( lightPos.z > 0.0f )
     {
         lightPos /= lightPos.w;

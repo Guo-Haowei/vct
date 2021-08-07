@@ -9,7 +9,9 @@
 #include "common/editor.h"
 #include "common/geometry.h"
 #include "common/main_window.h"
+#include "r_defines.h"
 #include "r_editor.h"
+#include "r_sun_shadow.h"
 #include "scene/Scene.h"
 #include "universal/core_assert.h"
 
@@ -71,10 +73,10 @@ void MainRenderer::createGpuResources()
     float voxelSize = worldSize * texelSize;
 
     // create uniform buffer
-    g_perframeCache.cache.LightPV    = lightSpaceMatrix( scene.light.position, scene.shadowBox );
-    g_perframeCache.cache.LightPos   = scene.light.position;
+    g_perframeCache.cache.SunDir     = scene.light.direction;
     g_perframeCache.cache.LightColor = scene.light.color;
     g_perframeCache.cache.CamPos     = scene.camera.position;
+    g_perframeCache.cache.seed       = 0;
     g_perframeCache.Update();
 
     m_constantBuffer.CreateAndBind( UNIFORM_BUFFER_CONSTANT_SLOT );
@@ -495,17 +497,22 @@ void MainRenderer::renderFrameBufferTextures( const ivec2& extent )
 
 void MainRenderer::render()
 {
-    Scene scene = Com_GetScene();
+    Scene& scene   = Com_GetScene();
+    Camera& camera = scene.camera;
 
     // update perframe cache
-    const mat4 PV                  = scene.camera.perspective() * scene.camera.view();
-    g_perframeCache.cache.LightPos = scene.light.position;
-    g_perframeCache.cache.CamPos   = scene.camera.position;
-    g_perframeCache.cache.PV       = PV;
-    g_perframeCache.cache.LightPV  = lightSpaceMatrix( scene.light.position, scene.shadowBox );
+    const mat4 PV                = camera.perspective() * camera.view();
+    g_perframeCache.cache.SunDir = scene.light.direction;
+    g_perframeCache.cache.CamPos = camera.position;
+    g_perframeCache.cache.PV     = PV;
+
+    mat4 lightPVs[NUM_CASCADES];
+    LightSpaceMatrix( camera, scene.light.direction, lightPVs );
+    g_perframeCache.cache.LightPV = lightPVs[0];
+    ++g_perframeCache.cache.seed;
     g_perframeCache.Update();
 
-    if ( scene.lightDirty )
+    // if ( scene.dirty )
     {
         shadowPass();
     }
@@ -521,6 +528,7 @@ void MainRenderer::render()
     if ( extent.x * extent.y > 0 )
     {
         // skip rendering if minimized
+        // TODO: refactor
         scene.camera.frustum = Frustum( PV );
 
         glViewport( 0, 0, extent.x, extent.y );

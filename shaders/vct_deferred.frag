@@ -1,5 +1,3 @@
-#define PI 3.14159265359
-
 layout(location = 0) out vec4 out_color;
 layout(location = 0) in vec2 pass_uv;
 
@@ -16,6 +14,9 @@ uniform sampler3D u_voxel_normal;
 uniform int u_gi_mode;
 
 #include "cbuffer.glsl"
+#include "common.glsl"
+#include "pbr.glsl"
+#include "shadow.glsl"
 
 layout(std140, binding = 3) uniform Constant {
   vec3 world_center;
@@ -36,8 +37,6 @@ const DiffuseCone g_diffuseCones[6] = DiffuseCone[6](
     DiffuseCone(vec3(0.509037, 0.5, -0.7006629), 3.0 * PI / 20.0),
     DiffuseCone(vec3(-0.50937, 0.5, -0.7006629), 3.0 * PI / 20.0),
     DiffuseCone(vec3(-0.823639, 0.5, 0.267617), 3.0 * PI / 20.0));
-
-#include "common.glsl"
 
 vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
   return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
@@ -124,7 +123,8 @@ void main() {
   vec3 Lo = vec3(0.0);
 
   vec3 N = normal_roughness.xyz;
-  vec3 L = normalize(LightPos - world_position);
+  vec3 L = SunDir;
+  // vec3 L = normalize(LightPos - world_position);
   vec3 V = normalize(CamPos - world_position);
   vec3 H = normalize(V + L);
 
@@ -150,10 +150,13 @@ void main() {
     vec3 kD = vec3(1.0) - kS;
     kD *= 1.0 - metallic;
 
-    float shadow = inShadow(light_space_position, NdotL);
+    // float
 
+    float visibility = Shadow(u_shadow_map, light_space_position, NdotL);
+    // uint state = 0;
+    // float visibility = PCF(u_shadow_map, light_space_position, state);
     vec3 directLight = (kD * albedo.rgb / PI + specular) * radiance * NdotL;
-    Lo += (1.0 - shadow) * directLight;
+    Lo += visibility * directLight;
   }
 
   float ambient = 0.15;

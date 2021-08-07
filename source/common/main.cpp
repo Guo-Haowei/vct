@@ -66,8 +66,7 @@ int main( int argc, const char** argv )
 
         MainWindow::Present();
 
-        scene.dirty      = false;
-        scene.lightDirty = false;
+        scene.dirty = false;
     }
 
     renderer.destroyGpuResources();

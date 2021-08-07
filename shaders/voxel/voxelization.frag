@@ -2,8 +2,6 @@
 #extension GL_NV_shader_atomic_float : enable
 #extension GL_NV_shader_atomic_fp16_vector : enable
 
-#define PI 3.14159265359
-
 in vec3 pass_position;
 in vec3 pass_normal;
 in vec2 pass_uv;
@@ -13,6 +11,9 @@ layout(rgba16f, binding = 0) uniform image3D u_albedo_texture;
 layout(rgba16f, binding = 1) uniform image3D u_normal_texture;
 
 #include "cbuffer.glsl"
+#include "common.glsl"
+#include "pbr.glsl"
+#include "shadow.glsl"
 
 layout(std140, binding = 2) uniform Material {
   vec4 albedo_color;
@@ -31,8 +32,6 @@ layout(std140, binding = 3) uniform Constant {
 uniform sampler2D u_shadow_map;
 uniform sampler2D u_albedo_map;
 uniform sampler2D u_metallic_roughness_map;
-
-#include "common.glsl"
 
 void main() {
   vec4 albedo =
@@ -53,7 +52,8 @@ void main() {
   vec3 Lo = vec3(0.0);
 
   vec3 N = normalize(pass_normal);
-  vec3 L = normalize(LightPos - world_position);
+  // vec3 L = normalize(LightPos - world_position);
+  vec3 L = SunDir;
   vec3 V = normalize(CamPos - world_position);
   vec3 H = normalize(V + L);
 
@@ -79,11 +79,9 @@ void main() {
 
   Lo += (kD * albedo.rgb / PI + specular) * radiance * NdotL;
 
-  float shadow = inShadow(pass_light_space_position, NdotL);
-
-  float ambient = 0.15;
-
-  vec3 color = (1.0 - shadow) * Lo + ambient * albedo.rgb;
+  const float ambient = 0.15;
+  float visibility = Shadow(u_shadow_map, pass_light_space_position, NdotL);
+  vec3 color = visibility * Lo + ambient * albedo.rgb;
 
   ///////////////////////////////////////////////////////////////////////////
 

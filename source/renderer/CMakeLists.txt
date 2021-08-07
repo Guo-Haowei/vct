@@ -8,6 +8,7 @@ add_library(renderer
     r_cbuffers.cpp
     r_editor.cpp
     r_graphics.cpp
+    r_sun_shadow.cpp
 )
 
 target_link_libraries(renderer PRIVATE

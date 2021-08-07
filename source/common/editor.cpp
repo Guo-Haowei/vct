@@ -50,16 +50,19 @@ void Editor::LightWindow()
     ImGui::Begin( "Light" );
     Scene& scene = Com_GetScene();
 
-    bool dirty = false;
-    dirty |= ImGui::DragFloat( "x", &( scene.light.position.x ), 1.f, -50.f, 50.f );
-    dirty |= ImGui::DragFloat( "y", &( scene.light.position.y ), 1.f, 10.f, 100.f );
-    dirty |= ImGui::DragFloat( "z", &( scene.light.position.z ), 1.f, -50.f, 50.f );
-
-    if ( dirty )
     {
-        scene.lightDirty = true;
-        scene.dirty      = true;
+        static vec3 sz( 2, 30, 5 );
+
+        bool dirty = false;
+        dirty |= ImGui::DragFloat( "z", &sz.z, 1.f, -50.f, 50.f );
+
+        if ( dirty )
+        {
+            scene.light.direction = glm::normalize( sz );
+            scene.dirty           = true;
+        }
     }
+
     ImGui::Separator();
     ImGui::ColorEdit3( "color", &( scene.light.color.x ) );
     ImGui::End();
@@ -338,7 +341,7 @@ void Editor::Update()
                     {
                         continue;
                     }
-                    const Box3& box = geom.boundingBox;
+                    const AABB& box = geom.boundingBox;
                     const auto mesh = geom.pMesh;
                     if ( ray.Intersects( box ) )
                     {
@@ -368,7 +371,6 @@ void Editor::Update()
         {
             scene.selected->visible = false;
             scene.dirty             = true;
-            scene.lightDirty        = true;
             scene.selected          = nullptr;
         }
     }

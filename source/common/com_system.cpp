@@ -37,16 +37,20 @@ bool Com_LoadScene()
     // TODO: configure the rest
     Camera& camera = scene.camera;
 
-    camera.fovy     = glm::radians( 60.0f );
-    camera.aspect   = 1.0f;
-    camera.zNear    = 0.2f;
-    camera.zFar     = 100.0f;
+    const vec4 cascades = Dvar_GetVec4( cam_cascades );
+
+    // TODO: config
+    camera.fovy   = glm::radians( 60.0f );
+    camera.aspect = 1.0f;
+    camera.zNear  = cascades[0];
+    camera.zFar   = cascades[3];
+
     camera.yaw      = glm::radians( 180.0f );
     camera.pitch    = -0.04f;
     camera.position = Dvar_GetVec3( cam_pos );
 
-    scene.light.position = vec3( -.5f, 25.f, -.5f );
-    scene.light.color    = vec3( 15.0f );
+    scene.light.direction = glm::normalize( vec3( 4, 25, 4 ) );
+    scene.light.color     = vec3( 15.0f );
 
     const vec3 center     = scene.boundingBox.Center();
     vec3 size             = scene.boundingBox.Size();

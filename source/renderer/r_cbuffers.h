@@ -7,8 +7,8 @@ struct PerFrameCB {
     mat4 PVM;
     mat4 LightPV;
     vec3 CamPos;
-    float perframe_pad0;
-    vec3 LightPos;
+    uint32_t seed;
+    vec3 SunDir;
     float perframe_pad1;
     vec3 LightColor;
     float perframe_pad2;

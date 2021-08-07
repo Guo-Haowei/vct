@@ -58,7 +58,7 @@ void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transfor
         MeshComponent* mesh  = processMesh( aimesh );
         size_t index         = materialOffset + mesh->materialIdx;
         Material* mat        = scene.materials.at( index ).get();
-        Box3 box;
+        AABB box;
 
         for ( vec3& position : mesh->positions )
         {

@@ -4,10 +4,6 @@
 
 namespace vct {
 
-constexpr unsigned int SHADOW_MAP_RESOLUTION = 2048;
-
-static_assert( is_power_of_two( SHADOW_MAP_RESOLUTION ) );
-
 // constexpr unsigned int VOXEL_TEXTURE_SIZE = 256;
 constexpr unsigned int VOXEL_TEXTURE_SIZE      = 128;
 constexpr unsigned int VOXEL_TEXTURE_MIP_LEVEL = log2( VOXEL_TEXTURE_SIZE );

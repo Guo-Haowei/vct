@@ -1,8 +1,6 @@
 #pragma once
 #include "universal/core_math.h"
 
-namespace vct {
-
 struct Camera {
     mat4 view() const;
     mat4 perspective() const;
@@ -17,5 +15,3 @@ struct Camera {
     vec3 position{ 0 };
     Frustum frustum;
 };
-
-}  // namespace vct

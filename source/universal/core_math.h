@@ -36,114 +36,45 @@ using glm::mat3;
 using glm::mat4;
 
 //------------------------------------------------------------------------------
-// box_t
+// AABB
 //------------------------------------------------------------------------------
-template<int N, typename T>
-struct box_t {
-    using vec_t  = glm::vec<N, T, glm::defaultp>;
-    using this_t = box_t<N, T>;
+struct AABB {
+    vec3 min, max;
 
-    vec_t min, max;
-
-    constexpr box_t()
-        : min{ std::numeric_limits<T>::infinity() }
-        , max{ -std::numeric_limits<T>::infinity() }
+    constexpr AABB::AABB()
+        : min( vec3( std::numeric_limits<float>::infinity() ) )
+        , max( vec3( -std::numeric_limits<float>::infinity() ) )
     {
-        static_assert( N == 2 || N == 3 );
+    }
+    constexpr AABB( const vec3& min, const vec3& max );
+
+    bool Valid() const;
+    void Expand( const vec3& point );
+
+    void Expand( const vec3* points, size_t count );
+
+    void Intersection( const AABB& o );
+    void Union( const AABB& o );
+
+    void ApplyMatrix( const mat4& mat4 );
+
+    void FromCenterSize( const vec3& center, const vec3& size )
+    {
+        vec3 half = 0.5f * size;
+        min       = center - half;
+        max       = center + half;
     }
 
-    constexpr box_t( const vec_t& min, const vec_t& max )
-        : min( min ), max( max )
+    vec3 Center() const
     {
-        static_assert( N == 2 || N == 3 );
-        assert( min.x < max.x );
-        assert( min.y < max.y );
-        if constexpr ( N > 2 )
-        {
-            assert( min.z < max.z );
-        }
+        return 0.5f * ( min + max );
     }
 
-    bool Valid() const
-    {
-        bool result = ( min.x < max.x ) && ( min.y < max.y );
-        if constexpr ( N > 2 )
-        {
-            result = result && ( min.z < max.z );
-        }
-        return result;
-    }
-
-    void Expand( const vec_t& point )
-    {
-        min = glm::min( min, point );
-        max = glm::max( max, point );
-    }
-
-    void Expand( const vec_t* points, size_t count )
-    {
-        for ( size_t idx = 0; idx < count; ++idx )
-        {
-            Expand( points[idx] );
-        }
-    }
-
-    void Intersection( const this_t& o )
-    {
-        min = glm::max( min, o.min );
-        max = glm::min( max, o.max );
-    }
-
-    void Union( const this_t& o )
-    {
-        min = glm::min( min, o.min );
-        max = glm::max( max, o.max );
-    }
-
-    vec_t Center() const
-    {
-        return static_cast<T>( 0.5 ) * ( min + max );
-    }
-
-    vec_t Size() const
+    vec3 Size() const
     {
         return max - min;
     }
-
-    void ApplyMatrix( const mat4& mat4 )
-    {
-        static_assert( N == 3 );
-        vec4 points[8] = {
-            vec4( min.x, min.y, min.z, 1.0f ),
-            vec4( min.x, min.y, max.z, 1.0f ),
-            vec4( min.x, max.y, min.z, 1.0f ),
-            vec4( min.x, max.y, max.z, 1.0f ),
-            vec4( max.x, min.y, min.z, 1.0f ),
-            vec4( max.x, min.y, max.z, 1.0f ),
-            vec4( max.x, max.y, min.z, 1.0f ),
-            vec4( max.x, max.y, max.z, 1.0f )
-        };
-
-        this_t newBox;
-        for ( int i = 0; i < 8; ++i )
-        {
-            newBox.Expand( vec3( mat4 * points[i] ) );
-        }
-
-        min = newBox.min;
-        max = newBox.max;
-    }
-
-    void FromCenterSize( const vec_t& center, const vec_t& size )
-    {
-        vec_t half = static_cast<T>( 0.5 ) * size;
-        min        = center - half;
-        max        = center + half;
-    }
 };
-
-using Box2 = box_t<2, float>;
-using Box3 = box_t<3, float>;
 
 //------------------------------------------------------------------------------
 // Plane3
@@ -181,7 +112,7 @@ struct Frustum {
         return reinterpret_cast<const Plane3*>( this )[i];
     }
 
-    bool Intersect( const Box3& box ) const;
+    bool Intersect( const AABB& box ) const;
 };
 
 //------------------------------------------------------------------------------
@@ -197,7 +128,7 @@ struct Ray {
     float distance_ = kRayMax;
 
     bool Intersects( vec3 A, vec3 B, vec3 C );
-    bool Intersects( const Box3& box );
+    bool Intersects( const AABB& box );
 };
 
 // TODO: refactor
