@@ -110,13 +110,11 @@ void main() {
 
   gl_FragDepth = depth;
 
-  vec4 normal_roughness = texture(u_gbuffer_normal_roughness, pass_uv);
-  vec4 position_metallic = texture(u_gbuffer_position_metallic, pass_uv);
-  vec3 world_position = position_metallic.xyz;
+  const vec4 normal_roughness = texture(u_gbuffer_normal_roughness, pass_uv);
+  const vec4 position_metallic = texture(u_gbuffer_position_metallic, pass_uv);
+  const vec4 worldPos = vec4(position_metallic.xyz, 1.0);
   float roughness = normal_roughness.w;
   float metallic = position_metallic.w;
-
-  vec4 light_space_position = LightPV * vec4(world_position, 1.0);
 
   vec4 albedo = texture(u_gbuffer_albedo, pass_uv);
   vec3 F0 = mix(vec3(0.04), albedo.rgb, metallic);
@@ -124,8 +122,7 @@ void main() {
 
   vec3 N = normal_roughness.xyz;
   vec3 L = SunDir;
-  // vec3 L = normalize(LightPos - world_position);
-  vec3 V = normalize(CamPos - world_position);
+  vec3 V = normalize(CamPos - worldPos.xyz);
   vec3 H = normalize(V + L);
 
   vec3 radiance = LightColor;
@@ -151,32 +148,39 @@ void main() {
     kD *= 1.0 - metallic;
 
     // float
-
-    float visibility = Shadow(u_shadow_map, light_space_position, NdotL);
-    // uint state = 0;
-    // float visibility = PCF(u_shadow_map, light_space_position, state);
     vec3 directLight = (kD * albedo.rgb / PI + specular) * radiance * NdotL;
-    Lo += visibility * directLight;
+
+    float shadow = 0.0;
+    float clipSpaceZ = (PV * worldPos).z;
+    for (int idx = 0; idx < NUM_CASCADES; ++idx) {
+      if (clipSpaceZ <= CascadedClipZ[idx + 1]) {
+        vec4 lightSpacePos = LightPVs[idx] * worldPos;
+        shadow = Shadow(u_shadow_map, lightSpacePos, NdotL, idx);
+        break;
+      }
+    }
+    Lo += (1.0 - shadow) * directLight;
   }
 
   float ambient = 0.15;
 
   vec3 color = Lo + ambient * albedo.rgb;
 
+  if (u_gi_mode == 1)
   // indirect light
-  if (u_gi_mode == 1) {
+  {
     vec3 F = fresnelSchlickRoughness(NdotV, F0, roughness);
     vec3 kS = F;
     vec3 kD = 1.0 - kS;
     kD *= 1.0 - metallic;
 
     // indirect diffuse
-    vec3 diffuse = albedo.rgb * indirectDiffuse(world_position, N);
+    vec3 diffuse = albedo.rgb * indirectDiffuse(worldPos.xyz, N);
 
     // specular cone
     vec3 coneDirection = reflect(-V, N);
     vec3 specular =
-        0.5 * indirectSpecular(world_position, coneDirection, roughness);
+        0.5 * indirectSpecular(worldPos.xyz, coneDirection, roughness);
     specular = vec3(0.0);
 
     color += (kD * diffuse + specular);

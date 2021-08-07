@@ -4,8 +4,6 @@
 #include "Camera.h"
 #include "common/scene_components.h"
 
-namespace vct {
-
 struct Material {
     /// only support albedo color for now
     std::string albedoTexture;
@@ -51,5 +49,3 @@ struct Scene {
     bool dirty               = true;
     const Geometry* selected = nullptr;
 };
-
-}  // namespace vct

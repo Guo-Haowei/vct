@@ -2,15 +2,16 @@
 #extension GL_NV_shader_atomic_float : enable
 #extension GL_NV_shader_atomic_fp16_vector : enable
 
-in vec3 pass_position;
-in vec3 pass_normal;
-in vec2 pass_uv;
-in vec4 pass_light_space_position;
-
 layout(rgba16f, binding = 0) uniform image3D u_albedo_texture;
 layout(rgba16f, binding = 1) uniform image3D u_normal_texture;
 
 #include "cbuffer.glsl"
+
+in vec3 pass_position;
+in vec3 pass_normal;
+in vec2 pass_uv;
+in vec4 pass_light_space_positions[NUM_CASCADES];
+
 #include "common.glsl"
 #include "pbr.glsl"
 #include "shadow.glsl"
@@ -80,8 +81,20 @@ void main() {
   Lo += (kD * albedo.rgb / PI + specular) * radiance * NdotL;
 
   const float ambient = 0.15;
-  float visibility = Shadow(u_shadow_map, pass_light_space_position, NdotL);
-  vec3 color = visibility * Lo + ambient * albedo.rgb;
+
+  vec4 lightPos = LightPVs[0] * vec4(pass_position, 1.0);
+
+  float shadow = 0.0;
+  float clipSpaceZ = (PV * vec4(pass_position, 1.0)).z;
+  for (int idx = 0; idx < NUM_CASCADES; ++idx) {
+    if (clipSpaceZ <= CascadedClipZ[idx + 1]) {
+      vec4 lightSpacePos = pass_light_space_positions[idx];
+      shadow = Shadow(u_shadow_map, lightSpacePos, NdotL, idx);
+      break;
+    }
+  }
+
+  vec3 color = (1.0 - shadow) * Lo + ambient * albedo.rgb;
 
   ///////////////////////////////////////////////////////////////////////////
 

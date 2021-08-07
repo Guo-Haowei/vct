@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "GpuTexture.h"
+#include "universal/core_math.h"
 #include "universal/print.h"
 
 static constexpr int kMaxShaderName = 128;
@@ -52,6 +54,17 @@ struct MeshData {
     GLuint ebo     = 0;
     GLuint vbos[5] = { 0, 0, 0, 0, 0 };
     uint32_t count = 0;
+};
+
+struct MaterialData {
+    GpuTexture albedoMap;
+    GpuTexture materialMap;
+    GpuTexture normalMap;
+    vec4 albedoColor;
+    float metallic;
+    float roughness;
+    // specular...
+    // normal...
 };
 
 namespace gl {

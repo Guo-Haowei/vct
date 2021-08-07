@@ -1,23 +1,19 @@
 #include "r_editor.h"
 
-#include "GlslProgram.h"
 #include "GpuTexture.h"
 #include "common/com_filesystem.h"
-#include "common/com_system.h"
+#include "common/com_misc.h"
 #include "common/geometry.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"
+#include "r_shader.h"
 #include "universal/universal.h"
-
-using namespace vct;
 
 struct VertexPoint3D {
     vec3 position;
     vec3 color;
 };
 
-static GlslProgram g_lineProgram;
-static GlslProgram g_imageProgram;
 static MeshData g_boxWireFrame;
 static MeshData g_gridWireFrame;
 static MeshData g_imageBuffer;
@@ -75,9 +71,6 @@ static void CreateBoxWireFrameData()
 
 void R_CreateEditorResource()
 {
-    g_lineProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "editor/line3d" ) ) );
-    g_imageProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "editor/image" ) ) );
-
     CreateBoxWireFrameData();
     CreateImageBuffer();
 
@@ -88,9 +81,6 @@ void R_CreateEditorResource()
 
 void R_DestroyEditorResource()
 {
-    g_lineProgram.Destroy();
-    g_imageProgram.Destroy();
-
     g_lightTexture.destroy();
 
     glDeleteVertexArrays( 1, &g_boxWireFrame.vao );
@@ -129,7 +119,7 @@ void R_DrawEditor()
         const AABB box = node->boundingBox;
         const mat4 M   = glm::translate( mat4( 1 ), box.Center() ) * glm::scale( mat4( 1 ), box.Size() );
 
-        g_lineProgram.use();
+        R_GetShaderProgram( ProgramType::LINE3D ).Use();
         glBindVertexArray( g_boxWireFrame.vao );
         g_perframeCache.cache.PVM = g_perframeCache.cache.PV * M;
         g_perframeCache.Update();
@@ -139,25 +129,23 @@ void R_DrawEditor()
     // draw light
     const Light& light   = scene.light;
     const Camera& camera = scene.camera;
-    const mat4 P         = camera.perspective();
-    const mat4 V         = camera.view();
 
     constexpr float distance = 10.0f;
     vec4 lightPos            = vec4( light.direction * distance, 1.0 );
-    lightPos                 = P * ( V * lightPos );
+    lightPos                 = camera.ProjView() * lightPos;
     if ( lightPos.z > 0.0f )
     {
         lightPos /= lightPos.w;
-        const vec2 lightPos2d( P * lightPos );
+        const vec2 lightPos2d( camera.Proj() * lightPos );
         std::vector<TextureVertex> iconBuffer;
 
-        FillTextureIconBuffer( iconBuffer, lightPos2d, camera.aspect );
+        FillTextureIconBuffer( iconBuffer, lightPos2d, camera.GetAspect() );
         glNamedBufferData( g_imageBuffer.vbos[0], sizeof( TextureVertex ) * iconBuffer.size(), iconBuffer.data(), GL_STREAM_DRAW );
 
         glActiveTexture( GL_TEXTURE0 );
         g_lightTexture.bind();
 
-        g_imageProgram.use();
+        R_GetShaderProgram( ProgramType::IMAGE2D ).Use();
         glBindVertexArray( g_imageBuffer.vao );
         glDrawArrays( GL_TRIANGLES, 0, 6 );
     }

@@ -5,20 +5,22 @@
 #include <unordered_map>
 
 #include "common/Globals.h"
-#include "common/com_system.h"
+#include "common/com_misc.h"
 #include "common/editor.h"
 #include "common/geometry.h"
 #include "common/main_window.h"
 #include "r_defines.h"
 #include "r_editor.h"
+#include "r_shader.h"
 #include "r_sun_shadow.h"
 #include "scene/Scene.h"
 #include "universal/core_assert.h"
 
-namespace vct {
+std::unordered_map<const MeshComponent*, MeshData> g_meshLUT;
+std::unordered_map<const Material*, MaterialData> g_matLUT;
+DepthRenderTarget g_shadowBuffer;
 
-static std::unordered_map<const MeshComponent*, MeshData> g_meshLUT;
-static std::unordered_map<const Material*, MaterialData> g_matLUT;
+namespace vct {
 
 static MeshData CreateMeshData( const MeshComponent& mesh )
 {
@@ -61,6 +63,8 @@ static MeshData CreateMeshData( const MeshComponent& mesh )
 
 void MainRenderer::createGpuResources()
 {
+    R_CreateShaderPrograms();
+
     R_Alloc_Cbuffers();
     R_CreateEditorResource();
 
@@ -76,7 +80,6 @@ void MainRenderer::createGpuResources()
     g_perframeCache.cache.SunDir     = scene.light.direction;
     g_perframeCache.cache.LightColor = scene.light.color;
     g_perframeCache.cache.CamPos     = scene.camera.position;
-    g_perframeCache.cache.seed       = 0;
     g_perframeCache.Update();
 
     m_constantBuffer.CreateAndBind( UNIFORM_BUFFER_CONSTANT_SLOT );
@@ -91,36 +94,35 @@ void MainRenderer::createGpuResources()
     // create shader
     m_gbufferProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "gbuffer" ) ) );
     {
-        m_gbufferProgram.use();
-        m_gbufferProgram.setUniform( m_gbufferProgram.getUniformLocation( "u_albedo_map" ), ALBEDO_MAP_SLOT );
-        m_gbufferProgram.setUniform( m_gbufferProgram.getUniformLocation( "u_normal_map" ), NORMAL_MAP_SLOT );
-        m_gbufferProgram.setUniform( m_gbufferProgram.getUniformLocation( "u_metallic_roughness_map" ), METALLIC_ROUGHNESS_SLOT );
-        m_gbufferProgram.stop();
+        m_gbufferProgram.Use();
+        m_gbufferProgram.SetUniform( m_gbufferProgram.GetUniformLocation( "u_albedo_map" ), ALBEDO_MAP_SLOT );
+        m_gbufferProgram.SetUniform( m_gbufferProgram.GetUniformLocation( "u_normal_map" ), NORMAL_MAP_SLOT );
+        m_gbufferProgram.SetUniform( m_gbufferProgram.GetUniformLocation( "u_metallic_roughness_map" ), METALLIC_ROUGHNESS_SLOT );
+        m_gbufferProgram.Stop();
     }
 
     m_vctProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "fullscreen", "vct_deferred" ) ) );
     {
-        m_vctProgram.use();
-        m_vctProgram.setUniform( m_vctProgram.getUniformLocation( "u_gbuffer_depth" ), TEXTURE_GBUFFER_DEPTH_SLOT );
-        m_vctProgram.setUniform( m_vctProgram.getUniformLocation( "u_gbuffer_albedo" ), TEXTURE_GBUFFER_ALBEDO_SLOT );
-        m_vctProgram.setUniform( m_vctProgram.getUniformLocation( "u_gbuffer_position_metallic" ), TEXTURE_GBUFFER_POSITION_METALLIC_SLOT );
-        m_vctProgram.setUniform( m_vctProgram.getUniformLocation( "u_gbuffer_normal_roughness" ), TEXTURE_GBUFFER_NORMAL_ROUGHNESS_SLOT );
-        m_vctProgram.setUniform( m_vctProgram.getUniformLocation( "u_shadow_map" ), TEXTURE_SHADOW_MAP_SLOT );
-        m_vctProgram.setUniform( m_vctProgram.getUniformLocation( "u_voxel_albedo" ), TEXTURE_VOXEL_ALBEDO_SLOT );
-        m_vctProgram.setUniform( m_vctProgram.getUniformLocation( "u_voxel_normal" ), TEXTURE_VOXEL_NORMAL_SLOT );
-        m_vctProgram.stop();
+        m_vctProgram.Use();
+        m_vctProgram.SetUniform( m_vctProgram.GetUniformLocation( "u_gbuffer_depth" ), TEXTURE_GBUFFER_DEPTH_SLOT );
+        m_vctProgram.SetUniform( m_vctProgram.GetUniformLocation( "u_gbuffer_albedo" ), TEXTURE_GBUFFER_ALBEDO_SLOT );
+        m_vctProgram.SetUniform( m_vctProgram.GetUniformLocation( "u_gbuffer_position_metallic" ), TEXTURE_GBUFFER_POSITION_METALLIC_SLOT );
+        m_vctProgram.SetUniform( m_vctProgram.GetUniformLocation( "u_gbuffer_normal_roughness" ), TEXTURE_GBUFFER_NORMAL_ROUGHNESS_SLOT );
+        m_vctProgram.SetUniform( m_vctProgram.GetUniformLocation( "u_shadow_map" ), TEXTURE_SHADOW_MAP_SLOT );
+        m_vctProgram.SetUniform( m_vctProgram.GetUniformLocation( "u_voxel_albedo" ), TEXTURE_VOXEL_ALBEDO_SLOT );
+        m_vctProgram.SetUniform( m_vctProgram.GetUniformLocation( "u_voxel_normal" ), TEXTURE_VOXEL_NORMAL_SLOT );
+        m_vctProgram.Stop();
     }
 
-    m_depthProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "depth" ) ) );
     m_debugTextureProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "fullscreen", "debug/texture" ) ) );
 
     m_voxelProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSGSPS( "voxel/voxelization" ) ) );
     {
         // set one time uniforms
-        m_voxelProgram.use();
-        m_voxelProgram.setUniform( m_voxelProgram.getUniformLocation( "u_albedo_map" ), ALBEDO_MAP_SLOT );
-        m_voxelProgram.setUniform( m_voxelProgram.getUniformLocation( "u_shadow_map" ), TEXTURE_SHADOW_MAP_SLOT );
-        m_voxelProgram.stop();
+        m_voxelProgram.Use();
+        m_voxelProgram.SetUniform( m_voxelProgram.GetUniformLocation( "u_albedo_map" ), ALBEDO_MAP_SLOT );
+        m_voxelProgram.SetUniform( m_voxelProgram.GetUniformLocation( "u_shadow_map" ), TEXTURE_SHADOW_MAP_SLOT );
+        m_voxelProgram.Stop();
     }
 
     m_visualizeProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "voxel/visualization" ) ) );
@@ -212,7 +214,7 @@ void MainRenderer::createGpuResources()
     }
 
     glActiveTexture( GL_TEXTURE0 + TEXTURE_SHADOW_MAP_SLOT );
-    m_shadowBuffer.getDepthTexture().bind();
+    g_shadowBuffer.getDepthTexture().bind();
 
     glActiveTexture( GL_TEXTURE0 + TEXTURE_GBUFFER_DEPTH_SLOT );
     m_gbuffer.getDepthTexture().bind();
@@ -242,23 +244,23 @@ void MainRenderer::visualizeVoxels()
     GlslProgram& program = m_visualizeProgram;
 
     glBindVertexArray( m_box.vao );
-    program.use();
-    static const GLint location_type = program.getUniformLocation( "u_is_albedo" );
+    program.Use();
+    static const GLint location_type = program.GetUniformLocation( "u_is_albedo" );
     int isAlbedo                     = g_UIControls.drawTexture == DrawTexture::TEXTURE_VOXEL_ALBEDO;
 
-    program.setUniform( location_type, isAlbedo );
+    program.SetUniform( location_type, isAlbedo );
 
     int mipLevel = g_UIControls.voxelMipLevel;
 
     GpuTexture& voxelTexture = isAlbedo ? m_albedoVoxel : m_normalVoxel;
 
-    glBindImageTexture( 0, voxelTexture.getHandle(), mipLevel, GL_TRUE, 0,
+    glBindImageTexture( 0, voxelTexture.GetHandle(), mipLevel, GL_TRUE, 1,
                         GL_READ_ONLY, voxelTexture.getFormat() );
 
     int size = VOXEL_TEXTURE_SIZE >> mipLevel;
     glDrawElementsInstanced( GL_TRIANGLES, m_box.count, GL_UNSIGNED_INT, 0, size * size * size );
 
-    program.stop();
+    program.Stop();
 }
 
 void MainRenderer::gbufferPass()
@@ -267,18 +269,19 @@ void MainRenderer::gbufferPass()
     GlslProgram& program = m_gbufferProgram;
 
     m_gbuffer.bind();
-    program.use();
+    program.Use();
 
     glEnable( GL_DEPTH_TEST );
     glEnable( GL_CULL_FACE );
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    static GLint location_M = program.getUniformLocation( "M" );
+    static GLint location_M = program.GetUniformLocation( "M" );
     // TODO: refactor draw scene
+    Frustum frustum( scene.camera.ProjView() );
     for ( const GeometryNode& node : scene.geometryNodes )
     {
-        program.setUniform( location_M, node.transform );
+        program.SetUniform( location_M, node.transform );
 
         for ( const Geometry& geom : node.geometries )
         {
@@ -286,7 +289,7 @@ void MainRenderer::gbufferPass()
             {
                 continue;
             }
-            if ( !scene.camera.frustum.Intersect( geom.boundingBox ) )
+            if ( !frustum.Intersect( geom.boundingBox ) )
             {
                 continue;
             }
@@ -314,49 +317,8 @@ void MainRenderer::gbufferPass()
         }
     }
 
-    m_gbufferProgram.stop();
+    m_gbufferProgram.Stop();
     m_gbuffer.unbind();
-}
-
-void MainRenderer::shadowPass()
-{
-    Scene scene = Com_GetScene();
-    m_shadowBuffer.bind();
-
-    glEnable( GL_DEPTH_TEST );
-    glEnable( GL_CULL_FACE );
-    glCullFace( GL_FRONT );
-
-    glViewport( 0, 0, SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION );
-    glClear( GL_DEPTH_BUFFER_BIT );
-    // render scene
-    m_depthProgram.use();
-
-    static GLint PVMLocation = m_depthProgram.getUniformLocation( "u_PVM" );
-
-    for ( const GeometryNode& node : scene.geometryNodes )
-    {
-        mat4 PVM = g_perframeCache.cache.LightPV * node.transform;
-        m_depthProgram.setUniform( PVMLocation, PVM );
-        for ( const Geometry& geom : node.geometries )
-        {
-            if ( !geom.visible )
-            {
-                continue;
-            }
-
-            const auto& meshPair = g_meshLUT.find( geom.pMesh );
-            core_assert( meshPair != g_meshLUT.end() );
-            const MeshData& drawData = meshPair->second;
-
-            glBindVertexArray( drawData.vao );
-            glDrawElements( GL_TRIANGLES, drawData.count, GL_UNSIGNED_INT, 0 );
-        }
-    }
-
-    m_shadowBuffer.unbind();
-
-    glCullFace( GL_BACK );
 }
 
 void MainRenderer::renderToVoxelTexture()
@@ -371,12 +333,12 @@ void MainRenderer::renderToVoxelTexture()
 
     m_albedoVoxel.bindImageTexture( IMAGE_VOXEL_ALBEDO_SLOT );
     m_normalVoxel.bindImageTexture( IMAGE_VOXEL_NORMAL_SLOT );
-    m_voxelProgram.use();
-    static GLint mLocation = m_voxelProgram.getUniformLocation( "u_M" );
+    m_voxelProgram.Use();
+    static GLint mLocation = m_voxelProgram.GetUniformLocation( "u_M" );
 
     for ( const GeometryNode& node : scene.geometryNodes )
     {
-        m_voxelProgram.setUniform( mLocation, node.transform );
+        m_voxelProgram.SetUniform( mLocation, node.transform );
         for ( const Geometry& geom : node.geometries )
         {
             if ( !geom.visible )
@@ -406,7 +368,7 @@ void MainRenderer::renderToVoxelTexture()
     glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
 
     // post process
-    m_voxelPostProgram.use();
+    m_voxelPostProgram.Use();
 
     constexpr GLuint workGroupX = 512;
     constexpr GLuint workGroupY = 512;
@@ -427,27 +389,27 @@ void MainRenderer::vctPass()
 {
     GlslProgram& program = m_vctProgram;
 
-    program.use();
+    program.Use();
 
-    static GLint location_gi_mode = program.getUniformLocation( "u_gi_mode" );
-    program.setUniform( location_gi_mode, g_UIControls.voxelGiMode );
+    static GLint location_gi_mode = program.GetUniformLocation( "u_gi_mode" );
+    program.SetUniform( location_gi_mode, g_UIControls.voxelGiMode );
 
     glBindVertexArray( m_quad.vao );
     glDrawArrays( GL_TRIANGLES, 0, 6 );
 
-    program.stop();
+    program.Stop();
 }
 
 void MainRenderer::renderFrameBufferTextures( const ivec2& extent )
 {
     GlslProgram& program = m_debugTextureProgram;
 
-    program.use();
+    program.Use();
 
     glDisable( GL_DEPTH_TEST );
 
-    static GLint location_texture = program.getUniformLocation( "u_texture" );
-    static GLint location_type    = program.getUniformLocation( "u_type" );
+    static GLint location_texture = program.GetUniformLocation( "u_texture" );
+    static GLint location_type    = program.GetUniformLocation( "u_type" );
 
     constexpr float scale = 0.13f;
     int width             = static_cast<int>( scale * extent.x );
@@ -488,34 +450,20 @@ void MainRenderer::renderFrameBufferTextures( const ivec2& extent )
         default: break;
     }
 
-    program.setUniform( location_texture, textureSlot );
-    program.setUniform( location_type, type );
+    program.SetUniform( location_texture, textureSlot );
+    program.SetUniform( location_type, type );
     glDrawArrays( GL_TRIANGLES, 0, 6 );
 
-    program.stop();
+    program.Stop();
 }
 
 void MainRenderer::render()
 {
-    Scene& scene   = Com_GetScene();
-    Camera& camera = scene.camera;
+    Scene& scene = Com_GetScene();
 
-    // update perframe cache
-    const mat4 PV                = camera.perspective() * camera.view();
-    g_perframeCache.cache.SunDir = scene.light.direction;
-    g_perframeCache.cache.CamPos = camera.position;
-    g_perframeCache.cache.PV     = PV;
-
-    mat4 lightPVs[NUM_CASCADES];
-    LightSpaceMatrix( camera, scene.light.direction, lightPVs );
-    g_perframeCache.cache.LightPV = lightPVs[0];
-    ++g_perframeCache.cache.seed;
     g_perframeCache.Update();
 
-    // if ( scene.dirty )
-    {
-        shadowPass();
-    }
+    R_ShadowPass();
 
     if ( scene.dirty || g_UIControls.forceUpdateVoxelTexture )
     {
@@ -529,7 +477,6 @@ void MainRenderer::render()
     {
         // skip rendering if minimized
         // TODO: refactor
-        scene.camera.frustum = Frustum( PV );
 
         glViewport( 0, 0, extent.x, extent.y );
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -560,7 +507,7 @@ void MainRenderer::createFrameBuffers()
 {
     const ivec2 extent = MainWindow::FrameSize();
 
-    m_shadowBuffer.create( SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION );
+    g_shadowBuffer.create( NUM_CASCADES * SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION );
 
     m_gbuffer.create( extent.x, extent.y );
 }
@@ -571,15 +518,16 @@ void MainRenderer::destroyGpuResources()
     m_voxelProgram.Destroy();
     m_visualizeProgram.Destroy();
     m_voxelPostProgram.Destroy();
-    m_depthProgram.Destroy();
     m_debugTextureProgram.Destroy();
 
     // render targets
-    m_shadowBuffer.destroy();
+    g_shadowBuffer.destroy();
     m_gbuffer.destroy();
 
     R_DestroyEditorResource();
     R_Destroy_Cbuffers();
+
+    R_DestroyShaderPrograms();
 }
 
 }  // namespace vct

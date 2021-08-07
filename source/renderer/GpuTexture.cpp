@@ -11,11 +11,9 @@
 
 using std::string;
 
-namespace vct {
-
 void GpuTexture::bind() const
 {
-    glBindTexture( m_type, m_handle );
+    glBindTexture( m_type, mHandle );
 }
 
 void GpuTexture::unbind() const
@@ -34,7 +32,7 @@ void GpuTexture::create2DEmpty( const Texture2DCreateInfo& info )
     m_type   = GL_TEXTURE_2D;
     m_format = info.internalFormat;
 
-    glGenTextures( 1, &m_handle );
+    glGenTextures( 1, &mHandle );
 
     bind();
     glTexImage2D( m_type, 0, info.internalFormat, info.width, info.height, 0, info.format, info.dataType, 0 );
@@ -56,7 +54,7 @@ void GpuTexture::create3DEmpty( const Texture3DCreateInfo& info )
     m_type   = GL_TEXTURE_3D;
     m_format = info.format;
 
-    glGenTextures( 1, &m_handle );
+    glGenTextures( 1, &mHandle );
     bind();
     glTexParameteri( m_type, GL_TEXTURE_WRAP_S, info.wrapS );
     glTexParameteri( m_type, GL_TEXTURE_WRAP_T, info.wrapT );
@@ -78,8 +76,8 @@ void GpuTexture::create2DImageFromFile( const char* path )
         Com_PrintError( "stb: failed to load image '%s'", path );
     }
 
-    glGenTextures( 1, &m_handle );
-    glBindTexture( m_type, m_handle );
+    glGenTextures( 1, &mHandle );
+    glBindTexture( m_type, mHandle );
     glTexParameteri( m_type, GL_TEXTURE_WRAP_S, GL_REPEAT );
     glTexParameteri( m_type, GL_TEXTURE_WRAP_T, GL_REPEAT );
     glTexParameteri( m_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
@@ -102,23 +100,23 @@ void GpuTexture::create2DImageFromFile( const char* path )
 
 void GpuTexture::destroy()
 {
-    if ( m_handle != NULL_HANDLE )
-        glDeleteTextures( 1, &m_handle );
-    m_handle = NULL_HANDLE;
+    if ( mHandle != 0 )
+    {
+        glDeleteTextures( 1, &mHandle );
+    }
+    mHandle = 0;
 }
 
 void GpuTexture::bindImageTexture( int i, int mipLevel )
 {
     core_assert( m_type == GL_TEXTURE_3D );
-    glBindImageTexture( i, m_handle, mipLevel, GL_TRUE, 0, GL_READ_WRITE, m_format );
+    glBindImageTexture( i, mHandle, mipLevel, GL_TRUE, 0, GL_READ_WRITE, m_format );
 }
 
 void GpuTexture::clear()
 {
     float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
     /// Hard code format for now
-    glClearTexImage( m_handle, 0, GL_RGBA, GL_FLOAT, clearColor );
+    glClearTexImage( mHandle, 0, GL_RGBA, GL_FLOAT, clearColor );
     //glClearTexImage(m_handle, 0, m_format, GL_FLOAT, clearColor);
 }
-
-}  // namespace vct

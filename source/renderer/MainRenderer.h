@@ -7,17 +7,6 @@
 
 namespace vct {
 
-struct MaterialData {
-    GpuTexture albedoMap;
-    GpuTexture materialMap;
-    GpuTexture normalMap;
-    vec4 albedoColor;
-    float metallic;
-    float roughness;
-    // specular...
-    // normal...
-};
-
 struct MaterialCache {
     vec4 albedo_color;  // if it doesn't have albedo color, then it's alpha is 0.0f
     float metallic                       = 0.0f;
@@ -30,8 +19,8 @@ struct MaterialCache {
         albedo_color                   = mat.albedoColor;
         roughness                      = mat.roughness;
         metallic                       = mat.metallic;
-        has_metallic_roughness_texture = mat.materialMap.getHandle() == 0 ? 0.0f : 1.0f;
-        has_normal_texture             = mat.normalMap.getHandle() == 0 ? 0.0f : 1.0f;
+        has_metallic_roughness_texture = mat.materialMap.GetHandle() == 0 ? 0.0f : 1.0f;
+        has_normal_texture             = mat.normalMap.GetHandle() == 0 ? 0.0f : 1.0f;
 
         return *this;
     }
@@ -59,16 +48,13 @@ class MainRenderer {
     void destroyGpuResources();
 
     void gbufferPass();
-    void shadowPass();
     void vctPass();
 
    private:
-    /// shader programs
     GlslProgram m_voxelProgram;
     GlslProgram m_visualizeProgram;
     GlslProgram m_vctProgram;
     GlslProgram m_voxelPostProgram;
-    GlslProgram m_depthProgram;
     GlslProgram m_debugTextureProgram;
 
     GlslProgram m_gbufferProgram;
@@ -86,7 +72,6 @@ class MainRenderer {
     gl::ConstantBuffer<ConstantCache> m_constantBuffer;    // global binding 3
 
     /// render targets
-    DepthRenderTarget m_shadowBuffer;
     GBuffer m_gbuffer;
 };
 

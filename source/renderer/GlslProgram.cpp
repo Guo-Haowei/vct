@@ -4,28 +4,34 @@
 #include "universal/core_assert.h"
 #include "universal/print.h"
 
-namespace vct {
+void GlslProgram::Create( GLuint program )
+{
+    mHandle = program;
+}
 
 void GlslProgram::Destroy()
 {
-    if ( m_handle != NULL_HANDLE )
-        glDeleteProgram( m_handle );
-    m_handle = NULL_HANDLE;
+    if ( mHandle != 0 )
+    {
+        glDeleteProgram( mHandle );
+    }
+
+    mHandle = 0;
 }
 
-void GlslProgram::use()
+void GlslProgram::Use() const
 {
-    glUseProgram( m_handle );
+    glUseProgram( mHandle );
 }
 
-void GlslProgram::stop()
+void GlslProgram::Stop()
 {
-    glUseProgram( NULL_HANDLE );
+    glUseProgram( 0 );
 }
 
-GLint GlslProgram::getUniformLocation( const char* name )
+GLint GlslProgram::GetUniformLocation( const char* name ) const
 {
-    GLint location = glGetUniformLocation( m_handle, name );
+    GLint location = glGetUniformLocation( mHandle, name );
     if ( location < 0 )
     {
         Com_PrintWarning( "uniform '%s' not found" );
@@ -33,34 +39,32 @@ GLint GlslProgram::getUniformLocation( const char* name )
     return location;
 }
 
-void GlslProgram::setUniform( GLint location, const int& val )
+void GlslProgram::SetUniform( GLint location, const int& val ) const
 {
     glUniform1i( location, val );
 }
 
-void GlslProgram::setUniform( GLint location, const float& val )
+void GlslProgram::SetUniform( GLint location, const float& val ) const
 {
     glUniform1f( location, val );
 }
 
-void GlslProgram::setUniform( GLint location, const vec2& val )
+void GlslProgram::SetUniform( GLint location, const vec2& val ) const
 {
     glUniform2f( location, val.x, val.y );
 }
 
-void GlslProgram::setUniform( GLint location, const vec3& val )
+void GlslProgram::SetUniform( GLint location, const vec3& val ) const
 {
     glUniform3f( location, val.x, val.y, val.z );
 }
 
-void GlslProgram::setUniform( GLint location, const vec4& val )
+void GlslProgram::SetUniform( GLint location, const vec4& val ) const
 {
     glUniform4f( location, val.x, val.y, val.z, val.w );
 }
 
-void GlslProgram::setUniform( GLint location, const mat4& val )
+void GlslProgram::SetUniform( GLint location, const mat4& val ) const
 {
     glUniformMatrix4fv( location, 1, GL_FALSE, &val[0].x );
 }
-
-}  // namespace vct

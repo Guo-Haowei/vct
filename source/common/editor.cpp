@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Globals.h"
-#include "common/com_system.h"
+#include "common/com_misc.h"
 #include "common/main_window.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
@@ -54,7 +54,7 @@ void Editor::LightWindow()
         static vec3 sz( 2, 30, 5 );
 
         bool dirty = false;
-        dirty |= ImGui::DragFloat( "z", &sz.z, 1.f, -50.f, 50.f );
+        dirty |= ImGui::DragFloat( "z", &sz.z, .4f, -20.f, 20.f );
 
         if ( dirty )
         {
@@ -325,7 +325,7 @@ void Editor::Update()
         {
             const Camera& camera = scene.camera;
 
-            const mat4 PV    = camera.perspective() * camera.view();
+            const mat4& PV   = camera.ProjView();
             const mat4 invPV = glm::inverse( PV );
             vec2 pos( mousePos.x / extent.x, 1.0f - mousePos.y / extent.y );
             pos -= 0.5f;

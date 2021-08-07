@@ -1,17 +1,20 @@
 #pragma once
 #include "gl_utils.h"
+#include "r_defines.h"
 #include "universal/core_math.h"
 
 struct PerFrameCB {
+    mat4 View;
     mat4 PV;
     mat4 PVM;
-    mat4 LightPV;
     vec3 CamPos;
-    uint32_t seed;
+    float perframe_pad0;
     vec3 SunDir;
     float perframe_pad1;
     vec3 LightColor;
     float perframe_pad2;
+    vec4 CascadedClipZ;
+    mat4 LightPVs[NUM_CASCADES];
 };
 
 static_assert( sizeof( PerFrameCB ) % 16 == 0 );

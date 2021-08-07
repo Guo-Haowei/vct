@@ -1,6 +1,6 @@
 #include "com_cmdline.h"
 #include "com_filesystem.h"
-#include "com_system.h"
+#include "com_misc.h"
 #include "editor.h"
 #include "imgui/imgui.h"
 #include "imgui_impl_glfw.h"
@@ -14,8 +14,6 @@
 #include <GLFW/glfw3.h>
 
 using namespace vct;
-
-void updateCamera();
 
 int main( int argc, const char** argv )
 {
@@ -44,13 +42,7 @@ int main( int argc, const char** argv )
         MainWindow::NewFrame();
         ImGui_ImplGlfw_NewFrame();
 
-        // TODO: camera controller
-        updateCamera();
-
-        ivec2 size          = MainWindow::FrameSize();
-        float aspect        = (float)size.x / size.y;
-        Scene& scene        = Com_GetScene();
-        scene.camera.aspect = aspect;
+        Com_UpdateWorld();
 
         ImGui::NewFrame();
         EditorSetup();
@@ -65,8 +57,6 @@ int main( int argc, const char** argv )
         glfwMakeContextCurrent( backup_current_context );
 
         MainWindow::Present();
-
-        scene.dirty = false;
     }
 
     renderer.destroyGpuResources();
@@ -77,47 +67,4 @@ int main( int argc, const char** argv )
     MainWindow::Shutdown();
 
     return ok ? 0 : 1;
-}
-
-static bool isKeyDown( int code )
-{
-    return ImGui::IsKeyDown( code );
-}
-
-void updateCamera()
-{
-    Scene& scene = Com_GetScene();
-
-    constexpr float VIEW_SPEED = 2.0f;
-    float CAMERA_SPEED         = 0.15f;
-
-    if ( isKeyDown( GLFW_KEY_LEFT_SHIFT ) )
-        CAMERA_SPEED *= 3.f;
-
-    int x = isKeyDown( GLFW_KEY_D ) - isKeyDown( GLFW_KEY_A );
-    int z = isKeyDown( GLFW_KEY_W ) - isKeyDown( GLFW_KEY_S );
-    int y = isKeyDown( GLFW_KEY_E ) - isKeyDown( GLFW_KEY_Q );
-
-    Camera& cam = scene.camera;
-    if ( x != 0 || z != 0 )
-    {
-        vec3 w           = cam.direction();
-        vec3 u           = glm::cross( w, vec3( 0, 1, 0 ) );
-        vec3 translation = ( CAMERA_SPEED * z ) * w + ( CAMERA_SPEED * x ) * u;
-        cam.position += translation;
-    }
-
-    cam.position.y += ( CAMERA_SPEED * y );
-
-    int yaw   = isKeyDown( GLFW_KEY_RIGHT ) - isKeyDown( GLFW_KEY_LEFT );
-    int pitch = isKeyDown( GLFW_KEY_UP ) - isKeyDown( GLFW_KEY_DOWN );
-
-    if ( yaw )
-        cam.yaw += VIEW_SPEED * yaw;
-
-    if ( pitch )
-    {
-        cam.pitch += VIEW_SPEED * pitch;
-        cam.pitch = glm::clamp( cam.pitch, -80.0f, 80.0f );
-    }
 }

@@ -3,8 +3,6 @@
 #include "universal/core_assert.h"
 #include "universal/print.h"
 
-namespace vct {
-
 void RenderTarget::bind()
 {
     glBindFramebuffer( GL_FRAMEBUFFER, m_handle );
@@ -37,12 +35,12 @@ void RenderTarget::createDepthAttachment()
     m_depthAttachment.create2DEmpty( info );
 
     m_depthAttachment.bind();
-    float border[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-    // float border[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    // float border[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    float border[] = { 1.0f, 1.0f, 1.0f, 1.0f };
     glTexParameterfv( GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border );
     m_depthAttachment.unbind();
 
-    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthAttachment.m_handle, 0 );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthAttachment.GetHandle(), 0 );
 }
 
 void RenderTarget::create( int width, int height )
@@ -101,7 +99,7 @@ void GBuffer::create( int width, int height )
         GL_FRAMEBUFFER,
         GL_COLOR_ATTACHMENT0 + POSISION,
         GL_TEXTURE_2D,
-        m_colorAttachments[POSISION].getHandle(),
+        m_colorAttachments[POSISION].GetHandle(),
         0 );
 
     // normal
@@ -110,7 +108,7 @@ void GBuffer::create( int width, int height )
         GL_FRAMEBUFFER,
         GL_COLOR_ATTACHMENT0 + NORMAL,
         GL_TEXTURE_2D,
-        m_colorAttachments[NORMAL].getHandle(),
+        m_colorAttachments[NORMAL].GetHandle(),
         0 );
 
     // albedo
@@ -121,7 +119,7 @@ void GBuffer::create( int width, int height )
         GL_FRAMEBUFFER,
         GL_COLOR_ATTACHMENT0 + ALBEDO,
         GL_TEXTURE_2D,
-        m_colorAttachments[ALBEDO].getHandle(),
+        m_colorAttachments[ALBEDO].GetHandle(),
         0 );
 
     GLuint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
@@ -133,5 +131,3 @@ void GBuffer::create( int width, int height )
     checkError();
     unbind();
 }
-
-}  // namespace vct
