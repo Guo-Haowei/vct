@@ -61,6 +61,9 @@ static const char* DrawTextureToStr( int mode )
         case TEXTURE_GBUFFER_SHADOW:
             str = "shadow";
             break;
+        case TEXTURE_SSAO:
+            str = "ssao";
+            break;
         default:
             break;
     }
@@ -81,6 +84,9 @@ void Editor::DbgWindow()
     ImGui::SameLine();
     ImGui::Checkbox( "No Texture", (bool*)( Dvar_GetPtr( r_noTexture ) ) );
     ImGui::Separator();
+
+    ImGui::Text( "SSAO" );
+    ImGui::SliderFloat( "radius", (float*)( Dvar_GetPtr( r_ssaoKernelRadius ) ), 0.1f, 5.0f );
 
     bool dirty = false;
     dirty |= ImGui::Checkbox( "Force Voxel GI texture update", (bool*)( Dvar_GetPtr( r_forceVXGI ) ) );

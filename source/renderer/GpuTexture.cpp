@@ -109,7 +109,6 @@ void GpuTexture::destroy()
 
 void GpuTexture::bindImageTexture( int i, int mipLevel )
 {
-    core_assert( m_type == GL_TEXTURE_3D );
     glBindImageTexture( i, mHandle, mipLevel, GL_TRUE, 0, GL_READ_WRITE, m_format );
 }
 

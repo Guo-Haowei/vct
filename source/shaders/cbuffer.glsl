@@ -7,6 +7,9 @@
 #ifndef MAX_LIGHT_ICON
 #define MAX_LIGHT_ICON 4
 #endif
+#ifndef NUM_SSAO_KERNEL
+#define NUM_SSAO_KERNEL 64
+#endif
 
 #ifdef __cplusplus
 struct PerFrameCB
@@ -15,21 +18,33 @@ layout( std140, binding = 0 ) uniform PerFrameCB
 #endif
 {
     mat4 View;
+    mat4 Proj;
     mat4 PV;
+
     vec3 CamPos;
     int DebugCSM;
+
     vec3 SunDir;
     int EnableGI;
+
     vec3 LightColor;
     float VoxelSize;
+
     vec4 CascadedClipZ;
     mat4 LightPVs[NUM_CASCADES];
+
     vec3 WorldCenter;
     float WorldSizeHalf;
-    float TexelSize;
+
     int DebugTexture;
     int NoTexture;
-    int _padding;
+    int ScreenWidth;
+    int ScreenHeight;
+
+    int SSAOKernelSize;
+    float SSAOKernelRadius;
+    int SSAONoiseSize;
+    float TexelSize;
 };
 
 #ifdef __cplusplus
@@ -72,6 +87,7 @@ struct ConstantCB
 layout( std140, binding = 3 ) uniform ConstantCB
 #endif
 {
+    vec4 SSAOKernels[NUM_SSAO_KERNEL];
     sampler2D ShadowMap;
     sampler3D VoxelAlbedoMap;
     sampler3D VoxelNormalMap;
@@ -80,6 +96,8 @@ layout( std140, binding = 3 ) uniform ConstantCB
     sampler2D GbufferPositionMetallicMap;
     sampler2D GbufferNormalRoughnessMap;
     sampler2D GbufferDepthMap;
+    sampler2D SSAOMap;
+    sampler2D NoiseMap;
     Sampler2DArray LightIconTextures[MAX_LIGHT_ICON];
     Sampler2DArray AlbedoMaps[MAX_MATERIALS];
     Sampler2DArray NormalMaps[MAX_MATERIALS];

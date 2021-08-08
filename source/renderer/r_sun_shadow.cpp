@@ -1,12 +1,12 @@
 #include "r_sun_shadow.h"
 
-#include "RenderTarget.h"
 #include "common/com_dvars.h"
 #include "common/com_misc.h"
 #include "common/main_window.h"
 #include "common/scene.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"
+#include "r_rendertarget.h"
 #include "r_shader.h"
 #include "universal/core_assert.h"
 #include "universal/dvar_api.h"
@@ -16,10 +16,22 @@
 #undef max
 #endif
 
-extern DepthRenderTarget g_shadowBuffer;
-
-void R_LightSpaceMatrix( const Camera& camera, vec3 lightDir, mat4 lightPVs[NUM_CASCADES] )
+static mat4 R_HackLightSpaceMatrix( const vec3& lightDir )
 {
+    const Scene& scene = Com_GetScene();
+    const vec3 center  = scene.boundingBox.Center();
+    const vec3 extents = scene.boundingBox.Size();
+    const float size   = 0.5f * glm::max( extents.x, glm::max( extents.y, extents.z ) );
+    const mat4 V       = glm::lookAt( center + glm::normalize( lightDir ) * size, center, vec3( 0, 1, 0 ) );
+    const mat4 P       = glm::ortho( -size, size, -size, size, 0.0f, 2.0f * size );
+    return P * V;
+}
+
+void R_LightSpaceMatrix( const Camera& camera, const vec3& lightDir, mat4 lightPVs[NUM_CASCADES] )
+{
+    // lightPVs[0] = lightPVs[1] = lightPVs[2] = R_HackLightSpaceMatrix( lightDir );
+    // return;
+
     const vec4 cascades     = Dvar_GetVec4( cam_cascades );
     const mat4 vInv         = glm::inverse( camera.View() );  // inversed V
     const float tanHalfHFOV = glm::tan( 0.5f * camera.fovy );
@@ -48,13 +60,13 @@ void R_LightSpaceMatrix( const Camera& camera, vec3 lightDir, mat4 lightPVs[NUM_
 void R_ShadowPass()
 {
     const Scene& scene = Com_GetScene();
-    g_shadowBuffer.bind();
+    g_shadowRT.Bind();
 
     glEnable( GL_DEPTH_TEST );
     glEnable( GL_CULL_FACE );
     glCullFace( GL_FRONT );
     glClear( GL_DEPTH_BUFFER_BIT );
-    const GlslProgram& program = R_GetShaderProgram( ProgramType::SHADOW );
+    const auto& program = R_GetShaderProgram( ProgramType::SHADOW );
     program.Use();
 
     const int res = Dvar_GetInt( r_shadowRes );
@@ -87,6 +99,6 @@ void R_ShadowPass()
         }
     }
 
-    g_shadowBuffer.unbind();
+    g_shadowRT.Unbind();
     glCullFace( GL_BACK );
 }

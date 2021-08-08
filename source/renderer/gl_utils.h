@@ -83,7 +83,38 @@ static inline void BindToSlot( GLuint buffer, int slot, int size )
     glEnableVertexAttribArray( slot );
 }
 
-GLuint CreateShaderProgram( const ProgramCreateInfo& info );
+GLuint CreateProgram( const ProgramCreateInfo& info );
+
+class Program {
+   public:
+    void Destroy()
+    {
+        if ( mHandle )
+        {
+            glDeleteProgram( mHandle );
+        }
+
+        mHandle = 0;
+    }
+
+    void Use() const
+    {
+        glUseProgram( mHandle );
+    }
+    void Stop() const
+    {
+        glUseProgram( 0 );
+    }
+
+    Program& operator=( GLuint program )
+    {
+        mHandle = program;
+        return *this;
+    }
+
+   private:
+    GLuint mHandle = 0;
+};
 
 //------------------------------------------------------------------------------
 // Constant Buffer

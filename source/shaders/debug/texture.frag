@@ -32,6 +32,11 @@ void main()
             out_color = vec4( texture( ShadowMap, pass_uv ).rrr, 1.0 );
             break;
         }
+        case 9: {
+            out_color = vec4( texture( SSAOMap, pass_uv ) );
+            // out_color = vec4( texture( SSAOMap, pass_uv ).rrr, 1.0 );
+            break;
+        }
         default:
             break;
     }

@@ -5,17 +5,25 @@
 #include "gl_utils.h"
 #include "universal/core_assert.h"
 
-static std::vector<GlslProgram> g_shaderCache;
+using gl::CreateProgram;
+using gl::Program;
+
+static std::vector<Program> g_shaderCache;
 
 void R_CreateShaderPrograms()
 {
     g_shaderCache.resize( static_cast<int>( ProgramType::COUNT ) );
-    g_shaderCache[static_cast<int>( ProgramType::LINE3D )].Create(
-        gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "editor/line3d" ) ) );
-    g_shaderCache[static_cast<int>( ProgramType::IMAGE2D )].Create(
-        gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "editor/image" ) ) );
-    g_shaderCache[static_cast<int>( ProgramType::SHADOW )].Create(
-        gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "depth" ) ) );
+
+    g_shaderCache[static_cast<int>( ProgramType::LINE3D )] =
+        CreateProgram( ProgramCreateInfo::VSPS( "editor/line3d" ) );
+    g_shaderCache[static_cast<int>( ProgramType::IMAGE2D )] =
+        CreateProgram( ProgramCreateInfo::VSPS( "editor/image" ) );
+    g_shaderCache[static_cast<int>( ProgramType::SHADOW )] =
+        CreateProgram( ProgramCreateInfo::VSPS( "depth" ) );
+    g_shaderCache[static_cast<int>( ProgramType::GBUFFER )] =
+        CreateProgram( ProgramCreateInfo::VSPS( "gbuffer" ) );
+    g_shaderCache[static_cast<int>( ProgramType::SSAO )] =
+        CreateProgram( ProgramCreateInfo::VSPS( "fullscreen", "ssao" ) );
 }
 
 void R_DestroyShaderPrograms()
@@ -26,7 +34,7 @@ void R_DestroyShaderPrograms()
     }
 }
 
-const GlslProgram& R_GetShaderProgram( ProgramType type )
+const Program& R_GetShaderProgram( ProgramType type )
 {
     core_assert( static_cast<int>( type ) < g_shaderCache.size() );
     return g_shaderCache[static_cast<int>( type )];

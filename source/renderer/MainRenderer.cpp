@@ -9,6 +9,8 @@
 #include "common/main_window.h"
 #include "r_defines.h"
 #include "r_editor.h"
+#include "r_passes.h"
+#include "r_rendertarget.h"
 #include "r_shader.h"
 #include "r_sun_shadow.h"
 #include "universal/core_assert.h"
@@ -17,7 +19,9 @@
 static std::vector<std::shared_ptr<MeshData>> g_meshdata;
 static std::vector<std::shared_ptr<MaterialData>> g_materialdata;
 
-DepthRenderTarget g_shadowBuffer;
+MeshData m_quad;
+
+extern void FillMaterialCB( const MaterialData* mat, MaterialCB& cb );
 
 namespace vct {
 
@@ -66,21 +70,20 @@ void MainRenderer::createGpuResources()
 {
     R_CreateShaderPrograms();
 
+    R_Create_Pass_Resources();
+
     R_Alloc_Cbuffers();
     R_CreateEditorResource();
+    R_CreateRT();
 
     Scene& scene = Com_GetScene();
 
     // create shader
-    m_gbufferProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "gbuffer" ) ) );
-    m_vctProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "fullscreen", "vct_deferred" ) ) );
-    m_debugTextureProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "fullscreen", "debug/texture" ) ) );
-    m_voxelProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSGSPS( "voxel/voxelization" ) ) );
-    m_visualizeProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::VSPS( "voxel/visualization" ) ) );
-    m_voxelPostProgram.Create( gl::CreateShaderProgram( ProgramCreateInfo::CS( "voxel/post" ) ) );
-
-    // frame buffers
-    createFrameBuffers();
+    m_vctProgram          = gl::CreateProgram( ProgramCreateInfo::VSPS( "fullscreen", "vct_deferred" ) );
+    m_debugTextureProgram = gl::CreateProgram( ProgramCreateInfo::VSPS( "fullscreen", "debug/texture" ) );
+    m_voxelProgram        = gl::CreateProgram( ProgramCreateInfo::VSGSPS( "voxel/voxelization" ) );
+    m_visualizeProgram    = gl::CreateProgram( ProgramCreateInfo::VSPS( "voxel/visualization" ) );
+    m_voxelPostProgram    = gl::CreateProgram( ProgramCreateInfo::CS( "voxel/post" ) );
 
     m_box = CreateMeshData( geometry::MakeBox() );
 
@@ -161,13 +164,14 @@ void MainRenderer::createGpuResources()
         mat->gpuResource = g_materialdata.back().get();
     }
 
-    g_constantCache.cache.ShadowMap                  = gl::MakeTextureResident( g_shadowBuffer.getDepthTexture().GetHandle() );
-    g_constantCache.cache.GbufferDepthMap            = gl::MakeTextureResident( m_gbuffer.getDepthTexture().GetHandle() );
-    g_constantCache.cache.GbufferPositionMetallicMap = gl::MakeTextureResident( m_gbuffer.getColorAttachment( 0 ).GetHandle() );
-    g_constantCache.cache.GbufferNormalRoughnessMap  = gl::MakeTextureResident( m_gbuffer.getColorAttachment( 1 ).GetHandle() );
-    g_constantCache.cache.GbufferAlbedoMap           = gl::MakeTextureResident( m_gbuffer.getColorAttachment( 2 ).GetHandle() );
+    g_constantCache.cache.ShadowMap                  = gl::MakeTextureResident( g_shadowRT.GetDepthTexture().GetHandle() );
+    g_constantCache.cache.GbufferDepthMap            = gl::MakeTextureResident( g_gbufferRT.GetDepthTexture().GetHandle() );
+    g_constantCache.cache.GbufferPositionMetallicMap = gl::MakeTextureResident( g_gbufferRT.GetColorAttachment( 0 ).GetHandle() );
+    g_constantCache.cache.GbufferNormalRoughnessMap  = gl::MakeTextureResident( g_gbufferRT.GetColorAttachment( 1 ).GetHandle() );
+    g_constantCache.cache.GbufferAlbedoMap           = gl::MakeTextureResident( g_gbufferRT.GetColorAttachment( 2 ).GetHandle() );
     g_constantCache.cache.VoxelAlbedoMap             = gl::MakeTextureResident( m_albedoVoxel.GetHandle() );
     g_constantCache.cache.VoxelNormalMap             = gl::MakeTextureResident( m_normalVoxel.GetHandle() );
+    g_constantCache.cache.SSAOMap                    = gl::MakeTextureResident( g_ssaoRT.GetColorAttachment( 0 ).GetHandle() );
 
     char buffer[kMaxOSPath];
     for ( int idx = 0; idx < 1; ++idx )
@@ -185,31 +189,15 @@ void MainRenderer::visualizeVoxels()
     glEnable( GL_CULL_FACE );
     glEnable( GL_DEPTH_TEST );
 
-    GlslProgram& program = m_visualizeProgram;
+    const auto& program = m_visualizeProgram;
 
     glBindVertexArray( m_box->vao );
     program.Use();
-
-    // GpuTexture& voxelTexture = isAlbedo ? m_albedoVoxel : m_normalVoxel;
-
-    // glBindImageTexture( 0, voxelTexture.GetHandle(), mipLevel, GL_TRUE, 1,
-    //                     GL_READ_ONLY, voxelTexture.getFormat() );
 
     constexpr int size = VOXEL_TEXTURE_SIZE;
     glDrawElementsInstanced( GL_TRIANGLES, m_box->count, GL_UNSIGNED_INT, 0, size * size * size );
 
     program.Stop();
-}
-
-void FillMaterialCB( const MaterialData* mat, MaterialCB& cb )
-{
-    cb.AlbedoColor   = mat->albedoColor;
-    cb.Metallic      = mat->metallic;
-    cb.Roughness     = mat->roughness;
-    cb.HasAlbedoMap  = mat->albedoMap.GetHandle() != 0;
-    cb.HasNormalMap  = mat->materialMap.GetHandle() != 0;
-    cb.HasPbrMap     = mat->materialMap.GetHandle() != 0;
-    cb.TextureMapIdx = mat->textureMapIdx;
 }
 
 struct MaterialCache {
@@ -230,52 +218,6 @@ struct MaterialCache {
         return *this;
     }
 };
-
-void MainRenderer::gbufferPass()
-{
-    Scene& scene         = Com_GetScene();
-    GlslProgram& program = m_gbufferProgram;
-
-    m_gbuffer.bind();
-    program.Use();
-
-    glEnable( GL_DEPTH_TEST );
-    glEnable( GL_CULL_FACE );
-
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    Frustum frustum( scene.camera.ProjView() );
-    for ( const GeometryNode& node : scene.geometryNodes )
-    {
-        g_perBatchCache.cache.Model = node.transform;
-        g_perBatchCache.cache.PVM   = g_perFrameCache.cache.PV * node.transform;
-        g_perBatchCache.Update();
-
-        for ( const Geometry& geom : node.geometries )
-        {
-            if ( !geom.visible )
-            {
-                continue;
-            }
-            if ( !frustum.Intersect( geom.boundingBox ) )
-            {
-                continue;
-            }
-
-            const MeshData* drawData    = reinterpret_cast<MeshData*>( geom.pMesh->gpuResource );
-            const MaterialData* matData = reinterpret_cast<MaterialData*>( geom.pMaterial->gpuResource );
-
-            FillMaterialCB( matData, g_materialCache.cache );
-            g_materialCache.Update();
-
-            glBindVertexArray( drawData->vao );
-            glDrawElements( GL_TRIANGLES, drawData->count, GL_UNSIGNED_INT, 0 );
-        }
-    }
-
-    m_gbufferProgram.Stop();
-    m_gbuffer.unbind();
-}
 
 void MainRenderer::renderToVoxelTexture()
 {
@@ -337,7 +279,7 @@ void MainRenderer::renderToVoxelTexture()
 
 void MainRenderer::vctPass()
 {
-    GlslProgram& program = m_vctProgram;
+    const auto& program = m_vctProgram;
 
     program.Use();
 
@@ -349,7 +291,7 @@ void MainRenderer::vctPass()
 
 void MainRenderer::renderFrameBufferTextures( const ivec2& extent )
 {
-    GlslProgram& program = m_debugTextureProgram;
+    const auto& program = m_debugTextureProgram;
 
     program.Use();
 
@@ -394,13 +336,11 @@ void MainRenderer::render()
     {
         // skip rendering if minimized
         glViewport( 0, 0, extent.x, extent.y );
+
+        R_Gbuffer_Pass();
+        R_SSAO_Pass();
+
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-        glEnable( GL_DEPTH_TEST );
-        glEnable( GL_CULL_FACE );
-
-        gbufferPass();
-
         const int mode = Dvar_GetInt( r_debugTexture );
         if ( mode == DrawTexture::TEXTURE_FINAL_IMAGE )
         {
@@ -419,17 +359,6 @@ void MainRenderer::render()
     }
 }
 
-void MainRenderer::createFrameBuffers()
-{
-    const ivec2 extent = MainWindow::FrameSize();
-
-    const int res = Dvar_GetInt( r_shadowRes );
-    g_shadowBuffer.create( NUM_CASCADES * res, res );
-    core_assert( is_power_of_two( res ) );
-
-    m_gbuffer.create( extent.x, extent.y );
-}
-
 void MainRenderer::destroyGpuResources()
 {
     // gpu resource
@@ -438,12 +367,12 @@ void MainRenderer::destroyGpuResources()
     m_voxelPostProgram.Destroy();
     m_debugTextureProgram.Destroy();
 
-    // render targets
-    g_shadowBuffer.destroy();
-    m_gbuffer.destroy();
+    R_DestroyRT();
 
     R_DestroyEditorResource();
     R_Destroy_Cbuffers();
+
+    R_Destroy_Pass_Resources();
 
     R_DestroyShaderPrograms();
 }

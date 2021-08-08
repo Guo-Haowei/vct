@@ -56,8 +56,7 @@ bool Com_LoadScene()
     camera.pitch    = 0.0f;
     camera.position = Dvar_GetVec3( cam_pos );
 
-    // TODO: configure
-    scene.light.color = vec3( 15.0f );
+    scene.light.color = vec3( glm::clamp( Dvar_GetFloat( light_power ), 5.0f, 30.0f ) );
 
     const vec3 center     = scene.boundingBox.Center();
     const vec3 size       = scene.boundingBox.Size();
@@ -142,12 +141,19 @@ void Com_UpdateWorld()
     g_perFrameCache.cache.LightColor    = scene.light.color;
     g_perFrameCache.cache.CamPos        = camera.position;
     g_perFrameCache.cache.View          = camera.View();
+    g_perFrameCache.cache.Proj          = camera.Proj();
     g_perFrameCache.cache.PV            = camera.ProjView();
     g_perFrameCache.cache.CascadedClipZ = Dvar_GetVec4( cam_cascades );
     g_perFrameCache.cache.EnableGI      = Dvar_GetBool( r_enableVXGI );
     g_perFrameCache.cache.DebugCSM      = Dvar_GetBool( r_debugCSM );
     g_perFrameCache.cache.DebugTexture  = Dvar_GetInt( r_debugTexture );
     g_perFrameCache.cache.NoTexture     = Dvar_GetBool( r_noTexture );
+    g_perFrameCache.cache.ScreenWidth   = extent.x;
+    g_perFrameCache.cache.ScreenHeight  = extent.y;
+
+    g_perFrameCache.cache.SSAOKernelSize   = Dvar_GetInt( r_ssaoKernelSize );
+    g_perFrameCache.cache.SSAOKernelRadius = Dvar_GetFloat( r_ssaoKernelRadius );
+    g_perFrameCache.cache.SSAONoiseSize    = Dvar_GetInt( r_ssaoNoiseSize );
 }
 
 static void ControlCamera( Camera& camera )

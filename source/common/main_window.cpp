@@ -16,6 +16,8 @@ static vec2 g_mousePos;
 
 static constexpr const char TITLE[] = "Editor";
 
+static constexpr ivec2 MAX_FRAME_SIZE = vec2( 2560, 1440 );
+
 bool Init()
 {
     core_assert( !g_initialized );
@@ -36,16 +38,18 @@ bool Init()
 
     const GLFWvidmode* vidmode = glfwGetVideoMode( glfwGetPrimaryMonitor() );
 
-    const float scale = 0.7f;
-    const int width   = static_cast<int>( scale * vidmode->width );
-    const int height  = static_cast<int>( scale * vidmode->height );
+    const float scale = 0.8f;
+    ivec2 extents;
+    extents.x = static_cast<int>( scale * vidmode->width );
+    extents.y = static_cast<int>( scale * vidmode->height );
+    extents   = glm::min( extents, MAX_FRAME_SIZE );
 
-    g_window = glfwCreateWindow( width, height, TITLE, 0, 0 );
+    g_window = glfwCreateWindow( extents.x, extents.y, TITLE, 0, 0 );
     core_assert( g_window );
 
     glfwMakeContextCurrent( g_window );
 
-    Com_PrintSuccess( "MainWindow created %d x %d", width, height );
+    Com_PrintSuccess( "MainWindow created %d x %d", extents.x, extents.y );
     glfwGetFramebufferSize( g_window, &g_frameSize.x, &g_frameSize.y );
     return g_initialized = true;
 }

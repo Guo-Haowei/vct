@@ -111,9 +111,7 @@ void main()
 
     if ( NoTexture != 0 )
     {
-        albedo.rgb = vec3( 0.7 );
-        metallic   = 0.1;
-        roughness  = 0.9;
+        albedo.rgb = vec3( 0.8 );
     }
 
     const vec3 N = normal_roughness.xyz;

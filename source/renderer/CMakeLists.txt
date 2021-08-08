@@ -1,13 +1,13 @@
 add_library(renderer
     gl_utils.cpp
-    GlslProgram.cpp
     GpuTexture.cpp
-    RenderTarget.cpp
     MainRenderer.cpp
     imgui_impl_opengl3.cpp
     r_cbuffers.cpp
     r_editor.cpp
+    r_passes.cpp
     r_graphics.cpp
+    r_rendertarget.cpp
     r_shader.cpp
     r_sun_shadow.cpp
 )

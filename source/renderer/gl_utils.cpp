@@ -8,10 +8,22 @@
 
 #include "common/com_dvars.h"
 #include "common/com_filesystem.h"
+#include "shaders/cbuffer.glsl"
 #include "universal/core_assert.h"
 #include "universal/dvar_api.h"
 #include "universal/print.h"
 #include "universal/universal.h"
+
+void FillMaterialCB( const MaterialData *mat, MaterialCB &cb )
+{
+    cb.AlbedoColor   = mat->albedoColor;
+    cb.Metallic      = mat->metallic;
+    cb.Roughness     = mat->roughness;
+    cb.HasAlbedoMap  = mat->albedoMap.GetHandle() != 0;
+    cb.HasNormalMap  = mat->materialMap.GetHandle() != 0;
+    cb.HasPbrMap     = mat->materialMap.GetHandle() != 0;
+    cb.TextureMapIdx = mat->textureMapIdx;
+}
 
 namespace gl {
 
@@ -146,7 +158,7 @@ static GLuint CreateShader( const char *file, GLenum type )
     return shader;
 }
 
-GLuint CreateShaderProgram( const ProgramCreateInfo &info )
+GLuint CreateProgram( const ProgramCreateInfo &info )
 {
     GLuint program   = 0;
     const char *name = "<unknown>";
