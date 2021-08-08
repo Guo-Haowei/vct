@@ -22,6 +22,7 @@ DVAR_INT( r_debugCSM, 0 );
 DVAR_INT( r_shadowRes, 4096 );
 
 // SSAO
+DVAR_INT( r_enableSsao, 1 );
 DVAR_INT( r_ssaoKernelSize, 32 );
 DVAR_INT( r_ssaoNoiseSize, 4 );
 DVAR_FLOAT( r_ssaoKernelRadius, 0.5f );

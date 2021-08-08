@@ -74,29 +74,33 @@ void Editor::DbgWindow()
 {
     Scene& scene         = Com_GetScene();
     const Camera& camera = scene.camera;
+    bool dirty           = false;
+
     ImGui::Begin( "Debug" );
     const vec3& eye = camera.position;
     ImGui::Text( "eye: %.2f, %.2f, %.2f", eye.x, eye.y, eye.z );
     ImGui::Separator();
-    ImGui::Checkbox( "Voxel GI", (bool*)( Dvar_GetPtr( r_enableVXGI ) ) );
-    ImGui::SameLine();
-    ImGui::Checkbox( "Dbg CSM", (bool*)( Dvar_GetPtr( r_debugCSM ) ) );
-    ImGui::SameLine();
+
+    ImGui::Text( "Voxel GI" );
+    ImGui::Checkbox( "Enable GI", (bool*)( Dvar_GetPtr( r_enableVXGI ) ) );
     ImGui::Checkbox( "No Texture", (bool*)( Dvar_GetPtr( r_noTexture ) ) );
+    dirty |= ImGui::Checkbox( "Force Voxel GI texture update", (bool*)( Dvar_GetPtr( r_forceVXGI ) ) );
+    ImGui::Separator();
+
+    ImGui::Text( "CSM" );
+    ImGui::Checkbox( "Debug CSM", (bool*)( Dvar_GetPtr( r_debugCSM ) ) );
     ImGui::Separator();
 
     ImGui::Text( "SSAO" );
-    ImGui::SliderFloat( "radius", (float*)( Dvar_GetPtr( r_ssaoKernelRadius ) ), 0.1f, 5.0f );
-
-    bool dirty = false;
-    dirty |= ImGui::Checkbox( "Force Voxel GI texture update", (bool*)( Dvar_GetPtr( r_forceVXGI ) ) );
-
+    ImGui::Checkbox( "Enable SSAO", (bool*)( Dvar_GetPtr( r_enableSsao ) ) );
+    ImGui::SliderFloat( "SSAO Kernel Radius", (float*)( Dvar_GetPtr( r_ssaoKernelRadius ) ), 0.1f, 5.0f );
     ImGui::Separator();
 
     ImGui::SliderInt( "Debug Texture", (int*)( Dvar_GetPtr( r_debugTexture ) ), DrawTexture::TEXTURE_FINAL_IMAGE, DrawTexture::TEXTURE_MAX );
     ImGui::Text( "%s", DrawTextureToStr( Dvar_GetInt( r_debugTexture ) ) );
 
     ImGui::Separator();
+    ImGui::Text( "Light" );
     float* lightDir = (float*)Dvar_GetPtr( light_dir );
     dirty |= ImGui::DragFloat( "x", lightDir, .4f, -20.f, 20.f );
     dirty |= ImGui::DragFloat( "z", lightDir + 2, .4f, -20.f, 20.f );

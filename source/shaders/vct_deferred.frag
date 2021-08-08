@@ -92,20 +92,21 @@ vec3 indirectSpecular( vec3 position, vec3 direction, float roughness )
 
 void main()
 {
-    float depth = texture( GbufferDepthMap, pass_uv ).r;
+    const vec2 uv = pass_uv;
+    float depth   = texture( GbufferDepthMap, uv ).r;
 
     if ( depth > 0.999 )
         discard;
 
     gl_FragDepth = depth;
 
-    const vec4 normal_roughness  = texture( GbufferNormalRoughnessMap, pass_uv );
-    const vec4 position_metallic = texture( GbufferPositionMetallicMap, pass_uv );
+    const vec4 normal_roughness  = texture( GbufferNormalRoughnessMap, uv );
+    const vec4 position_metallic = texture( GbufferPositionMetallicMap, uv );
     const vec4 worldPos          = vec4( position_metallic.xyz, 1.0 );
     float roughness              = normal_roughness.w;
     float metallic               = position_metallic.w;
 
-    vec4 albedo = texture( GbufferAlbedoMap, pass_uv );
+    vec4 albedo = texture( GbufferAlbedoMap, uv );
     vec3 F0     = mix( vec3( 0.04 ), albedo.rgb, metallic );
     vec3 Lo     = vec3( 0.0 );
 
@@ -134,12 +135,11 @@ void main()
     const vec3 nom    = NDF * G * F;
     const float denom = 4 * NdotV * NdotL;
 
-    const vec3 specular = nom / max( denom, 0.001 );
+    vec3 specular = nom / max( denom, 0.001 );
 
     const vec3 kS = F;
     const vec3 kD = ( 1.0 - metallic ) * ( vec3( 1.0 ) - kS );
 
-    // float
     vec3 directLight = ( kD * albedo.rgb / PI + specular ) * radiance * NdotL;
 
     float shadow     = 0.0;
@@ -155,9 +155,9 @@ void main()
     }
     Lo += ( 1.0 - shadow ) * directLight;
 
-    const float ambient = AMBIENT_POWER;
+    const float ao = EnableSSAO == 0 ? 1.0 : texture( SSAOMap, uv ).r;
 
-    vec3 color = Lo + ambient * albedo.rgb;
+    vec3 color = Lo;
 
     if ( EnableGI == 1 )
     // indirect light
@@ -174,7 +174,7 @@ void main()
         // vec3 specular      = 0.5 * indirectSpecular( worldPos.xyz, coneDirection, roughness );
         vec3 specular = vec3( 0.0 );
 
-        color += ( kD * diffuse + specular );
+        color += ( kD * diffuse + specular ) * ao;
     }
 
     const float gamma = 2.2;

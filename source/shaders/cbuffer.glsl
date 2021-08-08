@@ -44,6 +44,9 @@ layout( std140, binding = 0 ) uniform PerFrameCB
     int SSAOKernelSize;
     float SSAOKernelRadius;
     int SSAONoiseSize;
+    int EnableSSAO;
+
+    vec3 padding0;
     float TexelSize;
 };
 

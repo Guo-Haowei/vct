@@ -154,12 +154,12 @@ void SSAOBuffer::Create( int width, int height )
     info.height    = height;
     info.minFilter = info.magFilter = GL_NEAREST;
 
-    info.dataType       = GL_UNSIGNED_BYTE;
-    info.format         = GL_RGBA;
-    info.internalFormat = GL_RGBA;
-    // info.dataType       = GL_FLOAT;
-    // info.format         = GL_RED;
-    // info.internalFormat = GL_R32F;
+    // info.dataType       = GL_UNSIGNED_BYTE;
+    // info.format         = GL_RGBA;
+    // info.internalFormat = GL_RGBA;
+    info.dataType       = GL_FLOAT;
+    info.format         = GL_RED;
+    info.internalFormat = GL_R32F;
 
     // position
     mColorAttachments[SSAO].create2DEmpty( info );

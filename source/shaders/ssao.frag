@@ -1,8 +1,7 @@
 #include "cbuffer.glsl"
 
-layout( location = 0 ) out vec4 out_color;
-// layout( location = 0 ) out float occlusion;
 layout( location = 0 ) in vec2 pass_uv;
+layout( location = 0 ) out float occlusion;
 
 #include "common.glsl"
 
@@ -18,16 +17,14 @@ void main()
     const vec3 rvec      = texture( NoiseMap, noiseScale * uv ).xyz;
     const vec3 tangent   = normalize( rvec - N * dot( rvec, N ) );
     const vec3 bitangent = cross( N, tangent );
-    mat3 TBN             = mat3( tangent, bitangent, N );
-    TBN                  = mat3( View ) * TBN;
+
+    mat3 TBN = mat3( tangent, bitangent, N );
+    TBN      = mat3( View ) * TBN;
 
     vec4 origin = vec4( texture( GbufferPositionMetallicMap, uv ).xyz, 1.0 );
+    origin      = View * origin;
 
-    float occlusion;
     occlusion = 0.0;
-
-    origin = View * origin;
-
     for ( int i = 0; i < SSAOKernelSize; ++i )
     {
         // get sample position
@@ -50,5 +47,4 @@ void main()
     }
 
     occlusion = 1.0 - ( occlusion / float( SSAOKernelSize ) );
-    out_color = vec4( vec3( occlusion ), 1.0 );
 }

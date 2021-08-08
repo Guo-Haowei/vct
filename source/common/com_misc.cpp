@@ -151,9 +151,11 @@ void Com_UpdateWorld()
     g_perFrameCache.cache.ScreenWidth   = extent.x;
     g_perFrameCache.cache.ScreenHeight  = extent.y;
 
+    // SSAO
     g_perFrameCache.cache.SSAOKernelSize   = Dvar_GetInt( r_ssaoKernelSize );
     g_perFrameCache.cache.SSAOKernelRadius = Dvar_GetFloat( r_ssaoKernelRadius );
     g_perFrameCache.cache.SSAONoiseSize    = Dvar_GetInt( r_ssaoNoiseSize );
+    g_perFrameCache.cache.EnableSSAO       = Dvar_GetBool( r_enableSsao );
 }
 
 static void ControlCamera( Camera& camera )
