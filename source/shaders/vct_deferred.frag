@@ -171,9 +171,8 @@ void main()
 
         // specular cone
         vec3 coneDirection = reflect( -V, N );
-        // vec3 specular      = 0.5 * indirectSpecular( worldPos.xyz, coneDirection, roughness );
-        vec3 specular = vec3( 0.0 );
-
+        vec3 specular      = metallic * indirectSpecular( worldPos.xyz, coneDirection, roughness );
+        // specular           = vec3( 0.0 );
         color += ( kD * diffuse + specular ) * ao;
     }
 

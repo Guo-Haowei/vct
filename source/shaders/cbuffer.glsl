@@ -73,9 +73,10 @@ layout( std140, binding = 2 ) uniform MaterialCB
     int HasAlbedoMap;
     int HasPbrMap;
 
-    vec2 _padvec2;
     int HasNormalMap;
     int TextureMapIdx;
+    float ReflectPower;
+    int _padint0;
 };
 
 #ifdef __cplusplus

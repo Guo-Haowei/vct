@@ -5,8 +5,8 @@
 #include "scene_components.h"
 
 struct Geometry {
-    MeshComponent* pMesh;
-    Material* pMaterial;
+    std::shared_ptr<MeshComponent> mesh;
+    std::shared_ptr<Material> material;
     AABB boundingBox;
     mutable bool visible = true;
 };

@@ -7,8 +7,10 @@
 
 #include <assimp/Importer.hpp>
 
+#include "common/com_dvars.h"
 #include "common/com_filesystem.h"
 #include "universal/core_assert.h"
+#include "universal/dvar_api.h"
 #include "universal/print.h"
 
 using std::string;
@@ -60,9 +62,10 @@ void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transfor
     for ( uint32_t i = 0; i < numMeshes; ++i )
     {
         const aiMesh* aimesh = aiscene->mMeshes[i];
-        MeshComponent* mesh  = processMesh( aimesh );
-        size_t index         = materialOffset + mesh->materialIdx;
-        Material* mat        = scene.materials.at( index ).get();
+        std::shared_ptr<MeshComponent> mesh( processMesh( aimesh ) );
+        const size_t index = materialOffset + mesh->materialIdx;
+
+        std::shared_ptr<Material>& mat = scene.materials.at( index );
         AABB box;
 
         for ( vec3& position : mesh->positions )
@@ -75,11 +78,34 @@ void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transfor
         }
 
         box.Expand( mesh->positions.data(), mesh->positions.size() );
-        // box.ApplyMatrix( transform );
-        node.geometries.push_back( { mesh, mat, box } );
-        scene.meshes.emplace_back( std::shared_ptr<MeshComponent>( mesh ) );
 
+        // slightly enlarge bounding box
+        const vec3 offset = vec3( 0.01f );
+        box.min -= offset;
+        box.max += offset;
+
+        // box.ApplyMatrix( transform );
+        Geometry geom;
+        geom.boundingBox = box;
+        geom.material    = mat;
+        geom.mesh        = mesh;
+
+        node.geometries.emplace_back( geom );
+        scene.meshes.emplace_back( mesh );
         scene.boundingBox.Union( box );
+
+        // HACK configure floor
+        if ( Dvar_GetBool( r_mirrorFloor ) && mesh->name == "meshes_0-46" )
+        {
+            mat->reflectPower = 1.0;
+            mat->albedo       = vec3( 1.0f );
+            mat->metallic     = 0.0f;
+            mat->roughness    = 1.0f;
+
+            mat->albedoTexture            = "";
+            mat->metallicRoughnessTexture = "";
+            mat->normalTexture            = "";
+        }
     }
 
     scene.geometryNodes.push_back( node );
@@ -126,11 +152,11 @@ MeshComponent* SceneLoader::processMesh( const aiMesh* aimesh )
 {
     core_assert( aimesh->mNumVertices );
 
-    string name         = aimesh->mName.C_Str();
     MeshComponent* mesh = new MeshComponent;
     mesh->positions.reserve( aimesh->mNumVertices );
     mesh->normals.reserve( aimesh->mNumVertices );
     mesh->uvs.reserve( aimesh->mNumVertices );
+    mesh->name = aimesh->mName.C_Str();
 
     bool hasUv = aimesh->mTextureCoords[0];
 

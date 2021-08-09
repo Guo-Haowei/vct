@@ -22,7 +22,7 @@ DVAR_INT( r_voxelSize, 64 );
 
 // CSM
 DVAR_INT( r_debugCSM, 0 );
-DVAR_INT( r_shadowRes, 4096 );
+DVAR_INT( r_shadowRes, 2048 );
 
 // SSAO
 DVAR_INT( r_enableSsao, 1 );
@@ -32,5 +32,8 @@ DVAR_FLOAT( r_ssaoKernelRadius, 0.5f );
 
 // FXAA
 DVAR_INT( r_enableFXAA, 1 );
+
+// SSR
+DVAR_INT( r_mirrorFloor, 1 );
 
 #include "universal/dvar_end.h"

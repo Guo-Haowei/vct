@@ -74,21 +74,14 @@ void main()
 
     Lo += ( kD * albedo.rgb / PI + specular ) * radiance * NdotL;
 
-    const float ambient = AMBIENT_POWER;
-
-    vec4 lightPos = LightPVs[0] * vec4( pass_position, 1.0 );
+    const float ambient = 0.3;
 
     float shadow     = 0.0;
     float clipSpaceZ = ( PV * vec4( pass_position, 1.0 ) ).z;
-    for ( int idx = 0; idx < NUM_CASCADES; ++idx )
-    {
-        if ( clipSpaceZ <= CascadedClipZ[idx + 1] )
-        {
-            vec4 lightSpacePos = pass_light_space_positions[idx];
-            shadow             = Shadow( ShadowMap, lightSpacePos, NdotL, idx );
-            break;
-        }
-    }
+
+    // use lowest cascade for voxel
+    vec4 lightSpacePos = pass_light_space_positions[2];
+    shadow             = Shadow( ShadowMap, lightSpacePos, NdotL, 2 );
 
     vec3 color = ( 1.0 - shadow ) * Lo + ambient * albedo.rgb;
 

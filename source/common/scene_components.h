@@ -34,8 +34,9 @@ struct Material {
     std::string metallicRoughnessTexture;
     std::string normalTexture;
     vec3 albedo{ 0 };
-    float metallic  = 0.0f;
-    float roughness = 0.0f;
+    float metallic     = 0.0f;
+    float roughness    = 0.0f;
+    float reflectPower = 0.0f;
 
     Material() = default;
     Material( const vec3& albedo, float metallic, float roughness )

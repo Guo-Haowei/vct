@@ -63,6 +63,7 @@ struct MaterialData {
     vec4 albedoColor;
     float metallic;
     float roughness;
+    float reflectPower;
     int textureMapIdx;
 };
 

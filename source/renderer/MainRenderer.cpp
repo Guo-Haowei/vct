@@ -147,6 +147,9 @@ void MainRenderer::createGpuResources()
         }
 
         matData->textureMapIdx = idx;
+
+        matData->reflectPower = mat->reflectPower;
+
         g_materialdata.emplace_back( matData );
         mat->gpuResource = g_materialdata.back().get();
     }
@@ -195,12 +198,14 @@ struct MaterialCache {
     float roughness                      = 0.0f;
     float has_metallic_roughness_texture = 0.0f;
     float has_normal_texture             = 0.0f;
+    float reflect                        = 0.0f;
 
     MaterialCache& operator=( const MaterialData& mat )
     {
         albedo_color                   = mat.albedoColor;
         roughness                      = mat.roughness;
         metallic                       = mat.metallic;
+        reflect                        = mat.reflectPower;
         has_metallic_roughness_texture = mat.materialMap.GetHandle() == 0 ? 0.0f : 1.0f;
         has_normal_texture             = mat.normalMap.GetHandle() == 0 ? 0.0f : 1.0f;
 
@@ -236,8 +241,8 @@ void MainRenderer::renderToVoxelTexture()
                 continue;
             }
 
-            const MeshData* drawData    = reinterpret_cast<const MeshData*>( geom.pMesh->gpuResource );
-            const MaterialData* matData = reinterpret_cast<const MaterialData*>( geom.pMaterial->gpuResource );
+            const MeshData* drawData    = reinterpret_cast<const MeshData*>( geom.mesh->gpuResource );
+            const MaterialData* matData = reinterpret_cast<const MaterialData*>( geom.material->gpuResource );
 
             FillMaterialCB( matData, g_materialCache.cache );
             g_materialCache.Update();

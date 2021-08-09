@@ -109,10 +109,21 @@ void Editor::DbgWindow()
         ImGui::Separator();
         ImGui::Text( "Light" );
         float* lightDir = (float*)Dvar_GetPtr( light_dir );
-        dirty |= ImGui::DragFloat( "x", lightDir, .4f, -20.f, 20.f );
-        dirty |= ImGui::DragFloat( "z", lightDir + 2, .4f, -20.f, 20.f );
+        dirty |= ImGui::SliderFloat( "x", lightDir, -20.f, 20.f );
+        dirty |= ImGui::SliderFloat( "z", lightDir + 2, -20.f, 20.f );
+
+        ImGui::Text( "Floor" );
+        if ( scene.selected )
+        {
+            void* mat              = scene.selected->material->gpuResource;
+            MaterialData* drawData = reinterpret_cast<MaterialData*>( mat );
+            dirty |= ImGui::SliderFloat( "metallic", &drawData->metallic, 0.0f, 1.0f );
+            dirty |= ImGui::SliderFloat( "roughness", &drawData->roughness, 0.0f, 1.0f );
+        }
+
         scene.light.direction = glm::normalize( Dvar_GetVec3( light_dir ) );
         scene.dirty           = dirty;
+
         ImGui::End();
     }
 }
@@ -238,8 +249,8 @@ void Editor::Update()
                     {
                         continue;
                     }
-                    const AABB& box = geom.boundingBox;
-                    const auto mesh = geom.pMesh;
+                    const AABB& box  = geom.boundingBox;
+                    const auto& mesh = geom.mesh;
                     if ( ray.Intersects( box ) )
                     {
                         for ( uint32_t idx = 0; idx < mesh->indices.size(); )
@@ -266,6 +277,8 @@ void Editor::Update()
     {
         if ( scene.selected->visible )
         {
+            Com_PrintWarning( "material %s deleted", scene.selected->mesh->name.c_str() );
+
             scene.selected->visible = false;
             scene.dirty             = true;
             scene.selected          = nullptr;

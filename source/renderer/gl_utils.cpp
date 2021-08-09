@@ -47,6 +47,7 @@ void FillMaterialCB( const MaterialData *mat, MaterialCB &cb )
     cb.HasNormalMap  = mat->materialMap.GetHandle() != 0;
     cb.HasPbrMap     = mat->materialMap.GetHandle() != 0;
     cb.TextureMapIdx = mat->textureMapIdx;
+    cb.ReflectPower  = mat->reflectPower;
 }
 
 namespace gl {

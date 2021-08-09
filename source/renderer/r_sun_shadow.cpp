@@ -92,7 +92,7 @@ void R_ShadowPass()
                     continue;
                 }
 
-                const MeshData* drawData = reinterpret_cast<const MeshData*>( geom.pMesh->gpuResource );
+                const MeshData* drawData = reinterpret_cast<const MeshData*>( geom.mesh->gpuResource );
                 glBindVertexArray( drawData->vao );
                 glDrawElements( GL_TRIANGLES, drawData->count, GL_UNSIGNED_INT, 0 );
             }

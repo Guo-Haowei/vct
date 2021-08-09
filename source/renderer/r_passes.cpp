@@ -47,8 +47,8 @@ void R_Gbuffer_Pass()
                 continue;
             }
 
-            const MeshData* drawData    = reinterpret_cast<MeshData*>( geom.pMesh->gpuResource );
-            const MaterialData* matData = reinterpret_cast<MaterialData*>( geom.pMaterial->gpuResource );
+            const MeshData* drawData    = reinterpret_cast<MeshData*>( geom.mesh->gpuResource );
+            const MaterialData* matData = reinterpret_cast<MaterialData*>( geom.material->gpuResource );
 
             FillMaterialCB( matData, g_materialCache.cache );
             g_materialCache.Update();
