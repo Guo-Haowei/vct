@@ -142,22 +142,25 @@ void main()
 
     vec3 directLight = ( kD * albedo.rgb / PI + specular ) * radiance * NdotL;
 
-    float shadow     = 0.0;
-    float clipSpaceZ = ( PV * worldPos ).z;
-    for ( int idx = 0; idx < NUM_CASCADES; ++idx )
-    {
-        if ( clipSpaceZ <= CascadedClipZ[idx + 1] )
-        {
-            vec4 lightSpacePos = LightPVs[idx] * worldPos;
-            shadow             = Shadow( ShadowMap, lightSpacePos, NdotL, idx );
-            break;
-        }
-    }
+    float shadow = 0.0;
+#if ENABLE_CSM
+    // float clipSpaceZ = ( PV * worldPos ).z;
+    // for ( int idx = 0; idx < NUM_CASCADES; ++idx )
+    // {
+    //     if ( clipSpaceZ <= CascadedClipZ[idx + 1] )
+    //     {
+    //         vec4 lightSpacePos = LightPVs[idx] * worldPos;
+    //         shadow             = Shadow( ShadowMap, lightSpacePos, NdotL, idx );
+    //         break;
+    //     }
+    // }
+#else
+    vec4 lightSpacePos = LightPVs[0] * worldPos;
+    shadow             = Shadow( ShadowMap, lightSpacePos, NdotL );
+#endif
     Lo += ( 1.0 - shadow ) * directLight;
 
     const float ao = EnableSSAO == 0 ? 1.0 : texture( SSAOMap, uv ).r;
-
-    vec3 color = Lo;
 
     if ( EnableGI == 1 )
     // indirect light
@@ -173,8 +176,10 @@ void main()
         vec3 coneDirection = reflect( -V, N );
         vec3 specular      = metallic * indirectSpecular( worldPos.xyz, coneDirection, roughness );
         // specular           = vec3( 0.0 );
-        color += ( kD * diffuse + specular ) * ao;
+        Lo += ( kD * diffuse + specular ) * ao;
     }
+
+    vec3 color = Lo;
 
     const float gamma = 2.2;
 
@@ -183,6 +188,7 @@ void main()
 
     out_color = vec4( color, 1.0 );
 
+#if ENABLE_CSM
     if ( DebugCSM != 0 )
     {
         vec3 mask = vec3( 0.1 );
@@ -196,4 +202,5 @@ void main()
         }
         out_color.rgb = mix( out_color.rgb, mask, 0.1 );
     }
+#endif
 }

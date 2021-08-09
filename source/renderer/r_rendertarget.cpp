@@ -44,8 +44,8 @@ void RenderTarget::CreateDepthAttachment()
 
     mDepthAttachment.bind();
     // float border[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-    float border[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    glTexParameterfv( GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border );
+    const vec4 border( 1.0f );
+    glTexParameterfv( GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, &border.x );
     mDepthAttachment.unbind();
 
     glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, mDepthAttachment.GetHandle(), 0 );
@@ -231,7 +231,8 @@ void R_CreateRT()
     const int res = Dvar_GetInt( r_shadowRes );
     core_assert( is_power_of_two( res ) );
 
-    g_shadowRT.Create( NUM_CASCADES * res, res );
+    // g_shadowRT.Create( NUM_CASCADES * res, res );
+    g_shadowRT.Create( res, res );
     g_gbufferRT.Create( w, h );
     g_ssaoRT.Create( w, h );
     g_finalImageRT.Create( w, h );

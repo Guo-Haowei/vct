@@ -81,7 +81,7 @@ void main()
 
     // use lowest cascade for voxel
     vec4 lightSpacePos = pass_light_space_positions[2];
-    shadow             = Shadow( ShadowMap, lightSpacePos, NdotL, 2 );
+    shadow             = Shadow( ShadowMap, lightSpacePos, NdotL );
 
     vec3 color = ( 1.0 - shadow ) * Lo + ambient * albedo.rgb;
 

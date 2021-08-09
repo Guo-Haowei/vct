@@ -218,8 +218,17 @@ void Editor::DockSpace()
 
 void Editor::Update()
 {
-    DockSpace();
-    DbgWindow();
+    static bool hideUI = false;
+    if ( ImGui::IsKeyPressed( GLFW_KEY_ESCAPE ) )
+    {
+        hideUI = !hideUI;
+    }
+
+    if ( !hideUI )
+    {
+        DockSpace();
+        DbgWindow();
+    }
 
     ImGuiIO& io  = ImGui::GetIO();
     Scene& scene = Com_GetScene();

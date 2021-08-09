@@ -10,17 +10,13 @@
 
 ## Screenshots
 
-Indirect diffuse light
+VOGI on
 
-<img src="https://github.com/Guo-Haowei/VCT/blob/master/data/images/diffuse.png" width="70%">
+<img src="https://github.com/Guo-Haowei/VCT/blob/master/screenshots/vxgi.png" width="90%">
 
-Indirect specular light
+VOGI off
 
-<img src="https://github.com/Guo-Haowei/VCT/blob/master/data/images/specular.png" width="70%">
-
-Direct light only
-
-<img src="https://github.com/Guo-Haowei/VCT/blob/master/data/images/direct.png" width="70%">
+<img src="https://github.com/Guo-Haowei/VCT/blob/master/screenshots/nogi.png" width="90%">
 
 ## Reference
 

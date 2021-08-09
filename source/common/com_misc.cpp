@@ -53,7 +53,7 @@ bool Com_LoadScene()
 
     const vec4 cascades = Dvar_GetVec4( cam_cascades );
 
-    camera.fovy  = glm::radians( 60.0f );
+    camera.fovy  = glm::radians( Dvar_GetFloat( cam_fov ) );
     camera.zNear = cascades[0];
     camera.zFar  = cascades[3];
 

@@ -6,14 +6,15 @@
 #endif
 
 // no filter
-float Shadow( sampler2D shadowMap, const in vec4 position_light, float NdotL,
-              int level )
+float Shadow( sampler2D shadowMap, const in vec4 position_light, float NdotL
+              //, int level
+)
 {
     vec3 coords = position_light.xyz / position_light.w;
     coords      = 0.5 * coords + 0.5;
 
-    coords.x /= float( NUM_CASCADES );
-    coords.x += float( level ) / float( NUM_CASCADES );
+    // coords.x /= float( NUM_CASCADES );
+    // coords.x += float( level ) / float( NUM_CASCADES );
 
     float current_depth = coords.z;
 
