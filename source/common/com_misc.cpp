@@ -34,6 +34,11 @@ bool Com_RegisterDvars()
 
 bool Com_LoadScene()
 {
+    // validate dvars
+    const int voxelTextureSize = Dvar_GetInt( r_voxelSize );
+    core_assert( is_power_of_two( voxelTextureSize ) );
+    core_assert( voxelTextureSize <= 256 );
+
     vct::SceneLoader loader;
     Scene& scene = g_scene;
 
@@ -61,7 +66,7 @@ bool Com_LoadScene()
     const vec3 center     = scene.boundingBox.Center();
     const vec3 size       = scene.boundingBox.Size();
     const float worldSize = glm::max( size.x, glm::max( size.y, size.z ) );
-    const float texelSize = 1.0f / static_cast<float>( VOXEL_TEXTURE_SIZE );
+    const float texelSize = 1.0f / static_cast<float>( voxelTextureSize );
     const float voxelSize = worldSize * texelSize;
 
     g_perFrameCache.cache.WorldCenter   = center;

@@ -17,6 +17,9 @@ DVAR_INT( r_forceVXGI, 1 );
 DVAR_INT( r_debugTexture, 0 );
 DVAR_INT( r_noTexture, 0 );
 
+// VOXEL
+DVAR_INT( r_voxelSize, 64 );
+
 // CSM
 DVAR_INT( r_debugCSM, 0 );
 DVAR_INT( r_shadowRes, 4096 );

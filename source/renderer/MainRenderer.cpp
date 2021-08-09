@@ -102,14 +102,16 @@ void MainRenderer::createGpuResources()
         glEnableVertexAttribArray( 0 );
     }
 
+    const int voxelSize = Dvar_GetInt( r_voxelSize );
+
     /// create voxel image
     {
         Texture3DCreateInfo info;
         info.wrapS = info.wrapT = info.wrapR = GL_CLAMP_TO_BORDER;
-        info.size                            = VOXEL_TEXTURE_SIZE;
+        info.size                            = voxelSize;
         info.minFilter                       = GL_LINEAR_MIPMAP_LINEAR;
         info.magFilter                       = GL_NEAREST;
-        info.mipLevel                        = VOXEL_TEXTURE_MIP_LEVEL;
+        info.mipLevel                        = log_two( voxelSize );
         info.format                          = GL_RGBA16F;
 
         m_albedoVoxel.create3DEmpty( info );
@@ -194,7 +196,7 @@ void MainRenderer::visualizeVoxels()
     glBindVertexArray( m_box->vao );
     program.Use();
 
-    constexpr int size = VOXEL_TEXTURE_SIZE;
+    const int size = Dvar_GetInt( r_voxelSize );
     glDrawElementsInstanced( GL_TRIANGLES, m_box->count, GL_UNSIGNED_INT, 0, size * size * size );
 
     program.Stop();
@@ -221,13 +223,14 @@ struct MaterialCache {
 
 void MainRenderer::renderToVoxelTexture()
 {
-    Scene& scene = Com_GetScene();
+    const Scene& scene  = Com_GetScene();
+    const int voxelSize = Dvar_GetInt( r_voxelSize );
 
     glDisable( GL_CULL_FACE );
     glDisable( GL_DEPTH_TEST );
     glDisable( GL_BLEND );
     glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
-    glViewport( 0, 0, VOXEL_TEXTURE_SIZE, VOXEL_TEXTURE_SIZE );
+    glViewport( 0, 0, voxelSize, voxelSize );
 
     m_albedoVoxel.bindImageTexture( IMAGE_VOXEL_ALBEDO_SLOT );
     m_normalVoxel.bindImageTexture( IMAGE_VOXEL_NORMAL_SLOT );
@@ -264,8 +267,8 @@ void MainRenderer::renderToVoxelTexture()
 
     constexpr GLuint workGroupX = 512;
     constexpr GLuint workGroupY = 512;
-    constexpr GLuint workGroupZ =
-        ( VOXEL_TEXTURE_SIZE * VOXEL_TEXTURE_SIZE * VOXEL_TEXTURE_SIZE ) /
+    const GLuint workGroupZ =
+        ( voxelSize * voxelSize * voxelSize ) /
         ( workGroupX * workGroupY );
 
     glDispatchCompute( workGroupX, workGroupY, workGroupZ );
