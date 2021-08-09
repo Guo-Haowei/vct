@@ -66,6 +66,9 @@ struct MaterialData {
     int textureMapIdx;
 };
 
+void R_CreateQuad();
+void R_DrawQuad();
+
 namespace gl {
 
 [[nodiscard]] bool Init();

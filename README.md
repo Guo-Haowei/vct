@@ -6,7 +6,7 @@
 - [x] Cascaded Shadow Maping (Glitches on edges)
 - [ ] SSAO
 - [ ] SSR
-- [ ] TAA
+- [ ] FXAA
 
 ## Screenshots
 

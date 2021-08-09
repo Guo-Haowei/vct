@@ -33,11 +33,12 @@ void main()
             break;
         }
         case 9: {
-            // out_color = vec4( texture( SSAOMap, pass_uv ) );
             out_color = vec4( texture( SSAOMap, pass_uv ).rrr, 1.0 );
             break;
         }
         default:
+            out_color = vec4( texture( FXAA, pass_uv ).rgba );
+            // out_color = vec4( texture( FinalImage, pass_uv ).rgba );
             break;
     }
 }

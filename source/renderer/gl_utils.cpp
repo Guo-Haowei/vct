@@ -14,6 +14,30 @@
 #include "universal/print.h"
 #include "universal/universal.h"
 
+static MeshData g_quad;
+
+void R_CreateQuad()
+{
+    // clang-format off
+    float points[] = { -1.0f, +1.0f, -1.0f, -1.0f, +1.0f, +1.0f, +1.0f, +1.0f, -1.0f, -1.0f, +1.0f, -1.0f, };
+    // clang-format on
+    glGenVertexArrays( 1, &g_quad.vao );
+    glGenBuffers( 1, g_quad.vbos );
+    glBindVertexArray( g_quad.vao );
+
+    glBindBuffer( GL_ARRAY_BUFFER, g_quad.vbos[0] );
+    glBufferData( GL_ARRAY_BUFFER, sizeof( points ), points, GL_STATIC_DRAW );
+    glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( float ), 0 );
+    glEnableVertexAttribArray( 0 );
+}
+
+void R_DrawQuad()
+{
+    core_assert( g_quad.vao );
+    glBindVertexArray( g_quad.vao );
+    glDrawArrays( GL_TRIANGLES, 0, 6 );
+}
+
 void FillMaterialCB( const MaterialData *mat, MaterialCB &cb )
 {
     cb.AlbedoColor   = mat->albedoColor;
@@ -298,8 +322,8 @@ static void APIENTRY DebugCallback(
             break;
     }
 
-    // TODO: properly disable it
-    static std::set<int> sSet;
+    // TODO: properly disable repeated warnings
+    static std::set<int> sSet{ 131185 };
 
     if ( sSet.find( id ) == sSet.end() )
     {

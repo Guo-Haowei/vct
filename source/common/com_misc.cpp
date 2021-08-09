@@ -161,6 +161,9 @@ void Com_UpdateWorld()
     g_perFrameCache.cache.SSAOKernelRadius = Dvar_GetFloat( r_ssaoKernelRadius );
     g_perFrameCache.cache.SSAONoiseSize    = Dvar_GetInt( r_ssaoNoiseSize );
     g_perFrameCache.cache.EnableSSAO       = Dvar_GetBool( r_enableSsao );
+
+    // FXAA
+    g_perFrameCache.cache.EnableFXAA = Dvar_GetBool( r_enableFXAA );
 }
 
 static void ControlCamera( Camera& camera )

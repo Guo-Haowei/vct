@@ -23,7 +23,6 @@ class MainRenderer {
    private:
     gl::Program m_voxelProgram;
     gl::Program m_visualizeProgram;
-    gl::Program m_vctProgram;
     gl::Program m_voxelPostProgram;
     gl::Program m_debugTextureProgram;
 

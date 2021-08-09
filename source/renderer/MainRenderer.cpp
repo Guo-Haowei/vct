@@ -19,8 +19,6 @@
 static std::vector<std::shared_ptr<MeshData>> g_meshdata;
 static std::vector<std::shared_ptr<MaterialData>> g_materialdata;
 
-MeshData m_quad;
-
 extern void FillMaterialCB( const MaterialData* mat, MaterialCB& cb );
 
 namespace vct {
@@ -79,7 +77,6 @@ void MainRenderer::createGpuResources()
     Scene& scene = Com_GetScene();
 
     // create shader
-    m_vctProgram          = gl::CreateProgram( ProgramCreateInfo::VSPS( "fullscreen", "vct_deferred" ) );
     m_debugTextureProgram = gl::CreateProgram( ProgramCreateInfo::VSPS( "fullscreen", "debug/texture" ) );
     m_voxelProgram        = gl::CreateProgram( ProgramCreateInfo::VSGSPS( "voxel/voxelization" ) );
     m_visualizeProgram    = gl::CreateProgram( ProgramCreateInfo::VSPS( "voxel/visualization" ) );
@@ -88,19 +85,7 @@ void MainRenderer::createGpuResources()
     m_box = CreateMeshData( geometry::MakeBox() );
 
     // create box quad
-    {
-        // clang-format off
-        float points[] = { -1.0f, +1.0f, -1.0f, -1.0f, +1.0f, +1.0f, +1.0f, +1.0f, -1.0f, -1.0f, +1.0f, -1.0f, };
-        // clang-format on
-        glGenVertexArrays( 1, &m_quad.vao );
-        glGenBuffers( 1, m_quad.vbos );
-        glBindVertexArray( m_quad.vao );
-
-        glBindBuffer( GL_ARRAY_BUFFER, m_quad.vbos[0] );
-        glBufferData( GL_ARRAY_BUFFER, sizeof( points ), points, GL_STATIC_DRAW );
-        glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( float ), 0 );
-        glEnableVertexAttribArray( 0 );
-    }
+    R_CreateQuad();
 
     const int voxelSize = Dvar_GetInt( r_voxelSize );
 
@@ -173,7 +158,9 @@ void MainRenderer::createGpuResources()
     g_constantCache.cache.GbufferAlbedoMap           = gl::MakeTextureResident( g_gbufferRT.GetColorAttachment( 2 ).GetHandle() );
     g_constantCache.cache.VoxelAlbedoMap             = gl::MakeTextureResident( m_albedoVoxel.GetHandle() );
     g_constantCache.cache.VoxelNormalMap             = gl::MakeTextureResident( m_normalVoxel.GetHandle() );
-    g_constantCache.cache.SSAOMap                    = gl::MakeTextureResident( g_ssaoRT.GetColorAttachment( 0 ).GetHandle() );
+    g_constantCache.cache.SSAOMap                    = gl::MakeTextureResident( g_ssaoRT.GetColorAttachment().GetHandle() );
+    g_constantCache.cache.FinalImage                 = gl::MakeTextureResident( g_finalImageRT.GetColorAttachment().GetHandle() );
+    g_constantCache.cache.FXAA                       = gl::MakeTextureResident( g_fxaaRT.GetColorAttachment().GetHandle() );
 
     char buffer[kMaxOSPath];
     for ( int idx = 0; idx < 1; ++idx )
@@ -280,41 +267,15 @@ void MainRenderer::renderToVoxelTexture()
     m_normalVoxel.genMipMap();
 }
 
-void MainRenderer::vctPass()
-{
-    const auto& program = m_vctProgram;
-
-    program.Use();
-
-    glBindVertexArray( m_quad.vao );
-    glDrawArrays( GL_TRIANGLES, 0, 6 );
-
-    program.Stop();
-}
-
 void MainRenderer::renderFrameBufferTextures( const ivec2& extent )
 {
     const auto& program = m_debugTextureProgram;
 
     program.Use();
-
     glDisable( GL_DEPTH_TEST );
-
-    constexpr float scale = 0.13f;
-    int width             = static_cast<int>( scale * extent.x );
-    int height            = static_cast<int>( scale * extent.y );
-
-    glBindVertexArray( m_quad.vao );
     glViewport( 0, 0, extent.x, extent.y );
 
-    enum {
-        DrawVoxelAlbedo = 0,
-        DrawVoxelNormal = 1,
-        DrawAlbedo      = 2,
-        DrawNormal      = 3,
-    };
-
-    glDrawArrays( GL_TRIANGLES, 0, 6 );
+    R_DrawQuad();
 
     program.Stop();
 }
@@ -325,6 +286,8 @@ void MainRenderer::render()
 
     g_perFrameCache.Update();
 
+    // clear window
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     R_ShadowPass();
 
     if ( scene.dirty || Dvar_GetBool( r_forceVXGI ) )
@@ -343,19 +306,21 @@ void MainRenderer::render()
         R_Gbuffer_Pass();
         R_SSAO_Pass();
 
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
         const int mode = Dvar_GetInt( r_debugTexture );
-        if ( mode == DrawTexture::TEXTURE_FINAL_IMAGE )
+
+        switch ( mode )
         {
-            vctPass();
-        }
-        else if ( mode <= DrawTexture::TEXTURE_VOXEL_COUNT )
-        {
-            visualizeVoxels();
-        }
-        else
-        {
-            renderFrameBufferTextures( extent );
+            case DrawTexture::TEXTURE_VOXEL_ALBEDO:
+            case DrawTexture::TEXTURE_VOXEL_NORMAL:
+                visualizeVoxels();
+                break;
+            default: {
+                R_Deferred_VCT_Pass();
+                R_FXAA_Pass();
+
+                renderFrameBufferTextures( extent );
+            }
+            break;
         }
 
         R_DrawEditor();

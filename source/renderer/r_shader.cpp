@@ -24,6 +24,10 @@ void R_CreateShaderPrograms()
         CreateProgram( ProgramCreateInfo::VSPS( "gbuffer" ) );
     g_shaderCache[static_cast<int>( ProgramType::SSAO )] =
         CreateProgram( ProgramCreateInfo::VSPS( "fullscreen", "ssao" ) );
+    g_shaderCache[static_cast<int>( ProgramType::VCT_DEFERRED )] =
+        CreateProgram( ProgramCreateInfo::VSPS( "fullscreen", "vct_deferred" ) );
+    g_shaderCache[static_cast<int>( ProgramType::FXAA )] =
+        CreateProgram( ProgramCreateInfo::VSPS( "fullscreen", "fxaa" ) );
 }
 
 void R_DestroyShaderPrograms()

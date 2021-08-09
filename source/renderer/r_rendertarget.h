@@ -14,7 +14,7 @@ class RenderTarget {
     void CheckError();
 
     const GpuTexture& GetDepthTexture() const { return mDepthAttachment; }
-    const GpuTexture& GetColorAttachment( int i ) const { return mColorAttachments[i]; }
+    const GpuTexture& GetColorAttachment( int i = 0 ) const { return mColorAttachments[i]; }
 
     inline GLuint GetHandle() const { return mHandle; }
 
@@ -38,14 +38,21 @@ class GBuffer : public RenderTarget {
     virtual void Create( int width, int height ) override;
 };
 
-class SSAOBuffer : public RenderTarget {
+class SsaoRT : public RenderTarget {
+   public:
+    virtual void Create( int width, int height ) override;
+};
+
+class FinalImageRT : public RenderTarget {
    public:
     virtual void Create( int width, int height ) override;
 };
 
 extern DepthRenderTarget g_shadowRT;
 extern GBuffer g_gbufferRT;
-extern SSAOBuffer g_ssaoRT;
+extern SsaoRT g_ssaoRT;
+extern FinalImageRT g_finalImageRT;
+extern FinalImageRT g_fxaaRT;
 
 void R_CreateRT();
 void R_DestroyRT();

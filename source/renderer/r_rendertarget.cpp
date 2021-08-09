@@ -58,6 +58,8 @@ void RenderTarget::Create( int width, int height )
     glGenFramebuffers( 1, &mHandle );
 }
 
+static std::vector<RenderTarget*> g_rts;
+
 void DepthRenderTarget::Create( int width, int height )
 {
     RenderTarget::Create( width, height );
@@ -69,6 +71,8 @@ void DepthRenderTarget::Create( int width, int height )
 
     CheckError();
     Unbind();
+
+    g_rts.push_back( this );
 }
 
 void RenderTarget::CheckError()
@@ -79,12 +83,14 @@ void RenderTarget::CheckError()
     }
 }
 
-namespace {
-enum { POSISION = 0,
-       NORMAL   = 1,
-       ALBEDO   = 2,
-       SSAO     = 0 };
-}
+// TODO: expose
+enum {
+    POSISION   = 0,
+    NORMAL     = 1,
+    ALBEDO     = 2,
+    FINALIMAGE = 0,
+    SSAO       = 0
+};
 
 void GBuffer::Create( int width, int height )
 {
@@ -141,7 +147,7 @@ void GBuffer::Create( int width, int height )
     Unbind();
 }
 
-void SSAOBuffer::Create( int width, int height )
+void SsaoRT::Create( int width, int height )
 {
     RenderTarget::Create( width, height );
 
@@ -162,12 +168,45 @@ void SSAOBuffer::Create( int width, int height )
     info.internalFormat = GL_R32F;
 
     // position
-    mColorAttachments[SSAO].create2DEmpty( info );
+    const int slot = SSAO;
+    mColorAttachments[slot].create2DEmpty( info );
     glFramebufferTexture2D(
         GL_FRAMEBUFFER,
-        GL_COLOR_ATTACHMENT0 + SSAO,
+        GL_COLOR_ATTACHMENT0 + slot,
         GL_TEXTURE_2D,
-        mColorAttachments[SSAO].GetHandle(),
+        mColorAttachments[slot].GetHandle(),
+        0 );
+
+    GLuint attachments[1] = { GL_COLOR_ATTACHMENT0 };
+    glDrawBuffers( 1, attachments );
+
+    CheckError();
+    Unbind();
+}
+
+void FinalImageRT::Create( int width, int height )
+{
+    RenderTarget::Create( width, height );
+
+    mColorAttachmentCount = 1;
+    Bind();
+
+    Texture2DCreateInfo info{};
+    info.width     = width;
+    info.height    = height;
+    info.minFilter = info.magFilter = GL_NEAREST;
+    info.dataType                   = GL_UNSIGNED_BYTE;
+    info.format                     = GL_RGBA;
+    info.internalFormat             = GL_RGBA;
+
+    // position
+    const int slot = FINALIMAGE;
+    mColorAttachments[slot].create2DEmpty( info );
+    glFramebufferTexture2D(
+        GL_FRAMEBUFFER,
+        GL_COLOR_ATTACHMENT0 + slot,
+        GL_TEXTURE_2D,
+        mColorAttachments[slot].GetHandle(),
         0 );
 
     GLuint attachments[1] = { GL_COLOR_ATTACHMENT0 };
@@ -179,23 +218,30 @@ void SSAOBuffer::Create( int width, int height )
 
 DepthRenderTarget g_shadowRT;
 GBuffer g_gbufferRT;
-SSAOBuffer g_ssaoRT;
+SsaoRT g_ssaoRT;
+FinalImageRT g_finalImageRT;
+FinalImageRT g_fxaaRT;
 
 void R_CreateRT()
 {
     const ivec2 extent = MainWindow::FrameSize();
+    const int w        = extent.x;
+    const int h        = extent.y;
 
     const int res = Dvar_GetInt( r_shadowRes );
     core_assert( is_power_of_two( res ) );
 
     g_shadowRT.Create( NUM_CASCADES * res, res );
-    g_gbufferRT.Create( extent.x, extent.y );
-    g_ssaoRT.Create( extent.x, extent.y );
+    g_gbufferRT.Create( w, h );
+    g_ssaoRT.Create( w, h );
+    g_finalImageRT.Create( w, h );
+    g_fxaaRT.Create( w, h );
 }
 
 void R_DestroyRT()
 {
-    g_shadowRT.Destroy();
-    g_gbufferRT.Destroy();
-    g_ssaoRT.Destroy();
+    for ( auto& rt : g_rts )
+    {
+        rt->Destroy();
+    }
 }

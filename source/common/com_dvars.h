@@ -8,7 +8,7 @@ DVAR_VEC3( cam_pos, -8.f, 2.f, 0.f );
 DVAR_VEC4( cam_cascades, 0.1f, 8.0f, 18.0f, 50.0f );
 
 // light
-DVAR_VEC3( light_dir, 1.0f, 25.0f, 5.0f );
+DVAR_VEC3( light_dir, -8.0f, 25.0f, 5.0f );
 DVAR_FLOAT( light_power, 20.0f );
 
 DVAR_INT( r_debug, 1 );
@@ -29,5 +29,8 @@ DVAR_INT( r_enableSsao, 1 );
 DVAR_INT( r_ssaoKernelSize, 32 );
 DVAR_INT( r_ssaoNoiseSize, 4 );
 DVAR_FLOAT( r_ssaoKernelRadius, 0.5f );
+
+// FXAA
+DVAR_INT( r_enableFXAA, 1 );
 
 #include "universal/dvar_end.h"

@@ -13,8 +13,6 @@
 #include "universal/dvar_api.h"
 
 static GLuint g_noiseTexture;
-// TODO: refator
-extern MeshData m_quad;
 
 extern void FillMaterialCB( const MaterialData* mat, MaterialCB& cb );
 
@@ -66,18 +64,49 @@ void R_Gbuffer_Pass()
 
 void R_SSAO_Pass()
 {
+    const auto& shader = R_GetShaderProgram( ProgramType::SSAO );
+
     g_ssaoRT.Bind();
-    const ivec2& extent = MainWindow::FrameSize();
 
     glClear( GL_COLOR_BUFFER_BIT );
-    const auto& shader = R_GetShaderProgram( ProgramType::SSAO );
+
     shader.Use();
 
-    glBindVertexArray( m_quad.vao );
-    glDrawArrays( GL_TRIANGLES, 0, 6 );
+    R_DrawQuad();
 
     shader.Stop();
+
     g_ssaoRT.Unbind();
+}
+
+void R_Deferred_VCT_Pass()
+{
+    const auto& program = R_GetShaderProgram( ProgramType::VCT_DEFERRED );
+    g_finalImageRT.Bind();
+
+    glClear( GL_COLOR_BUFFER_BIT );
+
+    program.Use();
+
+    R_DrawQuad();
+
+    program.Stop();
+
+    g_finalImageRT.Unbind();
+}
+
+void R_FXAA_Pass()
+{
+    const auto& program = R_GetShaderProgram( ProgramType::FXAA );
+
+    g_fxaaRT.Bind();
+    glClear( GL_COLOR_BUFFER_BIT );
+
+    program.Use();
+    R_DrawQuad();
+    program.Stop();
+
+    g_fxaaRT.Unbind();
 }
 
 static float lerp( float a, float b, float f )

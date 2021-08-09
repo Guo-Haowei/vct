@@ -44,10 +44,11 @@ layout( std140, binding = 0 ) uniform PerFrameCB
     int SSAOKernelSize;
     float SSAOKernelRadius;
     int SSAONoiseSize;
-    int EnableSSAO;
-
-    vec3 padding0;
     float TexelSize;
+
+    vec2 padding0;
+    int EnableSSAO;
+    int EnableFXAA;
 };
 
 #ifdef __cplusplus
@@ -101,6 +102,8 @@ layout( std140, binding = 3 ) uniform ConstantCB
     sampler2D GbufferDepthMap;
     sampler2D SSAOMap;
     sampler2D NoiseMap;
+    sampler2D FinalImage;
+    sampler2D FXAA;
     Sampler2DArray LightIconTextures[MAX_LIGHT_ICON];
     Sampler2DArray AlbedoMaps[MAX_MATERIALS];
     Sampler2DArray NormalMaps[MAX_MATERIALS];

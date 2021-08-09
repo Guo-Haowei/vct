@@ -7,6 +7,8 @@ enum class ProgramType {
     SHADOW,
     GBUFFER,
     SSAO,
+    VCT_DEFERRED,
+    FXAA,
     COUNT,
 };
 
