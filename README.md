@@ -1,10 +1,9 @@
 # Voxel GI
 
 - [x] Indirect diffuse light bounce
-    - [ ] Second light bounce
-- [ ] indirect specular light bounce
+- [x] Indirect specular light bounce
 - [x] Cascaded Shadow Maping (Glitches on edges)
-- [ ] SSAO
+- [x] SSAO
 - [ ] SSR
 - [ ] FXAA
 
