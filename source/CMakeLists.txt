@@ -15,3 +15,5 @@ target_link_libraries(vct PUBLIC
     vct::renderer
     vct::scene
 )
+
+add_executable(ssaa ssaa.cpp)
