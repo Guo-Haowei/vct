@@ -69,7 +69,7 @@ void GpuTexture::create2DImageFromFile( const char* path )
 {
     m_type = GL_TEXTURE_2D;
     int width, height, channel;
-    unsigned char* image = stbi_load( path, &width, &height, &channel, 0 );
+    unsigned char* image = stbi_load( path, &width, &height, &channel, 4 );
 
     if ( !image )
     {
@@ -83,15 +83,15 @@ void GpuTexture::create2DImageFromFile( const char* path )
     glTexParameteri( m_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
     glTexParameteri( m_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
-    GLenum format;
-    switch ( channel )
-    {
-        case 4: format = GL_RGBA; break;
-        case 3: format = GL_RGB; break;
-        case 2: format = GL_RG; break;
-        case 1: format = GL_RED; break;
-        default: unreachable();
-    }
+    GLenum format = GL_RGBA;
+    // switch ( channel )
+    // {
+    //     case 4: format = GL_RGBA; break;
+    //     case 3: format = GL_RGB; break;
+    //     case 2: format = GL_RG; break;
+    //     case 1: format = GL_RED; break;
+    //     default: unreachable();
+    // }
 
     glTexImage2D( m_type, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, image );
     glGenerateMipmap( m_type );

@@ -159,6 +159,23 @@ DvarError Dvar_SetFloat_Internal( dvar_t& dvar, float value )
     return DvarError::Ok;
 }
 
+DvarError Dvar_SetVec_Internal( dvar_t& dvar, float x, float y, float z, float w )
+{
+    switch ( dvar.type_ )
+    {
+        case dvar_t::Vec2:
+            dvar.vec_.x = x;
+            dvar.vec_.y = y;
+        case dvar_t::Vec3:
+            dvar.vec_.z = z;
+        case dvar_t::Vec4:
+            dvar.vec_.w = w;
+            return DvarError::Ok;
+        default:
+            return DvarError::TypeMismatch;
+    }
+}
+
 DvarError Dvar_SetString_Internal( dvar_t& dvar, const char* value )
 {
     if ( dvar.type_ != dvar_t::String )

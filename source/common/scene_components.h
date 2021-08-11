@@ -35,7 +35,7 @@ struct Material {
     std::string normalTexture;
     vec3 albedo{ 0 };
     float metallic     = 0.0f;
-    float roughness    = 0.0f;
+    float roughness    = 1.0f;
     float reflectPower = 0.0f;
 
     Material() = default;

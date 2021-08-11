@@ -1,7 +1,7 @@
 #include "universal/dvar_begin.h"
 
-DVAR_STRING( scene, "Sponza/sponza.gltf" );
-DVAR_FLOAT( scene_scale, 0.01f );
+DVAR_STRING( scene, "" );
+DVAR_FLOAT( scene_scale, 1.0f );
 
 // window
 DVAR_INT( wnd_width, 0 );
@@ -28,7 +28,7 @@ DVAR_INT( r_voxelSize, 64 );
 
 // CSM
 DVAR_INT( r_debugCSM, 0 );
-DVAR_INT( r_shadowRes, 1024 * 4 );
+DVAR_INT( r_shadowRes, 1024 );
 DVAR_INT( r_enableCSM, 1 );
 
 // SSAO

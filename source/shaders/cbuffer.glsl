@@ -2,7 +2,7 @@
 #define NUM_CASCADES 3
 #endif
 #ifndef MAX_MATERIALS
-#define MAX_MATERIALS 32
+#define MAX_MATERIALS 300
 #endif
 #ifndef MAX_LIGHT_ICON
 #define MAX_LIGHT_ICON 4

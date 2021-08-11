@@ -1,11 +1,6 @@
 #pragma once
 #include "platform_defines.h"
 
-#if defined( assert )
-#pragma message( "'assert' redefined" )
-#undef assert
-#endif
-
 #if USING( TEST_BUILD )
 #define core_assert( expr )              (void)( ( !!( expr ) ) || ( detail::Assert( __FILE__, __LINE__, #expr ), 0 ) )
 #define core_assertfmt( expr, fmt, ... ) (void)( ( !!( expr ) ) || ( detail::Assertfmt( __FILE__, __LINE__, #expr, fmt, ##__VA_ARGS__ ), 0 ) )

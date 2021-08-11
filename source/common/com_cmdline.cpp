@@ -7,6 +7,7 @@
 #include <string>
 
 #include "com_filesystem.h"
+#include "lua_script.h"
 #include "universal/core_assert.h"
 #include "universal/dvar_api.h"
 #include "universal/print.h"
@@ -110,8 +111,13 @@ bool Com_ProcessCmdLine( int argc, const char** argv )
         else if ( str == "+exec" )
         {
             cmdHelper.Consume( str );
-            Com_PrintInfo( "Executing '%s'", str.c_str() );
-            cmdHelper.PushCfg( str.c_str() );
+            if ( !Com_ExecLua( str.c_str() ) )
+            {
+                Com_PrintError( "[lua] failed to execute script '%s'", str.c_str() );
+                return false;
+            }
+            // Com_PrintInfo( "Executing '%s'", str.c_str() );
+            // cmdHelper.PushCfg( str.c_str() );
         }
         else
         {

@@ -50,7 +50,7 @@ dvar_t* Dvar_FindByName_Internal( const char* name );
 
 DvarError Dvar_SetInt_Internal( dvar_t& dvar, int value );
 DvarError Dvar_SetFloat_Internal( dvar_t& dvar, float value );
-DvarError Dvar_SetVec_Internal( dvar_t& dvar, float x, float y, float z, float w, int n );
+DvarError Dvar_SetVec_Internal( dvar_t& dvar, float x, float y, float z, float w );
 DvarError Dvar_SetString_Internal( dvar_t& dvar, const char* value );
 DvarError Dvar_SetFromString_Internal( dvar_t& dvar, const char* str );
 

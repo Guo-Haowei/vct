@@ -46,9 +46,15 @@ bool Com_LoadScene()
     const mat4 S           = glm::scale( mat4( 1 ), vec3( worldScale ) );
     const mat4 trans       = S;
     const char* scenePath  = Dvar_GetString( scene );
+
+    if ( !scenePath[0] )
+    {
+        Com_PrintFatal( "Scene not specified, set it by +set scene <name> or +exec <lua-file>" );
+        return false;
+    }
+
     loader.loadGltf( scenePath, scene, trans );
 
-    // TODO: configure the rest
     Camera& camera = scene.camera;
 
     const vec4 cascades = Dvar_GetVec4( cam_cascades );

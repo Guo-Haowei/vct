@@ -21,7 +21,7 @@ namespace vct {
 void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transform, bool flipUVs )
 {
     char fullpath[kMaxOSPath];
-    Com_FsBuildPath( fullpath, kMaxOSPath, path, "data/models" );
+    Com_FsBuildPath( fullpath, kMaxOSPath, path, "" );
     Com_Printf( "[assimp] loading model from '%s'", fullpath );
 
     Assimp::Importer importer;
@@ -95,17 +95,17 @@ void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transfor
         scene.boundingBox.Union( box );
 
         // HACK configure floor
-        if ( Dvar_GetBool( r_mirrorFloor ) && mesh->name == "meshes_0-46" )
-        {
-            mat->reflectPower = 1.0;
-            mat->albedo       = vec3( 1.0f );
-            mat->metallic     = 0.0f;
-            mat->roughness    = 1.0f;
+        // if ( Dvar_GetBool( r_mirrorFloor ) && mesh->name == "meshes_0-46" )
+        // {
+        //     mat->reflectPower = 1.0;
+        //     mat->albedo       = vec3( 1.0f );
+        //     mat->metallic     = 0.0f;
+        //     mat->roughness    = 1.0f;
 
-            mat->albedoTexture            = "";
-            mat->metallicRoughnessTexture = "";
-            mat->normalTexture            = "";
-        }
+        //     mat->albedoTexture            = "";
+        //     mat->metallicRoughnessTexture = "";
+        //     mat->normalTexture            = "";
+        // }
     }
 
     scene.geometryNodes.push_back( node );
@@ -122,6 +122,15 @@ Material* SceneLoader::processMaterial( const aiMaterial* aimaterial )
         {
             mat->albedoTexture = m_currentPath;
             mat->albedoTexture.append( path.C_Str() );
+        }
+        else if ( aimaterial->GetTexture( aiTextureType_DIFFUSE, 0, &path ) == AI_SUCCESS )
+        {
+            mat->albedoTexture = m_currentPath;
+            mat->albedoTexture.append( path.C_Str() );
+        }
+        else
+        {
+            Com_PrintWarning( "[scene] mesh does not have diffuse texture" );
         }
     }
 

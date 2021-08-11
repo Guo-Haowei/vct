@@ -9,13 +9,9 @@
 
 ## Screenshots
 
-VOGI on
+<img src="https://github.com/Guo-Haowei/VCT/blob/master/screenshots/san-miguel.png" width="90%">
 
-<img src="https://github.com/Guo-Haowei/VCT/blob/master/screenshots/vxgi.png" width="90%">
-
-VOGI off
-
-<img src="https://github.com/Guo-Haowei/VCT/blob/master/screenshots/nogi.png" width="90%">
+<img src="https://github.com/Guo-Haowei/VCT/blob/master/screenshots/sponza.png" width="90%">
 
 ## Reference
 

@@ -6,6 +6,7 @@ add_library(common
     editor.cpp
     geometry.cpp
     imgui_impl_glfw.cpp
+    lua_script.cpp
     main_window.cpp
     main.cpp
 )
