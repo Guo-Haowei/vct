@@ -8,6 +8,7 @@ Dvar.SetFloat('scene_scale', 0.01);
 Dvar.SetInt('wnd_width', 1920 * windowScale);
 Dvar.SetInt('wnd_height', 1080 * windowScale);
 -- Dvar.SetInt('wnd_frameless', 1);
+Dvar.SetInt('r_voxelSize', 64);
 
 -- graphics
 Dvar.SetInt('r_shadowRes', 1024 * 8);

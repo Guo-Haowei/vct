@@ -34,13 +34,6 @@ void main()
         roughness = mr.g;
     }
 
-    // if ( NoTexture != 0 )
-    // {
-    //     albedo.rgb = vec3( 0.7 );
-    //     metallic   = 0.2;
-    //     roughness  = 0.8;
-    // }
-
     vec3 world_position = pass_position;
 
     vec3 F0 = mix( vec3( 0.04 ), albedo.rgb, metallic );

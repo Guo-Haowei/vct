@@ -1,5 +1,5 @@
 add_library(scene
-    SceneLoader.cpp
+    scene_loader.cpp
 )
 
 target_include_directories(scene PRIVATE

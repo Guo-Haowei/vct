@@ -7,7 +7,7 @@
 #include "main_window.h"
 #include "renderer/r_cbuffers.h"
 #include "renderer/r_sun_shadow.h"
-#include "scene/SceneLoader.h"
+#include "scene/scene_loader.h"
 #include "universal/core_assert.h"
 #include "universal/print.h"
 
@@ -39,7 +39,7 @@ bool Com_LoadScene()
     core_assert( is_power_of_two( voxelTextureSize ) );
     core_assert( voxelTextureSize <= 256 );
 
-    vct::SceneLoader loader;
+    SceneLoader loader;
     Scene& scene = g_scene;
 
     const float worldScale = Dvar_GetFloat( scene_scale );
@@ -111,7 +111,6 @@ bool Com_ImGuiInit()
     ImGuiIO& io        = ImGui::GetIO();
     io.IniFilenameLoad = s_iniFileNameLoad;
     io.IniFilenameSave = kDefaultIniFileName;
-    io.FontGlobalScale = 1.5f;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // Enable Docking
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;    // Enable Multi-Viewport / Platform Windows

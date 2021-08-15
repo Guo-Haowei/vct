@@ -144,6 +144,7 @@ void MainRenderer::createGpuResources()
         {
             matData->normalMap.create2DImageFromFile( mat->normalTexture.c_str() );
             g_constantCache.cache.NormalMaps[idx].data = gl::MakeTextureResident( matData->normalMap.GetHandle() );
+            Com_PrintInfo( "material has bump %s", mat->normalTexture.c_str() );
         }
 
         matData->textureMapIdx = idx;

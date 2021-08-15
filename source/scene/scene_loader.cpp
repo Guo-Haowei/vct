@@ -1,4 +1,4 @@
-#include "SceneLoader.h"
+#include "scene_loader.h"
 
 #include <assert.h>
 #include <assimp/pbrmaterial.h>
@@ -15,8 +15,6 @@
 
 using std::string;
 using std::vector;
-
-namespace vct {
 
 void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transform, bool flipUVs )
 {
@@ -152,6 +150,11 @@ Material* SceneLoader::processMaterial( const aiMaterial* aimaterial )
             mat->normalTexture = m_currentPath;
             mat->normalTexture.append( path.C_Str() );
         }
+        else if ( aimaterial->GetTexture( aiTextureType_HEIGHT, 0, &path ) == AI_SUCCESS )
+        {
+            mat->normalTexture = m_currentPath;
+            mat->normalTexture.append( path.C_Str() );
+        }
     }
 
     return mat;
@@ -217,5 +220,3 @@ MeshComponent* SceneLoader::processMesh( const aiMesh* aimesh )
 
     return mesh;
 }
-
-}  // namespace vct

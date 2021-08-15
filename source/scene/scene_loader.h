@@ -7,8 +7,6 @@ struct aiMaterial;
 struct aiScene;
 struct aiAnimation;
 
-namespace vct {
-
 class SceneLoader {
    public:
     void loadGltf( const char* path, Scene& scene, const mat4& transform, bool flipUVs = true );
@@ -20,5 +18,3 @@ class SceneLoader {
    private:
     std::string m_currentPath;
 };
-
-}  // namespace vct

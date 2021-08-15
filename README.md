@@ -9,9 +9,13 @@
 
 ## Screenshots
 
+<img src="https://github.com/Guo-Haowei/VCT/blob/master/screenshots/sponza.png" width="90%">
+
 <img src="https://github.com/Guo-Haowei/VCT/blob/master/screenshots/san-miguel.png" width="90%">
 
-<img src="https://github.com/Guo-Haowei/VCT/blob/master/screenshots/sponza.png" width="90%">
+<img src="https://github.com/Guo-Haowei/VCT/blob/master/screenshots/bistro.png" width="90%">
+
+<img src="https://github.com/Guo-Haowei/VCT/blob/master/screenshots/voxel.png" width="90%">
 
 ## Reference
 
