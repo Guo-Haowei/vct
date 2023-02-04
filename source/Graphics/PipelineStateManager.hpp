@@ -64,11 +64,11 @@ public:
         std::string name ) const;
 
 protected:
-    virtual bool InitializePipelineState( PipelineState** ppPipelineState )
+    virtual bool InitializePipelineState( PipelineState** )
     {
         return true;
     }
-    virtual void DestroyPipelineState( PipelineState& pipelineState ) {}
+    virtual void DestroyPipelineState( PipelineState& ) {}
 
 protected:
     std::map<std::string, std::shared_ptr<PipelineState>> m_pipelineStates;

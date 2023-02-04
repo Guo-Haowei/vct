@@ -16,8 +16,6 @@
 
 static GLuint g_noiseTexture;
 
-extern void FillMaterialCB( const MaterialData* mat, MaterialCB& cb );
-
 void R_Gbuffer_Pass()
 {
     auto PSO = g_pPipelineStateManager->GetPipelineState( "GBUFFER" );
@@ -29,30 +27,8 @@ void R_Gbuffer_Pass()
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    Frustum frustum( scene.camera.ProjView() );
-    for ( const GeometryNode& node : scene.geometryNodes ) {
-        g_perBatchCache.cache.Model = node.transform;
-        g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * node.transform;
-        g_perBatchCache.Update();
-
-        for ( const Geometry& geom : node.geometries ) {
-            if ( !geom.visible ) {
-                continue;
-            }
-            if ( !frustum.Intersect( geom.boundingBox ) ) {
-                continue;
-            }
-
-            const MeshData* drawData = reinterpret_cast<MeshData*>( geom.mesh->gpuResource );
-            const MaterialData* matData = reinterpret_cast<MaterialData*>( geom.material->gpuResource );
-
-            FillMaterialCB( matData, g_materialCache.cache );
-            g_materialCache.Update();
-
-            glBindVertexArray( drawData->vao );
-            glDrawElements( GL_TRIANGLES, drawData->count, GL_UNSIGNED_INT, 0 );
-        }
-    }
+    Frame frame;
+    g_gfxMgr->DrawBatch( frame );
 
     g_gbufferRT.Unbind();
 }

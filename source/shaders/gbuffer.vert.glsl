@@ -14,14 +14,14 @@ out struct PS_INPUT {
 
 void main()
 {
-    vec4 world_position = Model * vec4( in_position, 1.0 );
-    ps_in.position      = world_position.xyz;
-    mat3 rotation       = mat3( Model );
-    vec3 T              = normalize( rotation * in_tangent );
-    vec3 B              = normalize( rotation * in_bitangent );
-    vec3 N              = normalize( rotation * in_normal );
+    vec4 world_position = M * vec4( in_position, 1.0 );
+    ps_in.position = world_position.xyz;
+    mat3 rotation = mat3( M );
+    vec3 T = normalize( rotation * in_tangent );
+    vec3 B = normalize( rotation * in_bitangent );
+    vec3 N = normalize( rotation * in_normal );
 
     gl_Position = PV * world_position;
-    ps_in.uv    = in_uv;
-    ps_in.TBN   = mat3( T, B, N );
+    ps_in.uv = in_uv;
+    ps_in.TBN = mat3( T, B, N );
 }

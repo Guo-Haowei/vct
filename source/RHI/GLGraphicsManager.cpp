@@ -112,6 +112,94 @@ void GLGraphicsManager::SetPipelineState( const std::shared_ptr<PipelineState> &
     }
 }
 
+// @TODO: remove
+#include "Graphics/r_cbuffers.h"
+
+static void FillMaterialCB( const MaterialData *mat, MaterialCB &cb )
+{
+    cb.AlbedoColor = mat->albedoColor;
+    cb.Metallic = mat->metallic;
+    cb.Roughness = mat->roughness;
+    cb.HasAlbedoMap = mat->albedoMap.GetHandle() != 0;
+    cb.HasNormalMap = mat->materialMap.GetHandle() != 0;
+    cb.HasPbrMap = mat->materialMap.GetHandle() != 0;
+    cb.TextureMapIdx = mat->textureMapIdx;
+    cb.ReflectPower = mat->reflectPower;
+}
+// HACK:
+void GLGraphicsManager::DrawBatch( const Frame & )
+{
+    // @TODO: culling
+    // Frustum frustum( scene.camera.ProjView() );
+    // if ( !frustum.Intersect( geom.boundingBox ) ) {
+    // }
+
+    const Frame &frame = m_frame;
+    for ( auto &pDbc : frame.batchContexts ) {
+        SetPerBatchConstants( *pDbc );
+
+        const auto &dbc = dynamic_cast<const GLDrawBatchContext &>( *pDbc );
+
+        const MaterialData *matData = reinterpret_cast<MaterialData *>(
+            pDbc->pGeom->material->gpuResource );
+
+        FillMaterialCB( matData, g_materialCache.cache );
+        g_materialCache.Update();
+
+        glBindVertexArray( dbc.vao );
+        glDrawElements( dbc.mode, dbc.count, dbc.type, nullptr );
+    }
+
+    glBindVertexArray( 0 );
+}
+
+void GLGraphicsManager::SetPerBatchConstants(
+    const DrawBatchContext &context )
+{
+    glBindBuffer( GL_UNIFORM_BUFFER, m_uboDrawBatchConstant );
+
+    const auto &constant = static_cast<const PerBatchConstants &>( context );
+
+    glBufferData( GL_UNIFORM_BUFFER, kSizePerBatchConstantBuffer, &constant, GL_DYNAMIC_DRAW );
+
+    glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+}
+
+void GLGraphicsManager::InitializeGeometries( const Scene &scene )
+{
+    // glBindBufferBase( GL_UNIFORM_BUFFER, slot, handle );
+    uint32_t batch_index = 0;
+    for ( const GeometryNode &node : scene.geometryNodes ) {
+        for ( const Geometry &geom : node.geometries ) {
+            const MeshData *drawData = reinterpret_cast<MeshData *>( geom.mesh->gpuResource );
+
+            auto dbc = std::make_shared<GLDrawBatchContext>();
+            dbc->batchIndex = batch_index++;
+            dbc->vao = drawData->vao;
+            dbc->mode = GL_TRIANGLES;
+            dbc->type = GL_UNSIGNED_INT;
+            dbc->count = drawData->count;
+
+            dbc->pGeom = &geom;
+            dbc->M = mat4( 1 );
+
+            m_frame.batchContexts.push_back( dbc );
+        }
+    }
+
+    int slot = 1;
+    GLuint handle = 0;
+    glGenBuffers( 1, &handle );
+    // glBindBuffer( GL_UNIFORM_BUFFER, handle );
+    // glBufferData( GL_UNIFORM_BUFFER, sizeInByte, nullptr, GL_DYNAMIC_DRAW );
+    // glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+    glBindBufferBase( GL_UNIFORM_BUFFER, slot, handle );
+    // LOG_DEBUG( "[opengl] created buffer of size %zu (slot %d)", sizeInByte, slot );
+    glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+
+    m_uboDrawBatchConstant = handle;
+}
+
 static void APIENTRY debug_callback(
     GLenum source,
     GLenum type,

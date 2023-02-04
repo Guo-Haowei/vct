@@ -53,7 +53,7 @@ static bool LoadShaderFromFile( const char *file, const GLenum shaderType,
     std::string source;
     const SystemFile::Result result = fhandle.Read( source );
     if ( result != SystemFile::Result::Ok ) {
-        LOG_ERROR( "Failed to read shader '%s'", filename.c_str() );
+        LOG_FATAL( "Failed to read shader '%s'", filename.c_str() );
         return false;
     }
 
@@ -78,7 +78,7 @@ static bool LoadShaderFromFile( const char *file, const GLenum shaderType,
     if ( length > 0 ) {
         std::vector<char> buffer( length + 1 );
         glGetShaderInfoLog( shader, length, nullptr, buffer.data() );
-        LOG_ERROR( "[glsl] failed to compile shader '%s'\ndetails:\n%s", filename.c_str(), buffer.data() );
+        LOG_FATAL( "[glsl] failed to compile shader '%s'\ndetails:\n%s", filename.c_str(), buffer.data() );
     }
 
     if ( status == GL_FALSE ) {
@@ -119,7 +119,7 @@ static bool LoadShaderProgram( const ShaderSourceList &source, GLuint &shaderPro
     if ( length > 0 ) {
         std::vector<char> buffer( length + 1 );
         glGetProgramInfoLog( shaderProgram, length, nullptr, buffer.data() );
-        LOG_ERROR( "[glsl] failed to link program\ndetails:\n%s", buffer.data() );
+        LOG_FATAL( "[glsl] failed to link program\ndetails:\n%s", buffer.data() );
         return false;
     }
 

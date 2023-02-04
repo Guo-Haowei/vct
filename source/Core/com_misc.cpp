@@ -120,13 +120,7 @@ void Com_UpdateWorld()
     camera.SetAspect( aspect );
     camera.UpdatePV();
 
-    // update lightspace matrices
-    mat4 lightPVs[NUM_CASCADES];
-    R_LightSpaceMatrix( camera, scene.light.direction, lightPVs );
-
-    for ( size_t idx = 0; idx < array_length( lightPVs ); ++idx ) {
-        g_perFrameCache.cache.LightPVs[idx] = lightPVs[idx];
-    }
+    g_perFrameCache.cache.LightPV = R_HackLightSpaceMatrix( scene.light.direction );
 
     // update constants
     g_perFrameCache.cache.SunDir = scene.light.direction;

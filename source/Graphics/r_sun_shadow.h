@@ -3,6 +3,5 @@
 #include "Core/scene.h"
 #include "r_defines.h"
 
-void R_LightSpaceMatrix( const Camera& camera, const vec3& lightDir, mat4 lightPVs[NUM_CASCADES] );
-
+mat4 R_HackLightSpaceMatrix( const vec3& lightDir );
 void R_ShadowPass();

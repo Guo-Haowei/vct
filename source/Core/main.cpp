@@ -50,6 +50,8 @@ static int app_main( int argc, const char** argv )
     ok = ok && g_pPipelineStateManager->Init();
     renderer.createGpuResources();
 
+    g_gfxMgr->InitializeGeometries( Com_GetScene() );
+
     while ( !g_wndMgr->ShouldClose() ) {
         g_wndMgr->NewFrame();
         ImGui_ImplGlfw_NewFrame();
