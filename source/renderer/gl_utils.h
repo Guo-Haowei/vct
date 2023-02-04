@@ -6,7 +6,8 @@
 
 #include "GpuTexture.h"
 #include "universal/core_math.h"
-#include "universal/print.h"
+
+#include "Base/Logger.h"
 
 static constexpr int kMaxShaderName = 128;
 
@@ -50,8 +51,8 @@ struct ProgramCreateInfo {
 };
 
 struct MeshData {
-    GLuint vao     = 0;
-    GLuint ebo     = 0;
+    GLuint vao = 0;
+    GLuint ebo = 0;
     GLuint vbos[5] = { 0, 0, 0, 0, 0 };
     uint32_t count = 0;
 };
@@ -90,11 +91,10 @@ static inline void BindToSlot( GLuint buffer, int slot, int size )
 GLuint CreateProgram( const ProgramCreateInfo& info );
 
 class Program {
-   public:
+public:
     void Destroy()
     {
-        if ( mHandle )
-        {
+        if ( mHandle ) {
             glDeleteProgram( mHandle );
         }
 
@@ -116,7 +116,7 @@ class Program {
         return *this;
     }
 
-   private:
+private:
     GLuint mHandle = 0;
 };
 
@@ -131,9 +131,8 @@ template<typename T>
 struct ConstantBuffer {
     void Destroy()
     {
-        if ( mHandle != 0 )
-        {
-            Com_Printf( "[opengl] destroy cbuffer %u", mHandle );
+        if ( mHandle != 0 ) {
+            LOG_DEBUG( "[opengl] destroy cbuffer %u", mHandle );
             glDeleteBuffers( 1, &mHandle );
         }
         mHandle = 0;

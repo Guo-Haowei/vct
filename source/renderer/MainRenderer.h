@@ -9,7 +9,7 @@
 namespace vct {
 
 class MainRenderer {
-   public:
+public:
     void createGpuResources();
     void render();
     void renderFrameBufferTextures( const ivec2& extent );
@@ -20,7 +20,7 @@ class MainRenderer {
     void gbufferPass();
     void vctPass();
 
-   private:
+private:
     gl::Program m_voxelProgram;
     gl::Program m_visualizeProgram;
     gl::Program m_voxelPostProgram;

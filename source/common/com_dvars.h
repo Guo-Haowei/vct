@@ -1,5 +1,7 @@
 #include "universal/dvar_begin.h"
 
+DVAR_STRING( fs_root, "" );
+
 DVAR_STRING( scene, "" );
 DVAR_FLOAT( scene_scale, 1.0f );
 

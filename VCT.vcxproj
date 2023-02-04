@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\common\camera.cpp" />
+    <ClCompile Include="source\common\com_cmdline.cpp" />
+    <ClCompile Include="source\common\com_filesystem.cpp" />
+    <ClCompile Include="source\common\com_misc.cpp" />
+    <ClCompile Include="source\common\editor.cpp" />
+    <ClCompile Include="source\common\geometry.cpp" />
+    <ClCompile Include="source\common\imgui_impl_glfw.cpp" />
+    <ClCompile Include="source\common\lua_script.cpp" />
+    <ClCompile Include="source\common\main.cpp" />
+    <ClCompile Include="source\common\main_window.cpp" />
+    <ClCompile Include="source\dummy.cpp" />
+    <ClCompile Include="source\imgui\imgui.cpp" />
+    <ClCompile Include="source\imgui\imgui_draw.cpp" />
+    <ClCompile Include="source\imgui\imgui_tables.cpp" />
+    <ClCompile Include="source\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="source\lua\lapi.c" />
+    <ClCompile Include="source\lua\lauxlib.c" />
+    <ClCompile Include="source\lua\lbaselib.c" />
+    <ClCompile Include="source\lua\lcode.c" />
+    <ClCompile Include="source\lua\lcorolib.c" />
+    <ClCompile Include="source\lua\lctype.c" />
+    <ClCompile Include="source\lua\ldblib.c" />
+    <ClCompile Include="source\lua\ldebug.c" />
+    <ClCompile Include="source\lua\ldo.c" />
+    <ClCompile Include="source\lua\ldump.c" />
+    <ClCompile Include="source\lua\lfunc.c" />
+    <ClCompile Include="source\lua\lgc.c" />
+    <ClCompile Include="source\lua\linit.c" />
+    <ClCompile Include="source\lua\liolib.c" />
+    <ClCompile Include="source\lua\llex.c" />
+    <ClCompile Include="source\lua\lmathlib.c" />
+    <ClCompile Include="source\lua\lmem.c" />
+    <ClCompile Include="source\lua\loadlib.c" />
+    <ClCompile Include="source\lua\lobject.c" />
+    <ClCompile Include="source\lua\lopcodes.c" />
+    <ClCompile Include="source\lua\loslib.c" />
+    <ClCompile Include="source\lua\lparser.c" />
+    <ClCompile Include="source\lua\lstate.c" />
+    <ClCompile Include="source\lua\lstring.c" />
+    <ClCompile Include="source\lua\lstrlib.c" />
+    <ClCompile Include="source\lua\ltable.c" />
+    <ClCompile Include="source\lua\ltablib.c" />
+    <ClCompile Include="source\lua\ltm.c" />
+    <ClCompile Include="source\lua\lundump.c" />
+    <ClCompile Include="source\lua\lutf8lib.c" />
+    <ClCompile Include="source\lua\lvm.c" />
+    <ClCompile Include="source\lua\lzio.c" />
+    <ClCompile Include="source\renderer\gl_utils.cpp" />
+    <ClCompile Include="source\renderer\GpuTexture.cpp" />
+    <ClCompile Include="source\renderer\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="source\renderer\MainRenderer.cpp" />
+    <ClCompile Include="source\renderer\r_cbuffers.cpp" />
+    <ClCompile Include="source\renderer\r_editor.cpp" />
+    <ClCompile Include="source\renderer\r_graphics.cpp" />
+    <ClCompile Include="source\renderer\r_passes.cpp" />
+    <ClCompile Include="source\renderer\r_rendertarget.cpp" />
+    <ClCompile Include="source\renderer\r_shader.cpp" />
+    <ClCompile Include="source\renderer\r_sun_shadow.cpp" />
+    <ClCompile Include="source\scene\scene_loader.cpp" />
+    <ClCompile Include="source\universal\core_math.cpp" />
+    <ClCompile Include="source\universal\dvar_api.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\common\camera.h" />
+    <ClInclude Include="source\common\com_cmdline.h" />
+    <ClInclude Include="source\common\com_dvars.h" />
+    <ClInclude Include="source\common\com_filesystem.h" />
+    <ClInclude Include="source\common\com_misc.h" />
+    <ClInclude Include="source\common\editor.h" />
+    <ClInclude Include="source\common\geometry.h" />
+    <ClInclude Include="source\common\imgui_impl_glfw.h" />
+    <ClInclude Include="source\common\lua_script.h" />
+    <ClInclude Include="source\common\main_window.h" />
+    <ClInclude Include="source\common\scene.h" />
+    <ClInclude Include="source\common\scene_components.h" />
+    <ClInclude Include="source\imgui\imconfig.h" />
+    <ClInclude Include="source\imgui\imgui.h" />
+    <ClInclude Include="source\imgui\imgui_internal.h" />
+    <ClInclude Include="source\imgui\imstb_rectpack.h" />
+    <ClInclude Include="source\imgui\imstb_textedit.h" />
+    <ClInclude Include="source\imgui\imstb_truetype.h" />
+    <ClInclude Include="source\lua\lapi.h" />
+    <ClInclude Include="source\lua\lauxlib.h" />
+    <ClInclude Include="source\lua\lcode.h" />
+    <ClInclude Include="source\lua\lctype.h" />
+    <ClInclude Include="source\lua\ldebug.h" />
+    <ClInclude Include="source\lua\ldo.h" />
+    <ClInclude Include="source\lua\lfunc.h" />
+    <ClInclude Include="source\lua\lgc.h" />
+    <ClInclude Include="source\lua\llex.h" />
+    <ClInclude Include="source\lua\llimits.h" />
+    <ClInclude Include="source\lua\lmem.h" />
+    <ClInclude Include="source\lua\lobject.h" />
+    <ClInclude Include="source\lua\lopcodes.h" />
+    <ClInclude Include="source\lua\lparser.h" />
+    <ClInclude Include="source\lua\lprefix.h" />
+    <ClInclude Include="source\lua\lstate.h" />
+    <ClInclude Include="source\lua\lstring.h" />
+    <ClInclude Include="source\lua\ltable.h" />
+    <ClInclude Include="source\lua\ltm.h" />
+    <ClInclude Include="source\lua\luaconf.h" />
+    <ClInclude Include="source\lua\lualib.h" />
+    <ClInclude Include="source\lua\lundump.h" />
+    <ClInclude Include="source\lua\lvm.h" />
+    <ClInclude Include="source\lua\lzio.h" />
+    <ClInclude Include="source\renderer\GLPrerequisites.h" />
+    <ClInclude Include="source\renderer\gl_utils.h" />
+    <ClInclude Include="source\renderer\GpuResource.h" />
+    <ClInclude Include="source\renderer\GpuTexture.h" />
+    <ClInclude Include="source\renderer\imgui_impl_opengl3.h" />
+    <ClInclude Include="source\renderer\MainRenderer.h" />
+    <ClInclude Include="source\renderer\r_cbuffers.h" />
+    <ClInclude Include="source\renderer\r_defines.h" />
+    <ClInclude Include="source\renderer\r_editor.h" />
+    <ClInclude Include="source\renderer\r_graphics.h" />
+    <ClInclude Include="source\renderer\r_passes.h" />
+    <ClInclude Include="source\renderer\r_rendertarget.h" />
+    <ClInclude Include="source\renderer\r_shader.h" />
+    <ClInclude Include="source\renderer\r_sun_shadow.h" />
+    <ClInclude Include="source\scene\scene_loader.h" />
+    <ClInclude Include="source\universal\core_math.h" />
+    <ClInclude Include="source\universal\dvar_api.h" />
+    <ClInclude Include="source\universal\dvar_begin.h" />
+    <ClInclude Include="source\universal\dvar_end.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{a3bbc623-c284-4e39-8378-cee2fefde0a5}</ProjectGuid>
+    <RootNamespace>VCT</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)\source;$(ProjectDir)\external\include;$(ProjectDir)\external\glm;$(ProjectDir)\external\assimp\include</AdditionalIncludeDirectories>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)\$(Platform)\$(Configuration);$(SolutionDir)\external\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc142-mtd.lib;IrrXMLd.lib;zlibstaticd.lib;glfw3.lib;glad.lib;Base.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)\source;$(ProjectDir)\external\include;$(ProjectDir)\external\glm;$(ProjectDir)\external\assimp\include</AdditionalIncludeDirectories>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)\$(Platform)\$(Configuration);$(SolutionDir)\external\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc142-mt.lib;IrrXML.lib;zlibstatic.lib;glfw3.lib;glad.lib;Base.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

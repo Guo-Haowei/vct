@@ -2,6 +2,8 @@
 
 #include <random>
 
+#include "Base/Asserts.h"
+
 #include "common/com_dvars.h"
 #include "common/com_misc.h"
 #include "common/main_window.h"
@@ -9,8 +11,6 @@
 #include "r_cbuffers.h"
 #include "r_rendertarget.h"
 #include "r_shader.h"
-#include "universal/core_assert.h"
-#include "universal/dvar_api.h"
 
 static GLuint g_noiseTexture;
 
@@ -18,7 +18,7 @@ extern void FillMaterialCB( const MaterialData* mat, MaterialCB& cb );
 
 void R_Gbuffer_Pass()
 {
-    Scene& scene        = Com_GetScene();
+    Scene& scene = Com_GetScene();
     const auto& program = R_GetShaderProgram( ProgramType::GBUFFER );
 
     g_gbufferRT.Bind();
@@ -30,24 +30,20 @@ void R_Gbuffer_Pass()
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     Frustum frustum( scene.camera.ProjView() );
-    for ( const GeometryNode& node : scene.geometryNodes )
-    {
+    for ( const GeometryNode& node : scene.geometryNodes ) {
         g_perBatchCache.cache.Model = node.transform;
-        g_perBatchCache.cache.PVM   = g_perFrameCache.cache.PV * node.transform;
+        g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * node.transform;
         g_perBatchCache.Update();
 
-        for ( const Geometry& geom : node.geometries )
-        {
-            if ( !geom.visible )
-            {
+        for ( const Geometry& geom : node.geometries ) {
+            if ( !geom.visible ) {
                 continue;
             }
-            if ( !frustum.Intersect( geom.boundingBox ) )
-            {
+            if ( !frustum.Intersect( geom.boundingBox ) ) {
                 continue;
             }
 
-            const MeshData* drawData    = reinterpret_cast<MeshData*>( geom.mesh->gpuResource );
+            const MeshData* drawData = reinterpret_cast<MeshData*>( geom.mesh->gpuResource );
             const MaterialData* matData = reinterpret_cast<MaterialData*>( geom.material->gpuResource );
 
             FillMaterialCB( matData, g_materialCache.cache );
@@ -121,8 +117,7 @@ static void CreateSSAOResource()
     std::default_random_engine generator;
     std::vector<glm::vec4> ssaoKernel;
     const int kernelSize = Dvar_GetInt( r_ssaoKernelSize );
-    for ( int i = 0; i < kernelSize; ++i )
-    {
+    for ( int i = 0; i < kernelSize; ++i ) {
         // [-1, 1], [-1, 1], [0, 1]
         glm::vec3 sample( randomFloats( generator ) * 2.0 - 1.0, randomFloats( generator ) * 2.0 - 1.0, randomFloats( generator ) );
         sample = glm::normalize( sample );
@@ -141,8 +136,7 @@ static void CreateSSAOResource()
     const int noiseSize = Dvar_GetInt( r_ssaoNoiseSize );
 
     std::vector<glm::vec3> ssaoNoise;
-    for ( int i = 0; i < noiseSize * noiseSize; ++i )
-    {
+    for ( int i = 0; i < noiseSize * noiseSize; ++i ) {
         glm::vec3 noise( randomFloats( generator ) * 2.0 - 1.0, randomFloats( generator ) * 2.0 - 1.0, 0.0f );
         noise = glm::normalize( noise );
         ssaoNoise.emplace_back( noise );
@@ -157,7 +151,7 @@ static void CreateSSAOResource()
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
 
     g_constantCache.cache.NoiseMap = gl::MakeTextureResident( noiseTexture );
-    g_noiseTexture                 = noiseTexture;
+    g_noiseTexture = noiseTexture;
 }
 
 void R_Create_Pass_Resources()

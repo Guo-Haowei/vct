@@ -6,13 +6,13 @@
 #include <set>
 #include <sstream>
 
+#include "Base/Asserts.h"
+#include "Base/Logger.h"
+
 #include "common/com_dvars.h"
 #include "common/com_filesystem.h"
 #include "shaders/cbuffer.glsl"
-#include "universal/core_assert.h"
 #include "universal/dvar_api.h"
-#include "universal/print.h"
-#include "universal/universal.h"
 
 static MeshData g_quad;
 
@@ -33,21 +33,21 @@ void R_CreateQuad()
 
 void R_DrawQuad()
 {
-    core_assert( g_quad.vao );
+    ASSERT( g_quad.vao );
     glBindVertexArray( g_quad.vao );
     glDrawArrays( GL_TRIANGLES, 0, 6 );
 }
 
 void FillMaterialCB( const MaterialData *mat, MaterialCB &cb )
 {
-    cb.AlbedoColor   = mat->albedoColor;
-    cb.Metallic      = mat->metallic;
-    cb.Roughness     = mat->roughness;
-    cb.HasAlbedoMap  = mat->albedoMap.GetHandle() != 0;
-    cb.HasNormalMap  = mat->materialMap.GetHandle() != 0;
-    cb.HasPbrMap     = mat->materialMap.GetHandle() != 0;
+    cb.AlbedoColor = mat->albedoColor;
+    cb.Metallic = mat->metallic;
+    cb.Roughness = mat->roughness;
+    cb.HasAlbedoMap = mat->albedoMap.GetHandle() != 0;
+    cb.HasNormalMap = mat->materialMap.GetHandle() != 0;
+    cb.HasPbrMap = mat->materialMap.GetHandle() != 0;
     cb.TextureMapIdx = mat->textureMapIdx;
-    cb.ReflectPower  = mat->reflectPower;
+    cb.ReflectPower = mat->reflectPower;
 }
 
 namespace gl {
@@ -56,26 +56,23 @@ static void APIENTRY DebugCallback( GLenum, GLenum, unsigned int, GLenum, GLsize
 
 bool Init()
 {
-    if ( gladLoadGL() == 0 )
-    {
-        Com_PrintFatal( "[glad] failed to load gl functions" );
+    if ( gladLoadGL() == 0 ) {
+        LOG_FATAL( "[glad] failed to load gl functions" );
         return false;
     }
 
-    Com_Printf( "[opengl] renderer: %s", glGetString( GL_RENDERER ) );
-    Com_Printf( "[opengl] version: %s", glGetString( GL_VERSION ) );
+    LOG_DEBUG( "[opengl] renderer: %s", glGetString( GL_RENDERER ) );
+    LOG_DEBUG( "[opengl] version: %s", glGetString( GL_VERSION ) );
 
-    if ( Dvar_GetBool( r_debug ) )
-    {
+    if ( Dvar_GetBool( r_debug ) ) {
         int flags;
         glGetIntegerv( GL_CONTEXT_FLAGS, &flags );
-        if ( flags & GL_CONTEXT_FLAG_DEBUG_BIT )
-        {
+        if ( flags & GL_CONTEXT_FLAG_DEBUG_BIT ) {
             glEnable( GL_DEBUG_OUTPUT );
             glEnable( GL_DEBUG_OUTPUT_SYNCHRONOUS );
             glDebugMessageCallback( gl::DebugCallback, nullptr );
             glDebugMessageControl( GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE );
-            Com_Printf( "[opengl] debug callback enabled" );
+            LOG_DEBUG( "[opengl] debug callback enabled" );
         }
     }
 
@@ -90,24 +87,20 @@ static std::string ProcessShader( const std::string &source )
 {
     std::string result;
     std::stringstream ss( source );
-    for ( std::string line; std::getline( ss, line ); )
-    {
+    for ( std::string line; std::getline( ss, line ); ) {
         constexpr const char pattern[] = "#include";
-        if ( line.find( pattern ) == 0 )
-        {
+        if ( line.find( pattern ) == 0 ) {
             std::string include = line.substr( line.find( '"' ) );
-            core_assert( include.front() == '"' && include.back() == '"' );
+            ASSERT( include.front() == '"' && include.back() == '"' );
             include.pop_back();
             ComFileWrapper fhandle( Com_FsOpenRead( include.c_str() + 1, "source/shaders" ) );
             std::vector<char> extra;
-            if ( fhandle.Read( extra ) != ComFile::Result::Ok )
-            {
-                Com_PrintError( "[filesystem] failed to read shader '%s'", include );
+            if ( fhandle.Read( extra ) != ComFile::Result::Ok ) {
+                LOG_ERROR( "[filesystem] failed to read shader '%s'", include.c_str() );
             }
             result.append( extra.data() );
         }
-        else
-        {
+        else {
             result.append( line );
         }
 
@@ -120,21 +113,20 @@ static std::string ProcessShader( const std::string &source )
 class ShaderHandleWrapper {
     GLuint handle_ = 0;
 
-   public:
+public:
     ShaderHandleWrapper( GLuint handle )
         : handle_( handle ) {}
 
     ~ShaderHandleWrapper()
     {
-        if ( handle_ )
-        {
+        if ( handle_ ) {
             glDeleteShader( handle_ );
         }
     }
 
     operator GLuint()
     {
-        core_assert( handle_ );
+        ASSERT( handle_ );
         return handle_;
     }
 };
@@ -144,9 +136,8 @@ static GLuint CreateShader( const char *file, GLenum type )
     ComFileWrapper fhandle( Com_FsOpenRead( file, "source/shaders" ) );
     std::string source;
     const ComFile::Result result = fhandle.Read( source );
-    if ( result != ComFile::Result::Ok )
-    {
-        Com_PrintError( "[filesystem] failed to read shader '%s'", file );
+    if ( result != ComFile::Result::Ok ) {
+        LOG_ERROR( "[filesystem] failed to read shader '%s'", file );
         return 0;
     }
 
@@ -167,15 +158,13 @@ static GLuint CreateShader( const char *file, GLenum type )
     GLint status = GL_FALSE, length = 0;
     glGetShaderiv( shader, GL_COMPILE_STATUS, &status );
     glGetShaderiv( shader, GL_INFO_LOG_LENGTH, &length );
-    if ( length > 0 )
-    {
+    if ( length > 0 ) {
         std::vector<char> buffer( length + 1 );
         glGetShaderInfoLog( shader, length, nullptr, buffer.data() );
-        Com_PrintError( "[glsl] failed to compile shader '%s'\ndetails:\n%s", file, buffer.data() );
+        LOG_ERROR( "[glsl] failed to compile shader '%s'\ndetails:\n%s", file, buffer.data() );
     }
 
-    if ( status == GL_FALSE )
-    {
+    if ( status == GL_FALSE ) {
         glDeleteShader( shader );
         return 0;
     }
@@ -185,56 +174,51 @@ static GLuint CreateShader( const char *file, GLenum type )
 
 GLuint CreateProgram( const ProgramCreateInfo &info )
 {
-    GLuint program   = 0;
+    GLuint program = 0;
     const char *name = "<unknown>";
 
     GLuint vs, ps, gs, cs;
 
-    if ( !info.cs.empty() )
-    {
-        core_assert( info.vs.empty() );
-        core_assert( info.ps.empty() );
-        core_assert( info.gs.empty() );
+    if ( !info.cs.empty() ) {
+        ASSERT( info.vs.empty() );
+        ASSERT( info.ps.empty() );
+        ASSERT( info.gs.empty() );
 
-        Com_PrintInfo( "compiling compute (%s) pipeline", info.cs.c_str() );
+        LOG_INFO( "compiling compute (%s) pipeline", info.cs.c_str() );
         program = glCreateProgram();
-        name    = info.cs.c_str();
-        cs      = CreateShader( info.cs.c_str(), GL_COMPUTE_SHADER );
+        name = info.cs.c_str();
+        cs = CreateShader( info.cs.c_str(), GL_COMPUTE_SHADER );
         glAttachShader( program, cs );
     }
-    else if ( info.vs[0] && info.ps[0] )
-    {
-        Com_PrintInfo( "compiling vertex (%s), geometry(%s), pixel(%s)", info.vs.c_str(), info.gs.c_str(), info.ps.c_str() );
+    else if ( info.vs[0] && info.ps[0] ) {
+        LOG_INFO( "compiling vertex (%s), geometry(%s), pixel(%s)", info.vs.c_str(), info.gs.c_str(), info.ps.c_str() );
 
         program = glCreateProgram();
-        name    = info.vs.c_str();
+        name = info.vs.c_str();
 
         vs = CreateShader( info.vs.c_str(), GL_VERTEX_SHADER );
         glAttachShader( program, vs );
         ps = CreateShader( info.ps.c_str(), GL_FRAGMENT_SHADER );
         glAttachShader( program, ps );
-        if ( !info.gs.empty() )
-        {
+        if ( !info.gs.empty() ) {
             gs = CreateShader( info.gs.c_str(), GL_GEOMETRY_SHADER );
             glAttachShader( program, gs );
         }
     }
 
-    core_assert( program );
+    ASSERT( program );
 
     glLinkProgram( program );
     GLint status = GL_FALSE, length = 0;
     glGetProgramiv( program, GL_LINK_STATUS, &status );
     glGetProgramiv( program, GL_INFO_LOG_LENGTH, &length );
-    if ( length > 0 )
-    {
+    if ( length > 0 ) {
         std::vector<char> buffer( length + 1 );
         glGetProgramInfoLog( program, length, nullptr, buffer.data() );
-        Com_PrintError( "[glsl] failed to link program '%s'\ndetails:\n%s", name, buffer.data() );
+        LOG_ERROR( "[glsl] failed to link program '%s'\ndetails:\n%s", name, buffer.data() );
     }
 
-    if ( status == GL_FALSE )
-    {
+    if ( status == GL_FALSE ) {
         glDeleteProgram( program );
         return 0;
     }
@@ -253,7 +237,7 @@ GLuint CreateAndBindConstantBuffer( int slot, size_t sizeInByte )
     glBufferData( GL_UNIFORM_BUFFER, sizeInByte, nullptr, GL_DYNAMIC_DRAW );
     glBindBuffer( GL_UNIFORM_BUFFER, 0 );
     glBindBufferBase( GL_UNIFORM_BUFFER, slot, handle );
-    Com_Printf( "[opengl] created buffer of size %zu (slot %d)", sizeInByte, slot );
+    LOG_DEBUG( "[opengl] created buffer of size %zu (slot %d)", sizeInByte, slot );
     glBindBuffer( GL_UNIFORM_BUFFER, 0 );
     return handle;
 }
@@ -275,16 +259,15 @@ static void APIENTRY DebugCallback(
     GLenum type,
     unsigned int id,
     GLenum severity,
-    GLsizei length,
+    GLsizei,
     const char *message,
-    const void *userParam )
+    const void * )
 {
-    using detail::Level;
+    using base::Level;
 
     const char *sourceStr = "other";
-    const char *typeStr   = "other";
-    switch ( source )
-    {
+    const char *typeStr = "other";
+    switch ( source ) {
         case GL_DEBUG_SOURCE_API: sourceStr = "api"; break;
         case GL_DEBUG_SOURCE_WINDOW_SYSTEM: sourceStr = "window system"; break;
         case GL_DEBUG_SOURCE_SHADER_COMPILER: sourceStr = "shader compiler"; break;
@@ -293,8 +276,7 @@ static void APIENTRY DebugCallback(
         default: break;
     }
 
-    switch ( type )
-    {
+    switch ( type ) {
         case GL_DEBUG_TYPE_ERROR: typeStr = "error"; break;
         case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: typeStr = "depracated behaviour"; break;
         case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR: typeStr = "undefined behaviour"; break;
@@ -307,17 +289,16 @@ static void APIENTRY DebugCallback(
         default: break;
     }
 
-    Level level             = Level::Warning;
+    Level level = Level::Warn;
     const char *severityStr = "low";
-    switch ( severity )
-    {
+    switch ( severity ) {
         case GL_DEBUG_SEVERITY_HIGH:
             severityStr = "high";
-            level       = Level::Error;
+            level = Level::Error;
             break;
         case GL_DEBUG_SEVERITY_MEDIUM:
             severityStr = "medium";
-            level       = Level::Warning;
+            level = Level::Warn;
             break;
         default:
             break;
@@ -326,15 +307,9 @@ static void APIENTRY DebugCallback(
     // TODO: properly disable repeated warnings
     static std::set<int> sSet{ 131185 };
 
-    if ( sSet.find( id ) == sSet.end() )
-    {
-        detail::Print( level, "[opengl] %s\n\t| id: %d | source: %s | type: %s | severity: %s |", message, id, sourceStr, typeStr, severityStr );
+    if ( sSet.find( id ) == sSet.end() ) {
+        base::Log( level, "[opengl] %s\n\t| id: %d | source: %s | type: %s | severity: %s |", message, id, sourceStr, typeStr, severityStr );
         sSet.insert( id );
-    }
-
-    if ( static_cast<int>( level ) >= static_cast<int>( Level::Error ) )
-    {
-        __debugbreak();
     }
 }
 

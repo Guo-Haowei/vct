@@ -29,9 +29,9 @@ struct Scene {
     Light light;
     AABB boundingBox;
     Camera camera;
-    bool dirty               = true;
+    bool dirty = true;
     const Geometry* selected = nullptr;
 
     Scene( const Scene& ) = delete;
-    Scene()               = default;
+    Scene() = default;
 };

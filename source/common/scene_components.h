@@ -7,10 +7,10 @@
 
 struct MeshComponent {
     enum Flag {
-        None               = 0,
-        HAS_UV_FLAG        = 1 << 0,
-        HAS_NORMAL_FLAG    = 1 << 1,
-        HAS_TANGENT_FLAG   = 1 << 2,
+        None = 0,
+        HAS_UV_FLAG = 1 << 0,
+        HAS_NORMAL_FLAG = 1 << 1,
+        HAS_TANGENT_FLAG = 1 << 2,
         HAS_BITANGENT_FLAG = 1 << 3,
     };
 
@@ -34,8 +34,8 @@ struct Material {
     std::string metallicRoughnessTexture;
     std::string normalTexture;
     vec3 albedo{ 0 };
-    float metallic     = 0.0f;
-    float roughness    = 1.0f;
+    float metallic = 0.0f;
+    float roughness = 1.0f;
     float reflectPower = 0.0f;
 
     Material() = default;

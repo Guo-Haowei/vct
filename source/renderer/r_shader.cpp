@@ -2,8 +2,9 @@
 
 #include <vector>
 
+#include "Base/Asserts.h"
+
 #include "gl_utils.h"
-#include "universal/core_assert.h"
 
 using gl::CreateProgram;
 using gl::Program;
@@ -32,14 +33,13 @@ void R_CreateShaderPrograms()
 
 void R_DestroyShaderPrograms()
 {
-    for ( auto& program : g_shaderCache )
-    {
+    for ( auto& program : g_shaderCache ) {
         program.Destroy();
     }
 }
 
 const Program& R_GetShaderProgram( ProgramType type )
 {
-    core_assert( static_cast<int>( type ) < g_shaderCache.size() );
+    ASSERT( static_cast<int>( type ) < g_shaderCache.size() );
     return g_shaderCache[static_cast<int>( type )];
 }

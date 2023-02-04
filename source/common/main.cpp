@@ -10,12 +10,15 @@
 #include "renderer/r_graphics.h"
 #include "universal/core_math.h"
 
+#include "Base/Asserts.h"
+#include "Base/Logger.h"
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 using namespace vct;
 
-int main( int argc, const char** argv )
+static int app_main( int argc, const char** argv )
 {
     bool ok = true;
 
@@ -37,8 +40,7 @@ int main( int argc, const char** argv )
     MainRenderer renderer;
     renderer.createGpuResources();
 
-    while ( !MainWindow::ShouldClose() )
-    {
+    while ( !MainWindow::ShouldClose() ) {
         MainWindow::NewFrame();
         ImGui_ImplGlfw_NewFrame();
 
@@ -69,4 +71,26 @@ int main( int argc, const char** argv )
     MainWindow::Shutdown();
 
     return ok ? 0 : 1;
+}
+
+static int test_log_and_assert()
+{
+    LOG_DEBUG( "This is a debug message" );
+    LOG_OK( "This is an %s message", "Ok" );
+    LOG_WARN( "This is a warn message" );
+    LOG_ERROR( "This is an error message" );
+    ASSERT( 1 == 1 );
+    ASSERT( 1 == 2 );
+    return 0;
+}
+
+int main( int argc, const char** argv )
+{
+#if 0
+    unused( argc );
+    unused( argv );
+    return test_log_and_assert();
+#else
+    return app_main( argc, argv );
+#endif
 }

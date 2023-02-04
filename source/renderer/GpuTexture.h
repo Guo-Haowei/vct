@@ -2,8 +2,8 @@
 #include <glad/glad.h>
 
 struct Texture2DCreateInfo {
-    GLenum wrapS     = 0;
-    GLenum wrapT     = 0;
+    GLenum wrapS = 0;
+    GLenum wrapT = 0;
     GLenum minFilter = 0;
     GLenum magFilter = 0;
     GLenum internalFormat;
@@ -22,7 +22,7 @@ struct Texture3DCreateInfo {
 };
 
 class GpuTexture {
-   public:
+public:
     void create2DEmpty( const Texture2DCreateInfo& info );
     void create3DEmpty( const Texture3DCreateInfo& info );
     void create2DImageFromFile( const char* path );
@@ -37,7 +37,7 @@ class GpuTexture {
 
     inline GLuint GetHandle() const { return mHandle; }
 
-   protected:
+protected:
     GLenum m_type;
     GLenum m_format;
     GLuint mHandle = 0;

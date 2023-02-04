@@ -1,6 +1,8 @@
 #pragma once
 #include "MainRenderer.h"
 
+#include "Base/Asserts.h"
+
 #include "common/com_dvars.h"
 #include "common/com_filesystem.h"
 #include "common/com_misc.h"
@@ -13,8 +15,6 @@
 #include "r_rendertarget.h"
 #include "r_shader.h"
 #include "r_sun_shadow.h"
-#include "universal/core_assert.h"
-#include "universal/dvar_api.h"
 
 static std::vector<std::shared_ptr<MeshData>> g_meshdata;
 static std::vector<std::shared_ptr<MaterialData>> g_materialdata;
@@ -27,10 +27,10 @@ static std::shared_ptr<MeshData> CreateMeshData( const MeshComponent& mesh )
 {
     MeshData* ret = new MeshData;
 
-    MeshData& outMesh       = *ret;
-    const bool hasNormals   = !mesh.normals.empty();
-    const bool hasUVs       = !mesh.uvs.empty();
-    const bool hasTangent   = !mesh.tangents.empty();
+    MeshData& outMesh = *ret;
+    const bool hasNormals = !mesh.normals.empty();
+    const bool hasUVs = !mesh.uvs.empty();
+    const bool hasTangent = !mesh.tangents.empty();
     const bool hasBitangent = !mesh.bitangents.empty();
 
     glGenVertexArrays( 1, &outMesh.vao );
@@ -39,18 +39,15 @@ static std::shared_ptr<MeshData> CreateMeshData( const MeshComponent& mesh )
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, outMesh.ebo );
     gl::BindToSlot( outMesh.vbos[0], 0, 3 );
     gl::NamedBufferStorage( outMesh.vbos[0], mesh.positions );
-    if ( hasNormals )
-    {
+    if ( hasNormals ) {
         gl::BindToSlot( outMesh.vbos[1], 1, 3 );
         gl::NamedBufferStorage( outMesh.vbos[1], mesh.normals );
     }
-    if ( hasUVs )
-    {
+    if ( hasUVs ) {
         gl::BindToSlot( outMesh.vbos[2], 2, 2 );
         gl::NamedBufferStorage( outMesh.vbos[2], mesh.uvs );
     }
-    if ( hasTangent )
-    {
+    if ( hasTangent ) {
         gl::BindToSlot( outMesh.vbos[3], 3, 3 );
         gl::NamedBufferStorage( outMesh.vbos[3], mesh.tangents );
         gl::BindToSlot( outMesh.vbos[4], 4, 3 );
@@ -78,9 +75,9 @@ void MainRenderer::createGpuResources()
 
     // create shader
     m_debugTextureProgram = gl::CreateProgram( ProgramCreateInfo::VSPS( "fullscreen", "debug/texture" ) );
-    m_voxelProgram        = gl::CreateProgram( ProgramCreateInfo::VSGSPS( "voxel/voxelization" ) );
-    m_visualizeProgram    = gl::CreateProgram( ProgramCreateInfo::VSPS( "voxel/visualization" ) );
-    m_voxelPostProgram    = gl::CreateProgram( ProgramCreateInfo::CS( "voxel/post" ) );
+    m_voxelProgram = gl::CreateProgram( ProgramCreateInfo::VSGSPS( "voxel/voxelization" ) );
+    m_visualizeProgram = gl::CreateProgram( ProgramCreateInfo::VSPS( "voxel/visualization" ) );
+    m_voxelPostProgram = gl::CreateProgram( ProgramCreateInfo::CS( "voxel/post" ) );
 
     m_box = CreateMeshData( geometry::MakeBox() );
 
@@ -93,58 +90,51 @@ void MainRenderer::createGpuResources()
     {
         Texture3DCreateInfo info;
         info.wrapS = info.wrapT = info.wrapR = GL_CLAMP_TO_BORDER;
-        info.size                            = voxelSize;
-        info.minFilter                       = GL_LINEAR_MIPMAP_LINEAR;
-        info.magFilter                       = GL_NEAREST;
-        info.mipLevel                        = log_two( voxelSize );
-        info.format                          = GL_RGBA16F;
+        info.size = voxelSize;
+        info.minFilter = GL_LINEAR_MIPMAP_LINEAR;
+        info.magFilter = GL_NEAREST;
+        info.mipLevel = log_two( voxelSize );
+        info.format = GL_RGBA16F;
 
         m_albedoVoxel.create3DEmpty( info );
         m_normalVoxel.create3DEmpty( info );
     }
 
     // create mesh
-    for ( const auto& mesh : scene.meshes )
-    {
+    for ( const auto& mesh : scene.meshes ) {
         g_meshdata.emplace_back( CreateMeshData( *mesh.get() ) );
         mesh->gpuResource = g_meshdata.back().get();
     }
 
     // create material
-    core_assert( scene.materials.size() < array_length( g_constantCache.cache.AlbedoMaps ) );
+    ASSERT( scene.materials.size() < array_length( g_constantCache.cache.AlbedoMaps ) );
 
-    for ( int idx = 0; idx < scene.materials.size(); ++idx )
-    {
+    for ( int idx = 0; idx < scene.materials.size(); ++idx ) {
         const auto& mat = scene.materials.at( idx );
 
         std::shared_ptr<MaterialData> matData( new MaterialData() );
-        if ( !mat->albedoTexture.empty() )
-        {
+        if ( !mat->albedoTexture.empty() ) {
             matData->albedoColor = vec4( 0 );
             matData->albedoMap.create2DImageFromFile( mat->albedoTexture.c_str() );
             g_constantCache.cache.AlbedoMaps[idx].data = gl::MakeTextureResident( matData->albedoMap.GetHandle() );
         }
-        else
-        {
+        else {
             matData->albedoColor = vec4( mat->albedo, 1.0f );
         }
 
-        if ( !mat->metallicRoughnessTexture.empty() )
-        {
+        if ( !mat->metallicRoughnessTexture.empty() ) {
             matData->materialMap.create2DImageFromFile( mat->metallicRoughnessTexture.c_str() );
             g_constantCache.cache.PbrMaps[idx].data = gl::MakeTextureResident( matData->materialMap.GetHandle() );
         }
-        else
-        {
-            matData->metallic  = mat->metallic;
+        else {
+            matData->metallic = mat->metallic;
             matData->roughness = mat->roughness;
         }
 
-        if ( !mat->normalTexture.empty() )
-        {
+        if ( !mat->normalTexture.empty() ) {
             matData->normalMap.create2DImageFromFile( mat->normalTexture.c_str() );
             g_constantCache.cache.NormalMaps[idx].data = gl::MakeTextureResident( matData->normalMap.GetHandle() );
-            Com_PrintInfo( "material has bump %s", mat->normalTexture.c_str() );
+            LOG_INFO( "material has bump %s", mat->normalTexture.c_str() );
         }
 
         matData->textureMapIdx = idx;
@@ -155,20 +145,19 @@ void MainRenderer::createGpuResources()
         mat->gpuResource = g_materialdata.back().get();
     }
 
-    g_constantCache.cache.ShadowMap                  = gl::MakeTextureResident( g_shadowRT.GetDepthTexture().GetHandle() );
-    g_constantCache.cache.GbufferDepthMap            = gl::MakeTextureResident( g_gbufferRT.GetDepthTexture().GetHandle() );
+    g_constantCache.cache.ShadowMap = gl::MakeTextureResident( g_shadowRT.GetDepthTexture().GetHandle() );
+    g_constantCache.cache.GbufferDepthMap = gl::MakeTextureResident( g_gbufferRT.GetDepthTexture().GetHandle() );
     g_constantCache.cache.GbufferPositionMetallicMap = gl::MakeTextureResident( g_gbufferRT.GetColorAttachment( 0 ).GetHandle() );
-    g_constantCache.cache.GbufferNormalRoughnessMap  = gl::MakeTextureResident( g_gbufferRT.GetColorAttachment( 1 ).GetHandle() );
-    g_constantCache.cache.GbufferAlbedoMap           = gl::MakeTextureResident( g_gbufferRT.GetColorAttachment( 2 ).GetHandle() );
-    g_constantCache.cache.VoxelAlbedoMap             = gl::MakeTextureResident( m_albedoVoxel.GetHandle() );
-    g_constantCache.cache.VoxelNormalMap             = gl::MakeTextureResident( m_normalVoxel.GetHandle() );
-    g_constantCache.cache.SSAOMap                    = gl::MakeTextureResident( g_ssaoRT.GetColorAttachment().GetHandle() );
-    g_constantCache.cache.FinalImage                 = gl::MakeTextureResident( g_finalImageRT.GetColorAttachment().GetHandle() );
-    g_constantCache.cache.FXAA                       = gl::MakeTextureResident( g_fxaaRT.GetColorAttachment().GetHandle() );
+    g_constantCache.cache.GbufferNormalRoughnessMap = gl::MakeTextureResident( g_gbufferRT.GetColorAttachment( 1 ).GetHandle() );
+    g_constantCache.cache.GbufferAlbedoMap = gl::MakeTextureResident( g_gbufferRT.GetColorAttachment( 2 ).GetHandle() );
+    g_constantCache.cache.VoxelAlbedoMap = gl::MakeTextureResident( m_albedoVoxel.GetHandle() );
+    g_constantCache.cache.VoxelNormalMap = gl::MakeTextureResident( m_normalVoxel.GetHandle() );
+    g_constantCache.cache.SSAOMap = gl::MakeTextureResident( g_ssaoRT.GetColorAttachment().GetHandle() );
+    g_constantCache.cache.FinalImage = gl::MakeTextureResident( g_finalImageRT.GetColorAttachment().GetHandle() );
+    g_constantCache.cache.FXAA = gl::MakeTextureResident( g_fxaaRT.GetColorAttachment().GetHandle() );
 
     char buffer[kMaxOSPath];
-    for ( int idx = 0; idx < 1; ++idx )
-    {
+    for ( int idx = 0; idx < 1; ++idx ) {
         Com_FsBuildPath( buffer, kMaxOSPath, "pointlight.png", "data/images" );
         m_lightIcons[idx].create2DImageFromFile( buffer );
         g_constantCache.cache.LightIconTextures[idx].data = gl::MakeTextureResident( m_lightIcons[idx].GetHandle() );
@@ -195,20 +184,20 @@ void MainRenderer::visualizeVoxels()
 
 struct MaterialCache {
     vec4 albedo_color;  // if it doesn't have albedo color, then it's alpha is 0.0f
-    float metallic                       = 0.0f;
-    float roughness                      = 0.0f;
+    float metallic = 0.0f;
+    float roughness = 0.0f;
     float has_metallic_roughness_texture = 0.0f;
-    float has_normal_texture             = 0.0f;
-    float reflect                        = 0.0f;
+    float has_normal_texture = 0.0f;
+    float reflect = 0.0f;
 
     MaterialCache& operator=( const MaterialData& mat )
     {
-        albedo_color                   = mat.albedoColor;
-        roughness                      = mat.roughness;
-        metallic                       = mat.metallic;
-        reflect                        = mat.reflectPower;
+        albedo_color = mat.albedoColor;
+        roughness = mat.roughness;
+        metallic = mat.metallic;
+        reflect = mat.reflectPower;
         has_metallic_roughness_texture = mat.materialMap.GetHandle() == 0 ? 0.0f : 1.0f;
-        has_normal_texture             = mat.normalMap.GetHandle() == 0 ? 0.0f : 1.0f;
+        has_normal_texture = mat.normalMap.GetHandle() == 0 ? 0.0f : 1.0f;
 
         return *this;
     }
@@ -216,7 +205,7 @@ struct MaterialCache {
 
 void MainRenderer::renderToVoxelTexture()
 {
-    const Scene& scene  = Com_GetScene();
+    const Scene& scene = Com_GetScene();
     const int voxelSize = Dvar_GetInt( r_voxelSize );
 
     glDisable( GL_CULL_FACE );
@@ -229,20 +218,17 @@ void MainRenderer::renderToVoxelTexture()
     m_normalVoxel.bindImageTexture( IMAGE_VOXEL_NORMAL_SLOT );
     m_voxelProgram.Use();
 
-    for ( const GeometryNode& node : scene.geometryNodes )
-    {
+    for ( const GeometryNode& node : scene.geometryNodes ) {
         g_perBatchCache.cache.Model = node.transform;
-        g_perBatchCache.cache.PVM   = g_perFrameCache.cache.PV * node.transform;
+        g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * node.transform;
         g_perBatchCache.Update();
 
-        for ( const Geometry& geom : node.geometries )
-        {
-            if ( !geom.visible )
-            {
+        for ( const Geometry& geom : node.geometries ) {
+            if ( !geom.visible ) {
                 continue;
             }
 
-            const MeshData* drawData    = reinterpret_cast<const MeshData*>( geom.mesh->gpuResource );
+            const MeshData* drawData = reinterpret_cast<const MeshData*>( geom.mesh->gpuResource );
             const MaterialData* matData = reinterpret_cast<const MaterialData*>( geom.material->gpuResource );
 
             FillMaterialCB( matData, g_materialCache.cache );
@@ -296,16 +282,14 @@ void MainRenderer::render()
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     R_ShadowPass();
 
-    if ( scene.dirty || Dvar_GetBool( r_forceVXGI ) )
-    {
+    if ( scene.dirty || Dvar_GetBool( r_forceVXGI ) ) {
         m_albedoVoxel.clear();
         m_normalVoxel.clear();
         renderToVoxelTexture();
     }
 
     ivec2 extent = MainWindow::FrameSize();
-    if ( extent.x * extent.y > 0 )
-    {
+    if ( extent.x * extent.y > 0 ) {
         // skip rendering if minimized
         glViewport( 0, 0, extent.x, extent.y );
 
@@ -314,8 +298,7 @@ void MainRenderer::render()
 
         const int mode = Dvar_GetInt( r_debugTexture );
 
-        switch ( mode )
-        {
+        switch ( mode ) {
             case DrawTexture::TEXTURE_VOXEL_ALBEDO:
             case DrawTexture::TEXTURE_VOXEL_NORMAL:
                 visualizeVoxels();
@@ -325,8 +308,7 @@ void MainRenderer::render()
                 R_FXAA_Pass();
 
                 renderFrameBufferTextures( extent );
-            }
-            break;
+            } break;
         }
 
         R_DrawEditor();

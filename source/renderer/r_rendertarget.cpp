@@ -1,12 +1,12 @@
 #include "r_rendertarget.h"
 
+#include "Base/Asserts.h"
+#include "Base/Logger.h"
+
 #include "common/com_dvars.h"
 #include "common/main_window.h"
 #include "r_cbuffers.h"
-#include "universal/core_assert.h"
 #include "universal/dvar_api.h"
-#include "universal/print.h"
-#include "universal/universal.h"
 
 void RenderTarget::Bind()
 {
@@ -21,8 +21,7 @@ void RenderTarget::Unbind()
 void RenderTarget::Destroy()
 {
     mDepthAttachment.destroy();
-    for ( int i = 0; i < mColorAttachmentCount; ++i )
-    {
+    for ( int i = 0; i < mColorAttachmentCount; ++i ) {
         mColorAttachments[i].destroy();
     }
 
@@ -33,8 +32,8 @@ void RenderTarget::Destroy()
 void RenderTarget::CreateDepthAttachment()
 {
     Texture2DCreateInfo info{};
-    info.width    = mWidth;
-    info.height   = mHeight;
+    info.width = mWidth;
+    info.height = mHeight;
     info.dataType = GL_FLOAT;
     info.format = info.internalFormat = GL_DEPTH_COMPONENT;
     info.minFilter = info.magFilter = GL_NEAREST;
@@ -53,7 +52,7 @@ void RenderTarget::CreateDepthAttachment()
 
 void RenderTarget::Create( int width, int height )
 {
-    mWidth  = width;
+    mWidth = width;
     mHeight = height;
     glGenFramebuffers( 1, &mHandle );
 }
@@ -77,19 +76,18 @@ void DepthRenderTarget::Create( int width, int height )
 
 void RenderTarget::CheckError()
 {
-    if ( glCheckFramebufferStatus( GL_FRAMEBUFFER ) != GL_FRAMEBUFFER_COMPLETE )
-    {
-        Com_PrintError( "Frame buffer not completed" );
+    if ( glCheckFramebufferStatus( GL_FRAMEBUFFER ) != GL_FRAMEBUFFER_COMPLETE ) {
+        LOG_ERROR( "Frame buffer not completed" );
     }
 }
 
 // TODO: expose
 enum {
-    POSISION   = 0,
-    NORMAL     = 1,
-    ALBEDO     = 2,
+    POSISION = 0,
+    NORMAL = 1,
+    ALBEDO = 2,
     FINALIMAGE = 0,
-    SSAO       = 0
+    SSAO = 0
 };
 
 void GBuffer::Create( int width, int height )
@@ -101,10 +99,10 @@ void GBuffer::Create( int width, int height )
     Bind();
 
     Texture2DCreateInfo info{};
-    info.width          = width;
-    info.height         = height;
-    info.dataType       = GL_FLOAT;
-    info.format         = GL_RGBA;
+    info.width = width;
+    info.height = height;
+    info.dataType = GL_FLOAT;
+    info.format = GL_RGBA;
     info.internalFormat = GL_RGBA16F;
     info.minFilter = info.magFilter = GL_NEAREST;
 
@@ -128,7 +126,7 @@ void GBuffer::Create( int width, int height )
 
     // albedo
     info.internalFormat = GL_RGBA;
-    info.dataType       = GL_UNSIGNED_BYTE;
+    info.dataType = GL_UNSIGNED_BYTE;
     mColorAttachments[ALBEDO].create2DEmpty( info );
     glFramebufferTexture2D(
         GL_FRAMEBUFFER,
@@ -156,15 +154,15 @@ void SsaoRT::Create( int width, int height )
     Bind();
 
     Texture2DCreateInfo info{};
-    info.width     = width;
-    info.height    = height;
+    info.width = width;
+    info.height = height;
     info.minFilter = info.magFilter = GL_NEAREST;
 
     // info.dataType       = GL_UNSIGNED_BYTE;
     // info.format         = GL_RGBA;
     // info.internalFormat = GL_RGBA;
-    info.dataType       = GL_FLOAT;
-    info.format         = GL_RED;
+    info.dataType = GL_FLOAT;
+    info.format = GL_RED;
     info.internalFormat = GL_R32F;
 
     // position
@@ -192,12 +190,12 @@ void FinalImageRT::Create( int width, int height )
     Bind();
 
     Texture2DCreateInfo info{};
-    info.width     = width;
-    info.height    = height;
+    info.width = width;
+    info.height = height;
     info.minFilter = info.magFilter = GL_NEAREST;
-    info.dataType                   = GL_UNSIGNED_BYTE;
-    info.format                     = GL_RGBA;
-    info.internalFormat             = GL_RGBA;
+    info.dataType = GL_UNSIGNED_BYTE;
+    info.format = GL_RGBA;
+    info.internalFormat = GL_RGBA;
 
     // position
     const int slot = FINALIMAGE;
@@ -225,11 +223,11 @@ FinalImageRT g_fxaaRT;
 void R_CreateRT()
 {
     const ivec2 extent = MainWindow::FrameSize();
-    const int w        = extent.x;
-    const int h        = extent.y;
+    const int w = extent.x;
+    const int h = extent.y;
 
     const int res = Dvar_GetInt( r_shadowRes );
-    core_assert( is_power_of_two( res ) );
+    ASSERT( is_power_of_two( res ) );
 
     // g_shadowRT.Create( NUM_CASCADES * res, res );
     g_shadowRT.Create( res, res );
@@ -241,8 +239,7 @@ void R_CreateRT()
 
 void R_DestroyRT()
 {
-    for ( auto& rt : g_rts )
-    {
+    for ( auto& rt : g_rts ) {
         rt->Destroy();
     }
 }

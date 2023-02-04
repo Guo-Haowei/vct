@@ -4,8 +4,9 @@
 
 #include "com_dvars.h"
 #include "imgui/imgui.h"
-#include "universal/core_assert.h"
-#include "universal/print.h"
+
+#include "Base/Asserts.h"
+#include "Base/Logger.h"
 
 namespace MainWindow {
 
@@ -18,10 +19,10 @@ static constexpr const char TITLE[] = "Editor";
 
 bool Init()
 {
-    core_assert( !g_initialized );
+    ASSERT( !g_initialized );
 
     glfwSetErrorCallback( []( int code, const char* desc ) {
-        Com_PrintFatal( "[glfw] error(%d): %s", code, desc );
+        LOG_FATAL( "[glfw] error(%d): %s", code, desc );
     } );
 
     glfwInit();
@@ -31,8 +32,7 @@ bool Init()
     glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
     glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 6 );
     glfwWindowHint( GLFW_RESIZABLE, GLFW_FALSE );
-    if ( Dvar_GetBool( r_debug ) )
-    {
+    if ( Dvar_GetBool( r_debug ) ) {
         glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, 1 );
     }
 
@@ -40,8 +40,7 @@ bool Init()
 
     const ivec2 maxSize = ivec2( vidmode->width, vidmode->height );
     ivec2 size( Dvar_GetInt( wnd_width ), Dvar_GetInt( wnd_height ) );
-    if ( size.x == 0 || size.y == 0 )
-    {
+    if ( size.x == 0 || size.y == 0 ) {
         size.x = int( 0.8f * maxSize.x );
         size.y = int( 0.8f * maxSize.y );
     }
@@ -53,7 +52,7 @@ bool Init()
     g_window = glfwCreateWindow( int( size.x ), int( size.y ), TITLE, 0, 0 );
     glfwMakeContextCurrent( g_window );
 
-    Com_PrintSuccess( "MainWindow created %d x %d", size.x, size.y );
+    LOG_OK( "MainWindow created %d x %d", size.x, size.y );
     glfwGetFramebufferSize( g_window, &g_frameSize.x, &g_frameSize.y );
     return g_initialized = true;
 }
@@ -71,7 +70,7 @@ void Shutdown()
 
 GLFWwindow* GetRaw()
 {
-    core_assert( g_initialized && g_window );
+    ASSERT( g_initialized && g_window );
     return g_window;
 }
 

@@ -41,7 +41,7 @@ char* Com_FsAbsolutePath( char* path );
 class ComFileWrapper {
     ComFile file;
 
-   public:
+public:
     ComFileWrapper( ComFile file )
         : file( file )
     {

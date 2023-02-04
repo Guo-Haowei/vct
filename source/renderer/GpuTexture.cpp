@@ -3,8 +3,8 @@
 
 #include <string>
 
-#include "universal/core_assert.h"
-#include "universal/print.h"
+#include "Base/Asserts.h"
+#include "Base/Logger.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -29,7 +29,7 @@ void GpuTexture::genMipMap()
 
 void GpuTexture::create2DEmpty( const Texture2DCreateInfo& info )
 {
-    m_type   = GL_TEXTURE_2D;
+    m_type = GL_TEXTURE_2D;
     m_format = info.internalFormat;
 
     glGenTextures( 1, &mHandle );
@@ -51,7 +51,7 @@ void GpuTexture::create2DEmpty( const Texture2DCreateInfo& info )
 
 void GpuTexture::create3DEmpty( const Texture3DCreateInfo& info )
 {
-    m_type   = GL_TEXTURE_3D;
+    m_type = GL_TEXTURE_3D;
     m_format = info.format;
 
     glGenTextures( 1, &mHandle );
@@ -71,9 +71,8 @@ void GpuTexture::create2DImageFromFile( const char* path )
     int width, height, channel;
     unsigned char* image = stbi_load( path, &width, &height, &channel, 4 );
 
-    if ( !image )
-    {
-        Com_PrintError( "stb: failed to load image '%s'", path );
+    if ( !image ) {
+        LOG_ERROR( "stb: failed to load image '%s'", path );
     }
 
     glGenTextures( 1, &mHandle );
@@ -100,8 +99,7 @@ void GpuTexture::create2DImageFromFile( const char* path )
 
 void GpuTexture::destroy()
 {
-    if ( mHandle != 0 )
-    {
+    if ( mHandle != 0 ) {
         glDeleteTextures( 1, &mHandle );
     }
     mHandle = 0;
