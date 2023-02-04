@@ -1,8 +1,13 @@
 #pragma once
+#pragma warning( push )
+#pragma warning( disable : 4201 )
+
 #include "glm/glm.hpp"
 #include "glm/gtc/constants.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/vector_angle.hpp"
+
+#pragma warning( pop )
 #ifdef assert
 #undef assert
 #endif
@@ -41,7 +46,7 @@ using glm::mat4;
 struct AABB {
     vec3 min, max;
 
-    constexpr AABB::AABB()
+    constexpr AABB()
         : min( vec3( std::numeric_limits<float>::infinity() ) )
         , max( vec3( -std::numeric_limits<float>::infinity() ) )
     {
@@ -61,8 +66,8 @@ struct AABB {
     void FromCenterSize( const vec3& center, const vec3& size )
     {
         vec3 half = 0.5f * size;
-        min       = center - half;
-        max       = center + half;
+        min = center - half;
+        max = center + half;
     }
 
     vec3 Center() const

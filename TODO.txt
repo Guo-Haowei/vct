@@ -1,0 +1,2 @@
+1. remove docking
+2. split to multiple libs

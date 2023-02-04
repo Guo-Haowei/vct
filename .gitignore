@@ -1,3 +1,11 @@
 build*/
 .vscode/
 data/models/
+
+# vs
+.vs/
+x64/
+Debug/
+Release/
+*.vcxproj.user
+*.args.json
