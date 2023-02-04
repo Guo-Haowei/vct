@@ -1096,7 +1096,6 @@ ImGuiIO::ImGuiIO()
     DisplaySize = ImVec2(-1.0f, -1.0f);
     DeltaTime = 1.0f / 60.0f;
     IniSavingRate = 5.0f;
-    IniFilenameLoad = nullptr; 
     IniFilenameSave = "imgui.ini"; 
     LogFilename = "imgui_log.txt";
     MouseDoubleClickTime = 0.30f;
@@ -11035,8 +11034,8 @@ void ImGui::UpdateSettings()
     if (!g.SettingsLoaded)
     {
         IM_ASSERT(g.SettingsWindows.empty());
-        if (g.IO.IniFilenameLoad)
-            LoadIniSettingsFromDisk(g.IO.IniFilenameLoad);
+        if (g.IO.IniFilenameSave)
+            LoadIniSettingsFromDisk(g.IO.IniFilenameSave);
         g.SettingsLoaded = true;
     }
 

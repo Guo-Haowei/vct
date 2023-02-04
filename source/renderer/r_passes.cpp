@@ -4,9 +4,9 @@
 
 #include "Base/Asserts.h"
 
-#include "common/com_dvars.h"
-#include "common/com_misc.h"
-#include "common/main_window.h"
+#include "Core/com_dvars.h"
+#include "Core/com_misc.h"
+#include "Core/WindowManager.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"
 #include "r_rendertarget.h"

@@ -1,17 +1,19 @@
-#include "com_cmdline.h"
-#include "com_filesystem.h"
+#include "FileManager.h"
 #include "com_misc.h"
 #include "editor.h"
 #include "imgui/imgui.h"
 #include "imgui_impl_glfw.h"
-#include "main_window.h"
 #include "renderer/MainRenderer.h"
 #include "renderer/imgui_impl_opengl3.h"
-#include "renderer/r_graphics.h"
 #include "universal/core_math.h"
+#include "universal/dvar_api.h"
 
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
+
+#include "Core/FileManager.h"
+#include "Core/GraphicsManager.h"
+#include "Core/WindowManager.h"
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -22,17 +24,20 @@ static int app_main( int argc, const char** argv )
 {
     bool ok = true;
 
-    ok = ok && Com_FsInit();
     ok = ok && Com_RegisterDvars();
-    ok = ok && Com_ProcessCmdLine( argc - 1, argv + 1 );
+    ok = ok && dvar_process_from_cmdline( argc - 1, argv + 1 );
+
+    ok = ok && manager_init( g_fileMgr );
+
     ok = ok && Com_LoadScene();
     ok = ok && Com_ImGuiInit();
-    ok = ok && MainWindow::Init();
-    ok = ok && R_Init();
+
+    ok = ok && manager_init( g_wndMgr );
+    ok = ok && manager_init( g_gfxMgr );
 
     EditorSetupStyle();
 
-    ImGui_ImplGlfw_Init( MainWindow::GetRaw() );
+    ImGui_ImplGlfw_Init( g_wndMgr->GetHandle() );
 
     ImGui_ImplOpenGL3_Init();
     ImGui_ImplOpenGL3_CreateDeviceObjects();
@@ -40,8 +45,8 @@ static int app_main( int argc, const char** argv )
     MainRenderer renderer;
     renderer.createGpuResources();
 
-    while ( !MainWindow::ShouldClose() ) {
-        MainWindow::NewFrame();
+    while ( !g_wndMgr->ShouldClose() ) {
+        g_wndMgr->NewFrame();
         ImGui_ImplGlfw_NewFrame();
 
         ImGui::NewFrame();
@@ -58,7 +63,7 @@ static int app_main( int argc, const char** argv )
         ImGui::RenderPlatformWindowsDefault();
         glfwMakeContextCurrent( backup_current_context );
 
-        MainWindow::Present();
+        g_wndMgr->Present();
 
         Com_GetScene().dirty = false;
     }
@@ -68,7 +73,10 @@ static int app_main( int argc, const char** argv )
 
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-    MainWindow::Shutdown();
+
+    manager_deinit( g_gfxMgr );
+    manager_deinit( g_wndMgr );
+    manager_deinit( g_fileMgr );
 
     return ok ? 0 : 1;
 }

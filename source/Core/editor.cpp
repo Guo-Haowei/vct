@@ -4,8 +4,8 @@
 #include <GLFW/glfw3.h>
 
 #include "com_dvars.h"
-#include "common/com_misc.h"
-#include "common/main_window.h"
+#include "Core/com_misc.h"
+#include "Core/WindowManager.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 #include "renderer/r_cbuffers.h"
@@ -228,9 +228,9 @@ void Editor::Update()
     Scene& scene = Com_GetScene();
 
     // select object
-    if ( !io.WantCaptureMouse && MainWindow::IsMouseInScreen() ) {
-        const vec2 mousePos = MainWindow::MousePos();
-        const ivec2 extent = MainWindow::FrameSize();
+    if ( !io.WantCaptureMouse && g_wndMgr->IsMouseInScreen() ) {
+        const vec2 mousePos = g_wndMgr->MousePos();
+        const ivec2 extent = g_wndMgr->FrameSize();
         if ( ImGui::IsMouseClicked( GLFW_MOUSE_BUTTON_1 ) ) {
             const Camera& camera = scene.camera;
 

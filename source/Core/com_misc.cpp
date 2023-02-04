@@ -2,9 +2,9 @@
 
 #include <filesystem>
 
-#include "com_filesystem.h"
+#include "FileManager.h"
 #include "imgui/imgui.h"
-#include "main_window.h"
+#include "WindowManager.h"
 #include "renderer/r_cbuffers.h"
 #include "renderer/r_sun_shadow.h"
 #include "scene/scene_loader.h"
@@ -57,11 +57,9 @@ bool Com_LoadScene()
 
     Camera& camera = scene.camera;
 
-    const vec4 cascades = Dvar_GetVec4( cam_cascades );
-
     camera.fovy = glm::radians( Dvar_GetFloat( cam_fov ) );
-    camera.zNear = cascades[0];
-    camera.zFar = cascades[3];
+    camera.zNear = .1f;
+    camera.zFar = 1000.f;
 
     camera.yaw = glm::radians( 180.0f );
     camera.pitch = 0.0f;
@@ -91,24 +89,10 @@ Scene& Com_GetScene()
 
 bool Com_ImGuiInit()
 {
-    constexpr char kDefaultIniFileName[] = "imgui.ini";
-    constexpr char kDefaultEditorLayout[] = "default/imgui.ini";
-    static char s_iniFileNameLoad[kMaxOSPath];
-
-    if ( std::filesystem::exists( kDefaultIniFileName ) ) {
-        strncpy( s_iniFileNameLoad, kDefaultIniFileName, sizeof( s_iniFileNameLoad ) );
-    }
-    else {
-        Com_FsBuildPath( s_iniFileNameLoad, kMaxOSPath, kDefaultEditorLayout );
-    }
-
-    LOG_DEBUG( "[imgui] loading imgui config from '%s'", s_iniFileNameLoad );
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
     ImGuiIO& io = ImGui::GetIO();
-    io.IniFilenameLoad = s_iniFileNameLoad;
-    io.IniFilenameSave = kDefaultIniFileName;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // Enable Docking
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;    // Enable Multi-Viewport / Platform Windows
@@ -126,7 +110,7 @@ void Com_UpdateWorld()
     Scene& scene = Com_GetScene();
 
     // update camera
-    const ivec2 extent = MainWindow::FrameSize();
+    const ivec2 extent = g_wndMgr->FrameSize();
     const float aspect = (float)extent.x / extent.y;
     ASSERT( aspect > 0.0f );
 
@@ -150,7 +134,7 @@ void Com_UpdateWorld()
     g_perFrameCache.cache.View = camera.View();
     g_perFrameCache.cache.Proj = camera.Proj();
     g_perFrameCache.cache.PV = camera.ProjView();
-    g_perFrameCache.cache.CascadedClipZ = Dvar_GetVec4( cam_cascades );
+    //g_perFrameCache.cache.CascadedClipZ = Dvar_GetVec4( cam_cascades );
     g_perFrameCache.cache.EnableGI = Dvar_GetBool( r_enableVXGI );
     g_perFrameCache.cache.DebugCSM = Dvar_GetBool( r_debugCSM );
     g_perFrameCache.cache.DebugTexture = Dvar_GetInt( r_debugTexture );

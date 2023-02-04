@@ -27,12 +27,12 @@ void Print( unsigned short style, const char* message )
 void Log( Level level, const char* fmt, ... )
 {
     constexpr const char* s_tags[] = {
-        "[FATAL]- ",
-        "[ERROR]- ",
-        "[WARN] - ",
-        "[INFO] - ",
-        "[DEBUG]- ",
-        "[OK]   - ",
+        "[FATAL]: ",
+        "[ERROR]: ",
+        "[WARN] : ",
+        "[INFO] : ",
+        "[DEBUG]: ",
+        "[OK]   : ",
     };
 
     static_assert( array_length( s_tags ) == static_cast<int>( Level::Count ) );

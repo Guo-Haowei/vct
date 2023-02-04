@@ -3,12 +3,12 @@
 
 #include "Base/Asserts.h"
 
-#include "common/com_dvars.h"
-#include "common/com_filesystem.h"
-#include "common/com_misc.h"
-#include "common/editor.h"
-#include "common/geometry.h"
-#include "common/main_window.h"
+#include "Core/com_dvars.h"
+#include "Core/com_misc.h"
+#include "Core/editor.h"
+#include "Core/geometry.h"
+#include "Core/FileManager.h"
+#include "Core/WindowManager.h"
 #include "r_defines.h"
 #include "r_editor.h"
 #include "r_passes.h"
@@ -156,10 +156,9 @@ void MainRenderer::createGpuResources()
     g_constantCache.cache.FinalImage = gl::MakeTextureResident( g_finalImageRT.GetColorAttachment().GetHandle() );
     g_constantCache.cache.FXAA = gl::MakeTextureResident( g_fxaaRT.GetColorAttachment().GetHandle() );
 
-    char buffer[kMaxOSPath];
     for ( int idx = 0; idx < 1; ++idx ) {
-        Com_FsBuildPath( buffer, kMaxOSPath, "pointlight.png", "data/images" );
-        m_lightIcons[idx].create2DImageFromFile( buffer );
+        std::string path = g_fileMgr->BuildAbsPath( "pointlight.png", "data/images" );
+        m_lightIcons[idx].create2DImageFromFile( path.c_str() );
         g_constantCache.cache.LightIconTextures[idx].data = gl::MakeTextureResident( m_lightIcons[idx].GetHandle() );
     }
 
@@ -288,7 +287,7 @@ void MainRenderer::render()
         renderToVoxelTexture();
     }
 
-    ivec2 extent = MainWindow::FrameSize();
+    ivec2 extent = g_wndMgr->FrameSize();
     if ( extent.x * extent.y > 0 ) {
         // skip rendering if minimized
         glViewport( 0, 0, extent.x, extent.y );

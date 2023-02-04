@@ -10,8 +10,8 @@
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
 
-#include "common/com_dvars.h"
-#include "common/com_filesystem.h"
+#include "Core/com_dvars.h"
+#include "Core/FileManager.h"
 #include "universal/dvar_api.h"
 
 using std::string;
@@ -19,9 +19,8 @@ using std::vector;
 
 void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transform, bool flipUVs )
 {
-    char fullpath[kMaxOSPath];
-    Com_FsBuildPath( fullpath, kMaxOSPath, path, "" );
-    LOG_DEBUG( "[assimp] loading model from '%s'", fullpath );
+    string fullpath = g_fileMgr->BuildAbsPath( path );
+    LOG_DEBUG( "[assimp] loading model from '%s'", fullpath.c_str() );
 
     Assimp::Importer importer;
 
@@ -32,7 +31,7 @@ void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transfor
     // check for errors
     if ( !aiscene || aiscene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !aiscene->mRootNode )  // if is Not Zero
     {
-        LOG_ERROR( "[assimp] failed to load scene '%s'\n\tdetails: %s", fullpath, importer.GetErrorString() );
+        LOG_ERROR( "[assimp] failed to load scene '%s'\n\tdetails: %s", fullpath.c_str(), importer.GetErrorString() );
     }
 
     const uint32_t numMeshes    = aiscene->mNumMeshes;

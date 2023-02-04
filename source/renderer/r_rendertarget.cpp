@@ -3,8 +3,9 @@
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
 
-#include "common/com_dvars.h"
-#include "common/main_window.h"
+#include "Core/WindowManager.h"
+#include "Core/com_dvars.h"
+
 #include "r_cbuffers.h"
 #include "universal/dvar_api.h"
 
@@ -222,7 +223,7 @@ FinalImageRT g_fxaaRT;
 
 void R_CreateRT()
 {
-    const ivec2 extent = MainWindow::FrameSize();
+    const ivec2 extent = g_wndMgr->FrameSize();
     const int w = extent.x;
     const int h = extent.y;
 

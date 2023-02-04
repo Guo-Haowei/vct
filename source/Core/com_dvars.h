@@ -1,7 +1,6 @@
 #include "universal/dvar_begin.h"
 
-DVAR_STRING( fs_root, "" );
-
+DVAR_STRING( fs_base, "" );
 DVAR_STRING( scene, "" );
 DVAR_FLOAT( scene_scale, 1.0f );
 
@@ -12,7 +11,6 @@ DVAR_INT( wnd_frameless, 0 );
 
 // camera
 DVAR_VEC3( cam_pos, -8.f, 2.f, 0.f );
-DVAR_VEC4( cam_cascades, 0.1f, 8.0f, 18.0f, 50.0f );
 DVAR_FLOAT( cam_fov, 60.0f );
 
 // light

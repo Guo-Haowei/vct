@@ -3,9 +3,9 @@
 #include "Base/Asserts.h"
 
 #include "GpuTexture.h"
-#include "common/com_filesystem.h"
-#include "common/com_misc.h"
-#include "common/geometry.h"
+#include "Core/FileManager.h"
+#include "Core/com_misc.h"
+#include "Core/geometry.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"
 #include "r_shader.h"

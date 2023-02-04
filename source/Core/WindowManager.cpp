@@ -1,4 +1,4 @@
-#include "main_window.h"
+#include "WindowManager.h"
 
 #include <GLFW/glfw3.h>
 
@@ -8,19 +8,12 @@
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
 
-namespace MainWindow {
-
-static bool g_initialized;
-static GLFWwindow* g_window;
-static ivec2 g_frameSize;
-static vec2 g_mousePos;
-
 static constexpr const char TITLE[] = "Editor";
 
-bool Init()
-{
-    ASSERT( !g_initialized );
+WindowManager* g_wndMgr = new WindowManager();
 
+bool WindowManager::Init()
+{
     glfwSetErrorCallback( []( int code, const char* desc ) {
         LOG_FATAL( "[glfw] error(%d): %s", code, desc );
     } );
@@ -49,43 +42,43 @@ bool Init()
 
     size = glm::clamp( size, MIN_FRAME_SIZE, maxSize );
 
-    g_window = glfwCreateWindow( int( size.x ), int( size.y ), TITLE, 0, 0 );
-    glfwMakeContextCurrent( g_window );
+    m_window = glfwCreateWindow( int( size.x ), int( size.y ), TITLE, 0, 0 );
+    glfwMakeContextCurrent( m_window );
+    glfwGetFramebufferSize( m_window, &m_frameSize.x, &m_frameSize.y );
 
-    LOG_OK( "MainWindow created %d x %d", size.x, size.y );
-    glfwGetFramebufferSize( g_window, &g_frameSize.x, &g_frameSize.y );
-    return g_initialized = true;
+    return ( m_initialized = true );
 }
 
-bool ShouldClose()
+void WindowManager::Deinit()
 {
-    return glfwWindowShouldClose( g_window );
-}
-
-void Shutdown()
-{
-    glfwDestroyWindow( g_window );
+    glfwDestroyWindow( m_window );
     glfwTerminate();
+    m_initialized = false;
 }
 
-GLFWwindow* GetRaw()
+bool WindowManager::ShouldClose()
 {
-    ASSERT( g_initialized && g_window );
-    return g_window;
+    return glfwWindowShouldClose( m_window );
 }
 
-void NewFrame()
+GLFWwindow* WindowManager::GetHandle()
+{
+    ASSERT( m_initialized && m_window );
+    return m_window;
+}
+
+void WindowManager::NewFrame()
 {
     glfwPollEvents();
-    ivec2& size = g_frameSize;
-    glfwGetFramebufferSize( g_window, &size.x, &size.y );
+    ivec2& size = m_frameSize;
+    glfwGetFramebufferSize( m_window, &size.x, &size.y );
 
     // mouse position
     {
         double x, y;
-        glfwGetCursorPos( g_window, &x, &y );
-        g_mousePos.x = static_cast<float>( x );
-        g_mousePos.y = static_cast<float>( y );
+        glfwGetCursorPos( m_window, &x, &y );
+        m_mousePos.x = static_cast<float>( x );
+        m_mousePos.y = static_cast<float>( y );
     }
 
     // title
@@ -94,39 +87,39 @@ void NewFrame()
               "%s | Size: %d x %d | Mouse: %d x %d | FPS: %.1f",
               TITLE,
               size.x, size.y,
-              int( g_mousePos.x ), int( g_mousePos.y ),
+              int( m_mousePos.x ), int( m_mousePos.y ),
               ImGui::GetIO().Framerate );
-    glfwSetWindowTitle( g_window, buffer );
+    glfwSetWindowTitle( m_window, buffer );
 }
 
-ivec2 FrameSize()
+ivec2 WindowManager::FrameSize()
 {
-    return g_frameSize;
+    ASSERT( m_initialized && m_window );
+    return m_frameSize;
 }
 
-void Present()
+void WindowManager::Present()
 {
-    glfwSwapBuffers( g_window );
+    glfwSwapBuffers( m_window );
 }
 
-vec2 MousePos()
+vec2 WindowManager::MousePos()
 {
-    return g_mousePos;
+    ASSERT( m_initialized && m_window );
+    return m_mousePos;
 }
 
-bool IsKeyDown( int code )
+bool WindowManager::IsKeyDown( int code )
 {
     return ImGui::IsKeyDown( code );
 }
 
-bool IsMouseInScreen()
+bool WindowManager::IsMouseInScreen()
 {
     bool inside = true;
-    inside &= g_mousePos.x >= 0;
-    inside &= g_mousePos.y >= 0;
-    inside &= g_mousePos.x <= g_frameSize.x;
-    inside &= g_mousePos.y <= g_frameSize.y;
+    inside &= m_mousePos.x >= 0;
+    inside &= m_mousePos.y >= 0;
+    inside &= m_mousePos.x <= m_frameSize.x;
+    inside &= m_mousePos.y <= m_frameSize.y;
     return inside;
 }
-
-}  // namespace MainWindow
