@@ -8,7 +8,8 @@
 #include "Core/geometry.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"
-#include "r_shader.h"
+
+#include "GraphicsManager.hpp"
 
 struct VertexPoint3D {
     vec3 position;
@@ -110,13 +111,18 @@ void R_DrawEditor()
         const AABB box = node->boundingBox;
         const mat4 M = glm::translate( mat4( 1 ), box.Center() ) * glm::scale( mat4( 1 ), box.Size() );
 
-        R_GetShaderProgram( ProgramType::LINE3D ).Use();
+        auto PSO = g_pPipelineStateManager->GetPipelineState( "LINE3D" );
+        g_gfxMgr->SetPipelineState( PSO );
+
         glBindVertexArray( g_boxWireFrame.vao );
         g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
         g_perBatchCache.cache.Model = mat4( 1 );
         g_perBatchCache.Update();
         glDrawElements( GL_LINES, g_boxWireFrame.count, GL_UNSIGNED_INT, 0 );
     }
+
+    int unused_for_warning;
+#if 0
 
     // draw light
     const Light& light = scene.light;
@@ -137,4 +143,5 @@ void R_DrawEditor()
         glBindVertexArray( g_imageBuffer.vao );
         glDrawArrays( GL_TRIANGLES, 0, 6 );
     }
+#endif
 }

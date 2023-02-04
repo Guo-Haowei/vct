@@ -3,8 +3,6 @@
 #include "editor.h"
 #include "imgui/imgui.h"
 #include "imgui_impl_glfw.h"
-#include "renderer/MainRenderer.h"
-#include "renderer/imgui_impl_opengl3.h"
 #include "universal/core_math.h"
 #include "universal/dvar_api.h"
 
@@ -12,8 +10,12 @@
 #include "Base/Logger.h"
 
 #include "Core/FileManager.h"
-#include "Core/GraphicsManager.h"
 #include "Core/WindowManager.h"
+
+#include "Graphics/MainRenderer.h"
+#include "Graphics/imgui_impl_opengl3.h"
+#include "Graphics/GraphicsManager.hpp"
+#include "Graphics/PipelineStateManager.hpp"
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -43,6 +45,9 @@ static int app_main( int argc, const char** argv )
     ImGui_ImplOpenGL3_CreateDeviceObjects();
 
     MainRenderer renderer;
+
+    // TODO: refactor
+    ok = ok && g_pPipelineStateManager->Init();
     renderer.createGpuResources();
 
     while ( !g_wndMgr->ShouldClose() ) {
@@ -67,6 +72,8 @@ static int app_main( int argc, const char** argv )
 
         Com_GetScene().dirty = false;
     }
+
+    g_pPipelineStateManager->Deinit();
 
     renderer.destroyGpuResources();
     ImGui_ImplOpenGL3_Shutdown();

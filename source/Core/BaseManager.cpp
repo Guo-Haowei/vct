@@ -1,9 +1,9 @@
-#include "IManager.h"
+#include "BaseManager.hpp"
 
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
 
-bool manager_init( IManager* manager )
+bool manager_init( BaseManager* manager )
 {
     ASSERT( manager && !manager->IsInitialized() );
     const char* debugName = manager->GetDebugName().c_str();
@@ -16,7 +16,7 @@ bool manager_init( IManager* manager )
     return true;
 }
 
-void manager_deinit( IManager* manager )
+void manager_deinit( BaseManager* manager )
 {
     ASSERT( manager && manager->IsInitialized() );
     LOG_INFO( "manager_deinit: Manager '%s' finalized", manager->GetDebugName().c_str() );

@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-#include "Base/IManager.h"
+#include "BaseManager.hpp"
 
 struct SystemFile {
     enum class Result {
@@ -58,10 +58,10 @@ public:
     inline SystemFile::Result Write( char* buffer, size_t size ) { return file.Write( buffer, size ); }
 };
 
-class FileManager : public IManager {
+class FileManager : _Inherits_ BaseManager {
 public:
     FileManager()
-        : IManager( "FileManager" )
+        : BaseManager( "FileManager" )
     {
     }
 

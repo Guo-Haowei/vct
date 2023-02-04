@@ -20,13 +20,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Asserts.cpp" />
-    <ClCompile Include="IManager.cpp" />
     <ClCompile Include="Logger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Asserts.h" />
     <ClInclude Include="Defines.h" />
-    <ClInclude Include="IManager.h" />
     <ClInclude Include="Logger.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

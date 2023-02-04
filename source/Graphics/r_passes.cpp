@@ -10,7 +10,9 @@
 #include "gl_utils.h"
 #include "r_cbuffers.h"
 #include "r_rendertarget.h"
-#include "r_shader.h"
+
+#include "Graphics/PipelineStateManager.hpp"
+#include "Graphics/GraphicsManager.hpp"
 
 static GLuint g_noiseTexture;
 
@@ -18,14 +20,12 @@ extern void FillMaterialCB( const MaterialData* mat, MaterialCB& cb );
 
 void R_Gbuffer_Pass()
 {
+    auto PSO = g_pPipelineStateManager->GetPipelineState( "GBUFFER" );
+    g_gfxMgr->SetPipelineState( PSO );
+
     Scene& scene = Com_GetScene();
-    const auto& program = R_GetShaderProgram( ProgramType::GBUFFER );
 
     g_gbufferRT.Bind();
-    program.Use();
-
-    glEnable( GL_DEPTH_TEST );
-    glEnable( GL_CULL_FACE );
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -54,53 +54,46 @@ void R_Gbuffer_Pass()
         }
     }
 
-    program.Stop();
     g_gbufferRT.Unbind();
 }
 
 void R_SSAO_Pass()
 {
-    const auto& shader = R_GetShaderProgram( ProgramType::SSAO );
+    auto PSO = g_pPipelineStateManager->GetPipelineState( "SSAO" );
+    g_gfxMgr->SetPipelineState( PSO );
 
     g_ssaoRT.Bind();
 
     glClear( GL_COLOR_BUFFER_BIT );
 
-    shader.Use();
-
     R_DrawQuad();
-
-    shader.Stop();
 
     g_ssaoRT.Unbind();
 }
 
 void R_Deferred_VCT_Pass()
 {
-    const auto& program = R_GetShaderProgram( ProgramType::VCT_DEFERRED );
+    auto PSO = g_pPipelineStateManager->GetPipelineState( "VCT" );
+    g_gfxMgr->SetPipelineState( PSO );
+
     g_finalImageRT.Bind();
 
     glClear( GL_COLOR_BUFFER_BIT );
 
-    program.Use();
-
     R_DrawQuad();
-
-    program.Stop();
 
     g_finalImageRT.Unbind();
 }
 
 void R_FXAA_Pass()
 {
-    const auto& program = R_GetShaderProgram( ProgramType::FXAA );
+    auto PSO = g_pPipelineStateManager->GetPipelineState( "FXAA" );
+    g_gfxMgr->SetPipelineState( PSO );
 
     g_fxaaRT.Bind();
     glClear( GL_COLOR_BUFFER_BIT );
 
-    program.Use();
     R_DrawQuad();
-    program.Stop();
 
     g_fxaaRT.Unbind();
 }

@@ -3,12 +3,10 @@
   <ItemGroup>
     <ClCompile Include="Asserts.cpp" />
     <ClCompile Include="Logger.cpp" />
-    <ClCompile Include="IManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Asserts.h" />
     <ClInclude Include="Defines.h" />
     <ClInclude Include="Logger.h" />
-    <ClInclude Include="IManager.h" />
   </ItemGroup>
 </Project>

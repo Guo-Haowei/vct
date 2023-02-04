@@ -8,11 +8,12 @@
 #include "Core/WindowManager.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
-#include "renderer/r_cbuffers.h"
 #include "universal/dvar_api.h"
 
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
+
+#include "Graphics/r_cbuffers.h"
 
 class Editor {
     ImVec2 pos;

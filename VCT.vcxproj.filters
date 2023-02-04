@@ -7,9 +7,6 @@
     <Filter Include="source\imgui">
       <UniqueIdentifier>{e04d8fdb-0ba5-434b-a693-fba893bc057e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\renderer">
-      <UniqueIdentifier>{55516cd8-e7e6-4632-81a0-168e8e9af5a5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="source\scene">
       <UniqueIdentifier>{68dab9e1-cc2b-4496-bf88-a9594529bfe6}</UniqueIdentifier>
     </Filter>
@@ -18,6 +15,15 @@
     </Filter>
     <Filter Include="source\Core">
       <UniqueIdentifier>{756446d9-0e15-44fa-a221-c01a5954f667}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\Interface">
+      <UniqueIdentifier>{b1f81314-472e-41f3-bfdb-2d898949a664}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\RHI">
+      <UniqueIdentifier>{3aa78427-fac6-4ba4-b425-cec55bdc4e36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\Graphics">
+      <UniqueIdentifier>{ad44f282-0b40-48bc-87f7-cf6afcbdc298}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -35,39 +41,6 @@
     </ClCompile>
     <ClCompile Include="source\imgui\imgui_widgets.cpp">
       <Filter>source\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\renderer\gl_utils.cpp">
-      <Filter>source\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="source\renderer\GpuTexture.cpp">
-      <Filter>source\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="source\renderer\imgui_impl_opengl3.cpp">
-      <Filter>source\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="source\renderer\MainRenderer.cpp">
-      <Filter>source\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="source\renderer\r_cbuffers.cpp">
-      <Filter>source\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="source\renderer\r_editor.cpp">
-      <Filter>source\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="source\renderer\GLGraphicsManager.cpp">
-      <Filter>source\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="source\renderer\r_passes.cpp">
-      <Filter>source\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="source\renderer\r_rendertarget.cpp">
-      <Filter>source\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="source\renderer\r_shader.cpp">
-      <Filter>source\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="source\renderer\r_sun_shadow.cpp">
-      <Filter>source\renderer</Filter>
     </ClCompile>
     <ClCompile Include="source\scene\scene_loader.cpp">
       <Filter>source\scene</Filter>
@@ -102,6 +75,45 @@
     <ClCompile Include="source\Core\WindowManager.cpp">
       <Filter>source\Core</Filter>
     </ClCompile>
+    <ClCompile Include="source\Core\BaseManager.cpp">
+      <Filter>source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="source\RHI\GLPipelineStateManager.cpp">
+      <Filter>source\RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Graphics\gl_utils.cpp">
+      <Filter>source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Graphics\GpuTexture.cpp">
+      <Filter>source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Graphics\imgui_impl_opengl3.cpp">
+      <Filter>source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Graphics\MainRenderer.cpp">
+      <Filter>source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Graphics\PipelineStateManager.cpp">
+      <Filter>source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Graphics\r_cbuffers.cpp">
+      <Filter>source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Graphics\r_editor.cpp">
+      <Filter>source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Graphics\r_passes.cpp">
+      <Filter>source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Graphics\r_rendertarget.cpp">
+      <Filter>source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Graphics\r_sun_shadow.cpp">
+      <Filter>source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\RHI\GLGraphicsManager.cpp">
+      <Filter>source\RHI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\imgui\imconfig.h">
@@ -121,48 +133,6 @@
     </ClInclude>
     <ClInclude Include="source\imgui\imstb_truetype.h">
       <Filter>source\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="source\renderer\gl_utils.h">
-      <Filter>source\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="source\renderer\GLPrerequisites.h">
-      <Filter>source\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="source\renderer\GpuResource.h">
-      <Filter>source\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="source\renderer\GpuTexture.h">
-      <Filter>source\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="source\renderer\imgui_impl_opengl3.h">
-      <Filter>source\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="source\renderer\MainRenderer.h">
-      <Filter>source\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="source\renderer\r_cbuffers.h">
-      <Filter>source\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="source\renderer\r_defines.h">
-      <Filter>source\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="source\renderer\r_editor.h">
-      <Filter>source\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="source\renderer\GLGraphicsManager.h">
-      <Filter>source\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="source\renderer\r_passes.h">
-      <Filter>source\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="source\renderer\r_rendertarget.h">
-      <Filter>source\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="source\renderer\r_shader.h">
-      <Filter>source\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="source\renderer\r_sun_shadow.h">
-      <Filter>source\renderer</Filter>
     </ClInclude>
     <ClInclude Include="source\scene\scene_loader.h">
       <Filter>source\scene</Filter>
@@ -209,8 +179,65 @@
     <ClInclude Include="source\Core\WindowManager.h">
       <Filter>source\Core</Filter>
     </ClInclude>
-    <ClInclude Include="source\Core\GraphicsManager.h">
+    <ClInclude Include="source\Interface\Interface.hpp">
+      <Filter>source\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Interface\IRuntimeModule.hpp">
+      <Filter>source\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Core\BaseManager.hpp">
       <Filter>source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RHI\GLPipelineStateManager.hpp">
+      <Filter>source\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Graphics\gl_utils.h">
+      <Filter>source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Graphics\GLPrerequisites.h">
+      <Filter>source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Graphics\GpuResource.h">
+      <Filter>source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Graphics\GpuTexture.h">
+      <Filter>source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Graphics\GraphicsManager.hpp">
+      <Filter>source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Graphics\imgui_impl_opengl3.h">
+      <Filter>source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Graphics\MainRenderer.h">
+      <Filter>source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Graphics\PipelineStateManager.hpp">
+      <Filter>source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Graphics\r_cbuffers.h">
+      <Filter>source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Graphics\r_defines.h">
+      <Filter>source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Graphics\r_editor.h">
+      <Filter>source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Graphics\r_passes.h">
+      <Filter>source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Graphics\r_rendertarget.h">
+      <Filter>source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Graphics\r_sun_shadow.h">
+      <Filter>source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Graphics\stb_image.h">
+      <Filter>source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RHI\GLGraphicsManager.hpp">
+      <Filter>source\RHI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

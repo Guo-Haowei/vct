@@ -1,5 +1,7 @@
 #include "r_sun_shadow.h"
 
+#include "GraphicsManager.hpp"
+
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
 
@@ -10,8 +12,9 @@
 #include "gl_utils.h"
 #include "r_cbuffers.h"
 #include "r_rendertarget.h"
-#include "r_shader.h"
 #include "universal/dvar_api.h"
+
+#include "PipelineStateManager.hpp"
 
 #ifdef max
 #undef max
@@ -64,15 +67,14 @@ void R_LightSpaceMatrix( const Camera& camera, const vec3& lightDir, mat4 lightP
 
 void R_ShadowPass()
 {
+    auto PSO = g_pPipelineStateManager->GetPipelineState( "SHADOW" );
+    g_gfxMgr->SetPipelineState( PSO );
+
     const Scene& scene = Com_GetScene();
     g_shadowRT.Bind();
 
-    glEnable( GL_DEPTH_TEST );
-    glEnable( GL_CULL_FACE );
     glCullFace( GL_FRONT );
     glClear( GL_DEPTH_BUFFER_BIT );
-    const auto& program = R_GetShaderProgram( ProgramType::SHADOW );
-    program.Use();
 
     const int res = Dvar_GetInt( r_shadowRes );
     // render scene 3 times

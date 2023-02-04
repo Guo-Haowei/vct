@@ -1,14 +1,14 @@
 #pragma once
 #include "universal/core_math.h"
 
-#include "Base/IManager.h"
+#include "BaseManager.hpp"
 
 struct GLFWwindow;
 
-class WindowManager : public IManager {
+class WindowManager : _Inherits_ BaseManager {
 public:
     WindowManager()
-        : IManager( "WindowManager" )
+        : BaseManager( "WindowManager" )
     {
     }
 

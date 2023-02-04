@@ -13,8 +13,9 @@
 #include "r_editor.h"
 #include "r_passes.h"
 #include "r_rendertarget.h"
-#include "r_shader.h"
 #include "r_sun_shadow.h"
+
+#include "GraphicsManager.hpp"
 
 static std::vector<std::shared_ptr<MeshData>> g_meshdata;
 static std::vector<std::shared_ptr<MaterialData>> g_materialdata;
@@ -63,8 +64,6 @@ static std::shared_ptr<MeshData> CreateMeshData( const MeshComponent& mesh )
 
 void MainRenderer::createGpuResources()
 {
-    R_CreateShaderPrograms();
-
     R_Create_Pass_Resources();
 
     R_Alloc_Cbuffers();
@@ -72,12 +71,6 @@ void MainRenderer::createGpuResources()
     R_CreateRT();
 
     Scene& scene = Com_GetScene();
-
-    // create shader
-    m_debugTextureProgram = gl::CreateProgram( ProgramCreateInfo::VSPS( "fullscreen", "debug/texture" ) );
-    m_voxelProgram = gl::CreateProgram( ProgramCreateInfo::VSGSPS( "voxel/voxelization" ) );
-    m_visualizeProgram = gl::CreateProgram( ProgramCreateInfo::VSPS( "voxel/visualization" ) );
-    m_voxelPostProgram = gl::CreateProgram( ProgramCreateInfo::CS( "voxel/post" ) );
 
     m_box = CreateMeshData( geometry::MakeBox() );
 
@@ -165,20 +158,14 @@ void MainRenderer::createGpuResources()
     g_constantCache.Update();
 }
 
+// @TODO: make another pass
 void MainRenderer::visualizeVoxels()
 {
-    glEnable( GL_CULL_FACE );
-    glEnable( GL_DEPTH_TEST );
-
-    const auto& program = m_visualizeProgram;
-
+    auto PSO = g_pPipelineStateManager->GetPipelineState( "VOXEL_VIS" );
+    g_gfxMgr->SetPipelineState( PSO );
     glBindVertexArray( m_box->vao );
-    program.Use();
-
     const int size = Dvar_GetInt( r_voxelSize );
     glDrawElementsInstanced( GL_TRIANGLES, m_box->count, GL_UNSIGNED_INT, 0, size * size * size );
-
-    program.Stop();
 }
 
 struct MaterialCache {
@@ -207,15 +194,16 @@ void MainRenderer::renderToVoxelTexture()
     const Scene& scene = Com_GetScene();
     const int voxelSize = Dvar_GetInt( r_voxelSize );
 
-    glDisable( GL_CULL_FACE );
-    glDisable( GL_DEPTH_TEST );
+    // @TODO: move to PSO
     glDisable( GL_BLEND );
     glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
     glViewport( 0, 0, voxelSize, voxelSize );
 
     m_albedoVoxel.bindImageTexture( IMAGE_VOXEL_ALBEDO_SLOT );
     m_normalVoxel.bindImageTexture( IMAGE_VOXEL_NORMAL_SLOT );
-    m_voxelProgram.Use();
+
+    auto PSO = g_pPipelineStateManager->GetPipelineState( "VOXEL" );
+    g_gfxMgr->SetPipelineState( PSO );
 
     for ( const GeometryNode& node : scene.geometryNodes ) {
         g_perBatchCache.cache.Model = node.transform;
@@ -240,35 +228,36 @@ void MainRenderer::renderToVoxelTexture()
 
     glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
 
+    // @TODO: make another pass
     // post process
-    m_voxelPostProgram.Use();
+    {
+        auto PSO = g_pPipelineStateManager->GetPipelineState( "VOXEL_POST" );
+        g_gfxMgr->SetPipelineState( PSO );
 
-    constexpr GLuint workGroupX = 512;
-    constexpr GLuint workGroupY = 512;
-    const GLuint workGroupZ =
-        ( voxelSize * voxelSize * voxelSize ) /
-        ( workGroupX * workGroupY );
+        constexpr GLuint workGroupX = 512;
+        constexpr GLuint workGroupY = 512;
+        const GLuint workGroupZ =
+            ( voxelSize * voxelSize * voxelSize ) /
+            ( workGroupX * workGroupY );
 
-    glDispatchCompute( workGroupX, workGroupY, workGroupZ );
-    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
+        glDispatchCompute( workGroupX, workGroupY, workGroupZ );
+        glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
 
-    m_albedoVoxel.bind();
-    m_albedoVoxel.genMipMap();
-    m_normalVoxel.bind();
-    m_normalVoxel.genMipMap();
+        m_albedoVoxel.bind();
+        m_albedoVoxel.genMipMap();
+        m_normalVoxel.bind();
+        m_normalVoxel.genMipMap();
+    }
 }
 
 void MainRenderer::renderFrameBufferTextures( const ivec2& extent )
 {
-    const auto& program = m_debugTextureProgram;
+    auto PSO = g_pPipelineStateManager->GetPipelineState( "DEBUG_TEXTURE" );
+    g_gfxMgr->SetPipelineState( PSO );
 
-    program.Use();
-    glDisable( GL_DEPTH_TEST );
     glViewport( 0, 0, extent.x, extent.y );
 
     R_DrawQuad();
-
-    program.Stop();
 }
 
 void MainRenderer::render()
@@ -316,20 +305,12 @@ void MainRenderer::render()
 
 void MainRenderer::destroyGpuResources()
 {
-    // gpu resource
-    m_voxelProgram.Destroy();
-    m_visualizeProgram.Destroy();
-    m_voxelPostProgram.Destroy();
-    m_debugTextureProgram.Destroy();
-
     R_DestroyRT();
 
     R_DestroyEditorResource();
     R_Destroy_Cbuffers();
 
     R_Destroy_Pass_Resources();
-
-    R_DestroyShaderPrograms();
 }
 
 }  // namespace vct

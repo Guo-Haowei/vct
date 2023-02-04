@@ -11,45 +11,6 @@
 
 static constexpr int kMaxShaderName = 128;
 
-struct ProgramCreateInfo {
-    std::string vs;
-    std::string ps;
-    std::string gs;
-    std::string cs;
-
-    static ProgramCreateInfo VSPS( const std::string& name )
-    {
-        ProgramCreateInfo info;
-        info.vs = name + ".vert";
-        info.ps = name + ".frag";
-        return info;
-    }
-
-    static ProgramCreateInfo VSGSPS( const std::string& name )
-    {
-        ProgramCreateInfo info;
-        info.vs = name + ".vert";
-        info.gs = name + ".geom";
-        info.ps = name + ".frag";
-        return info;
-    }
-
-    static ProgramCreateInfo VSPS( const std::string& vs, const std::string& ps )
-    {
-        ProgramCreateInfo info;
-        info.vs = vs + ".vert";
-        info.ps = ps + ".frag";
-        return info;
-    }
-
-    static ProgramCreateInfo CS( const std::string& cs )
-    {
-        ProgramCreateInfo info;
-        info.cs = cs + ".comp";
-        return info;
-    }
-};
-
 struct MeshData {
     GLuint vao = 0;
     GLuint ebo = 0;
@@ -73,8 +34,6 @@ void R_DrawQuad();
 
 namespace gl {
 
-[[nodiscard]] bool Init();
-
 template<typename T>
 void NamedBufferStorage( GLuint buffer, const std::vector<T>& data )
 {
@@ -87,38 +46,6 @@ static inline void BindToSlot( GLuint buffer, int slot, int size )
     glVertexAttribPointer( slot, size, GL_FLOAT, GL_FALSE, size * sizeof( float ), 0 );
     glEnableVertexAttribArray( slot );
 }
-
-GLuint CreateProgram( const ProgramCreateInfo& info );
-
-class Program {
-public:
-    void Destroy()
-    {
-        if ( mHandle ) {
-            glDeleteProgram( mHandle );
-        }
-
-        mHandle = 0;
-    }
-
-    void Use() const
-    {
-        glUseProgram( mHandle );
-    }
-    void Stop() const
-    {
-        glUseProgram( 0 );
-    }
-
-    Program& operator=( GLuint program )
-    {
-        mHandle = program;
-        return *this;
-    }
-
-private:
-    GLuint mHandle = 0;
-};
 
 //------------------------------------------------------------------------------
 // Constant Buffer

@@ -5,12 +5,13 @@
 #include "FileManager.h"
 #include "imgui/imgui.h"
 #include "WindowManager.h"
-#include "renderer/r_cbuffers.h"
-#include "renderer/r_sun_shadow.h"
 #include "scene/scene_loader.h"
 
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
+
+#include "Graphics/r_cbuffers.h"
+#include "Graphics/r_sun_shadow.h"
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -58,7 +59,7 @@ bool Com_LoadScene()
     Camera& camera = scene.camera;
 
     camera.fovy = glm::radians( Dvar_GetFloat( cam_fov ) );
-    camera.zNear = .1f;
+    camera.zNear = 1.f;
     camera.zFar = 1000.f;
 
     camera.yaw = glm::radians( 180.0f );
