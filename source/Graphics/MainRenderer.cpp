@@ -1,5 +1,6 @@
 #pragma once
 #include "MainRenderer.h"
+#include <random>
 
 #include "Base/Asserts.h"
 
@@ -11,16 +12,19 @@
 #include "Core/WindowManager.h"
 #include "r_defines.h"
 #include "r_editor.h"
-#include "r_passes.h"
 #include "r_rendertarget.h"
-#include "r_sun_shadow.h"
 
 #include "GraphicsManager.hpp"
+
+#include "DrawPass/BaseDrawPass.hpp"
 
 static std::vector<std::shared_ptr<MeshData>> g_meshdata;
 static std::vector<std::shared_ptr<MaterialData>> g_materialdata;
 
-namespace vct {
+static GLuint g_noiseTexture;
+MainRenderer renderer;
+GpuTexture m_albedoVoxel;
+GpuTexture m_normalVoxel;
 
 static std::shared_ptr<MeshData> CreateMeshData( const MeshComponent& mesh )
 {
@@ -58,6 +62,60 @@ static std::shared_ptr<MeshData> CreateMeshData( const MeshComponent& mesh )
 
     glBindVertexArray( 0 );
     return std::shared_ptr<MeshData>( ret );
+}
+
+static float lerp( float a, float b, float f )
+{
+    return a + f * ( b - a );
+}
+
+static void R_Create_Pass_Resources()
+{
+    // generate sample kernel
+    std::uniform_real_distribution<float> randomFloats( 0.0f, 1.0f );  // generates random floats between 0.0 and 1.0
+    std::default_random_engine generator;
+    std::vector<glm::vec4> ssaoKernel;
+    const int kernelSize = Dvar_GetInt( r_ssaoKernelSize );
+    for ( int i = 0; i < kernelSize; ++i ) {
+        // [-1, 1], [-1, 1], [0, 1]
+        glm::vec3 sample( randomFloats( generator ) * 2.0 - 1.0, randomFloats( generator ) * 2.0 - 1.0, randomFloats( generator ) );
+        sample = glm::normalize( sample );
+        sample *= randomFloats( generator );
+        float scale = float( i ) / kernelSize;
+
+        scale = lerp( 0.1f, 1.0f, scale * scale );
+        sample *= scale;
+        ssaoKernel.emplace_back( vec4( sample, 0.0f ) );
+    }
+
+    memset( &g_constantCache.cache.SSAOKernels, 0, sizeof( g_constantCache.cache.SSAOKernels ) );
+    memcpy( &g_constantCache.cache.SSAOKernels, ssaoKernel.data(), sizeof( ssaoKernel.front() ) * ssaoKernel.size() );
+
+    // generate noise texture
+    const int noiseSize = Dvar_GetInt( r_ssaoNoiseSize );
+
+    std::vector<glm::vec3> ssaoNoise;
+    for ( int i = 0; i < noiseSize * noiseSize; ++i ) {
+        glm::vec3 noise( randomFloats( generator ) * 2.0 - 1.0, randomFloats( generator ) * 2.0 - 1.0, 0.0f );
+        noise = glm::normalize( noise );
+        ssaoNoise.emplace_back( noise );
+    }
+    unsigned int noiseTexture;
+    glGenTextures( 1, &noiseTexture );
+    glBindTexture( GL_TEXTURE_2D, noiseTexture );
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA32F, noiseSize, noiseSize, 0, GL_RGB, GL_FLOAT, ssaoNoise.data() );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+
+    g_constantCache.cache.NoiseMap = gl::MakeTextureResident( noiseTexture );
+    g_noiseTexture = noiseTexture;
+}
+
+static void R_Destroy_Pass_Resources()
+{
+    glDeleteTextures( 1, &g_noiseTexture );
 }
 
 void MainRenderer::createGpuResources()
@@ -145,12 +203,15 @@ void MainRenderer::createGpuResources()
     g_constantCache.cache.VoxelNormalMap = gl::MakeTextureResident( m_normalVoxel.GetHandle() );
     g_constantCache.cache.SSAOMap = gl::MakeTextureResident( g_ssaoRT.GetColorAttachment().GetHandle() );
     g_constantCache.cache.FinalImage = gl::MakeTextureResident( g_finalImageRT.GetColorAttachment().GetHandle() );
-    g_constantCache.cache.FXAA = gl::MakeTextureResident( g_fxaaRT.GetColorAttachment().GetHandle() );
 
-    for ( int idx = 0; idx < 1; ++idx ) {
-        std::string path = g_fileMgr->BuildAbsPath( "pointlight.png", "data/images" );
-        m_lightIcons[idx].create2DImageFromFile( path.c_str() );
-        g_constantCache.cache.LightIconTextures[idx].data = gl::MakeTextureResident( m_lightIcons[idx].GetHandle() );
+    {
+        int i = 0;
+        g_constantCache.cache.OverlayPositions[i++] = vec4( vec2( 0 ), vec2( 1 ) );
+        constexpr float s = 0.14f;
+        for ( float h = 1.0f - s; i < NUM_OVERLAYS; ) {
+            g_constantCache.cache.OverlayPositions[i++] = vec4( vec2( 1.0f - s, h ), vec2( s - 0.01f ) );
+            h -= 2 * s;
+        }
     }
 
     g_constantCache.Update();
@@ -187,99 +248,6 @@ struct MaterialCache {
     }
 };
 
-void MainRenderer::renderToVoxelTexture()
-{
-    const int voxelSize = Dvar_GetInt( r_voxelSize );
-
-    // @TODO: move to PSO
-    glDisable( GL_BLEND );
-    glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
-    glViewport( 0, 0, voxelSize, voxelSize );
-
-    m_albedoVoxel.bindImageTexture( IMAGE_VOXEL_ALBEDO_SLOT );
-    m_normalVoxel.bindImageTexture( IMAGE_VOXEL_NORMAL_SLOT );
-
-    auto PSO = g_pPipelineStateManager->GetPipelineState( "VOXEL" );
-    g_gfxMgr->SetPipelineState( PSO );
-
-    Frame dummy;
-    g_gfxMgr->DrawBatch( dummy );
-
-    glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
-
-    // @TODO: make another pass
-    // post process
-    {
-        auto PSO = g_pPipelineStateManager->GetPipelineState( "VOXEL_POST" );
-        g_gfxMgr->SetPipelineState( PSO );
-
-        constexpr GLuint workGroupX = 512;
-        constexpr GLuint workGroupY = 512;
-        const GLuint workGroupZ =
-            ( voxelSize * voxelSize * voxelSize ) /
-            ( workGroupX * workGroupY );
-
-        glDispatchCompute( workGroupX, workGroupY, workGroupZ );
-        glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT );
-
-        m_albedoVoxel.bind();
-        m_albedoVoxel.genMipMap();
-        m_normalVoxel.bind();
-        m_normalVoxel.genMipMap();
-    }
-}
-
-void MainRenderer::renderFrameBufferTextures( const ivec2& extent )
-{
-    auto PSO = g_pPipelineStateManager->GetPipelineState( "DEBUG_TEXTURE" );
-    g_gfxMgr->SetPipelineState( PSO );
-
-    glViewport( 0, 0, extent.x, extent.y );
-
-    R_DrawQuad();
-}
-
-void MainRenderer::render()
-{
-    Scene& scene = Com_GetScene();
-
-    // clear window
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    R_ShadowPass();
-
-    if ( scene.dirty || Dvar_GetBool( r_forceVXGI ) ) {
-        m_albedoVoxel.clear();
-        m_normalVoxel.clear();
-        renderToVoxelTexture();
-    }
-
-    ivec2 extent = g_wndMgr->FrameSize();
-    if ( extent.x * extent.y > 0 ) {
-        // skip rendering if minimized
-        glViewport( 0, 0, extent.x, extent.y );
-
-        R_Gbuffer_Pass();
-        R_SSAO_Pass();
-
-        const int mode = Dvar_GetInt( r_debugTexture );
-
-        switch ( mode ) {
-            case DrawTexture::TEXTURE_VOXEL_ALBEDO:
-            case DrawTexture::TEXTURE_VOXEL_NORMAL:
-                visualizeVoxels();
-                break;
-            default: {
-                R_Deferred_VCT_Pass();
-                R_FXAA_Pass();
-
-                renderFrameBufferTextures( extent );
-            } break;
-        }
-
-        R_DrawEditor();
-    }
-}
-
 void MainRenderer::destroyGpuResources()
 {
     R_DestroyRT();
@@ -289,5 +257,3 @@ void MainRenderer::destroyGpuResources()
 
     R_Destroy_Pass_Resources();
 }
-
-}  // namespace vct

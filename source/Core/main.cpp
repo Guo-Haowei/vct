@@ -13,14 +13,13 @@
 #include "Core/WindowManager.h"
 
 #include "Graphics/MainRenderer.h"
-#include "Graphics/imgui_impl_opengl3.h"
 #include "Graphics/GraphicsManager.hpp"
 #include "Graphics/PipelineStateManager.hpp"
 
+#include "Graphics/imgui_impl_opengl3.h"
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
-
-using namespace vct;
 
 static int app_main( int argc, const char** argv )
 {
@@ -35,7 +34,7 @@ static int app_main( int argc, const char** argv )
     ok = ok && Com_ImGuiInit();
 
     ok = ok && manager_init( g_wndMgr );
-    ok = ok && manager_init( g_gfxMgr );
+    ok = ok && g_gfxMgr->Initialize();
 
     EditorSetupStyle();
 
@@ -44,10 +43,8 @@ static int app_main( int argc, const char** argv )
     ImGui_ImplOpenGL3_Init();
     ImGui_ImplOpenGL3_CreateDeviceObjects();
 
-    MainRenderer renderer;
-
     // TODO: refactor
-    ok = ok && g_pPipelineStateManager->Init();
+    ok = ok && g_pPipelineStateManager->Initialize();
     renderer.createGpuResources();
 
     g_gfxMgr->InitializeGeometries( Com_GetScene() );
@@ -56,23 +53,15 @@ static int app_main( int argc, const char** argv )
         g_wndMgr->NewFrame();
         ImGui_ImplGlfw_NewFrame();
 
-        ImGui::NewFrame();
-        EditorSetup();
-        ImGui::Render();
-
         Com_UpdateWorld();
 
-        g_gfxMgr->UpdateConstants();  // update constants
-
-        Frame dummy;
-        g_gfxMgr->BeginFrame( dummy );  // upload constants
-
-        renderer.render();
-        ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
+        g_gfxMgr->Tick();
 
         GLFWwindow* backup_current_context = glfwGetCurrentContext();
+
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
+
         glfwMakeContextCurrent( backup_current_context );
 
         g_wndMgr->Present();
@@ -80,7 +69,7 @@ static int app_main( int argc, const char** argv )
         Com_GetScene().dirty = false;
     }
 
-    g_pPipelineStateManager->Deinit();
+    g_pPipelineStateManager->Finalize();
 
     renderer.destroyGpuResources();
     ImGui_ImplOpenGL3_Shutdown();
@@ -88,7 +77,7 @@ static int app_main( int argc, const char** argv )
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
-    manager_deinit( g_gfxMgr );
+    g_gfxMgr->Finalize();
     manager_deinit( g_wndMgr );
     manager_deinit( g_fileMgr );
 

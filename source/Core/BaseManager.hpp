@@ -2,7 +2,7 @@
 #include <string>
 #include "Interface/IRuntimeModule.hpp"
 
-_Interface_ BaseManager : _Implements_ IRuntimeModule
+class BaseManager : public IRuntimeModule
 {
 public:
     BaseManager( const char* debugName )
@@ -12,8 +12,8 @@ public:
 
     virtual ~BaseManager() = default;
 
-    virtual bool Init() override { return true; }
-    virtual void Deinit() override {}
+    virtual bool Initialize() override { return true; }
+    virtual void Finalize() override {}
     virtual void Tick() override {}
 
     const std::string& GetDebugName() const { return m_debugName; }

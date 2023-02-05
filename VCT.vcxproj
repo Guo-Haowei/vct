@@ -20,6 +20,13 @@
     <ClCompile Include="source\Core\imgui_impl_glfw.cpp" />
     <ClCompile Include="source\Core\main.cpp" />
     <ClCompile Include="source\Core\WindowManager.cpp" />
+    <ClCompile Include="source\DrawPass\BaseDrawPass.cpp" />
+    <ClCompile Include="source\DrawPass\DeferredPass.cpp" />
+    <ClCompile Include="source\DrawPass\GBufferPass.cpp" />
+    <ClCompile Include="source\DrawPass\OverlayPass.cpp" />
+    <ClCompile Include="source\DrawPass\ShadowMapPass.cpp" />
+    <ClCompile Include="source\DrawPass\SSAOPass.cpp" />
+    <ClCompile Include="source\DrawPass\VoxelizationPass.cpp" />
     <ClCompile Include="source\dummy.cpp" />
     <ClCompile Include="source\Graphics\gl_utils.cpp" />
     <ClCompile Include="source\Graphics\GpuTexture.cpp" />
@@ -29,9 +36,7 @@
     <ClCompile Include="source\Graphics\PipelineStateManager.cpp" />
     <ClCompile Include="source\Graphics\r_cbuffers.cpp" />
     <ClCompile Include="source\Graphics\r_editor.cpp" />
-    <ClCompile Include="source\Graphics\r_passes.cpp" />
     <ClCompile Include="source\Graphics\r_rendertarget.cpp" />
-    <ClCompile Include="source\Graphics\r_sun_shadow.cpp" />
     <ClCompile Include="source\imgui\imgui.cpp" />
     <ClCompile Include="source\imgui\imgui_draw.cpp" />
     <ClCompile Include="source\imgui\imgui_tables.cpp" />
@@ -54,6 +59,13 @@
     <ClInclude Include="source\Core\scene.h" />
     <ClInclude Include="source\Core\scene_components.h" />
     <ClInclude Include="source\Core\WindowManager.h" />
+    <ClInclude Include="source\DrawPass\BaseDrawPass.hpp" />
+    <ClInclude Include="source\DrawPass\DeferredPass.hpp" />
+    <ClInclude Include="source\DrawPass\GBufferPass.hpp" />
+    <ClInclude Include="source\DrawPass\OverlayPass.hpp" />
+    <ClInclude Include="source\DrawPass\ShadowMapPass.hpp" />
+    <ClInclude Include="source\DrawPass\SSAOPass.hpp" />
+    <ClInclude Include="source\DrawPass\VoxelizationPass.hpp" />
     <ClInclude Include="source\Graphics\GLPrerequisites.h" />
     <ClInclude Include="source\Graphics\gl_utils.h" />
     <ClInclude Include="source\Graphics\GpuResource.h" />
@@ -65,9 +77,7 @@
     <ClInclude Include="source\Graphics\r_cbuffers.h" />
     <ClInclude Include="source\Graphics\r_defines.h" />
     <ClInclude Include="source\Graphics\r_editor.h" />
-    <ClInclude Include="source\Graphics\r_passes.h" />
     <ClInclude Include="source\Graphics\r_rendertarget.h" />
-    <ClInclude Include="source\Graphics\r_sun_shadow.h" />
     <ClInclude Include="source\Graphics\stb_image.h" />
     <ClInclude Include="source\imgui\imconfig.h" />
     <ClInclude Include="source\imgui\imgui.h" />
@@ -75,7 +85,8 @@
     <ClInclude Include="source\imgui\imstb_rectpack.h" />
     <ClInclude Include="source\imgui\imstb_textedit.h" />
     <ClInclude Include="source\imgui\imstb_truetype.h" />
-    <ClInclude Include="source\Interface\Interface.hpp" />
+    <ClInclude Include="source\Interface\IGraphicsManager.hpp" />
+    <ClInclude Include="source\Interface\IPipelineStateManager.hpp" />
     <ClInclude Include="source\Interface\IRuntimeModule.hpp" />
     <ClInclude Include="source\RHI\OpenGLGraphicsManager.hpp" />
     <ClInclude Include="source\RHI\OpenGLPipelineStateManager.hpp" />

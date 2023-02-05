@@ -18,6 +18,8 @@ struct MeshData {
     uint32_t count = 0;
 };
 
+extern MeshData g_quad;
+
 struct MaterialData {
     GpuTexture albedoMap;
     GpuTexture materialMap;

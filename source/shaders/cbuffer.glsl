@@ -38,7 +38,7 @@ CBUFFER( PerFrameConstants, 0 )
     vec3 WorldCenter;
     float WorldSizeHalf;
 
-    int DebugTexture;
+    int _placeholder0;
     int NoTexture;
     int ScreenWidth;
     int ScreenHeight;
@@ -76,6 +76,8 @@ layout( std140, binding = 2 ) uniform MaterialCB
     int _padint0;
 };
 
+#define NUM_OVERLAYS 8
+
 #ifdef __cplusplus
 using sampler2D = uint64_t;
 using sampler3D = uint64_t;
@@ -106,6 +108,8 @@ layout( std140, binding = 3 ) uniform ConstantCB
     Sampler2DArray AlbedoMaps[MAX_MATERIALS];
     Sampler2DArray NormalMaps[MAX_MATERIALS];
     Sampler2DArray PbrMaps[MAX_MATERIALS];
+
+    vec4 OverlayPositions[NUM_OVERLAYS];
 };
 
 #ifdef __cplusplus

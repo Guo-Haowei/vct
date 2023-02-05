@@ -5,15 +5,15 @@
 
 struct GLFWwindow;
 
-class WindowManager : _Inherits_ BaseManager {
+class WindowManager : public BaseManager {
 public:
     WindowManager()
         : BaseManager( "WindowManager" )
     {
     }
 
-    virtual bool Init() override;
-    virtual void Deinit() override;
+    virtual bool Initialize() override;
+    virtual void Finalize() override;
 
     bool ShouldClose();
     ivec2 FrameSize();
