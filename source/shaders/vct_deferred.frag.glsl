@@ -28,19 +28,18 @@ vec3 fresnelSchlickRoughness( float cosTheta, vec3 F0, float roughness )
 vec3 traceCone( vec3 from, vec3 direction, float aperture )
 {
     float max_dist = 2.0 * WorldSizeHalf;
-    vec4 acc       = vec4( 0.0 );
+    vec4 acc = vec4( 0.0 );
 
     float offset = 2.0 * VoxelSize;
-    float dist   = offset + VoxelSize;
+    float dist = offset + VoxelSize;
 
-    while ( acc.a < 1.0 && dist < max_dist )
-    {
+    while ( acc.a < 1.0 && dist < max_dist ) {
         vec3 conePosition = from + direction * dist;
-        float diameter    = 2.0 * aperture * dist;
-        float mipLevel    = log2( diameter / VoxelSize );
+        float diameter = 2.0 * aperture * dist;
+        float mipLevel = log2( diameter / VoxelSize );
 
         vec3 coords = ( conePosition - WorldCenter ) / WorldSizeHalf;
-        coords      = 0.5 * coords + 0.5;
+        coords = 0.5 * coords + 0.5;
 
         vec4 voxel = textureLod( VoxelAlbedoMap, coords, mipLevel );
         acc += ( 1.0 - acc.a ) * voxel;
@@ -65,8 +64,7 @@ vec3 indirectDiffuse( vec3 position, vec3 N )
     vec3 T = normalize( up - dot( N, up ) * N );
     vec3 B = cross( T, N );
 
-    for ( int i = 0; i < 6; ++i )
-    {
+    for ( int i = 0; i < 6; ++i ) {
         vec3 direction = T * g_diffuseCones[i].direction.x +
                          B * g_diffuseCones[i].direction.z + N;
         direction = normalize( direction );
@@ -93,25 +91,24 @@ vec3 indirectSpecular( vec3 position, vec3 direction, float roughness )
 void main()
 {
     const vec2 uv = pass_uv;
-    float depth   = texture( GbufferDepthMap, uv ).r;
+    float depth = texture( GbufferDepthMap, uv ).r;
 
     if ( depth > 0.999 )
         discard;
 
     gl_FragDepth = depth;
 
-    const vec4 normal_roughness  = texture( GbufferNormalRoughnessMap, uv );
+    const vec4 normal_roughness = texture( GbufferNormalRoughnessMap, uv );
     const vec4 position_metallic = texture( GbufferPositionMetallicMap, uv );
-    const vec4 worldPos          = vec4( position_metallic.xyz, 1.0 );
-    float roughness              = normal_roughness.w;
-    float metallic               = position_metallic.w;
+    const vec4 worldPos = vec4( position_metallic.xyz, 1.0 );
+    float roughness = normal_roughness.w;
+    float metallic = position_metallic.w;
 
     vec4 albedo = texture( GbufferAlbedoMap, uv );
-    vec3 F0     = mix( vec3( 0.04 ), albedo.rgb, metallic );
-    vec3 Lo     = vec3( 0.0 );
+    vec3 F0 = mix( vec3( 0.04 ), albedo.rgb, metallic );
+    vec3 Lo = vec3( 0.0 );
 
-    if ( NoTexture != 0 )
-    {
+    if ( NoTexture != 0 ) {
         albedo.rgb = vec3( 0.6 );
     }
 
@@ -129,10 +126,10 @@ void main()
     // direct
     // cook-torrance brdf
     const float NDF = distributionGGX( NdotH, roughness );
-    const float G   = geometrySmith( NdotV, NdotL, roughness );
-    const vec3 F    = fresnelSchlick( clamp( dot( H, V ), 0.0, 1.0 ), F0 );
+    const float G = geometrySmith( NdotV, NdotL, roughness );
+    const vec3 F = fresnelSchlick( clamp( dot( H, V ), 0.0, 1.0 ), F0 );
 
-    const vec3 nom    = NDF * G * F;
+    const vec3 nom = NDF * G * F;
     const float denom = 4 * NdotV * NdotL;
 
     vec3 specular = nom / max( denom, 0.001 );
@@ -143,21 +140,10 @@ void main()
     vec3 directLight = ( kD * albedo.rgb / PI + specular ) * radiance * NdotL;
 
     float shadow = 0.0;
-#if ENABLE_CSM
-    // float clipSpaceZ = ( PV * worldPos ).z;
-    // for ( int idx = 0; idx < NUM_CASCADES; ++idx )
-    // {
-    //     if ( clipSpaceZ <= CascadedClipZ[idx + 1] )
-    //     {
-    //         vec4 lightSpacePos = LightPVs[idx] * worldPos;
-    //         shadow             = Shadow( ShadowMap, lightSpacePos, NdotL, idx );
-    //         break;
-    //     }
-    // }
-#else
-    vec4 lightSpacePos = LightPVs[0] * worldPos;
-    shadow             = Shadow( ShadowMap, lightSpacePos, NdotL );
-#endif
+
+    vec4 lightSpacePos = LightPV * worldPos;
+    shadow = Shadow( ShadowMap, lightSpacePos, NdotL );
+
     Lo += ( 1.0 - shadow ) * directLight;
 
     const float ao = EnableSSAO == 0 ? 1.0 : texture( SSAOMap, uv ).r;
@@ -165,7 +151,7 @@ void main()
     if ( EnableGI == 1 )
     // indirect light
     {
-        const vec3 F  = fresnelSchlickRoughness( NdotV, F0, roughness );
+        const vec3 F = fresnelSchlickRoughness( NdotV, F0, roughness );
         const vec3 kS = F;
         const vec3 kD = ( 1.0 - kS ) * ( 1.0 - metallic );
 
@@ -174,7 +160,7 @@ void main()
 
         // specular cone
         vec3 coneDirection = reflect( -V, N );
-        vec3 specular      = metallic * indirectSpecular( worldPos.xyz, coneDirection, roughness );
+        vec3 specular = metallic * indirectSpecular( worldPos.xyz, coneDirection, roughness );
         // specular           = vec3( 0.0 );
         Lo += ( kD * diffuse + specular ) * ao;
     }
@@ -187,20 +173,4 @@ void main()
     color = pow( color, vec3( gamma ) );
 
     out_color = vec4( color, 1.0 );
-
-#if ENABLE_CSM
-    if ( DebugCSM != 0 )
-    {
-        vec3 mask = vec3( 0.1 );
-        for ( int idx = 0; idx < NUM_CASCADES; ++idx )
-        {
-            if ( clipSpaceZ <= CascadedClipZ[idx + 1] )
-            {
-                mask[idx] = 0.7;
-                break;
-            }
-        }
-        out_color.rgb = mix( out_color.rgb, mask, 0.1 );
-    }
-#endif
 }

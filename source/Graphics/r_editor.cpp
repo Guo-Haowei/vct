@@ -105,6 +105,7 @@ static inline void FillTextureIconBuffer( std::vector<TextureVertex>& iconBuffer
 // draw grid, bounding box, ui
 void R_DrawEditor()
 {
+#if 0
     const Scene& scene = Com_GetScene();
 
     if ( const Geometry* node = scene.selected ) {
@@ -115,14 +116,10 @@ void R_DrawEditor()
         g_gfxMgr->SetPipelineState( PSO );
 
         glBindVertexArray( g_boxWireFrame.vao );
-        g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
-        g_perBatchCache.cache.Model = mat4( 1 );
-        g_perBatchCache.Update();
         glDrawElements( GL_LINES, g_boxWireFrame.count, GL_UNSIGNED_INT, 0 );
     }
 
     int unused_for_warning;
-#if 0
 
     // draw light
     const Light& light = scene.light;

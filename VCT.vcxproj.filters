@@ -78,7 +78,7 @@
     <ClCompile Include="source\Core\BaseManager.cpp">
       <Filter>source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="source\RHI\GLPipelineStateManager.cpp">
+    <ClCompile Include="source\RHI\OpenGLPipelineStateManager.cpp">
       <Filter>source\RHI</Filter>
     </ClCompile>
     <ClCompile Include="source\Graphics\gl_utils.cpp">
@@ -111,8 +111,11 @@
     <ClCompile Include="source\Graphics\r_sun_shadow.cpp">
       <Filter>source\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="source\RHI\GLGraphicsManager.cpp">
+    <ClCompile Include="source\RHI\OpenGLGraphicsManager.cpp">
       <Filter>source\RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Graphics\GraphicsManager.cpp">
+      <Filter>source\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -188,7 +191,7 @@
     <ClInclude Include="source\Core\BaseManager.hpp">
       <Filter>source\Core</Filter>
     </ClInclude>
-    <ClInclude Include="source\RHI\GLPipelineStateManager.hpp">
+    <ClInclude Include="source\RHI\OpenGLPipelineStateManager.hpp">
       <Filter>source\RHI</Filter>
     </ClInclude>
     <ClInclude Include="source\Graphics\gl_utils.h">
@@ -236,7 +239,7 @@
     <ClInclude Include="source\Graphics\stb_image.h">
       <Filter>source\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="source\RHI\GLGraphicsManager.hpp">
+    <ClInclude Include="source\RHI\OpenGLGraphicsManager.hpp">
       <Filter>source\RHI</Filter>
     </ClInclude>
   </ItemGroup>

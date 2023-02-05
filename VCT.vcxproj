@@ -23,6 +23,7 @@
     <ClCompile Include="source\dummy.cpp" />
     <ClCompile Include="source\Graphics\gl_utils.cpp" />
     <ClCompile Include="source\Graphics\GpuTexture.cpp" />
+    <ClCompile Include="source\Graphics\GraphicsManager.cpp" />
     <ClCompile Include="source\Graphics\imgui_impl_opengl3.cpp" />
     <ClCompile Include="source\Graphics\MainRenderer.cpp" />
     <ClCompile Include="source\Graphics\PipelineStateManager.cpp" />
@@ -35,8 +36,8 @@
     <ClCompile Include="source\imgui\imgui_draw.cpp" />
     <ClCompile Include="source\imgui\imgui_tables.cpp" />
     <ClCompile Include="source\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="source\RHI\GLGraphicsManager.cpp" />
-    <ClCompile Include="source\RHI\GLPipelineStateManager.cpp" />
+    <ClCompile Include="source\RHI\OpenGLGraphicsManager.cpp" />
+    <ClCompile Include="source\RHI\OpenGLPipelineStateManager.cpp" />
     <ClCompile Include="source\scene\scene_loader.cpp" />
     <ClCompile Include="source\universal\core_math.cpp" />
     <ClCompile Include="source\universal\dvar_api.cpp" />
@@ -76,8 +77,8 @@
     <ClInclude Include="source\imgui\imstb_truetype.h" />
     <ClInclude Include="source\Interface\Interface.hpp" />
     <ClInclude Include="source\Interface\IRuntimeModule.hpp" />
-    <ClInclude Include="source\RHI\GLGraphicsManager.hpp" />
-    <ClInclude Include="source\RHI\GLPipelineStateManager.hpp" />
+    <ClInclude Include="source\RHI\OpenGLGraphicsManager.hpp" />
+    <ClInclude Include="source\RHI\OpenGLPipelineStateManager.hpp" />
     <ClInclude Include="source\scene\scene_loader.h" />
     <ClInclude Include="source\universal\core_math.h" />
     <ClInclude Include="source\universal\dvar_api.h" />

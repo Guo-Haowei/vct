@@ -5,15 +5,13 @@ in vec3 pass_positions[];
 in vec3 pass_normals[];
 in vec2 pass_uvs[];
 in vec4 pass_light_space_positions0[];
-in vec4 pass_light_space_positions1[];
-in vec4 pass_light_space_positions2[];
 
 #include "cbuffer.glsl"
 
 out vec3 pass_position;
 out vec3 pass_normal;
 out vec2 pass_uv;
-out vec4 pass_light_space_positions[NUM_CASCADES];
+out vec4 pass_light_space_position;
 
 void main()
 {
@@ -21,19 +19,16 @@ void main()
         abs( pass_normals[0] + pass_normals[1] + pass_normals[2] );
 
     uint dominant = triangle_normal.x > triangle_normal.y ? 0 : 1;
-    dominant      = triangle_normal.z > dominant ? 2 : dominant;
+    dominant = triangle_normal.z > dominant ? 2 : dominant;
 
     vec3 output_positions[3];
 
-    for ( uint i = 0; i < 3; ++i )
-    {
+    for ( uint i = 0; i < 3; ++i ) {
         output_positions[i] = ( pass_positions[i] - WorldCenter ) / WorldSizeHalf;
-        if ( dominant == 0 )
-        {
+        if ( dominant == 0 ) {
             output_positions[i].xyz = output_positions[i].zyx;
         }
-        else if ( dominant == 1 )
-        {
+        else if ( dominant == 1 ) {
             output_positions[i].xyz = output_positions[i].xzy;
         }
     }
@@ -47,15 +42,12 @@ void main()
     output_positions[1].xy += normalize( side0N - side1N ) * TexelSize;
     output_positions[2].xy += normalize( side1N - side2N ) * TexelSize;
 
-    for ( uint i = 0; i < 3; ++i )
-    {
-        pass_position                 = pass_positions[i];
-        pass_normal                   = pass_normals[i];
-        pass_uv                       = pass_uvs[i];
-        pass_light_space_positions[0] = pass_light_space_positions0[i];
-        pass_light_space_positions[1] = pass_light_space_positions1[i];
-        pass_light_space_positions[2] = pass_light_space_positions2[i];
-        gl_Position                   = vec4( output_positions[i].xy, 1.0, 1.0 );
+    for ( uint i = 0; i < 3; ++i ) {
+        pass_position = pass_positions[i];
+        pass_normal = pass_normals[i];
+        pass_uv = pass_uvs[i];
+        pass_light_space_position = pass_light_space_positions0[i];
+        gl_Position = vec4( output_positions[i].xy, 1.0, 1.0 );
         EmitVertex();
     }
     EndPrimitive();

@@ -20,8 +20,6 @@
 static std::vector<std::shared_ptr<MeshData>> g_meshdata;
 static std::vector<std::shared_ptr<MaterialData>> g_materialdata;
 
-extern void FillMaterialCB( const MaterialData* mat, MaterialCB& cb );
-
 namespace vct {
 
 static std::shared_ptr<MeshData> CreateMeshData( const MeshComponent& mesh )
@@ -191,7 +189,6 @@ struct MaterialCache {
 
 void MainRenderer::renderToVoxelTexture()
 {
-    const Scene& scene = Com_GetScene();
     const int voxelSize = Dvar_GetInt( r_voxelSize );
 
     // @TODO: move to PSO
@@ -205,26 +202,8 @@ void MainRenderer::renderToVoxelTexture()
     auto PSO = g_pPipelineStateManager->GetPipelineState( "VOXEL" );
     g_gfxMgr->SetPipelineState( PSO );
 
-    for ( const GeometryNode& node : scene.geometryNodes ) {
-        g_perBatchCache.cache.Model = node.transform;
-        g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * node.transform;
-        g_perBatchCache.Update();
-
-        for ( const Geometry& geom : node.geometries ) {
-            if ( !geom.visible ) {
-                continue;
-            }
-
-            const MeshData* drawData = reinterpret_cast<const MeshData*>( geom.mesh->gpuResource );
-            const MaterialData* matData = reinterpret_cast<const MaterialData*>( geom.material->gpuResource );
-
-            FillMaterialCB( matData, g_materialCache.cache );
-            g_materialCache.Update();
-
-            glBindVertexArray( drawData->vao );
-            glDrawElements( GL_TRIANGLES, drawData->count, GL_UNSIGNED_INT, 0 );
-        }
-    }
+    Frame dummy;
+    g_gfxMgr->DrawBatch( dummy );
 
     glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
 
@@ -263,8 +242,6 @@ void MainRenderer::renderFrameBufferTextures( const ivec2& extent )
 void MainRenderer::render()
 {
     Scene& scene = Com_GetScene();
-
-    g_perFrameCache.Update();
 
     // clear window
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );

@@ -20,6 +20,8 @@
 
 #define ENABLE_IMGUI_RENDERING IN_USE
 
+#define ALIGN( x, a ) ( ( ( x ) + ( (a)-1 ) ) & ~( (a)-1 ) )
+
 inline constexpr size_t KB = 1024;
 inline constexpr size_t MB = 1024 * KB;
 inline constexpr size_t GB = 1024 * MB;

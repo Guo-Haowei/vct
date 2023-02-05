@@ -1,11 +1,11 @@
 #pragma once
 #include "Graphics/PipelineStateManager.hpp"
 
-struct GLPipelineState : public PipelineState {
+struct OpenGLPipelineState : public PipelineState {
     uint32_t shaderProgram = 0;
-    GLPipelineState( PipelineState& rhs )
+    OpenGLPipelineState( PipelineState& rhs )
         : PipelineState( rhs ) {}
-    GLPipelineState( PipelineState&& rhs )
+    OpenGLPipelineState( PipelineState&& rhs )
         : PipelineState( std::move( rhs ) ) {}
 };
 

@@ -50,6 +50,8 @@ static int app_main( int argc, const char** argv )
     ok = ok && g_pPipelineStateManager->Init();
     renderer.createGpuResources();
 
+    g_gfxMgr->InitializeGeometries( Com_GetScene() );
+
     while ( !g_wndMgr->ShouldClose() ) {
         g_wndMgr->NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -59,6 +61,11 @@ static int app_main( int argc, const char** argv )
         ImGui::Render();
 
         Com_UpdateWorld();
+
+        g_gfxMgr->UpdateConstants();  // update constants
+
+        Frame dummy;
+        g_gfxMgr->BeginFrame( dummy );  // upload constants
 
         renderer.render();
         ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
@@ -88,24 +95,7 @@ static int app_main( int argc, const char** argv )
     return ok ? 0 : 1;
 }
 
-static int test_log_and_assert()
-{
-    LOG_DEBUG( "This is a debug message" );
-    LOG_OK( "This is an %s message", "Ok" );
-    LOG_WARN( "This is a warn message" );
-    LOG_ERROR( "This is an error message" );
-    ASSERT( 1 == 1 );
-    ASSERT( 1 == 2 );
-    return 0;
-}
-
 int main( int argc, const char** argv )
 {
-#if 0
-    unused( argc );
-    unused( argv );
-    return test_log_and_assert();
-#else
     return app_main( argc, argv );
-#endif
 }

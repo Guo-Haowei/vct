@@ -1,5 +1,6 @@
-#ifndef NUM_CASCADES
-#define NUM_CASCADES 3
+#ifdef __cplusplus
+#include "Base/Defines.h"
+#pragma once
 #endif
 #ifndef MAX_MATERIALS
 #define MAX_MATERIALS 300
@@ -12,14 +13,15 @@
 #endif
 
 #ifdef __cplusplus
-struct PerFrameCB
+#define CBUFFER( NAME, SLOT ) struct NAME
 #else
-layout( std140, binding = 0 ) uniform PerFrameCB
+#define CBUFFER( NAME, SLOT ) layout( std140, binding = SLOT ) uniform NAME
 #endif
+
+CBUFFER( PerFrameConstants, 0 )
 {
     mat4 View;
     mat4 Proj;
-    mat4 PV;
 
     vec3 CamPos;
     int DebugCSM;
@@ -31,7 +33,7 @@ layout( std140, binding = 0 ) uniform PerFrameCB
     float VoxelSize;
 
     vec4 CascadedClipZ;
-    mat4 LightPVs[NUM_CASCADES];
+    mat4 LightPV;
 
     vec3 WorldCenter;
     float WorldSizeHalf;
@@ -51,13 +53,8 @@ layout( std140, binding = 0 ) uniform PerFrameCB
     int EnableFXAA;
 };
 
-#ifdef __cplusplus
-struct PerBatchCB
-#else
-layout( std140, binding = 1 ) uniform PerBatchCB
-#endif
+CBUFFER( PerBatchConstants, 1 )
 {
-    mat4 PVM;
     mat4 Model;
 };
 
@@ -112,8 +109,10 @@ layout( std140, binding = 3 ) uniform ConstantCB
 };
 
 #ifdef __cplusplus
-static_assert( sizeof( PerFrameCB ) % 16 == 0 );
-static_assert( sizeof( PerBatchCB ) % 16 == 0 );
 static_assert( sizeof( MaterialCB ) % 16 == 0 );
 static_assert( sizeof( ConstantCB ) % 16 == 0 );
+
+// CB size is required to be 256-byte aligned.
+const size_t kSizePerBatchConstantBuffer = ALIGN( sizeof( PerBatchConstants ), 256 );
+const size_t kSizePerFrameConstantBuffer = ALIGN( sizeof( PerFrameConstants ), 256 );
 #endif
