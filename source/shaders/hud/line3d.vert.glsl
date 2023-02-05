@@ -8,7 +8,7 @@ layout( location = 0 ) out vec3 pass_color;
 void main()
 {
     vec4 position = vec4( in_position, 1.0 );
-    position = PV * M * position;
+    position = Proj * View * Model * position;
     gl_Position = position;
     pass_color = in_color;
 }

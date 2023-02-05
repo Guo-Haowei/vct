@@ -36,11 +36,6 @@ bool Com_RegisterDvars()
 
 bool Com_LoadScene()
 {
-    // validate dvars
-    const int voxelTextureSize = Dvar_GetInt( r_voxelSize );
-    ASSERT( is_power_of_two( voxelTextureSize ) );
-    ASSERT( voxelTextureSize <= 256 );
-
     SceneLoader loader;
     Scene& scene = g_scene;
 
@@ -67,17 +62,6 @@ bool Com_LoadScene()
     camera.position = Dvar_GetVec3( cam_pos );
 
     scene.light.color = vec3( glm::clamp( Dvar_GetFloat( light_power ), 5.0f, 30.0f ) );
-
-    const vec3 center = scene.boundingBox.Center();
-    const vec3 size = scene.boundingBox.Size();
-    const float worldSize = glm::max( size.x, glm::max( size.y, size.z ) );
-    const float texelSize = 1.0f / static_cast<float>( voxelTextureSize );
-    const float voxelSize = worldSize * texelSize;
-
-    g_perFrameCache.cache.WorldCenter = center;
-    g_perFrameCache.cache.WorldSizeHalf = 0.5f * worldSize;
-    g_perFrameCache.cache.TexelSize = texelSize;
-    g_perFrameCache.cache.VoxelSize = voxelSize;
 
     LOG_OK( "Scene '%s' loaded", scenePath );
     return true;
@@ -119,32 +103,6 @@ void Com_UpdateWorld()
     ControlCamera( camera );
     camera.SetAspect( aspect );
     camera.UpdatePV();
-
-    g_perFrameCache.cache.LightPV = R_HackLightSpaceMatrix( scene.light.direction );
-
-    // update constants
-    g_perFrameCache.cache.SunDir = scene.light.direction;
-    g_perFrameCache.cache.LightColor = scene.light.color;
-    g_perFrameCache.cache.CamPos = camera.position;
-    g_perFrameCache.cache.View = camera.View();
-    g_perFrameCache.cache.Proj = camera.Proj();
-    g_perFrameCache.cache.PV = camera.ProjView();
-    //g_perFrameCache.cache.CascadedClipZ = Dvar_GetVec4( cam_cascades );
-    g_perFrameCache.cache.EnableGI = Dvar_GetBool( r_enableVXGI );
-    g_perFrameCache.cache.DebugCSM = Dvar_GetBool( r_debugCSM );
-    g_perFrameCache.cache.DebugTexture = Dvar_GetInt( r_debugTexture );
-    g_perFrameCache.cache.NoTexture = Dvar_GetBool( r_noTexture );
-    g_perFrameCache.cache.ScreenWidth = extent.x;
-    g_perFrameCache.cache.ScreenHeight = extent.y;
-
-    // SSAO
-    g_perFrameCache.cache.SSAOKernelSize = Dvar_GetInt( r_ssaoKernelSize );
-    g_perFrameCache.cache.SSAOKernelRadius = Dvar_GetFloat( r_ssaoKernelRadius );
-    g_perFrameCache.cache.SSAONoiseSize = Dvar_GetInt( r_ssaoNoiseSize );
-    g_perFrameCache.cache.EnableSSAO = Dvar_GetBool( r_enableSsao );
-
-    // FXAA
-    g_perFrameCache.cache.EnableFXAA = Dvar_GetBool( r_enableFXAA );
 }
 
 static void ControlCamera( Camera& camera )

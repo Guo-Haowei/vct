@@ -4,5 +4,5 @@ layout( location = 0 ) in vec3 in_position;
 
 void main()
 {
-    gl_Position = PV * M * vec4( in_position, 1.0 );
+    gl_Position = LightPV * Model * vec4( in_position, 1.0 );
 }

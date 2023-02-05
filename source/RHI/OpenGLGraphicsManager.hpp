@@ -1,11 +1,10 @@
 #pragma once
 #include "Graphics/GraphicsManager.hpp"
 
-[[nodiscard]] bool R_Init();
-
-class GLGraphicsManager : public GraphicsManager {
+// @TODO: rename to OpenGL
+class OpenGLGraphicsManager : public GraphicsManager {
 public:
-    GLGraphicsManager()
+    OpenGLGraphicsManager()
         : GraphicsManager( "GLGraphicsManager" )
     {
     }
@@ -17,10 +16,14 @@ public:
 
     virtual void DrawBatch( const Frame& frame ) override;
 
-private:
-    void SetPerBatchConstants( const DrawBatchContext& context );
-
     virtual void InitializeGeometries( const Scene& scene ) final;
+
+    virtual void BeginFrame( Frame& frame ) final;
+    // virtual void EndFrame( Frame& frame ) {}
+
+protected:
+    void SetPerFrameConstants( const DrawFrameContext& context );
+    void SetPerBatchConstants( const DrawBatchContext& context );
 
     struct GLDrawBatchContext : public DrawBatchContext {
         uint32_t vao{ 0 };
@@ -29,6 +32,6 @@ private:
         int32_t count{ 0 };
     };
 
-    // @TODO: make multiple frames
+    uint32_t m_uboDrawFrameConstant = { 0 };
     uint32_t m_uboDrawBatchConstant = { 0 };
 };

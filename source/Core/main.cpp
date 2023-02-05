@@ -62,6 +62,11 @@ static int app_main( int argc, const char** argv )
 
         Com_UpdateWorld();
 
+        g_gfxMgr->UpdateConstants();  // update constants
+
+        Frame dummy;
+        g_gfxMgr->BeginFrame( dummy );  // upload constants
+
         renderer.render();
         ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
 
@@ -90,24 +95,7 @@ static int app_main( int argc, const char** argv )
     return ok ? 0 : 1;
 }
 
-static int test_log_and_assert()
-{
-    LOG_DEBUG( "This is a debug message" );
-    LOG_OK( "This is an %s message", "Ok" );
-    LOG_WARN( "This is a warn message" );
-    LOG_ERROR( "This is an error message" );
-    ASSERT( 1 == 1 );
-    ASSERT( 1 == 2 );
-    return 0;
-}
-
 int main( int argc, const char** argv )
 {
-#if 0
-    unused( argc );
-    unused( argv );
-    return test_log_and_assert();
-#else
     return app_main( argc, argv );
-#endif
 }

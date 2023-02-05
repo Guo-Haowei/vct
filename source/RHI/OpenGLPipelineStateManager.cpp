@@ -1,4 +1,4 @@
-#include "GLPipelineStateManager.hpp"
+#include "OpenGLPipelineStateManager.hpp"
 
 #include <sstream>
 #include <vector>
@@ -129,7 +129,7 @@ static bool LoadShaderProgram( const ShaderSourceList &source, GLuint &shaderPro
 bool GLPipelineStateManager::InitializePipelineState(
     PipelineState **ppPipelineState )
 {
-    GLPipelineState *pnew_state = new GLPipelineState( **ppPipelineState );
+    OpenGLPipelineState *pnew_state = new OpenGLPipelineState( **ppPipelineState );
     ShaderSourceList list;
 
     if ( !( *ppPipelineState )->vertexShaderName.empty() ) {
@@ -160,6 +160,6 @@ bool GLPipelineStateManager::InitializePipelineState(
 void GLPipelineStateManager::DestroyPipelineState(
     PipelineState &pipelineState )
 {
-    GLPipelineState *pPipelineState = dynamic_cast<GLPipelineState *>( &pipelineState );
+    OpenGLPipelineState *pPipelineState = dynamic_cast<OpenGLPipelineState *>( &pipelineState );
     glDeleteProgram( pPipelineState->shaderProgram );
 }

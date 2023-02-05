@@ -189,7 +189,6 @@ struct MaterialCache {
 
 void MainRenderer::renderToVoxelTexture()
 {
-    const Scene& scene = Com_GetScene();
     const int voxelSize = Dvar_GetInt( r_voxelSize );
 
     // @TODO: move to PSO
@@ -243,8 +242,6 @@ void MainRenderer::renderFrameBufferTextures( const ivec2& extent )
 void MainRenderer::render()
 {
     Scene& scene = Com_GetScene();
-
-    g_perFrameCache.Update();
 
     // clear window
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );

@@ -9,8 +9,8 @@
 #define PS_HUD_IMAGE_SOURCE_FILE        "hud/image.frag"
 #define VS_HUD_TEXTURE_SOURCE_FILE      "fullscreen.vert"
 #define PS_HUD_TEXTURE_SOURCE_FILE      "hud/texture.frag"
-#define VS_DEPTH_SOURCE_FILE            "depth.vert"
-#define PS_DEPTH_SOURCE_FILE            "depth.frag"
+#define VS_SHADOWMAP_SOURCE_FILE        "shadowmap.vert"
+#define PS_SHADOWMAP_SOURCE_FILE        "shadowmap.frag"
 #define VS_GBUFFER_SOURCE_FILE          "gbuffer.vert"
 #define PS_GBUFFER_SOURCE_FILE          "gbuffer.frag"
 #define VS_SSAO_SOURCE_FILE             "fullscreen.vert"
@@ -134,8 +134,8 @@ bool PipelineStateManager::Init()
 
     {
         PipelineStateEx pipelineState{ "SHADOW" };
-        pipelineState.vertexShaderName = VS_DEPTH_SOURCE_FILE;
-        pipelineState.pixelShaderName = PS_DEPTH_SOURCE_FILE;
+        pipelineState.vertexShaderName = VS_SHADOWMAP_SOURCE_FILE;
+        pipelineState.pixelShaderName = PS_SHADOWMAP_SOURCE_FILE;
         RegisterPipelineState( pipelineState );
     }
 

@@ -6,7 +6,6 @@
 // inline include
 #include "shaders/cbuffer.glsl"
 
-extern gl::ConstantBuffer<PerFrameCB> g_perFrameCache;
 extern gl::ConstantBuffer<MaterialCB> g_materialCache;
 extern gl::ConstantBuffer<ConstantCB> g_constantCache;
 

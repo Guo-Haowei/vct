@@ -116,8 +116,6 @@ void R_DrawEditor()
         g_gfxMgr->SetPipelineState( PSO );
 
         glBindVertexArray( g_boxWireFrame.vao );
-        g_perBatchCache.cache.Model = mat4( 1 );
-        g_perBatchCache.Update();
         glDrawElements( GL_LINES, g_boxWireFrame.count, GL_UNSIGNED_INT, 0 );
     }
 

@@ -21,8 +21,6 @@ void R_Gbuffer_Pass()
     auto PSO = g_pPipelineStateManager->GetPipelineState( "GBUFFER" );
     g_gfxMgr->SetPipelineState( PSO );
 
-    Scene& scene = Com_GetScene();
-
     g_gbufferRT.Bind();
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );

@@ -18,20 +18,10 @@
 #define CBUFFER( NAME, SLOT ) layout( std140, binding = SLOT ) uniform NAME
 #endif
 
-CBUFFER( PerBatchConstants, 1 )
-{
-    mat4 M;
-};
-
-#ifdef __cplusplus
-struct PerFrameCB
-#else
-layout( std140, binding = 0 ) uniform PerFrameCB
-#endif
+CBUFFER( PerFrameConstants, 0 )
 {
     mat4 View;
     mat4 Proj;
-    mat4 PV;
 
     vec3 CamPos;
     int DebugCSM;
@@ -61,6 +51,11 @@ layout( std140, binding = 0 ) uniform PerFrameCB
     vec2 padding0;
     int EnableSSAO;
     int EnableFXAA;
+};
+
+CBUFFER( PerBatchConstants, 1 )
+{
+    mat4 Model;
 };
 
 #ifdef __cplusplus
@@ -114,10 +109,10 @@ layout( std140, binding = 3 ) uniform ConstantCB
 };
 
 #ifdef __cplusplus
-static_assert( sizeof( PerFrameCB ) % 16 == 0 );
 static_assert( sizeof( MaterialCB ) % 16 == 0 );
 static_assert( sizeof( ConstantCB ) % 16 == 0 );
 
 // CB size is required to be 256-byte aligned.
 const size_t kSizePerBatchConstantBuffer = ALIGN( sizeof( PerBatchConstants ), 256 );
+const size_t kSizePerFrameConstantBuffer = ALIGN( sizeof( PerFrameConstants ), 256 );
 #endif

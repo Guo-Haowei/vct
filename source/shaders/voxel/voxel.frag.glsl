@@ -67,7 +67,6 @@ void main()
     const float ambient = 0.3;
 
     float shadow = 0.0;
-    float clipSpaceZ = ( PV * vec4( pass_position, 1.0 ) ).z;
 
     // use lowest cascade for voxel
     vec4 lightSpacePos = pass_light_space_position;

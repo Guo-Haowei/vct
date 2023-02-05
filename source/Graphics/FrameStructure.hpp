@@ -7,17 +7,8 @@
 
 #include "shaders/cbuffer.glsl"
 
-// @TODO: fix
-//using Texture2D = uint32_t;
-
-// struct material_textures {
-//     Texture2D diffuseMap;
-//     Texture2D normalMap;
-//     Texture2D metallicMap;
-//     Texture2D roughnessMap;
-//     Texture2D aoMap;
-//     Texture2D heightMap;
-// };
+struct DrawFrameContext : PerFrameConstants {
+};
 
 struct DrawBatchContext : PerBatchConstants {
     int32_t batchIndex{ 0 };
@@ -29,5 +20,6 @@ struct DrawBatchContext : PerBatchConstants {
 };
 
 struct Frame {
+    DrawFrameContext frameContexts;
     std::vector<std::shared_ptr<DrawBatchContext>> batchContexts;
 };

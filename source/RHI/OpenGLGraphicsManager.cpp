@@ -1,4 +1,4 @@
-#include "GLGraphicsManager.hpp"
+#include "OpenGLGraphicsManager.hpp"
 
 #include <set>
 
@@ -6,15 +6,15 @@
 
 #include "Core/com_dvars.h"
 
-#include "GLPipelineStateManager.hpp"
+#include "OpenGLPipelineStateManager.hpp"
 
 #include "Graphics/gl_utils.h"
 
-GraphicsManager *g_gfxMgr = new GLGraphicsManager();
+GraphicsManager *g_gfxMgr = new OpenGLGraphicsManager();
 
 static void APIENTRY debug_callback( GLenum, GLenum, unsigned int, GLenum, GLsizei, const char *, const void * );
 
-bool GLGraphicsManager::Init()
+bool OpenGLGraphicsManager::Init()
 {
     if ( gladLoadGL() == 0 ) {
         LOG_FATAL( "[glad] failed to load gl functions" );
@@ -39,14 +39,14 @@ bool GLGraphicsManager::Init()
     return ( m_initialized = true );
 }
 
-void GLGraphicsManager::Deinit()
+void OpenGLGraphicsManager::Deinit()
 {
     m_initialized = false;
 }
 
-void GLGraphicsManager::SetPipelineState( const std::shared_ptr<PipelineState> &pipelineState )
+void OpenGLGraphicsManager::SetPipelineState( const std::shared_ptr<PipelineState> &pipelineState )
 {
-    const GLPipelineState *pPipelineState = dynamic_cast<const GLPipelineState *>( pipelineState.get() );
+    const OpenGLPipelineState *pPipelineState = dynamic_cast<const OpenGLPipelineState *>( pipelineState.get() );
 
     //m_CurrentShader = pPipelineState->shaderProgram;
 
@@ -126,13 +126,16 @@ static void FillMaterialCB( const MaterialData *mat, MaterialCB &cb )
     cb.TextureMapIdx = mat->textureMapIdx;
     cb.ReflectPower = mat->reflectPower;
 }
+
 // HACK:
-void GLGraphicsManager::DrawBatch( const Frame & )
+void OpenGLGraphicsManager::DrawBatch( const Frame & )
 {
     // @TODO: culling
     // Frustum frustum( scene.camera.ProjView() );
     // if ( !frustum.Intersect( geom.boundingBox ) ) {
     // }
+
+    UpdateConstants();
 
     const Frame &frame = m_frame;
     for ( auto &pDbc : frame.batchContexts ) {
@@ -153,7 +156,19 @@ void GLGraphicsManager::DrawBatch( const Frame & )
     glBindVertexArray( 0 );
 }
 
-void GLGraphicsManager::SetPerBatchConstants(
+void OpenGLGraphicsManager::SetPerFrameConstants(
+    const DrawFrameContext &context )
+{
+    glBindBuffer( GL_UNIFORM_BUFFER, m_uboDrawFrameConstant );
+
+    const auto &constants = static_cast<const PerFrameConstants &>( context );
+
+    glBufferData( GL_UNIFORM_BUFFER, kSizePerFrameConstantBuffer, &constants, GL_DYNAMIC_DRAW );
+
+    glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+}
+
+void OpenGLGraphicsManager::SetPerBatchConstants(
     const DrawBatchContext &context )
 {
     glBindBuffer( GL_UNIFORM_BUFFER, m_uboDrawBatchConstant );
@@ -165,7 +180,7 @@ void GLGraphicsManager::SetPerBatchConstants(
     glBindBuffer( GL_UNIFORM_BUFFER, 0 );
 }
 
-void GLGraphicsManager::InitializeGeometries( const Scene &scene )
+void OpenGLGraphicsManager::InitializeGeometries( const Scene &scene )
 {
     // glBindBufferBase( GL_UNIFORM_BUFFER, slot, handle );
     uint32_t batch_index = 0;
@@ -181,23 +196,35 @@ void GLGraphicsManager::InitializeGeometries( const Scene &scene )
             dbc->count = drawData->count;
 
             dbc->pGeom = &geom;
-            dbc->M = mat4( 1 );
+            dbc->Model = mat4( 1 );
 
             m_frame.batchContexts.push_back( dbc );
         }
     }
 
-    int slot = 1;
-    GLuint handle = 0;
-    glGenBuffers( 1, &handle );
-    // glBindBuffer( GL_UNIFORM_BUFFER, handle );
-    // glBufferData( GL_UNIFORM_BUFFER, sizeInByte, nullptr, GL_DYNAMIC_DRAW );
-    // glBindBuffer( GL_UNIFORM_BUFFER, 0 );
-    glBindBufferBase( GL_UNIFORM_BUFFER, slot, handle );
-    // LOG_DEBUG( "[opengl] created buffer of size %zu (slot %d)", sizeInByte, slot );
-    glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+    {
+        GLuint handle = 0;
+        glGenBuffers( 1, &handle );
+        glBindBufferBase( GL_UNIFORM_BUFFER, 0, handle );
+        glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+        m_uboDrawFrameConstant = handle;
+    }
 
-    m_uboDrawBatchConstant = handle;
+    {
+        GLuint handle = 0;
+        glGenBuffers( 1, &handle );
+        glBindBufferBase( GL_UNIFORM_BUFFER, 1, handle );
+        glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+        m_uboDrawBatchConstant = handle;
+    }
+}
+
+void OpenGLGraphicsManager::BeginFrame( Frame & /*frame */ )
+{
+    Frame &frame = m_frame;
+
+    GraphicsManager::BeginFrame( frame );
+    SetPerFrameConstants( frame.frameContexts );
 }
 
 static void APIENTRY debug_callback(
