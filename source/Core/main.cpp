@@ -3,7 +3,6 @@
 #include "editor.h"
 #include "imgui/imgui.h"
 #include "imgui_impl_glfw.h"
-#include "universal/core_math.h"
 #include "universal/dvar_api.h"
 
 #include "Base/Asserts.h"

@@ -1,5 +1,5 @@
 #pragma once
-#include "universal/core_math.h"
+#include "Core/GeomMath.hpp"
 
 class Camera {
 public:

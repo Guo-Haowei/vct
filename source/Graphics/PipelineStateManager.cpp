@@ -117,13 +117,6 @@ bool PipelineStateManager::Initialize()
     }
 
     {
-        PipelineStateEx pipelineState{ "IMAGE2D" };
-        pipelineState.vertexShaderName = VS_HUD_IMAGE_SOURCE_FILE;
-        pipelineState.pixelShaderName = PS_HUD_IMAGE_SOURCE_FILE;
-        RegisterPipelineState( pipelineState );
-    }
-
-    {
         PipelineStateEx pipelineState{ "SHADOW" };
         pipelineState.vertexShaderName = VS_SHADOWMAP_SOURCE_FILE;
         pipelineState.pixelShaderName = PS_SHADOWMAP_SOURCE_FILE;

@@ -6,6 +6,8 @@ extern void R_DrawQuad();
 
 void SSAOPass::Draw( Frame& frame )
 {
+    unused( frame );
+
     auto PSO = m_pPipelineStateManager->GetPipelineState( "SSAO" );
     m_pGraphicsManager->SetPipelineState( PSO );
 

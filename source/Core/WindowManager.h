@@ -1,6 +1,6 @@
 #pragma once
-#include "universal/core_math.h"
 
+#include "GeomMath.hpp"
 #include "BaseManager.hpp"
 
 struct GLFWwindow;

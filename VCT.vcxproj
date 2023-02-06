@@ -17,6 +17,7 @@
     <ClCompile Include="source\Core\com_misc.cpp" />
     <ClCompile Include="source\Core\editor.cpp" />
     <ClCompile Include="source\Core\geometry.cpp" />
+    <ClCompile Include="source\Core\GeomMath.cpp" />
     <ClCompile Include="source\Core\imgui_impl_glfw.cpp" />
     <ClCompile Include="source\Core\main.cpp" />
     <ClCompile Include="source\Core\WindowManager.cpp" />
@@ -36,7 +37,6 @@
     <ClCompile Include="source\Graphics\MainRenderer.cpp" />
     <ClCompile Include="source\Graphics\PipelineStateManager.cpp" />
     <ClCompile Include="source\Graphics\r_cbuffers.cpp" />
-    <ClCompile Include="source\Graphics\r_editor.cpp" />
     <ClCompile Include="source\Graphics\r_rendertarget.cpp" />
     <ClCompile Include="source\imgui\imgui.cpp" />
     <ClCompile Include="source\imgui\imgui_draw.cpp" />
@@ -44,8 +44,8 @@
     <ClCompile Include="source\imgui\imgui_widgets.cpp" />
     <ClCompile Include="source\RHI\OpenGLGraphicsManager.cpp" />
     <ClCompile Include="source\RHI\OpenGLPipelineStateManager.cpp" />
+    <ClCompile Include="source\SceneGraph\Entity.cpp" />
     <ClCompile Include="source\scene\scene_loader.cpp" />
-    <ClCompile Include="source\universal\core_math.cpp" />
     <ClCompile Include="source\universal\dvar_api.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -56,6 +56,7 @@
     <ClInclude Include="source\Core\com_misc.h" />
     <ClInclude Include="source\Core\editor.h" />
     <ClInclude Include="source\Core\geometry.h" />
+    <ClInclude Include="source\Core\GeomMath.hpp" />
     <ClInclude Include="source\Core\imgui_impl_glfw.h" />
     <ClInclude Include="source\Core\scene.h" />
     <ClInclude Include="source\Core\scene_components.h" />
@@ -77,8 +78,6 @@
     <ClInclude Include="source\Graphics\MainRenderer.h" />
     <ClInclude Include="source\Graphics\PipelineStateManager.hpp" />
     <ClInclude Include="source\Graphics\r_cbuffers.h" />
-    <ClInclude Include="source\Graphics\r_defines.h" />
-    <ClInclude Include="source\Graphics\r_editor.h" />
     <ClInclude Include="source\Graphics\r_rendertarget.h" />
     <ClInclude Include="source\Graphics\stb_image.h" />
     <ClInclude Include="source\imgui\imconfig.h" />
@@ -92,8 +91,8 @@
     <ClInclude Include="source\Interface\IRuntimeModule.hpp" />
     <ClInclude Include="source\RHI\OpenGLGraphicsManager.hpp" />
     <ClInclude Include="source\RHI\OpenGLPipelineStateManager.hpp" />
+    <ClInclude Include="source\SceneGraph\Entity.hpp" />
     <ClInclude Include="source\scene\scene_loader.h" />
-    <ClInclude Include="source\universal\core_math.h" />
     <ClInclude Include="source\universal\dvar_api.h" />
     <ClInclude Include="source\universal\dvar_begin.h" />
     <ClInclude Include="source\universal\dvar_end.h" />

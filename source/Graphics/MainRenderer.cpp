@@ -10,8 +10,6 @@
 #include "Core/geometry.h"
 #include "Core/FileManager.h"
 #include "Core/WindowManager.h"
-#include "r_defines.h"
-#include "r_editor.h"
 #include "r_rendertarget.h"
 
 #include "GraphicsManager.hpp"
@@ -123,7 +121,6 @@ void MainRenderer::createGpuResources()
     R_Create_Pass_Resources();
 
     R_Alloc_Cbuffers();
-    R_CreateEditorResource();
     R_CreateRT();
 
     Scene& scene = Com_GetScene();
@@ -218,6 +215,7 @@ void MainRenderer::createGpuResources()
 }
 
 // @TODO: make another pass
+#if 0
 void MainRenderer::visualizeVoxels()
 {
     auto PSO = g_pPipelineStateManager->GetPipelineState( "VOXEL_VIS" );
@@ -226,6 +224,7 @@ void MainRenderer::visualizeVoxels()
     const int size = Dvar_GetInt( r_voxelSize );
     glDrawElementsInstanced( GL_TRIANGLES, m_box->count, GL_UNSIGNED_INT, 0, size * size * size );
 }
+#endif
 
 struct MaterialCache {
     vec4 albedo_color;  // if it doesn't have albedo color, then it's alpha is 0.0f
@@ -252,7 +251,6 @@ void MainRenderer::destroyGpuResources()
 {
     R_DestroyRT();
 
-    R_DestroyEditorResource();
     R_Destroy_Cbuffers();
 
     R_Destroy_Pass_Resources();

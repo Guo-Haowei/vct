@@ -9,8 +9,6 @@
 class MainRenderer {
 public:
     void createGpuResources();
-    void renderFrameBufferTextures( const ivec2& extent );
-    void visualizeVoxels();
     void destroyGpuResources();
 
 private:

@@ -5,9 +5,6 @@
 #ifndef MAX_MATERIALS
 #define MAX_MATERIALS 300
 #endif
-#ifndef MAX_LIGHT_ICON
-#define MAX_LIGHT_ICON 4
-#endif
 #ifndef NUM_SSAO_KERNEL
 #define NUM_SSAO_KERNEL 64
 #endif
@@ -17,6 +14,42 @@
 #else
 #define CBUFFER( NAME, SLOT ) layout( std140, binding = SLOT ) uniform NAME
 #endif
+
+// struct TextureBase {
+//     TextureHandler handler = 0;
+//     TextureFormat format = 0;
+//     PIXEL_FORMAT pixel_format;
+
+//     uint32_t width = 0;
+//     uint32_t height = 0;
+//     uint32_t mips = 1;
+//     uint32_t samples = 1;
+// };
+
+// struct TextureArrayBase : virtual TextureBase {
+//     uint32_t size = 0;
+// };
+
+// struct Texture2D : virtual TextureBase {
+// };
+
+// struct TextureCube : virtual TextureBase {
+// };
+
+// struct Texture2DArray : Texture2D, TextureArrayBase {
+// };
+
+// struct TextureCubeArray : TextureCube, TextureArrayBase {
+// };
+
+// struct material_textures {
+//     Texture2D diffuseMap;
+//     Texture2D normalMap;
+//     Texture2D metallicMap;
+//     Texture2D roughnessMap;
+//     Texture2D aoMap;
+//     Texture2D heightMap;
+// };
 
 CBUFFER( PerFrameConstants, 0 )
 {
@@ -104,7 +137,6 @@ layout( std140, binding = 3 ) uniform ConstantCB
     sampler2D NoiseMap;
     sampler2D FinalImage;
     sampler2D FXAA;
-    Sampler2DArray LightIconTextures[MAX_LIGHT_ICON];
     Sampler2DArray AlbedoMaps[MAX_MATERIALS];
     Sampler2DArray NormalMaps[MAX_MATERIALS];
     Sampler2DArray PbrMaps[MAX_MATERIALS];

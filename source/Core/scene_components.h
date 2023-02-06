@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "universal/core_math.h"
+#include "Core/GeomMath.hpp"
 
 struct MeshComponent {
     enum Flag {
