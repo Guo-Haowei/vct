@@ -13,6 +13,8 @@ BaseDrawPass::BaseDrawPass( IGraphicsManager* pGfxMgr, IPipelineStateManager* pP
 
 void BaseDrawPass::BeginPass( Frame& frame )
 {
+    unused( frame );
+
     if ( m_pRenderTarget ) {
         m_pRenderTarget->Bind();
     }
@@ -40,5 +42,6 @@ void BaseDrawPass::EndPass( Frame& )
 
 void BaseDrawPass::Draw( Frame& frame )
 {
+    unused( frame );
     // DO NOTHING FOR NOW
 }

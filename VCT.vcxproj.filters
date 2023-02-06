@@ -135,6 +135,9 @@
     <ClCompile Include="source\DrawPass\OverlayPass.cpp">
       <Filter>source\DrawPass</Filter>
     </ClCompile>
+    <ClCompile Include="source\DrawPass\GuiPass.cpp">
+      <Filter>source\DrawPass</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\imgui\imconfig.h">
@@ -276,6 +279,9 @@
       <Filter>source\DrawPass</Filter>
     </ClInclude>
     <ClInclude Include="source\DrawPass\OverlayPass.hpp">
+      <Filter>source\DrawPass</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DrawPass\GuiPass.hpp">
       <Filter>source\DrawPass</Filter>
     </ClInclude>
   </ItemGroup>

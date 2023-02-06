@@ -23,6 +23,7 @@
     <ClCompile Include="source\DrawPass\BaseDrawPass.cpp" />
     <ClCompile Include="source\DrawPass\DeferredPass.cpp" />
     <ClCompile Include="source\DrawPass\GBufferPass.cpp" />
+    <ClCompile Include="source\DrawPass\GuiPass.cpp" />
     <ClCompile Include="source\DrawPass\OverlayPass.cpp" />
     <ClCompile Include="source\DrawPass\ShadowMapPass.cpp" />
     <ClCompile Include="source\DrawPass\SSAOPass.cpp" />
@@ -62,6 +63,7 @@
     <ClInclude Include="source\DrawPass\BaseDrawPass.hpp" />
     <ClInclude Include="source\DrawPass\DeferredPass.hpp" />
     <ClInclude Include="source\DrawPass\GBufferPass.hpp" />
+    <ClInclude Include="source\DrawPass\GuiPass.hpp" />
     <ClInclude Include="source\DrawPass\OverlayPass.hpp" />
     <ClInclude Include="source\DrawPass\ShadowMapPass.hpp" />
     <ClInclude Include="source\DrawPass\SSAOPass.hpp" />

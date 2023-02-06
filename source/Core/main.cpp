@@ -54,6 +54,7 @@ static int app_main( int argc, const char** argv )
         ImGui_ImplGlfw_NewFrame();
 
         Com_UpdateWorld();
+        EditorSetup();
 
         g_gfxMgr->Tick();
 

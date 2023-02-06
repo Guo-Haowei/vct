@@ -25,7 +25,7 @@ public:
 
     virtual void BeginPass( Frame& frame );
     virtual void Draw( Frame& frame );
-    virtual void EndPass( Frame& );
+    virtual void EndPass( Frame& frame );
 
 protected:
     // std::vector<std::shared_ptr<IDrawSubPass>> m_DrawSubPasses;
@@ -37,11 +37,3 @@ protected:
     RenderTarget* m_pRenderTarget;
     const uint32_t m_clearFlag;
 };
-
-// @TODO: remove
-extern BaseDrawPass* g_pShadowDrawPass;
-extern BaseDrawPass* g_pSSAOPass;
-extern BaseDrawPass* g_pGBufferPass;
-extern BaseDrawPass* g_pDeferredPass;
-extern BaseDrawPass* g_pVoxelizationPass;
-extern BaseDrawPass* g_pOverlayPass;

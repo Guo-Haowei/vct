@@ -20,13 +20,7 @@
 #include "DrawPass/DeferredPass.hpp"
 #include "DrawPass/OverlayPass.hpp"
 #include "DrawPass/VoxelizationPass.hpp"
-
-BaseDrawPass *g_pShadowDrawPass;
-BaseDrawPass *g_pSSAOPass;
-BaseDrawPass *g_pGBufferPass;
-BaseDrawPass *g_pDeferredPass;
-BaseDrawPass *g_pVoxelizationPass;
-BaseDrawPass *g_pOverlayPass;
+#include "DrawPass/GuiPass.hpp"
 
 GraphicsManager *g_gfxMgr = new OpenGLGraphicsManager();
 
@@ -68,6 +62,7 @@ bool OpenGLGraphicsManager::Initialize()
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new SSAOPass( this, psm, &g_ssaoRT, CLEAR_FLAG_COLOR ) ) );
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new DeferredPass( this, psm, &g_finalImageRT, CLEAR_FLAG_COLOR ) ) );
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new OverlayPass( this, psm, nullptr, CLEAR_FLAG_COLOR_DPETH ) ) );
+    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new GuiPass( this, psm, nullptr, 0 ) ) );
 
     return ( m_bInitialized = true );
 }
@@ -260,8 +255,6 @@ void OpenGLGraphicsManager::Draw()
         drawPass->Draw( frame );
         drawPass->EndPass( frame );
     }
-
-    EditorSetup();
 }
 
 void OpenGLGraphicsManager::EndFrame( Frame &frame )
