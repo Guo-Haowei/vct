@@ -1,30 +1,36 @@
 #pragma once
-#include "Core/BaseManager.hpp"
+#include "Interface/IGraphicsManager.hpp"
 
-#include "PipelineStateManager.hpp"
+// #include <vector>
+
 #include "FrameStructure.hpp"
+#include "DrawPass/BaseDrawPass.hpp"
 
 struct GLFWwindow;
 
-class GraphicsManager : _Inherits_ BaseManager {
+class GraphicsManager : public IGraphicsManager {
 public:
-    GraphicsManager( const char* debugName )
-        : BaseManager( debugName ) {}
-
+    virtual bool Initialize() override;
     virtual void Tick() override;
+
+    virtual void Draw() override;
+    virtual void Present() override {}
 
     virtual void SetPipelineState( const std::shared_ptr<PipelineState>& ) {}
 
     virtual void DrawBatch( const Frame& ) = 0;
 
-    virtual void InitializeGeometries( const Scene& ) {}
-
     virtual void BeginFrame( Frame& ) {}
     virtual void EndFrame( Frame& ) {}
 
-private:
-    // @TODO: make private
+    virtual void BeginPass( Frame& ) override {}
+    virtual void EndPass( Frame& ) override {}
+
 public:
+    // @TODO: make protected:
+    virtual void InitializeGeometries( const Scene& ) {}
+
+private:
     void CalculateCameraMatrix();
     void CalculateLights();
 
@@ -32,6 +38,8 @@ public:
 
 protected:
     Frame m_frame;
+    bool m_bInitialized{ false };
+    std::vector<std::shared_ptr<BaseDrawPass>> m_drawPasses;
 };
 
 extern GraphicsManager* g_gfxMgr;

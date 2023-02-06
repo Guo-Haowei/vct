@@ -8,7 +8,7 @@ bool manager_init( BaseManager* manager )
     ASSERT( manager && !manager->IsInitialized() );
     const char* debugName = manager->GetDebugName().c_str();
     LOG_INFO( "manager_init: Initializing manager '%s'...", debugName );
-    if ( !manager->Init() ) {
+    if ( !manager->Initialize() ) {
         LOG_ERROR( "manager_init: Failed to initialize manager '%s'...", debugName );
         return false;
     }

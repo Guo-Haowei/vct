@@ -4,22 +4,19 @@
 // @TODO: rename to OpenGL
 class OpenGLGraphicsManager : public GraphicsManager {
 public:
-    OpenGLGraphicsManager()
-        : GraphicsManager( "GLGraphicsManager" )
-    {
-    }
+    virtual bool Initialize() override;
+    virtual void Finalize() override;
 
-    virtual bool Init() override;
-    virtual void Deinit() override;
+    virtual void SetPipelineState( const std::shared_ptr<PipelineState>& pipelineState ) final;
 
-    virtual void SetPipelineState( const std::shared_ptr<PipelineState>& pipelineState ) override;
-
-    virtual void DrawBatch( const Frame& frame ) override;
+    virtual void DrawBatch( const Frame& frame ) final;
 
     virtual void InitializeGeometries( const Scene& scene ) final;
 
     virtual void BeginFrame( Frame& frame ) final;
-    // virtual void EndFrame( Frame& frame ) {}
+    virtual void EndFrame( Frame& frame ) final;
+
+    virtual void Draw() final;
 
 protected:
     void SetPerFrameConstants( const DrawFrameContext& context );

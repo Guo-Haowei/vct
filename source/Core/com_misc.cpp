@@ -11,7 +11,6 @@
 #include "Base/Logger.h"
 
 #include "Graphics/r_cbuffers.h"
-#include "Graphics/r_sun_shadow.h"
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>

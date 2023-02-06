@@ -10,7 +10,7 @@
 #include "Core/FileManager.h"
 
 // TODO: remove
-PipelineStateManager *g_pPipelineStateManager = new GLPipelineStateManager();
+IPipelineStateManager *g_pPipelineStateManager = new GLPipelineStateManager();
 
 using std::pair;
 using std::string;

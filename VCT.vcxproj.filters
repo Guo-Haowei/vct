@@ -25,6 +25,9 @@
     <Filter Include="source\Graphics">
       <UniqueIdentifier>{ad44f282-0b40-48bc-87f7-cf6afcbdc298}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\DrawPass">
+      <UniqueIdentifier>{dd782f83-99de-43bb-bc77-33b3b7a8adc7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\dummy.cpp">
@@ -102,13 +105,7 @@
     <ClCompile Include="source\Graphics\r_editor.cpp">
       <Filter>source\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="source\Graphics\r_passes.cpp">
-      <Filter>source\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="source\Graphics\r_rendertarget.cpp">
-      <Filter>source\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Graphics\r_sun_shadow.cpp">
       <Filter>source\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="source\RHI\OpenGLGraphicsManager.cpp">
@@ -116,6 +113,30 @@
     </ClCompile>
     <ClCompile Include="source\Graphics\GraphicsManager.cpp">
       <Filter>source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DrawPass\BaseDrawPass.cpp">
+      <Filter>source\DrawPass</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DrawPass\ShadowMapPass.cpp">
+      <Filter>source\DrawPass</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DrawPass\SSAOPass.cpp">
+      <Filter>source\DrawPass</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DrawPass\DeferredPass.cpp">
+      <Filter>source\DrawPass</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DrawPass\GBufferPass.cpp">
+      <Filter>source\DrawPass</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DrawPass\VoxelizationPass.cpp">
+      <Filter>source\DrawPass</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DrawPass\OverlayPass.cpp">
+      <Filter>source\DrawPass</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DrawPass\GuiPass.cpp">
+      <Filter>source\DrawPass</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -182,9 +203,6 @@
     <ClInclude Include="source\Core\WindowManager.h">
       <Filter>source\Core</Filter>
     </ClInclude>
-    <ClInclude Include="source\Interface\Interface.hpp">
-      <Filter>source\Interface</Filter>
-    </ClInclude>
     <ClInclude Include="source\Interface\IRuntimeModule.hpp">
       <Filter>source\Interface</Filter>
     </ClInclude>
@@ -227,13 +245,7 @@
     <ClInclude Include="source\Graphics\r_editor.h">
       <Filter>source\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="source\Graphics\r_passes.h">
-      <Filter>source\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="source\Graphics\r_rendertarget.h">
-      <Filter>source\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Graphics\r_sun_shadow.h">
       <Filter>source\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="source\Graphics\stb_image.h">
@@ -241,6 +253,36 @@
     </ClInclude>
     <ClInclude Include="source\RHI\OpenGLGraphicsManager.hpp">
       <Filter>source\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DrawPass\BaseDrawPass.hpp">
+      <Filter>source\DrawPass</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DrawPass\ShadowMapPass.hpp">
+      <Filter>source\DrawPass</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DrawPass\SSAOPass.hpp">
+      <Filter>source\DrawPass</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DrawPass\DeferredPass.hpp">
+      <Filter>source\DrawPass</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DrawPass\GBufferPass.hpp">
+      <Filter>source\DrawPass</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Interface\IGraphicsManager.hpp">
+      <Filter>source\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Interface\IPipelineStateManager.hpp">
+      <Filter>source\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DrawPass\VoxelizationPass.hpp">
+      <Filter>source\DrawPass</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DrawPass\OverlayPass.hpp">
+      <Filter>source\DrawPass</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DrawPass\GuiPass.hpp">
+      <Filter>source\DrawPass</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -3,31 +3,39 @@
 #include "Base/Asserts.h"
 
 #include "Core/com_dvars.h"
-#include "Core/com_misc.h"
 #include "Core/WindowManager.h"
+
+#include "imgui/imgui.h"
+
+#include "Core/com_misc.h"
 
 #ifdef max
 #undef max
 #endif
 
+bool GraphicsManager::Initialize()
+{
+    return true;
+}
+
 void GraphicsManager::Tick()
 {
     UpdateConstants();
 
-    // BeginFrame( m_Frames[m_nFrameIndex] );
-    // ImGui::NewFrame();
-    // Draw();
-    // ImGui::EndFrame();
-    // ImGui::Render();
-    // EndFrame( m_Frames[m_nFrameIndex] );
+    // Frame& frame = m_frames[];
+    Frame& frame = m_frame;
+    BeginFrame( frame );
+    ImGui::NewFrame();
 
-    // Present();
+    Draw();
 
-    // ImGuiIO& io = ImGui::GetIO();
-    // if ( io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable ) {
-    //     ImGui::UpdatePlatformWindows();
-    //     ImGui::RenderPlatformWindowsDefault();
-    // }
+    ImGui::EndFrame();
+    ImGui::Render();
+    EndFrame( frame );
+}
+
+void GraphicsManager::Draw()
+{
 }
 
 void GraphicsManager::CalculateCameraMatrix()
@@ -64,16 +72,11 @@ void GraphicsManager::UpdateConstants()
     const float texelSize = 1.0f / static_cast<float>( voxelTextureSize );
     const float voxelSize = worldSize * texelSize;
 
-    // HACK
-    static bool s_tmp = false;
-    if ( !s_tmp ) {
-        frameConstats.WorldCenter = center;
-        frameConstats.WorldSizeHalf = 0.5f * worldSize;
-        frameConstats.TexelSize = texelSize;
-        frameConstats.VoxelSize = voxelSize;
-        frameConstats.LightPV = R_HackLightSpaceMatrix( scene.light.direction );
-        s_tmp = true;
-    }
+    frameConstats.WorldCenter = center;
+    frameConstats.WorldSizeHalf = 0.5f * worldSize;
+    frameConstats.TexelSize = texelSize;
+    frameConstats.VoxelSize = voxelSize;
+    frameConstats.LightPV = R_HackLightSpaceMatrix( scene.light.direction );
 
     const Camera& camera = scene.camera;
     const ivec2 extent = g_wndMgr->FrameSize();
@@ -85,8 +88,6 @@ void GraphicsManager::UpdateConstants()
     frameConstats.View = camera.View();
     frameConstats.Proj = camera.Proj();
     frameConstats.EnableGI = Dvar_GetBool( r_enableVXGI );
-    frameConstats.DebugCSM = Dvar_GetBool( r_debugCSM );
-    frameConstats.DebugTexture = Dvar_GetInt( r_debugTexture );
     frameConstats.NoTexture = Dvar_GetBool( r_noTexture );
     frameConstats.ScreenWidth = extent.x;
     frameConstats.ScreenHeight = extent.y;
@@ -96,7 +97,4 @@ void GraphicsManager::UpdateConstants()
     frameConstats.SSAOKernelRadius = Dvar_GetFloat( r_ssaoKernelRadius );
     frameConstats.SSAONoiseSize = Dvar_GetInt( r_ssaoNoiseSize );
     frameConstats.EnableSSAO = Dvar_GetBool( r_enableSsao );
-
-    // FXAA
-    frameConstats.EnableFXAA = Dvar_GetBool( r_enableFXAA );
 }

@@ -10,12 +10,28 @@
 
 #include "Graphics/gl_utils.h"
 
+#include "Graphics/imgui_impl_opengl3.h"
+#include "Core/WindowManager.h"
+
+// @TODO: remove
+#include "DrawPass/ShadowMapPass.hpp"
+#include "DrawPass/SSAOPass.hpp"
+#include "DrawPass/GBufferPass.hpp"
+#include "DrawPass/DeferredPass.hpp"
+#include "DrawPass/OverlayPass.hpp"
+#include "DrawPass/VoxelizationPass.hpp"
+#include "DrawPass/GuiPass.hpp"
+
 GraphicsManager *g_gfxMgr = new OpenGLGraphicsManager();
 
 static void APIENTRY debug_callback( GLenum, GLenum, unsigned int, GLenum, GLsizei, const char *, const void * );
 
-bool OpenGLGraphicsManager::Init()
+bool OpenGLGraphicsManager::Initialize()
 {
+    if ( !GraphicsManager::Initialize() ) {
+        return false;
+    }
+
     if ( gladLoadGL() == 0 ) {
         LOG_FATAL( "[glad] failed to load gl functions" );
         return false;
@@ -36,12 +52,24 @@ bool OpenGLGraphicsManager::Init()
         }
     }
 
-    return ( m_initialized = true );
+    // @TODO: move to GraphicsManager
+    ASSERT( g_pPipelineStateManager );
+    IPipelineStateManager *psm = g_pPipelineStateManager;
+
+    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new ShadowMapPass( this, psm, &g_shadowRT, CLEAR_FLAG_DEPTH ) ) );
+    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new VoxelizationPass( this, psm, nullptr, CLEAR_FLAG_NONE ) ) );
+    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new GBufferPass( this, psm, &g_gbufferRT, CLEAR_FLAG_COLOR_DPETH ) ) );
+    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new SSAOPass( this, psm, &g_ssaoRT, CLEAR_FLAG_COLOR ) ) );
+    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new DeferredPass( this, psm, &g_finalImageRT, CLEAR_FLAG_COLOR ) ) );
+    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new OverlayPass( this, psm, nullptr, CLEAR_FLAG_COLOR_DPETH ) ) );
+    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new GuiPass( this, psm, nullptr, 0 ) ) );
+
+    return ( m_bInitialized = true );
 }
 
-void OpenGLGraphicsManager::Deinit()
+void OpenGLGraphicsManager::Finalize()
 {
-    m_initialized = false;
+    m_bInitialized = false;
 }
 
 void OpenGLGraphicsManager::SetPipelineState( const std::shared_ptr<PipelineState> &pipelineState )
@@ -131,12 +159,6 @@ static void FillMaterialCB( const MaterialData *mat, MaterialCB &cb )
 void OpenGLGraphicsManager::DrawBatch( const Frame & )
 {
     // @TODO: culling
-    // Frustum frustum( scene.camera.ProjView() );
-    // if ( !frustum.Intersect( geom.boundingBox ) ) {
-    // }
-
-    UpdateConstants();
-
     const Frame &frame = m_frame;
     for ( auto &pDbc : frame.batchContexts ) {
         SetPerBatchConstants( *pDbc );
@@ -202,29 +224,42 @@ void OpenGLGraphicsManager::InitializeGeometries( const Scene &scene )
         }
     }
 
-    {
+    auto createUBO = []( int slot ) {
         GLuint handle = 0;
         glGenBuffers( 1, &handle );
-        glBindBufferBase( GL_UNIFORM_BUFFER, 0, handle );
+        glBindBufferBase( GL_UNIFORM_BUFFER, slot, handle );
         glBindBuffer( GL_UNIFORM_BUFFER, 0 );
-        m_uboDrawFrameConstant = handle;
-    }
-
-    {
-        GLuint handle = 0;
-        glGenBuffers( 1, &handle );
-        glBindBufferBase( GL_UNIFORM_BUFFER, 1, handle );
-        glBindBuffer( GL_UNIFORM_BUFFER, 0 );
-        m_uboDrawBatchConstant = handle;
-    }
+        return handle;
+    };
+    m_uboDrawFrameConstant = createUBO( 0 );
+    m_uboDrawBatchConstant = createUBO( 1 );
 }
 
-void OpenGLGraphicsManager::BeginFrame( Frame & /*frame */ )
+void OpenGLGraphicsManager::BeginFrame( Frame &frame )
+{
+    GraphicsManager::BeginFrame( frame );
+
+    SetPerFrameConstants( frame.frameContexts );
+    // ImGui_ImplOpenGL3_NewFrame
+}
+
+// @TODO: make pass
+extern void EditorSetup();
+
+void OpenGLGraphicsManager::Draw()
 {
     Frame &frame = m_frame;
 
-    GraphicsManager::BeginFrame( frame );
-    SetPerFrameConstants( frame.frameContexts );
+    for ( auto &drawPass : m_drawPasses ) {
+        drawPass->BeginPass( frame );
+        drawPass->Draw( frame );
+        drawPass->EndPass( frame );
+    }
+}
+
+void OpenGLGraphicsManager::EndFrame( Frame &frame )
+{
+    ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
 }
 
 static void APIENTRY debug_callback(

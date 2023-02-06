@@ -7,8 +7,6 @@
 #define PS_HUD_LINE3D_SOURCE_FILE       "hud/line3d.frag"
 #define VS_HUD_IMAGE_SOURCE_FILE        "hud/image.vert"
 #define PS_HUD_IMAGE_SOURCE_FILE        "hud/image.frag"
-#define VS_HUD_TEXTURE_SOURCE_FILE      "fullscreen.vert"
-#define PS_HUD_TEXTURE_SOURCE_FILE      "hud/texture.frag"
 #define VS_SHADOWMAP_SOURCE_FILE        "shadowmap.vert"
 #define PS_SHADOWMAP_SOURCE_FILE        "shadowmap.frag"
 #define VS_GBUFFER_SOURCE_FILE          "gbuffer.vert"
@@ -17,17 +15,18 @@
 #define PS_SSAO_SOURCE_FILE             "ssao.frag"
 #define VS_DEFFERED_VCT_SOURCE_FILE     "fullscreen.vert"
 #define PS_DEFFERED_VCT_SOURCE_FILE     "vct_deferred.frag"
-#define VS_FXAA_SOURCE_FILE             "fullscreen.vert"
-#define PS_FXAA_SOURCE_FILE             "vct_deferred.frag"
 #define VS_VOXEL_SOURCE_FILE            "voxel/voxel.vert"
 #define GS_VOXEL_SOURCE_FILE            "voxel/voxel.geom"
 #define PS_VOXEL_SOURCE_FILE            "voxel/voxel.frag"
 #define VS_VOXEL_VISIUALIZE_SOURCE_FILE "voxel/visualization.vert"
 #define PS_VOXEL_VISIUALIZE_SOURCE_FILE "voxel/visualization.frag"
 #define CS_VOXEL_POST_SOURCE_FILE       "voxel/post.comp"
+#define VS_HUD_OVERLAY_SOURCE_FILE      "hud/overlay.vert"
+#define PS_HUD_OVERLAY_SOURCE_FILE      "hud/overlay.frag"
 
 PipelineStateManager::~PipelineStateManager()
 {
+    ASSERT( m_pipelineStates.empty() );
 }
 
 bool PipelineStateManager::RegisterPipelineState( PipelineState& pipelineState )
@@ -82,8 +81,7 @@ void PipelineStateManager::Clear()
     LOG_DEBUG( "Pipeline State Manager Clear has been called. " );
 }
 
-const std::shared_ptr<PipelineState> PipelineStateManager::GetPipelineState(
-    std::string name ) const
+const std::shared_ptr<PipelineState> PipelineStateManager::GetPipelineState( const std::string& name ) const
 {
     const auto& it = m_pipelineStates.find( name );
     if ( it != m_pipelineStates.end() ) {
@@ -96,7 +94,7 @@ const std::shared_ptr<PipelineState> PipelineStateManager::GetPipelineState(
     }
 }
 
-bool PipelineStateManager::Init()
+bool PipelineStateManager::Initialize()
 {
     struct PipelineStateEx : PipelineState {
         explicit PipelineStateEx( const char* name )
@@ -126,16 +124,10 @@ bool PipelineStateManager::Init()
     }
 
     {
-        PipelineStateEx pipelineState{ "DEBUG_TEXTURE" };
-        pipelineState.vertexShaderName = VS_HUD_TEXTURE_SOURCE_FILE;
-        pipelineState.pixelShaderName = PS_HUD_TEXTURE_SOURCE_FILE;
-        RegisterPipelineState( pipelineState );
-    }
-
-    {
         PipelineStateEx pipelineState{ "SHADOW" };
         pipelineState.vertexShaderName = VS_SHADOWMAP_SOURCE_FILE;
         pipelineState.pixelShaderName = PS_SHADOWMAP_SOURCE_FILE;
+        pipelineState.cullFaceMode = CULL_FACE_MODE::FRONT;
         RegisterPipelineState( pipelineState );
     }
 
@@ -157,13 +149,6 @@ bool PipelineStateManager::Init()
         PipelineStateEx pipelineState{ "VCT" };
         pipelineState.vertexShaderName = VS_DEFFERED_VCT_SOURCE_FILE;
         pipelineState.pixelShaderName = PS_DEFFERED_VCT_SOURCE_FILE;
-        RegisterPipelineState( pipelineState );
-    }
-
-    {
-        PipelineStateEx pipelineState{ "FXAA" };
-        pipelineState.vertexShaderName = VS_FXAA_SOURCE_FILE;
-        pipelineState.pixelShaderName = PS_FXAA_SOURCE_FILE;
         RegisterPipelineState( pipelineState );
     }
 
@@ -193,11 +178,18 @@ bool PipelineStateManager::Init()
         RegisterPipelineState( pipelineState );
     }
 
+    {
+        PipelineStateEx pipelineState{ "OVERLAY" };
+        pipelineState.vertexShaderName = VS_HUD_OVERLAY_SOURCE_FILE;
+        pipelineState.pixelShaderName = PS_HUD_OVERLAY_SOURCE_FILE;
+        RegisterPipelineState( pipelineState );
+    }
+
     LOG_OK( "Pipeline State Manager Initialized. [%zu]", m_pipelineStates.size() );
     return true;
 }
 
-void PipelineStateManager::Deinit()
+void PipelineStateManager::Finalize()
 {
     Clear();
 }

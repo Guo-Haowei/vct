@@ -12,7 +12,7 @@ static constexpr const char TITLE[] = "Editor";
 
 WindowManager* g_wndMgr = new WindowManager();
 
-bool WindowManager::Init()
+bool WindowManager::Initialize()
 {
     glfwSetErrorCallback( []( int code, const char* desc ) {
         LOG_FATAL( "[glfw] error(%d): %s", code, desc );
@@ -49,7 +49,7 @@ bool WindowManager::Init()
     return ( m_initialized = true );
 }
 
-void WindowManager::Deinit()
+void WindowManager::Finalize()
 {
     glfwDestroyWindow( m_window );
     glfwTerminate();

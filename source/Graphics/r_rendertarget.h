@@ -52,7 +52,6 @@ extern DepthRenderTarget g_shadowRT;
 extern GBuffer g_gbufferRT;
 extern SsaoRT g_ssaoRT;
 extern FinalImageRT g_finalImageRT;
-extern FinalImageRT g_fxaaRT;
 
 void R_CreateRT();
 void R_DestroyRT();

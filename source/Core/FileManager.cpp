@@ -51,7 +51,7 @@ SystemFile::Result SystemFile::Write( char* buffer, size_t size )
     std::fwrite( buffer, size, 1, file );
     return Result::Ok;
 }
-bool FileManager::Init()
+bool FileManager::Initialize()
 {
     if ( m_initialized ) {
         return true;
@@ -62,7 +62,7 @@ bool FileManager::Init()
     return ( m_initialized = true );
 }
 
-void FileManager::Deinit()
+void FileManager::Finalize()
 {
     m_initialized = false;
 }

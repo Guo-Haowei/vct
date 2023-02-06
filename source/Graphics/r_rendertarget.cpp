@@ -219,7 +219,6 @@ DepthRenderTarget g_shadowRT;
 GBuffer g_gbufferRT;
 SsaoRT g_ssaoRT;
 FinalImageRT g_finalImageRT;
-FinalImageRT g_fxaaRT;
 
 void R_CreateRT()
 {
@@ -235,7 +234,6 @@ void R_CreateRT()
     g_gbufferRT.Create( w, h );
     g_ssaoRT.Create( w, h );
     g_finalImageRT.Create( w, h );
-    g_fxaaRT.Create( w, h );
 }
 
 void R_DestroyRT()
