@@ -10,8 +10,6 @@
 #include "Core/geometry.h"
 #include "Core/FileManager.h"
 #include "Core/WindowManager.h"
-#include "r_defines.h"
-#include "r_editor.h"
 #include "r_rendertarget.h"
 
 #include "GraphicsManager.hpp"
@@ -123,7 +121,6 @@ void MainRenderer::createGpuResources()
     R_Create_Pass_Resources();
 
     R_Alloc_Cbuffers();
-    R_CreateEditorResource();
     R_CreateRT();
 
     Scene& scene = Com_GetScene();
@@ -150,16 +147,16 @@ void MainRenderer::createGpuResources()
     }
 
     // create mesh
-    for ( const auto& mesh : scene.meshes ) {
+    for ( const auto& mesh : scene.m_meshes ) {
         g_meshdata.emplace_back( CreateMeshData( *mesh.get() ) );
         mesh->gpuResource = g_meshdata.back().get();
     }
 
     // create material
-    ASSERT( scene.materials.size() < array_length( g_constantCache.cache.AlbedoMaps ) );
+    ASSERT( scene.m_materials.size() < array_length( g_constantCache.cache.AlbedoMaps ) );
 
-    for ( int idx = 0; idx < scene.materials.size(); ++idx ) {
-        const auto& mat = scene.materials.at( idx );
+    for ( int idx = 0; idx < scene.m_materials.size(); ++idx ) {
+        const auto& mat = scene.m_materials.at( idx );
 
         std::shared_ptr<MaterialData> matData( new MaterialData() );
         if ( !mat->albedoTexture.empty() ) {
@@ -183,7 +180,6 @@ void MainRenderer::createGpuResources()
         if ( !mat->normalTexture.empty() ) {
             matData->normalMap.create2DImageFromFile( mat->normalTexture.c_str() );
             g_constantCache.cache.NormalMaps[idx].data = gl::MakeTextureResident( matData->normalMap.GetHandle() );
-            LOG_INFO( "material has bump %s", mat->normalTexture.c_str() );
         }
 
         matData->textureMapIdx = idx;
@@ -218,6 +214,7 @@ void MainRenderer::createGpuResources()
 }
 
 // @TODO: make another pass
+#if 0
 void MainRenderer::visualizeVoxels()
 {
     auto PSO = g_pPipelineStateManager->GetPipelineState( "VOXEL_VIS" );
@@ -226,6 +223,7 @@ void MainRenderer::visualizeVoxels()
     const int size = Dvar_GetInt( r_voxelSize );
     glDrawElementsInstanced( GL_TRIANGLES, m_box->count, GL_UNSIGNED_INT, 0, size * size * size );
 }
+#endif
 
 struct MaterialCache {
     vec4 albedo_color;  // if it doesn't have albedo color, then it's alpha is 0.0f
@@ -252,7 +250,6 @@ void MainRenderer::destroyGpuResources()
 {
     R_DestroyRT();
 
-    R_DestroyEditorResource();
     R_Destroy_Cbuffers();
 
     R_Destroy_Pass_Resources();

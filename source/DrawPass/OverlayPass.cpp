@@ -7,6 +7,8 @@
 
 void OverlayPass::Draw( Frame& frame )
 {
+    unused( frame );
+
     auto PSO = m_pPipelineStateManager->GetPipelineState( "OVERLAY" );
     m_pGraphicsManager->SetPipelineState( PSO );
 

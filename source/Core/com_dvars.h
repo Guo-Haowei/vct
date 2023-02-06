@@ -5,8 +5,6 @@ DVAR_STRING( scene, "" );
 DVAR_FLOAT( scene_scale, 1.0f );
 
 // window
-DVAR_INT( wnd_width, 0 );
-DVAR_INT( wnd_height, 0 );
 DVAR_INT( wnd_frameless, 0 );
 
 // camera
@@ -20,7 +18,7 @@ DVAR_FLOAT( light_power, 20.0f );
 DVAR_INT( r_debug, 1 );
 DVAR_INT( r_enableVXGI, 1 );
 DVAR_INT( r_forceVXGI, 1 );
-DVAR_INT( r_showDebugTexture, 1 );
+DVAR_INT( r_showDebugTexture, 0 );
 DVAR_INT( r_noTexture, 0 );
 
 // voxel GI

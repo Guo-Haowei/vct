@@ -7,9 +7,6 @@
     <Filter Include="source\imgui">
       <UniqueIdentifier>{e04d8fdb-0ba5-434b-a693-fba893bc057e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\scene">
-      <UniqueIdentifier>{68dab9e1-cc2b-4496-bf88-a9594529bfe6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="source\universal">
       <UniqueIdentifier>{170e9c45-a67c-4879-b7cb-ccfaee181fdf}</UniqueIdentifier>
     </Filter>
@@ -28,6 +25,9 @@
     <Filter Include="source\DrawPass">
       <UniqueIdentifier>{dd782f83-99de-43bb-bc77-33b3b7a8adc7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\SceneGraph">
+      <UniqueIdentifier>{967736ca-e992-497d-98ed-3b4745c3cf75}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\dummy.cpp">
@@ -44,12 +44,6 @@
     </ClCompile>
     <ClCompile Include="source\imgui\imgui_widgets.cpp">
       <Filter>source\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\scene\scene_loader.cpp">
-      <Filter>source\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="source\universal\core_math.cpp">
-      <Filter>source\universal</Filter>
     </ClCompile>
     <ClCompile Include="source\universal\dvar_api.cpp">
       <Filter>source\universal</Filter>
@@ -102,9 +96,6 @@
     <ClCompile Include="source\Graphics\r_cbuffers.cpp">
       <Filter>source\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="source\Graphics\r_editor.cpp">
-      <Filter>source\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="source\Graphics\r_rendertarget.cpp">
       <Filter>source\Graphics</Filter>
     </ClCompile>
@@ -138,6 +129,18 @@
     <ClCompile Include="source\DrawPass\GuiPass.cpp">
       <Filter>source\DrawPass</Filter>
     </ClCompile>
+    <ClCompile Include="source\SceneGraph\Entity.cpp">
+      <Filter>source\SceneGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Core\GeomMath.cpp">
+      <Filter>source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SceneGraph\Scene.cpp">
+      <Filter>source\SceneGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Core\AssimpLoader.cpp">
+      <Filter>source\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\imgui\imconfig.h">
@@ -157,12 +160,6 @@
     </ClInclude>
     <ClInclude Include="source\imgui\imstb_truetype.h">
       <Filter>source\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="source\scene\scene_loader.h">
-      <Filter>source\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="source\universal\core_math.h">
-      <Filter>source\universal</Filter>
     </ClInclude>
     <ClInclude Include="source\universal\dvar_api.h">
       <Filter>source\universal</Filter>
@@ -194,12 +191,6 @@
     <ClInclude Include="source\Core\imgui_impl_glfw.h">
       <Filter>source\Core</Filter>
     </ClInclude>
-    <ClInclude Include="source\Core\scene.h">
-      <Filter>source\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Core\scene_components.h">
-      <Filter>source\Core</Filter>
-    </ClInclude>
     <ClInclude Include="source\Core\WindowManager.h">
       <Filter>source\Core</Filter>
     </ClInclude>
@@ -213,12 +204,6 @@
       <Filter>source\RHI</Filter>
     </ClInclude>
     <ClInclude Include="source\Graphics\gl_utils.h">
-      <Filter>source\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Graphics\GLPrerequisites.h">
-      <Filter>source\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Graphics\GpuResource.h">
       <Filter>source\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="source\Graphics\GpuTexture.h">
@@ -237,12 +222,6 @@
       <Filter>source\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="source\Graphics\r_cbuffers.h">
-      <Filter>source\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Graphics\r_defines.h">
-      <Filter>source\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Graphics\r_editor.h">
       <Filter>source\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="source\Graphics\r_rendertarget.h">
@@ -283,6 +262,18 @@
     </ClInclude>
     <ClInclude Include="source\DrawPass\GuiPass.hpp">
       <Filter>source\DrawPass</Filter>
+    </ClInclude>
+    <ClInclude Include="source\SceneGraph\Entity.hpp">
+      <Filter>source\SceneGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Core\GeomMath.hpp">
+      <Filter>source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="source\SceneGraph\Scene.hpp">
+      <Filter>source\SceneGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Core\AssimpLoader.hpp">
+      <Filter>source\Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

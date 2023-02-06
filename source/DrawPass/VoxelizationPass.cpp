@@ -4,7 +4,6 @@
 #include "Graphics/r_rendertarget.h"
 #include "Core/com_dvars.h"
 #include "glad/glad.h"
-#include "Graphics/r_defines.h"
 
 extern GpuTexture m_albedoVoxel;
 extern GpuTexture m_normalVoxel;
@@ -20,6 +19,9 @@ void VoxelizationPass::Draw( Frame& frame )
     // @TODO: move to PSO
     glDisable( GL_BLEND );
     glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
+
+    constexpr int IMAGE_VOXEL_ALBEDO_SLOT = 0;
+    constexpr int IMAGE_VOXEL_NORMAL_SLOT = 1;
 
     m_albedoVoxel.bindImageTexture( IMAGE_VOXEL_ALBEDO_SLOT );
     m_normalVoxel.bindImageTexture( IMAGE_VOXEL_NORMAL_SLOT );

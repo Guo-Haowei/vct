@@ -1,6 +1,7 @@
-#include "scene_loader.h"
+#include "AssimpLoader.hpp"
 
-#include <assert.h>
+#include <filesystem>
+
 #include <assimp/pbrmaterial.h>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
@@ -10,14 +11,14 @@
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
 
-#include "Core/com_dvars.h"
-#include "Core/FileManager.h"
-#include "universal/dvar_api.h"
+#include "com_dvars.h"
+#include "FileManager.h"
 
 using std::string;
 using std::vector;
+namespace fs = std::filesystem;
 
-void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transform, bool flipUVs )
+void AssimpLoader::loadGltf( const char* path, Scene& scene, bool flipUVs )
 {
     string fullpath = g_fileMgr->BuildAbsPath( path );
     LOG_DEBUG( "[assimp] loading model from '%s'", fullpath.c_str() );
@@ -34,47 +35,32 @@ void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transfor
         LOG_ERROR( "[assimp] failed to load scene '%s'\n\tdetails: %s", fullpath.c_str(), importer.GetErrorString() );
     }
 
-    const uint32_t numMeshes    = aiscene->mNumMeshes;
+    const uint32_t numMeshes = aiscene->mNumMeshes;
     const uint32_t numMaterials = aiscene->mNumMaterials;
 
     LOG_DEBUG( "scene '%s' has %u meshes, %u materials", path, numMeshes, numMaterials );
 
     // set base path
-    m_currentPath = fullpath;
-    auto found    = m_currentPath.find_last_of( "/\\" );
-    m_currentPath = m_currentPath.substr( 0, found + 1 );
+    fs::path fullsyspath{ fullpath };
+    string modelName = fullsyspath.filename().string();
+    m_currentPath = fullsyspath.remove_filename().string();
 
-    size_t materialOffset = scene.materials.size();
+    Entity* model = scene.RegisterEntity( modelName.c_str(), Entity::FLAG_NONE );
+    scene.m_root->AddChild( model );
 
-    for ( uint32_t i = 0; i < numMaterials; ++i )
-    {
+    size_t materialOffset = scene.m_materials.size();
+    for ( uint32_t i = 0; i < numMaterials; ++i ) {
         const aiMaterial* aimat = aiscene->mMaterials[i];
-        Material* mat           = processMaterial( aimat );
-        scene.materials.emplace_back( std::shared_ptr<Material>( mat ) );
+        Material* mat = processMaterial( aimat );
+        scene.m_materials.emplace_back( std::shared_ptr<Material>( mat ) );
     }
 
-    GeometryNode node;
-    // node.transform = transform;
-    node.transform = mat4( 1 );
-
-    for ( uint32_t i = 0; i < numMeshes; ++i )
-    {
+    for ( uint32_t i = 0; i < numMeshes; ++i ) {
         const aiMesh* aimesh = aiscene->mMeshes[i];
         std::shared_ptr<MeshComponent> mesh( processMesh( aimesh ) );
         const size_t index = materialOffset + mesh->materialIdx;
 
-        std::shared_ptr<Material>& mat = scene.materials.at( index );
         AABB box;
-
-        for ( vec3& position : mesh->positions )
-        {
-            position = transform * vec4( position, 1.0 );
-        }
-        for ( vec3& normal : mesh->normals )
-        {
-            normal = mat3( transform ) * normal;
-        }
-
         box.Expand( mesh->positions.data(), mesh->positions.size() );
 
         // slightly enlarge bounding box
@@ -82,52 +68,33 @@ void SceneLoader::loadGltf( const char* path, Scene& scene, const mat4& transfor
         box.min -= offset;
         box.max += offset;
 
-        // box.ApplyMatrix( transform );
-        Geometry geom;
-        geom.boundingBox = box;
-        geom.material    = mat;
-        geom.mesh        = mesh;
+        Entity* entity = scene.RegisterEntity( aimesh->mName.C_Str(), Entity::FLAG_GEOMETRY );
 
-        node.geometries.emplace_back( geom );
-        scene.meshes.emplace_back( mesh );
-        scene.boundingBox.Union( box );
+        model->AddChild( entity );
+        entity->m_material = scene.m_materials.at( index ).get();
+        entity->m_mesh = mesh.get();
 
-        // HACK configure floor
-        // if ( Dvar_GetBool( r_mirrorFloor ) && mesh->name == "meshes_0-46" )
-        // {
-        //     mat->reflectPower = 1.0;
-        //     mat->albedo       = vec3( 1.0f );
-        //     mat->metallic     = 0.0f;
-        //     mat->roughness    = 1.0f;
-
-        //     mat->albedoTexture            = "";
-        //     mat->metallicRoughnessTexture = "";
-        //     mat->normalTexture            = "";
-        // }
+        scene.m_meshes.emplace_back( mesh );
+        scene.m_aabb.Union( box );
     }
-
-    scene.geometryNodes.push_back( node );
 }
 
-Material* SceneLoader::processMaterial( const aiMaterial* aimaterial )
+Material* AssimpLoader::processMaterial( const aiMaterial* aimaterial )
 {
     Material* mat = new Material;
 
     /// albedo
     {
         aiString path;
-        if ( aimaterial->GetTexture( AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_BASE_COLOR_TEXTURE, &path ) == AI_SUCCESS )
-        {
+        if ( aimaterial->GetTexture( AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_BASE_COLOR_TEXTURE, &path ) == AI_SUCCESS ) {
             mat->albedoTexture = m_currentPath;
             mat->albedoTexture.append( path.C_Str() );
         }
-        else if ( aimaterial->GetTexture( aiTextureType_DIFFUSE, 0, &path ) == AI_SUCCESS )
-        {
+        else if ( aimaterial->GetTexture( aiTextureType_DIFFUSE, 0, &path ) == AI_SUCCESS ) {
             mat->albedoTexture = m_currentPath;
             mat->albedoTexture.append( path.C_Str() );
         }
-        else
-        {
+        else {
             LOG_WARN( "[scene] mesh does not have diffuse texture" );
         }
     }
@@ -135,8 +102,7 @@ Material* SceneLoader::processMaterial( const aiMaterial* aimaterial )
     /// metallic roughness
     {
         aiString path;
-        if ( aimaterial->GetTexture( AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE, &path ) == AI_SUCCESS )
-        {
+        if ( aimaterial->GetTexture( AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE, &path ) == AI_SUCCESS ) {
             mat->metallicRoughnessTexture = m_currentPath;
             mat->metallicRoughnessTexture.append( path.C_Str() );
         }
@@ -145,13 +111,11 @@ Material* SceneLoader::processMaterial( const aiMaterial* aimaterial )
     /// normal texture
     {
         aiString path;
-        if ( aimaterial->GetTexture( aiTextureType_NORMALS, 0, &path ) == AI_SUCCESS )
-        {
+        if ( aimaterial->GetTexture( aiTextureType_NORMALS, 0, &path ) == AI_SUCCESS ) {
             mat->normalTexture = m_currentPath;
             mat->normalTexture.append( path.C_Str() );
         }
-        else if ( aimaterial->GetTexture( aiTextureType_HEIGHT, 0, &path ) == AI_SUCCESS )
-        {
+        else if ( aimaterial->GetTexture( aiTextureType_HEIGHT, 0, &path ) == AI_SUCCESS ) {
             mat->normalTexture = m_currentPath;
             mat->normalTexture.append( path.C_Str() );
         }
@@ -160,7 +124,7 @@ Material* SceneLoader::processMaterial( const aiMaterial* aimaterial )
     return mat;
 }
 
-MeshComponent* SceneLoader::processMesh( const aiMesh* aimesh )
+MeshComponent* AssimpLoader::processMesh( const aiMesh* aimesh )
 {
     ASSERT( aimesh->mNumVertices );
 
@@ -174,32 +138,27 @@ MeshComponent* SceneLoader::processMesh( const aiMesh* aimesh )
 
     mesh->flags = MeshComponent::HAS_UV_FLAG | MeshComponent::HAS_NORMAL_FLAG;
 
-    for ( uint32_t i = 0; i < aimesh->mNumVertices; ++i )
-    {
+    for ( uint32_t i = 0; i < aimesh->mNumVertices; ++i ) {
         auto& position = aimesh->mVertices[i];
         mesh->positions.emplace_back( vec3( position.x, position.y, position.z ) );
         auto& normal = aimesh->mNormals[i];
         mesh->normals.emplace_back( vec3( normal.x, normal.y, normal.z ) );
 
-        if ( hasUv )
-        {
+        if ( hasUv ) {
             auto& uv = aimesh->mTextureCoords[0][i];
             mesh->uvs.emplace_back( vec2( uv.x, uv.y ) );
         }
-        else
-        {
+        else {
             mesh->uvs.emplace_back( vec2( 0 ) );
         }
     }
 
     bool hasTangent = aimesh->mTangents != nullptr;
-    if ( hasTangent )
-    {
+    if ( hasTangent ) {
         mesh->flags |= MeshComponent::HAS_BITANGENT_FLAG;
         mesh->tangents.reserve( aimesh->mNumVertices );
         mesh->bitangents.reserve( aimesh->mNumVertices );
-        for ( uint32_t i = 0; i < aimesh->mNumVertices; ++i )
-        {
+        for ( uint32_t i = 0; i < aimesh->mNumVertices; ++i ) {
             auto& tangent = aimesh->mTangents[i];
             mesh->tangents.emplace_back( vec3( tangent.x, tangent.y, tangent.z ) );
             auto& bitangent = aimesh->mBitangents[i];
@@ -208,8 +167,7 @@ MeshComponent* SceneLoader::processMesh( const aiMesh* aimesh )
     }
 
     mesh->indices.reserve( aimesh->mNumFaces * 3 );
-    for ( uint32_t i = 0; i < aimesh->mNumFaces; ++i )
-    {
+    for ( uint32_t i = 0; i < aimesh->mNumFaces; ++i ) {
         aiFace& face = aimesh->mFaces[i];
         mesh->indices.emplace_back( face.mIndices[0] );
         mesh->indices.emplace_back( face.mIndices[1] );

@@ -6,6 +6,8 @@ extern void R_DrawQuad();
 
 void DeferredPass::Draw( Frame& frame )
 {
+    unused( frame );
+
     auto PSO = m_pPipelineStateManager->GetPipelineState( "VCT" );
     m_pGraphicsManager->SetPipelineState( PSO );
 

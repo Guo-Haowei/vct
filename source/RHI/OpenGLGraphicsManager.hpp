@@ -1,7 +1,6 @@
 #pragma once
 #include "Graphics/GraphicsManager.hpp"
 
-// @TODO: rename to OpenGL
 class OpenGLGraphicsManager : public GraphicsManager {
 public:
     virtual bool Initialize() override;
@@ -22,6 +21,7 @@ protected:
     void SetPerFrameConstants( const DrawFrameContext& context );
     void SetPerBatchConstants( const DrawBatchContext& context );
 
+    // @TODO: rename this to OpenGLDrawBatchContext
     struct GLDrawBatchContext : public DrawBatchContext {
         uint32_t vao{ 0 };
         uint32_t mode{ 0 };

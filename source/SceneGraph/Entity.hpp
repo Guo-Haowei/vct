@@ -1,9 +1,10 @@
 #pragma once
-#include <cstdint>
+#include <list>
+#include <memory>
 #include <string>
 #include <vector>
 
-#include "universal/core_math.h"
+#include "Core/GeomMath.hpp"
 
 struct MeshComponent {
     enum Flag {
@@ -45,4 +46,35 @@ struct Material {
     }
 
     mutable void* gpuResource = nullptr;
+};
+
+class Entity {
+    Entity( Entity& ) = delete;
+    Entity( Entity&& ) = delete;
+    Entity( const char* name, uint32_t flag )
+        : m_name( name ), m_flag( flag ) {}
+
+public:
+    enum {
+        FLAG_NONE = 0,
+        FLAG_GEOMETRY = 0x1,
+    };
+
+    virtual ~Entity() = default;
+
+    void GetCalculatedTransform( mat4& out ) const;
+    void AddChild( Entity* child );
+
+protected:
+public:
+    std::string m_name;
+    uint32_t m_flag;
+    mat4 m_trans = mat4( 1 );
+
+    std::list<Entity*> m_children;
+    Entity* m_pParent{ nullptr };
+    MeshComponent* m_mesh{ nullptr };
+    Material* m_material{ nullptr };
+
+    friend class Scene;
 };

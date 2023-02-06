@@ -34,6 +34,7 @@ public:
 
 void Editor::Update()
 {
+#if 0
     ImGuiIO& io = ImGui::GetIO();
     Scene& scene = Com_GetScene();
 
@@ -54,9 +55,6 @@ void Editor::Update()
 
             for ( const auto& node : scene.geometryNodes ) {
                 for ( const auto& geom : node.geometries ) {
-                    if ( !geom.visible ) {
-                        continue;
-                    }
                     const AABB& box = geom.boundingBox;
                     const auto& mesh = geom.mesh;
                     if ( ray.Intersects( box ) ) {
@@ -76,6 +74,7 @@ void Editor::Update()
             scene.selected = nullptr;
         }
     }
+#endif
 }
 
 void EditorSetup()

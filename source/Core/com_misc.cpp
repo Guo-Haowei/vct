@@ -5,7 +5,7 @@
 #include "FileManager.h"
 #include "imgui/imgui.h"
 #include "WindowManager.h"
-#include "scene/scene_loader.h"
+#include "AssimpLoader.hpp"
 
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
@@ -35,12 +35,9 @@ bool Com_RegisterDvars()
 
 bool Com_LoadScene()
 {
-    SceneLoader loader;
+    AssimpLoader loader;
     Scene& scene = g_scene;
 
-    const float worldScale = Dvar_GetFloat( scene_scale );
-    const mat4 S = glm::scale( mat4( 1 ), vec3( worldScale ) );
-    const mat4 trans = S;
     const char* scenePath = Dvar_GetString( scene );
 
     if ( !scenePath[0] ) {
@@ -48,7 +45,11 @@ bool Com_LoadScene()
         return false;
     }
 
-    loader.loadGltf( scenePath, scene, trans );
+    scene.m_root = scene.RegisterEntity( "world", Entity::FLAG_NONE );
+    scene.m_root->m_trans = glm::scale( vec3( Dvar_GetFloat( scene_scale ) ) );
+
+    loader.loadGltf( scenePath, scene );
+    scene.m_aabb.ApplyMatrix( scene.m_root->m_trans );
 
     Camera& camera = scene.camera;
 

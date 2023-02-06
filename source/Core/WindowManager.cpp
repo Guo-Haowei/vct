@@ -30,19 +30,10 @@ bool WindowManager::Initialize()
     }
 
     const GLFWvidmode* vidmode = glfwGetVideoMode( glfwGetPrimaryMonitor() );
+    const float s = 0.9f;
+    ivec2 size{ s * vidmode->width, s * vidmode->height };
 
-    const ivec2 maxSize = ivec2( vidmode->width, vidmode->height );
-    ivec2 size( Dvar_GetInt( wnd_width ), Dvar_GetInt( wnd_height ) );
-    if ( size.x == 0 || size.y == 0 ) {
-        size.x = int( 0.8f * maxSize.x );
-        size.y = int( 0.8f * maxSize.y );
-    }
-
-    constexpr ivec2 MIN_FRAME_SIZE = ivec2( 800, 600 );
-
-    size = glm::clamp( size, MIN_FRAME_SIZE, maxSize );
-
-    m_window = glfwCreateWindow( int( size.x ), int( size.y ), TITLE, 0, 0 );
+    m_window = glfwCreateWindow( size.x, size.y, TITLE, 0, 0 );
     glfwMakeContextCurrent( m_window );
     glfwGetFramebufferSize( m_window, &m_frameSize.x, &m_frameSize.y );
 
