@@ -22,8 +22,8 @@ bool WindowManager::Initialize()
 
     glfwWindowHint( GLFW_DECORATED, !Dvar_GetBool( wnd_frameless ) );
 
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 6 );
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, OPENGL_DEFAULT_VERSION_MAJOR );
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, OPENGL_DEFAULT_VERSION_MINOR );
     glfwWindowHint( GLFW_RESIZABLE, GLFW_FALSE );
     if ( Dvar_GetBool( r_debug ) ) {
         glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, 1 );

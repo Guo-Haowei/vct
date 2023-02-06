@@ -11,6 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Base\Asserts.cpp" />
+    <ClCompile Include="Base\Logger.cpp" />
     <ClCompile Include="Core\AssimpLoader.cpp" />
     <ClCompile Include="Core\BaseManager.cpp" />
     <ClCompile Include="Core\camera.cpp" />
@@ -44,6 +46,9 @@
     <ClCompile Include="SceneGraph\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Base\Asserts.h" />
+    <ClInclude Include="Base\Defines.h" />
+    <ClInclude Include="Base\Logger.h" />
     <ClInclude Include="Core\AssimpLoader.hpp" />
     <ClInclude Include="Core\BaseManager.hpp" />
     <ClInclude Include="Core\camera.h" />
@@ -66,6 +71,7 @@
     <ClInclude Include="DrawPass\ShadowMapPass.hpp" />
     <ClInclude Include="DrawPass\SSAOPass.hpp" />
     <ClInclude Include="DrawPass\VoxelizationPass.hpp" />
+    <ClInclude Include="Graphics\cbuffer.glsl" />
     <ClInclude Include="Graphics\FrameStructure.hpp" />
     <ClInclude Include="Graphics\gl_utils.h" />
     <ClInclude Include="Graphics\GpuTexture.h" />
@@ -120,11 +126,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IntDir>$(SolutionDir)\$(Platform)\$(Configuration)\Engine\</IntDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IntDir>$(SolutionDir)\$(Platform)\$(Configuration)\Engine\</IntDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -136,7 +142,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\source;$(SolutionDir)\external\;$(SolutionDir)\external\glm;$(SolutionDir)\external\imgui;$(SolutionDir)\external\include;$(SolutionDir)\external\assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\source\;$(SolutionDir)\Engine\;$(SolutionDir)\external\;$(SolutionDir)\external\glm;$(SolutionDir)\external\imgui;$(SolutionDir)\external\include;$(SolutionDir)\external\assimp\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -144,7 +150,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>glfw3.lib;glad.lib;ImGui.lib;Base.lib;assimp-vc142-mtd.lib;IrrXMLd.lib;zlibstaticd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;glad.lib;ImGui.lib;assimp-vc142-mtd.lib;IrrXMLd.lib;zlibstaticd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)\external\lib\$(Configuration);$(SolutionDir)\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -161,7 +167,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\source;$(SolutionDir)\external\;$(SolutionDir)\external\glm;$(SolutionDir)\external\imgui;$(SolutionDir)\external\include;$(SolutionDir)\external\assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\source\;$(SolutionDir)\Engine\;$(SolutionDir)\external\;$(SolutionDir)\external\glm;$(SolutionDir)\external\imgui;$(SolutionDir)\external\include;$(SolutionDir)\external\assimp\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -172,7 +178,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>glfw3.lib;glad.lib;ImGui.lib;Base.lib;assimp-vc142-mt.lib;IrrXML.lib;zlibstatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;glad.lib;ImGui.lib;assimp-vc142-mt.lib;IrrXML.lib;zlibstatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)\external\lib\$(Configuration);$(SolutionDir)\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>

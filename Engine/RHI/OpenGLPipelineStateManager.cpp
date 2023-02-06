@@ -26,7 +26,16 @@ static std::string ProcessShader( const std::string &source )
             std::string include = line.substr( line.find( '"' ) );
             ASSERT( include.front() == '"' && include.back() == '"' );
             include.pop_back();
-            SystemFileWrapper fhandle( g_fileMgr->OpenRead( include.c_str() + 1, "source/shaders" ) );
+            SystemFile sysFile;
+            constexpr char cbufferFile [] = "cbuffer.glsl";
+            const char *removeQuote = include.c_str() + 1;
+            if ( strncmp( cbufferFile, removeQuote, sizeof( cbufferFile ) ) == 0 ) {
+                sysFile = ( g_fileMgr->OpenRead( removeQuote, "Engine/Graphics" ) );
+            }
+            else {
+                sysFile = ( g_fileMgr->OpenRead( removeQuote, "Shaders" ) );
+            }
+            SystemFileWrapper fhandle( sysFile );
             std::vector<char> extra;
             if ( fhandle.Read( extra ) != SystemFile::Result::Ok ) {
                 LOG_ERROR( "[filesystem] failed to read shader '%s'", include.c_str() );
@@ -49,7 +58,7 @@ static bool LoadShaderFromFile( const char *file, const GLenum shaderType,
     // @TODO: resource management
     std::string filename( file );
     filename.append( ".glsl" );
-    SystemFileWrapper fhandle( g_fileMgr->OpenRead( filename.c_str(), "source/shaders" ) );
+    SystemFileWrapper fhandle( g_fileMgr->OpenRead( filename.c_str(), "Shaders" ) );
     std::string source;
     const SystemFile::Result result = fhandle.Read( source );
     if ( result != SystemFile::Result::Ok ) {

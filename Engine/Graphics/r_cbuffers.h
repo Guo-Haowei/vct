@@ -1,8 +1,7 @@
 #pragma once
 #include "gl_utils.h"
 
-// inline include
-#include "shaders/cbuffer.glsl"
+#include "cbuffer.glsl"
 
 extern gl::ConstantBuffer<MaterialCB> g_materialCache;
 extern gl::ConstantBuffer<ConstantCB> g_constantCache;

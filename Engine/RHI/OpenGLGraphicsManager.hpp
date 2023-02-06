@@ -32,8 +32,8 @@ protected:
         int32_t count{ 0 };
     };
 
-    uint32_t m_uboDrawFrameConstant = { 0 };
-    uint32_t m_uboDrawBatchConstant = { 0 };
+    uint32_t m_uboDrawFrameConstant{ 0 };
+    uint32_t m_uboDrawBatchConstant{ 0 };
 
-    GLFWwindow* m_pGlfwWindow;
+    GLFWwindow* m_pGlfwWindow{ nullptr };
 };

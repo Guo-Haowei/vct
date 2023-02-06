@@ -11,7 +11,7 @@
 
 #include "Core/FileManager.h"
 
-#include "shaders/cbuffer.glsl"
+#include "cbuffer.glsl"
 
 MeshData g_quad;
 

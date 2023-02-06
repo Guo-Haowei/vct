@@ -19,6 +19,9 @@
     <Filter Include="SceneGraph">
       <UniqueIdentifier>{60b0d8ba-57d2-4ddf-9399-be69dd83a239}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Base">
+      <UniqueIdentifier>{d87e43d4-ea49-49e2-b38b-c2aa2b283447}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\AssimpLoader.cpp">
@@ -31,6 +34,9 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\com_misc.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\dvar_api.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\editor.cpp">
@@ -50,6 +56,42 @@
     </ClCompile>
     <ClCompile Include="Core\WindowManager.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneGraph\Entity.cpp">
+      <Filter>SceneGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneGraph\Scene.cpp">
+      <Filter>SceneGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\imgui_impl_opengl3.cpp">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\OpenGLGraphicsManager.cpp">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\OpenGLPipelineStateManager.cpp">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\gl_utils.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\GpuTexture.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\GraphicsManager.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\MainRenderer.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\PipelineStateManager.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\r_cbuffers.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\r_rendertarget.cpp">
+      <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="DrawPass\BaseDrawPass.cpp">
       <Filter>DrawPass</Filter>
@@ -75,44 +117,11 @@
     <ClCompile Include="DrawPass\VoxelizationPass.cpp">
       <Filter>DrawPass</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\gl_utils.cpp">
-      <Filter>Graphics</Filter>
+    <ClCompile Include="Base\Asserts.cpp">
+      <Filter>Base</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\GpuTexture.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\GraphicsManager.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\MainRenderer.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\PipelineStateManager.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\r_cbuffers.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\r_rendertarget.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="RHI\imgui_impl_opengl3.cpp">
-      <Filter>RHI</Filter>
-    </ClCompile>
-    <ClCompile Include="RHI\OpenGLGraphicsManager.cpp">
-      <Filter>RHI</Filter>
-    </ClCompile>
-    <ClCompile Include="RHI\OpenGLPipelineStateManager.cpp">
-      <Filter>RHI</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneGraph\Entity.cpp">
-      <Filter>SceneGraph</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneGraph\Scene.cpp">
-      <Filter>SceneGraph</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\dvar_api.cpp">
-      <Filter>Core</Filter>
+    <ClCompile Include="Base\Logger.cpp">
+      <Filter>Base</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -129,6 +138,15 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Core\com_misc.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\dvar_api.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\dvar_begin.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\dvar_end.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Core\editor.h">
@@ -149,29 +167,32 @@
     <ClInclude Include="Core\WindowManager.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="DrawPass\BaseDrawPass.hpp">
-      <Filter>DrawPass</Filter>
+    <ClInclude Include="SceneGraph\Entity.hpp">
+      <Filter>SceneGraph</Filter>
     </ClInclude>
-    <ClInclude Include="DrawPass\DeferredPass.hpp">
-      <Filter>DrawPass</Filter>
+    <ClInclude Include="SceneGraph\Scene.hpp">
+      <Filter>SceneGraph</Filter>
     </ClInclude>
-    <ClInclude Include="DrawPass\GBufferPass.hpp">
-      <Filter>DrawPass</Filter>
+    <ClInclude Include="RHI\imgui_impl_opengl3.h">
+      <Filter>RHI</Filter>
     </ClInclude>
-    <ClInclude Include="DrawPass\GuiPass.hpp">
-      <Filter>DrawPass</Filter>
+    <ClInclude Include="RHI\imgui_impl_opengl3_loader.h">
+      <Filter>RHI</Filter>
     </ClInclude>
-    <ClInclude Include="DrawPass\OverlayPass.hpp">
-      <Filter>DrawPass</Filter>
+    <ClInclude Include="RHI\OpenGLGraphicsManager.hpp">
+      <Filter>RHI</Filter>
     </ClInclude>
-    <ClInclude Include="DrawPass\ShadowMapPass.hpp">
-      <Filter>DrawPass</Filter>
+    <ClInclude Include="RHI\OpenGLPipelineStateManager.hpp">
+      <Filter>RHI</Filter>
     </ClInclude>
-    <ClInclude Include="DrawPass\SSAOPass.hpp">
-      <Filter>DrawPass</Filter>
+    <ClInclude Include="Interface\IGraphicsManager.hpp">
+      <Filter>Interface</Filter>
     </ClInclude>
-    <ClInclude Include="DrawPass\VoxelizationPass.hpp">
-      <Filter>DrawPass</Filter>
+    <ClInclude Include="Interface\IPipelineStateManager.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Interface\IRuntimeModule.hpp">
+      <Filter>Interface</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\FrameStructure.hpp">
       <Filter>Graphics</Filter>
@@ -200,41 +221,41 @@
     <ClInclude Include="Graphics\stb_image.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Interface\IGraphicsManager.hpp">
-      <Filter>Interface</Filter>
+    <ClInclude Include="DrawPass\BaseDrawPass.hpp">
+      <Filter>DrawPass</Filter>
     </ClInclude>
-    <ClInclude Include="Interface\IPipelineStateManager.hpp">
-      <Filter>Interface</Filter>
+    <ClInclude Include="DrawPass\DeferredPass.hpp">
+      <Filter>DrawPass</Filter>
     </ClInclude>
-    <ClInclude Include="Interface\IRuntimeModule.hpp">
-      <Filter>Interface</Filter>
+    <ClInclude Include="DrawPass\GBufferPass.hpp">
+      <Filter>DrawPass</Filter>
     </ClInclude>
-    <ClInclude Include="RHI\imgui_impl_opengl3.h">
-      <Filter>RHI</Filter>
+    <ClInclude Include="DrawPass\GuiPass.hpp">
+      <Filter>DrawPass</Filter>
     </ClInclude>
-    <ClInclude Include="RHI\imgui_impl_opengl3_loader.h">
-      <Filter>RHI</Filter>
+    <ClInclude Include="DrawPass\OverlayPass.hpp">
+      <Filter>DrawPass</Filter>
     </ClInclude>
-    <ClInclude Include="RHI\OpenGLGraphicsManager.hpp">
-      <Filter>RHI</Filter>
+    <ClInclude Include="DrawPass\ShadowMapPass.hpp">
+      <Filter>DrawPass</Filter>
     </ClInclude>
-    <ClInclude Include="RHI\OpenGLPipelineStateManager.hpp">
-      <Filter>RHI</Filter>
+    <ClInclude Include="DrawPass\SSAOPass.hpp">
+      <Filter>DrawPass</Filter>
     </ClInclude>
-    <ClInclude Include="SceneGraph\Entity.hpp">
-      <Filter>SceneGraph</Filter>
+    <ClInclude Include="DrawPass\VoxelizationPass.hpp">
+      <Filter>DrawPass</Filter>
     </ClInclude>
-    <ClInclude Include="SceneGraph\Scene.hpp">
-      <Filter>SceneGraph</Filter>
+    <ClInclude Include="Base\Asserts.h">
+      <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="Core\dvar_api.h">
-      <Filter>Core</Filter>
+    <ClInclude Include="Base\Defines.h">
+      <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="Core\dvar_begin.h">
-      <Filter>Core</Filter>
+    <ClInclude Include="Base\Logger.h">
+      <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="Core\dvar_end.h">
-      <Filter>Core</Filter>
+    <ClInclude Include="Graphics\cbuffer.glsl">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

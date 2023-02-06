@@ -20,6 +20,9 @@
 
 #define ENABLE_IMGUI_RENDERING IN_USE
 
+constexpr int OPENGL_DEFAULT_VERSION_MAJOR = 4;
+constexpr int OPENGL_DEFAULT_VERSION_MINOR = 6;
+
 #define ALIGN( x, a ) ( ( ( x ) + ( (a)-1 ) ) & ~( (a)-1 ) )
 
 inline constexpr size_t KB = 1024;

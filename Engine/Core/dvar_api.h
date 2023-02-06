@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/GeomMath.hpp"
+#include "GeomMath.hpp"
 
 struct dvar_t {
     enum { kMaxStringLengh = 128 };

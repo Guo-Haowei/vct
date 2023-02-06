@@ -171,15 +171,12 @@ static void ControlCamera( Camera& camera )
     constexpr float VIEW_SPEED = 2.0f;
     float CAMERA_SPEED = 0.15f;
 
-    //if ( ImGui::IsKeyDown( GLFW_KEY_LEFT_SHIFT ) )
-    //    CAMERA_SPEED *= 3.f;
+    if ( ImGui::IsKeyDown( ImGuiKey_LeftShift ) )
+        CAMERA_SPEED *= 3.f;
 
-    //int x = ImGui::IsKeyDown( GLFW_KEY_D ) - ImGui::IsKeyDown( GLFW_KEY_A );
-    //int y = ImGui::IsKeyDown( GLFW_KEY_E ) - ImGui::IsKeyDown( GLFW_KEY_Q );
-    //int z = ImGui::IsKeyDown( GLFW_KEY_W ) - ImGui::IsKeyDown( GLFW_KEY_S );
-    int x = 0;
-    int y = 0;
-    int z = 0;
+    int x = ImGui::IsKeyDown( ImGuiKey_D ) - ImGui::IsKeyDown( ImGuiKey_A );
+    int y = ImGui::IsKeyDown( ImGuiKey_E ) - ImGui::IsKeyDown( ImGuiKey_Q );
+    int z = ImGui::IsKeyDown( ImGuiKey_W ) - ImGui::IsKeyDown( ImGuiKey_S );
 
     if ( x != 0 || z != 0 ) {
         vec3 w = camera.direction();

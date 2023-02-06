@@ -71,7 +71,10 @@ bool OpenGLGraphicsManager::Initialize()
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new GuiPass( this, psm, nullptr, 0 ) ) );
 
     // @TODO: config
-    ImGui_ImplOpenGL3_Init( "#version 460 core" );
+
+    char glsl_version[256] = { 0 };
+    snprintf( glsl_version, sizeof( glsl_version ), "#version %d%d0 core", OPENGL_DEFAULT_VERSION_MAJOR, OPENGL_DEFAULT_VERSION_MINOR );
+    ImGui_ImplOpenGL3_Init( glsl_version );
     g_renderer.createGpuResources();
 
     return ( m_bInitialized = true );

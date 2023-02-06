@@ -1,16 +1,16 @@
 #include "imgui/imgui.h"
 
-#include "Base/Asserts.h"
-#include "Base/Logger.h"
+#include "Engine/Base/Asserts.h"
+#include "Engine/Base/Logger.h"
 
-#include "Core/dvar_api.h"
-#include "Core/FileManager.h"
-#include "Core/com_misc.h"
-#include "Core/editor.h"
-#include "Core/WindowManager.h"
+#include "Engine/Core/dvar_api.h"
+#include "Engine/Core/FileManager.h"
+#include "Engine/Core/com_misc.h"
+#include "Engine/Core/editor.h"
+#include "Engine/Core/WindowManager.h"
 
-#include "Graphics/GraphicsManager.hpp"
-#include "Graphics/PipelineStateManager.hpp"
+#include "Engine/Graphics/GraphicsManager.hpp"
+#include "Engine/Graphics/PipelineStateManager.hpp"
 
 static int app_main( int argc, const char** argv )
 {
