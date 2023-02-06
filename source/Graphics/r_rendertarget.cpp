@@ -7,7 +7,6 @@
 #include "Core/com_dvars.h"
 
 #include "r_cbuffers.h"
-#include "universal/dvar_api.h"
 
 void RenderTarget::Bind()
 {

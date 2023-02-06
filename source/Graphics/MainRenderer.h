@@ -2,7 +2,6 @@
 #include <memory>
 
 #include "GpuTexture.h"
-#include "gl_utils.h"
 #include "r_cbuffers.h"
 #include "r_rendertarget.h"
 
@@ -18,6 +17,5 @@ private:
     /// textures
 };
 
-extern MainRenderer renderer;
 extern GpuTexture m_albedoVoxel;
 extern GpuTexture m_normalVoxel;

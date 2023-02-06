@@ -1,0 +1,240 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Core">
+      <UniqueIdentifier>{7df83d14-2dad-4f4e-b008-30a15b75002f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DrawPass">
+      <UniqueIdentifier>{0458f03c-90a6-40e9-ac15-cc26f3eb967a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{0fcdd87c-9745-403d-bbaa-8be083f199c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface">
+      <UniqueIdentifier>{e27aa55d-6160-4006-9ecc-17dfba6585f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RHI">
+      <UniqueIdentifier>{c0612726-558d-44c4-b42e-6d83c86ce235}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneGraph">
+      <UniqueIdentifier>{60b0d8ba-57d2-4ddf-9399-be69dd83a239}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Core\AssimpLoader.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\BaseManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\camera.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\com_misc.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\editor.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\FileManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\geometry.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\GeomMath.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\imgui_impl_glfw.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\WindowManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawPass\BaseDrawPass.cpp">
+      <Filter>DrawPass</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawPass\DeferredPass.cpp">
+      <Filter>DrawPass</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawPass\GBufferPass.cpp">
+      <Filter>DrawPass</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawPass\GuiPass.cpp">
+      <Filter>DrawPass</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawPass\OverlayPass.cpp">
+      <Filter>DrawPass</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawPass\ShadowMapPass.cpp">
+      <Filter>DrawPass</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawPass\SSAOPass.cpp">
+      <Filter>DrawPass</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawPass\VoxelizationPass.cpp">
+      <Filter>DrawPass</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\gl_utils.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\GpuTexture.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\GraphicsManager.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\MainRenderer.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\PipelineStateManager.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\r_cbuffers.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\r_rendertarget.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\imgui_impl_opengl3.cpp">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\OpenGLGraphicsManager.cpp">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\OpenGLPipelineStateManager.cpp">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneGraph\Entity.cpp">
+      <Filter>SceneGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneGraph\Scene.cpp">
+      <Filter>SceneGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\dvar_api.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Core\AssimpLoader.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\BaseManager.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\camera.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\com_dvars.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\com_misc.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\editor.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\FileManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\geometry.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\GeomMath.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\imgui_impl_glfw.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\WindowManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawPass\BaseDrawPass.hpp">
+      <Filter>DrawPass</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawPass\DeferredPass.hpp">
+      <Filter>DrawPass</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawPass\GBufferPass.hpp">
+      <Filter>DrawPass</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawPass\GuiPass.hpp">
+      <Filter>DrawPass</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawPass\OverlayPass.hpp">
+      <Filter>DrawPass</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawPass\ShadowMapPass.hpp">
+      <Filter>DrawPass</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawPass\SSAOPass.hpp">
+      <Filter>DrawPass</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawPass\VoxelizationPass.hpp">
+      <Filter>DrawPass</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\FrameStructure.hpp">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\gl_utils.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GpuTexture.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GraphicsManager.hpp">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\MainRenderer.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\PipelineStateManager.hpp">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\r_cbuffers.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\r_rendertarget.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\stb_image.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Interface\IGraphicsManager.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Interface\IPipelineStateManager.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Interface\IRuntimeModule.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\imgui_impl_opengl3.h">
+      <Filter>RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\imgui_impl_opengl3_loader.h">
+      <Filter>RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\OpenGLGraphicsManager.hpp">
+      <Filter>RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\OpenGLPipelineStateManager.hpp">
+      <Filter>RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneGraph\Entity.hpp">
+      <Filter>SceneGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneGraph\Scene.hpp">
+      <Filter>SceneGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\dvar_api.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\dvar_begin.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\dvar_end.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

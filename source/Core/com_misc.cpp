@@ -77,7 +77,7 @@ bool Com_ImGuiInit()
     IMGUI_CHECKVERSION();
 
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
+    [[maybe_unused]] ImGuiIO& io = ImGui::GetIO();
 
 #if 0
     ImGuiStyle* style = &ImGui::GetStyle();

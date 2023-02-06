@@ -3,12 +3,10 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include "com_dvars.h"
 #include "Core/com_misc.h"
 #include "Core/WindowManager.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
-#include "universal/dvar_api.h"
 
 #include "Base/Asserts.h"
 #include "Base/Logger.h"

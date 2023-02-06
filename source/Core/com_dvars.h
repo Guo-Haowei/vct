@@ -1,4 +1,4 @@
-#include "universal/dvar_begin.h"
+#include "Core/dvar_begin.h"
 
 DVAR_STRING( fs_base, "" );
 DVAR_STRING( scene, "" );
@@ -36,4 +36,4 @@ DVAR_FLOAT( r_ssaoKernelRadius, 0.5f );
 // SSR
 DVAR_INT( r_mirrorFloor, 0 );  // for testing reflection
 
-#include "universal/dvar_end.h"
+#include "Core/dvar_end.h"

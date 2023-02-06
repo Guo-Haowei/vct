@@ -1,23 +1,16 @@
-#include "FileManager.h"
-#include "com_misc.h"
-#include "editor.h"
 #include "imgui/imgui.h"
-#include "universal/dvar_api.h"
 
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
 
+#include "Core/dvar_api.h"
 #include "Core/FileManager.h"
+#include "Core/com_misc.h"
+#include "Core/editor.h"
 #include "Core/WindowManager.h"
 
-#include "Graphics/MainRenderer.h"
 #include "Graphics/GraphicsManager.hpp"
 #include "Graphics/PipelineStateManager.hpp"
-
-#include "RHI/imgui_impl_opengl3.h"
-
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
 
 static int app_main( int argc, const char** argv )
 {
@@ -36,7 +29,6 @@ static int app_main( int argc, const char** argv )
 
     // TODO: refactor
     ok = ok && g_pPipelineStateManager->Initialize();
-    renderer.createGpuResources();
 
     g_gfxMgr->InitializeGeometries( Com_GetScene() );
 
@@ -53,7 +45,6 @@ static int app_main( int argc, const char** argv )
 
     g_pPipelineStateManager->Finalize();
 
-    renderer.destroyGpuResources();
     g_gfxMgr->Finalize();
     manager_deinit( g_wndMgr );
     ImGui::DestroyContext();

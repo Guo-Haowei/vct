@@ -36,7 +36,9 @@ static void RegisterDvar_Internal( const char* key, dvar_t* dvar )
     dvar->debugName_[dvar_t::kMaxStringLengh - 1] = 0;
 
     s_dvarLookupTable.insert( std::make_pair( keyStr, dvar ) );
+#if USING( DVAR_VERBOSE )
     const auto& v = dvar->vec_;
+#endif
     switch ( dvar->type_ ) {
         case dvar_t::Integer:
             DVAR_PRINTF( "register dvar '%s'(int) %d", key, dvar->int_ );

@@ -23,6 +23,8 @@
 #include "DrawPass/VoxelizationPass.hpp"
 #include "DrawPass/GuiPass.hpp"
 
+#include "Graphics/MainRenderer.h"
+static MainRenderer g_renderer;
 GraphicsManager *g_gfxMgr = new OpenGLGraphicsManager();
 
 static void APIENTRY debug_callback( GLenum, GLenum, unsigned int, GLenum, GLsizei, const char *, const void * );
@@ -70,12 +72,14 @@ bool OpenGLGraphicsManager::Initialize()
 
     // @TODO: config
     ImGui_ImplOpenGL3_Init( "#version 460 core" );
+    g_renderer.createGpuResources();
 
     return ( m_bInitialized = true );
 }
 
 void OpenGLGraphicsManager::Finalize()
 {
+    g_renderer.destroyGpuResources();
     ImGui_ImplOpenGL3_Shutdown();
     m_bInitialized = false;
 }
@@ -252,7 +256,7 @@ void OpenGLGraphicsManager::BeginFrame( Frame &frame )
     ImGui_ImplGlfw_NewFrame();
 }
 
-void OpenGLGraphicsManager::EndFrame( Frame &frame )
+void OpenGLGraphicsManager::EndFrame( Frame & )
 {
     ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
 }

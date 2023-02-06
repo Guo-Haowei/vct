@@ -11,9 +11,7 @@
 
 #include "Core/FileManager.h"
 
-#include "Core/com_dvars.h"
 #include "shaders/cbuffer.glsl"
-#include "universal/dvar_api.h"
 
 MeshData g_quad;
 
