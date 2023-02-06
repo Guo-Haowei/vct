@@ -58,15 +58,15 @@ public:
     inline SystemFile::Result Write( char* buffer, size_t size ) { return file.Write( buffer, size ); }
 };
 
-class FileManager : _Inherits_ BaseManager {
+class FileManager : public BaseManager {
 public:
     FileManager()
         : BaseManager( "FileManager" )
     {
     }
 
-    virtual bool Init() override;
-    virtual void Deinit() override;
+    virtual bool Initialize() override;
+    virtual void Finalize() override;
 
     SystemFile OpenRead( const char* filename, const char* path = nullptr );
     SystemFile OpenWrite( const char* filename );

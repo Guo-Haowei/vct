@@ -15,7 +15,7 @@
 #include "shaders/cbuffer.glsl"
 #include "universal/dvar_api.h"
 
-static MeshData g_quad;
+MeshData g_quad;
 
 void R_CreateQuad()
 {
@@ -37,6 +37,7 @@ void R_DrawQuad()
     ASSERT( g_quad.vao );
     glBindVertexArray( g_quad.vao );
     glDrawArrays( GL_TRIANGLES, 0, 6 );
+    // glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
 }
 
 namespace gl {

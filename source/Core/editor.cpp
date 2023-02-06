@@ -34,43 +34,6 @@ public:
     void Update();
 };
 
-static const char* DrawTextureToStr( int mode )
-{
-    const char* str = "scene";
-    switch ( mode ) {
-        case TEXTURE_VOXEL_ALBEDO:
-            str = "voxel color";
-            break;
-        case TEXTURE_VOXEL_NORMAL:
-            str = "voxel normal";
-            break;
-        case TEXTURE_GBUFFER_DEPTH:
-            str = "depth";
-            break;
-        case TEXTURE_GBUFFER_ALBEDO:
-            str = "albedo";
-            break;
-        case TEXTURE_GBUFFER_NORMAL:
-            str = "normal";
-            break;
-        case TEXTURE_GBUFFER_METALLIC:
-            str = "metallic";
-            break;
-        case TEXTURE_GBUFFER_ROUGHNESS:
-            str = "roughness";
-            break;
-        case TEXTURE_GBUFFER_SHADOW:
-            str = "shadow";
-            break;
-        case TEXTURE_SSAO:
-            str = "ssao";
-            break;
-        default:
-            break;
-    }
-    return str;
-}
-
 void Editor::DbgWindow()
 {
     if ( ImGui::Begin( "Debug" ) ) {
@@ -79,17 +42,13 @@ void Editor::DbgWindow()
         bool dirty = false;
 
         const vec3& eye = camera.position;
-        ImGui::Text( "eye: %.2f, %.2f, %.2f", eye.x, eye.y, eye.z );
+        ImGui::Text( "Eye position: %.2f, %.2f, %.2f", eye.x, eye.y, eye.z );
         ImGui::Separator();
 
-        ImGui::Text( "Voxel GI" );
-        ImGui::Checkbox( "Enable GI", (bool*)( Dvar_GetPtr( r_enableVXGI ) ) );
-        ImGui::Checkbox( "No Texture", (bool*)( Dvar_GetPtr( r_noTexture ) ) );
+        ImGui::Checkbox( "Show debug textures", (bool*)( Dvar_GetPtr( r_showDebugTexture ) ) );
         dirty |= ImGui::Checkbox( "Force Voxel GI texture update", (bool*)( Dvar_GetPtr( r_forceVXGI ) ) );
-        ImGui::Separator();
-
-        ImGui::Text( "CSM" );
-        ImGui::Checkbox( "Debug CSM", (bool*)( Dvar_GetPtr( r_debugCSM ) ) );
+        ImGui::Checkbox( "Enable Voxel GI", (bool*)( Dvar_GetPtr( r_enableVXGI ) ) );
+        ImGui::Checkbox( "Default mesh", (bool*)( Dvar_GetPtr( r_noTexture ) ) );
         ImGui::Separator();
 
         ImGui::Text( "SSAO" );
@@ -97,14 +56,6 @@ void Editor::DbgWindow()
         ImGui::Text( "SSAO Kernal Radius" );
         ImGui::SliderFloat( "Kernal Radius", (float*)( Dvar_GetPtr( r_ssaoKernelRadius ) ), 0.1f, 5.0f );
         ImGui::Separator();
-
-        ImGui::Text( "FXAA" );
-        ImGui::Checkbox( "Enable FXAA", (bool*)( Dvar_GetPtr( r_enableFXAA ) ) );
-        ImGui::Separator();
-
-        ImGui::Text( "Display Texture" );
-        ImGui::SliderInt( "Display Texture", (int*)( Dvar_GetPtr( r_debugTexture ) ), DrawTexture::TEXTURE_FINAL_IMAGE, DrawTexture::TEXTURE_MAX );
-        ImGui::Text( "%s", DrawTextureToStr( Dvar_GetInt( r_debugTexture ) ) );
 
         ImGui::Separator();
         ImGui::Text( "Light" );
@@ -123,8 +74,8 @@ void Editor::DbgWindow()
         scene.light.direction = glm::normalize( Dvar_GetVec3( light_dir ) );
         scene.dirty = dirty;
 
-        ImGui::End();
     }
+    ImGui::End();
 }
 
 void Editor::DockSpace()

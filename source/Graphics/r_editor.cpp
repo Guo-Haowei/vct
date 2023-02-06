@@ -102,7 +102,7 @@ static inline void FillTextureIconBuffer( std::vector<TextureVertex>& iconBuffer
     }
 }
 
-// draw grid, bounding box, ui
+// @TODO: fix it draw grid, bounding box, ui
 void R_DrawEditor()
 {
 #if 0
