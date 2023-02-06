@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Base\Asserts.cpp" />
+    <ClCompile Include="Base\Logger.cpp" />
+    <ClCompile Include="Core\AssimpLoader.cpp" />
+    <ClCompile Include="Core\BaseManager.cpp" />
+    <ClCompile Include="Core\camera.cpp" />
+    <ClCompile Include="Core\com_misc.cpp" />
+    <ClCompile Include="Core\dvar_api.cpp" />
+    <ClCompile Include="Core\editor.cpp" />
+    <ClCompile Include="Core\FileManager.cpp" />
+    <ClCompile Include="Core\geometry.cpp" />
+    <ClCompile Include="Core\GeomMath.cpp" />
+    <ClCompile Include="Core\imgui_impl_glfw.cpp" />
+    <ClCompile Include="Core\WindowManager.cpp" />
+    <ClCompile Include="DrawPass\BaseDrawPass.cpp" />
+    <ClCompile Include="DrawPass\DeferredPass.cpp" />
+    <ClCompile Include="DrawPass\GBufferPass.cpp" />
+    <ClCompile Include="DrawPass\GuiPass.cpp" />
+    <ClCompile Include="DrawPass\OverlayPass.cpp" />
+    <ClCompile Include="DrawPass\ShadowMapPass.cpp" />
+    <ClCompile Include="DrawPass\SSAOPass.cpp" />
+    <ClCompile Include="DrawPass\VoxelizationPass.cpp" />
+    <ClCompile Include="Graphics\gl_utils.cpp" />
+    <ClCompile Include="Graphics\GpuTexture.cpp" />
+    <ClCompile Include="Graphics\GraphicsManager.cpp" />
+    <ClCompile Include="Graphics\MainRenderer.cpp" />
+    <ClCompile Include="Graphics\PipelineStateManager.cpp" />
+    <ClCompile Include="Graphics\r_cbuffers.cpp" />
+    <ClCompile Include="Graphics\r_rendertarget.cpp" />
+    <ClCompile Include="RHI\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="RHI\OpenGLGraphicsManager.cpp" />
+    <ClCompile Include="RHI\OpenGLPipelineStateManager.cpp" />
+    <ClCompile Include="SceneGraph\Entity.cpp" />
+    <ClCompile Include="SceneGraph\Scene.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Base\Asserts.h" />
+    <ClInclude Include="Base\Defines.h" />
+    <ClInclude Include="Base\Logger.h" />
+    <ClInclude Include="Core\AssimpLoader.hpp" />
+    <ClInclude Include="Core\BaseManager.hpp" />
+    <ClInclude Include="Core\camera.h" />
+    <ClInclude Include="Core\com_dvars.h" />
+    <ClInclude Include="Core\com_misc.h" />
+    <ClInclude Include="Core\dvar_api.h" />
+    <ClInclude Include="Core\dvar_begin.h" />
+    <ClInclude Include="Core\dvar_end.h" />
+    <ClInclude Include="Core\editor.h" />
+    <ClInclude Include="Core\FileManager.h" />
+    <ClInclude Include="Core\geometry.h" />
+    <ClInclude Include="Core\GeomMath.hpp" />
+    <ClInclude Include="Core\imgui_impl_glfw.h" />
+    <ClInclude Include="Core\WindowManager.h" />
+    <ClInclude Include="DrawPass\BaseDrawPass.hpp" />
+    <ClInclude Include="DrawPass\DeferredPass.hpp" />
+    <ClInclude Include="DrawPass\GBufferPass.hpp" />
+    <ClInclude Include="DrawPass\GuiPass.hpp" />
+    <ClInclude Include="DrawPass\OverlayPass.hpp" />
+    <ClInclude Include="DrawPass\ShadowMapPass.hpp" />
+    <ClInclude Include="DrawPass\SSAOPass.hpp" />
+    <ClInclude Include="DrawPass\VoxelizationPass.hpp" />
+    <ClInclude Include="Graphics\cbuffer.glsl" />
+    <ClInclude Include="Graphics\FrameStructure.hpp" />
+    <ClInclude Include="Graphics\gl_utils.h" />
+    <ClInclude Include="Graphics\GpuTexture.h" />
+    <ClInclude Include="Graphics\GraphicsManager.hpp" />
+    <ClInclude Include="Graphics\MainRenderer.h" />
+    <ClInclude Include="Graphics\PipelineStateManager.hpp" />
+    <ClInclude Include="Graphics\r_cbuffers.h" />
+    <ClInclude Include="Graphics\r_rendertarget.h" />
+    <ClInclude Include="Graphics\stb_image.h" />
+    <ClInclude Include="Interface\IGraphicsManager.hpp" />
+    <ClInclude Include="Interface\IPipelineStateManager.hpp" />
+    <ClInclude Include="Interface\IRuntimeModule.hpp" />
+    <ClInclude Include="RHI\imgui_impl_opengl3.h" />
+    <ClInclude Include="RHI\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="RHI\OpenGLGraphicsManager.hpp" />
+    <ClInclude Include="RHI\OpenGLPipelineStateManager.hpp" />
+    <ClInclude Include="SceneGraph\Entity.hpp" />
+    <ClInclude Include="SceneGraph\Scene.hpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{8619feaa-5938-4aa4-8a88-da0d24df50ab}</ProjectGuid>
+    <RootNamespace>Engine</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)\source\;$(SolutionDir)\Engine\;$(SolutionDir)\external\;$(SolutionDir)\external\glm;$(SolutionDir)\external\imgui;$(SolutionDir)\external\include;$(SolutionDir)\external\assimp\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>glfw3.lib;glad.lib;ImGui.lib;assimp-vc142-mtd.lib;IrrXMLd.lib;zlibstaticd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)\external\lib\$(Configuration);$(SolutionDir)\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)\source\;$(SolutionDir)\Engine\;$(SolutionDir)\external\;$(SolutionDir)\external\glm;$(SolutionDir)\external\imgui;$(SolutionDir)\external\include;$(SolutionDir)\external\assimp\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>glfw3.lib;glad.lib;ImGui.lib;assimp-vc142-mt.lib;IrrXML.lib;zlibstatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)\external\lib\$(Configuration);$(SolutionDir)\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
