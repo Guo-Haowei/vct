@@ -165,8 +165,7 @@ void OpenGLGraphicsManager::DrawBatch( const Frame & )
 
         const auto &dbc = dynamic_cast<const GLDrawBatchContext &>( *pDbc );
 
-        const MaterialData *matData = reinterpret_cast<MaterialData *>(
-            pDbc->pGeom->material->gpuResource );
+        const MaterialData *matData = reinterpret_cast<MaterialData *>( pDbc->pEntity->m_material->gpuResource );
 
         FillMaterialCB( matData, g_materialCache.cache );
         g_materialCache.Update();
@@ -204,24 +203,25 @@ void OpenGLGraphicsManager::SetPerBatchConstants(
 
 void OpenGLGraphicsManager::InitializeGeometries( const Scene &scene )
 {
-    // glBindBufferBase( GL_UNIFORM_BUFFER, slot, handle );
     uint32_t batch_index = 0;
-    for ( const GeometryNode &node : scene.geometryNodes ) {
-        for ( const Geometry &geom : node.geometries ) {
-            const MeshData *drawData = reinterpret_cast<MeshData *>( geom.mesh->gpuResource );
-
-            auto dbc = std::make_shared<GLDrawBatchContext>();
-            dbc->batchIndex = batch_index++;
-            dbc->vao = drawData->vao;
-            dbc->mode = GL_TRIANGLES;
-            dbc->type = GL_UNSIGNED_INT;
-            dbc->count = drawData->count;
-
-            dbc->pGeom = &geom;
-            dbc->Model = mat4( 1 );
-
-            m_frame.batchContexts.push_back( dbc );
+    for ( const auto &entity : scene.m_entities ) {
+        if ( !( entity->m_flag & Entity::FLAG_GEOMETRY ) ) {
+            continue;
         }
+
+        const MeshData *drawData = reinterpret_cast<MeshData *>( entity->m_mesh->gpuResource );
+
+        auto dbc = std::make_shared<GLDrawBatchContext>();
+        dbc->batchIndex = batch_index++;
+        dbc->vao = drawData->vao;
+        dbc->mode = GL_TRIANGLES;
+        dbc->type = GL_UNSIGNED_INT;
+        dbc->count = drawData->count;
+
+        dbc->pEntity = entity.get();
+        dbc->Model = mat4( 1 );
+
+        m_frame.batchContexts.push_back( dbc );
     }
 
     auto createUBO = []( int slot ) {
@@ -242,9 +242,6 @@ void OpenGLGraphicsManager::BeginFrame( Frame &frame )
     SetPerFrameConstants( frame.frameContexts );
     // ImGui_ImplOpenGL3_NewFrame
 }
-
-// @TODO: make pass
-extern void EditorSetup();
 
 void OpenGLGraphicsManager::Draw()
 {

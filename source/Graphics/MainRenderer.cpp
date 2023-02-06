@@ -147,16 +147,16 @@ void MainRenderer::createGpuResources()
     }
 
     // create mesh
-    for ( const auto& mesh : scene.meshes ) {
+    for ( const auto& mesh : scene.m_meshes ) {
         g_meshdata.emplace_back( CreateMeshData( *mesh.get() ) );
         mesh->gpuResource = g_meshdata.back().get();
     }
 
     // create material
-    ASSERT( scene.materials.size() < array_length( g_constantCache.cache.AlbedoMaps ) );
+    ASSERT( scene.m_materials.size() < array_length( g_constantCache.cache.AlbedoMaps ) );
 
-    for ( int idx = 0; idx < scene.materials.size(); ++idx ) {
-        const auto& mat = scene.materials.at( idx );
+    for ( int idx = 0; idx < scene.m_materials.size(); ++idx ) {
+        const auto& mat = scene.m_materials.at( idx );
 
         std::shared_ptr<MaterialData> matData( new MaterialData() );
         if ( !mat->albedoTexture.empty() ) {
@@ -180,7 +180,6 @@ void MainRenderer::createGpuResources()
         if ( !mat->normalTexture.empty() ) {
             matData->normalMap.create2DImageFromFile( mat->normalTexture.c_str() );
             g_constantCache.cache.NormalMaps[idx].data = gl::MakeTextureResident( matData->normalMap.GetHandle() );
-            LOG_INFO( "material has bump %s", mat->normalTexture.c_str() );
         }
 
         matData->textureMapIdx = idx;

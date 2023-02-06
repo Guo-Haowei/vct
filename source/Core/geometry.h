@@ -1,5 +1,5 @@
 #pragma once
-#include "scene_components.h"
+#include "SceneGraph/Entity.hpp"
 
 namespace geometry {
 

@@ -1,6 +1,7 @@
 #ifdef __cplusplus
-#include "Base/Defines.h"
 #pragma once
+#include "Base/Defines.h"
+#include "Core/GeomMath.hpp"
 #endif
 #ifndef MAX_MATERIALS
 #define MAX_MATERIALS 300

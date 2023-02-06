@@ -1,10 +1,9 @@
 #pragma once
 #include "Interface/IGraphicsManager.hpp"
 
-// #include <vector>
-
 #include "FrameStructure.hpp"
 #include "DrawPass/BaseDrawPass.hpp"
+#include "SceneGraph/Scene.hpp"
 
 struct GLFWwindow;
 

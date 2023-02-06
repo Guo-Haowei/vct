@@ -1,11 +1,12 @@
 #pragma once
-#include "Core/scene.h"
-
 #include "Base/Defines.h"
 
-#define REGISTER( a )
-
 #include "shaders/cbuffer.glsl"
+
+#include <vector>
+#include <memory>
+
+class Entity;
 
 struct DrawFrameContext : PerFrameConstants {
 };
@@ -13,7 +14,7 @@ struct DrawFrameContext : PerFrameConstants {
 struct DrawBatchContext : PerBatchConstants {
     int32_t batchIndex{ 0 };
 
-    const Geometry* pGeom;
+    const Entity* pEntity;
     // material_textures material;
 
     virtual ~DrawBatchContext() = default;

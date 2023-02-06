@@ -49,8 +49,8 @@ void GraphicsManager::CalculateLights()
 static mat4 R_HackLightSpaceMatrix( const vec3& lightDir )
 {
     const Scene& scene = Com_GetScene();
-    const vec3 center = scene.boundingBox.Center();
-    const vec3 extents = scene.boundingBox.Size();
+    const vec3 center = scene.m_aabb.Center();
+    const vec3 extents = scene.m_aabb.Size();
     const float size = 0.5f * glm::max( extents.x, glm::max( extents.y, extents.z ) );
     const mat4 V = glm::lookAt( center + glm::normalize( lightDir ) * size, center, vec3( 0, 1, 0 ) );
     const mat4 P = glm::ortho( -size, size, -size, size, 0.0f, 2.0f * size );
@@ -60,14 +60,19 @@ static mat4 R_HackLightSpaceMatrix( const vec3& lightDir )
 void GraphicsManager::UpdateConstants()
 {
     const Scene& scene = Com_GetScene();
+
+    for ( auto& pDbc : m_frame.batchContexts ) {
+        pDbc->pEntity->GetCalculatedTransform( pDbc->Model );
+    }
+
     PerFrameConstants& frameConstats = m_frame.frameContexts;
 
     // validate dvars
     const int voxelTextureSize = Dvar_GetInt( r_voxelSize );
     ASSERT( is_power_of_two( voxelTextureSize ) );
     ASSERT( voxelTextureSize <= 256 );
-    const vec3 center = scene.boundingBox.Center();
-    const vec3 size = scene.boundingBox.Size();
+    const vec3 center = scene.m_aabb.Center();
+    const vec3 size = scene.m_aabb.Size();
     const float worldSize = glm::max( size.x, glm::max( size.y, size.z ) );
     const float texelSize = 1.0f / static_cast<float>( voxelTextureSize );
     const float voxelSize = worldSize * texelSize;

@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\Core\AssimpLoader.cpp" />
     <ClCompile Include="source\Core\BaseManager.cpp" />
     <ClCompile Include="source\Core\camera.cpp" />
     <ClCompile Include="source\Core\FileManager.cpp" />
@@ -45,10 +46,11 @@
     <ClCompile Include="source\RHI\OpenGLGraphicsManager.cpp" />
     <ClCompile Include="source\RHI\OpenGLPipelineStateManager.cpp" />
     <ClCompile Include="source\SceneGraph\Entity.cpp" />
-    <ClCompile Include="source\scene\scene_loader.cpp" />
+    <ClCompile Include="source\SceneGraph\Scene.cpp" />
     <ClCompile Include="source\universal\dvar_api.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\Core\AssimpLoader.hpp" />
     <ClInclude Include="source\Core\BaseManager.hpp" />
     <ClInclude Include="source\Core\camera.h" />
     <ClInclude Include="source\Core\com_dvars.h" />
@@ -58,8 +60,6 @@
     <ClInclude Include="source\Core\geometry.h" />
     <ClInclude Include="source\Core\GeomMath.hpp" />
     <ClInclude Include="source\Core\imgui_impl_glfw.h" />
-    <ClInclude Include="source\Core\scene.h" />
-    <ClInclude Include="source\Core\scene_components.h" />
     <ClInclude Include="source\Core\WindowManager.h" />
     <ClInclude Include="source\DrawPass\BaseDrawPass.hpp" />
     <ClInclude Include="source\DrawPass\DeferredPass.hpp" />
@@ -69,9 +69,7 @@
     <ClInclude Include="source\DrawPass\ShadowMapPass.hpp" />
     <ClInclude Include="source\DrawPass\SSAOPass.hpp" />
     <ClInclude Include="source\DrawPass\VoxelizationPass.hpp" />
-    <ClInclude Include="source\Graphics\GLPrerequisites.h" />
     <ClInclude Include="source\Graphics\gl_utils.h" />
-    <ClInclude Include="source\Graphics\GpuResource.h" />
     <ClInclude Include="source\Graphics\GpuTexture.h" />
     <ClInclude Include="source\Graphics\GraphicsManager.hpp" />
     <ClInclude Include="source\Graphics\imgui_impl_opengl3.h" />
@@ -92,7 +90,7 @@
     <ClInclude Include="source\RHI\OpenGLGraphicsManager.hpp" />
     <ClInclude Include="source\RHI\OpenGLPipelineStateManager.hpp" />
     <ClInclude Include="source\SceneGraph\Entity.hpp" />
-    <ClInclude Include="source\scene\scene_loader.h" />
+    <ClInclude Include="source\SceneGraph\Scene.hpp" />
     <ClInclude Include="source\universal\dvar_api.h" />
     <ClInclude Include="source\universal\dvar_begin.h" />
     <ClInclude Include="source\universal\dvar_end.h" />
