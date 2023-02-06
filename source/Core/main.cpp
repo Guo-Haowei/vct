@@ -2,7 +2,6 @@
 #include "com_misc.h"
 #include "editor.h"
 #include "imgui/imgui.h"
-#include "imgui_impl_glfw.h"
 #include "universal/dvar_api.h"
 
 #include "Base/Asserts.h"
@@ -15,7 +14,7 @@
 #include "Graphics/GraphicsManager.hpp"
 #include "Graphics/PipelineStateManager.hpp"
 
-#include "Graphics/imgui_impl_opengl3.h"
+#include "RHI/imgui_impl_opengl3.h"
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -35,13 +34,6 @@ static int app_main( int argc, const char** argv )
     ok = ok && manager_init( g_wndMgr );
     ok = ok && g_gfxMgr->Initialize();
 
-    EditorSetupStyle();
-
-    ImGui_ImplGlfw_Init( g_wndMgr->GetHandle() );
-
-    ImGui_ImplOpenGL3_Init();
-    ImGui_ImplOpenGL3_CreateDeviceObjects();
-
     // TODO: refactor
     ok = ok && g_pPipelineStateManager->Initialize();
     renderer.createGpuResources();
@@ -50,21 +42,11 @@ static int app_main( int argc, const char** argv )
 
     while ( !g_wndMgr->ShouldClose() ) {
         g_wndMgr->NewFrame();
-        ImGui_ImplGlfw_NewFrame();
 
         Com_UpdateWorld();
         EditorSetup();
 
         g_gfxMgr->Tick();
-
-        GLFWwindow* backup_current_context = glfwGetCurrentContext();
-
-        ImGui::UpdatePlatformWindows();
-        ImGui::RenderPlatformWindowsDefault();
-
-        glfwMakeContextCurrent( backup_current_context );
-
-        g_wndMgr->Present();
 
         Com_GetScene().dirty = false;
     }
@@ -72,13 +54,10 @@ static int app_main( int argc, const char** argv )
     g_pPipelineStateManager->Finalize();
 
     renderer.destroyGpuResources();
-    ImGui_ImplOpenGL3_Shutdown();
-
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-
     g_gfxMgr->Finalize();
     manager_deinit( g_wndMgr );
+    ImGui::DestroyContext();
+
     manager_deinit( g_fileMgr );
 
     return ok ? 0 : 1;

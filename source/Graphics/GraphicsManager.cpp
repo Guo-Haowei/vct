@@ -23,6 +23,7 @@ void GraphicsManager::Tick()
     UpdateConstants();
 
     // Frame& frame = m_frames[];
+
     Frame& frame = m_frame;
     BeginFrame( frame );
     ImGui::NewFrame();
@@ -32,6 +33,8 @@ void GraphicsManager::Tick()
     ImGui::EndFrame();
     ImGui::Render();
     EndFrame( frame );
+
+    Present();
 }
 
 void GraphicsManager::Draw()

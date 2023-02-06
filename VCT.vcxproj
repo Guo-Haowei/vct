@@ -34,15 +34,11 @@
     <ClCompile Include="source\Graphics\gl_utils.cpp" />
     <ClCompile Include="source\Graphics\GpuTexture.cpp" />
     <ClCompile Include="source\Graphics\GraphicsManager.cpp" />
-    <ClCompile Include="source\Graphics\imgui_impl_opengl3.cpp" />
     <ClCompile Include="source\Graphics\MainRenderer.cpp" />
     <ClCompile Include="source\Graphics\PipelineStateManager.cpp" />
     <ClCompile Include="source\Graphics\r_cbuffers.cpp" />
     <ClCompile Include="source\Graphics\r_rendertarget.cpp" />
-    <ClCompile Include="source\imgui\imgui.cpp" />
-    <ClCompile Include="source\imgui\imgui_draw.cpp" />
-    <ClCompile Include="source\imgui\imgui_tables.cpp" />
-    <ClCompile Include="source\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="source\RHI\imgui_impl_opengl3.cpp" />
     <ClCompile Include="source\RHI\OpenGLGraphicsManager.cpp" />
     <ClCompile Include="source\RHI\OpenGLPipelineStateManager.cpp" />
     <ClCompile Include="source\SceneGraph\Entity.cpp" />
@@ -72,21 +68,16 @@
     <ClInclude Include="source\Graphics\gl_utils.h" />
     <ClInclude Include="source\Graphics\GpuTexture.h" />
     <ClInclude Include="source\Graphics\GraphicsManager.hpp" />
-    <ClInclude Include="source\Graphics\imgui_impl_opengl3.h" />
     <ClInclude Include="source\Graphics\MainRenderer.h" />
     <ClInclude Include="source\Graphics\PipelineStateManager.hpp" />
     <ClInclude Include="source\Graphics\r_cbuffers.h" />
     <ClInclude Include="source\Graphics\r_rendertarget.h" />
     <ClInclude Include="source\Graphics\stb_image.h" />
-    <ClInclude Include="source\imgui\imconfig.h" />
-    <ClInclude Include="source\imgui\imgui.h" />
-    <ClInclude Include="source\imgui\imgui_internal.h" />
-    <ClInclude Include="source\imgui\imstb_rectpack.h" />
-    <ClInclude Include="source\imgui\imstb_textedit.h" />
-    <ClInclude Include="source\imgui\imstb_truetype.h" />
     <ClInclude Include="source\Interface\IGraphicsManager.hpp" />
     <ClInclude Include="source\Interface\IPipelineStateManager.hpp" />
     <ClInclude Include="source\Interface\IRuntimeModule.hpp" />
+    <ClInclude Include="source\RHI\imgui_impl_opengl3.h" />
+    <ClInclude Include="source\RHI\imgui_impl_opengl3_loader.h" />
     <ClInclude Include="source\RHI\OpenGLGraphicsManager.hpp" />
     <ClInclude Include="source\RHI\OpenGLPipelineStateManager.hpp" />
     <ClInclude Include="source\SceneGraph\Entity.hpp" />
@@ -140,7 +131,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\source;$(ProjectDir)\external\include;$(ProjectDir)\external\glm;$(ProjectDir)\external\assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\source;$(ProjectDir)\external;$(ProjectDir)\external\include;$(ProjectDir)\external\glm;$(ProjectDir)\external\imgui;$(ProjectDir)\external\assimp\include</AdditionalIncludeDirectories>
       <TreatWarningAsError>false</TreatWarningAsError>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -148,7 +139,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)\$(Platform)\$(Configuration);$(SolutionDir)\external\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc142-mtd.lib;IrrXMLd.lib;zlibstaticd.lib;glfw3.lib;glad.lib;Base.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc142-mtd.lib;IrrXMLd.lib;zlibstaticd.lib;glfw3.lib;glad.lib;Base.lib;ImGui.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -159,7 +150,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\source;$(ProjectDir)\external\include;$(ProjectDir)\external\glm;$(ProjectDir)\external\assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\source;$(ProjectDir)\external;$(ProjectDir)\external\include;$(ProjectDir)\external\glm;$(ProjectDir)\external\imgui;$(ProjectDir)\external\assimp\include</AdditionalIncludeDirectories>
       <TreatWarningAsError>false</TreatWarningAsError>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -169,7 +160,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)\$(Platform)\$(Configuration);$(SolutionDir)\external\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc142-mt.lib;IrrXML.lib;zlibstatic.lib;glfw3.lib;glad.lib;Base.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc142-mt.lib;IrrXML.lib;zlibstatic.lib;glfw3.lib;glad.lib;Base.lib;ImGui.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

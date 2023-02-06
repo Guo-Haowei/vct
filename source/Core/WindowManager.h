@@ -2,6 +2,7 @@
 
 #include "GeomMath.hpp"
 #include "BaseManager.hpp"
+#include "imgui/imgui.h"
 
 struct GLFWwindow;
 
@@ -20,9 +21,8 @@ public:
     vec2 MousePos();
     bool IsMouseInScreen();
 
-    bool IsKeyDown( int code );
+    bool IsKeyDown( ImGuiKey code );
     void NewFrame();
-    void Present();
 
     GLFWwindow* GetHandle();
 

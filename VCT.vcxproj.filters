@@ -4,9 +4,6 @@
     <Filter Include="source">
       <UniqueIdentifier>{aebe78ba-1f59-4c02-a22c-0a3a0e01b80f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\imgui">
-      <UniqueIdentifier>{e04d8fdb-0ba5-434b-a693-fba893bc057e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="source\universal">
       <UniqueIdentifier>{170e9c45-a67c-4879-b7cb-ccfaee181fdf}</UniqueIdentifier>
     </Filter>
@@ -33,18 +30,6 @@
     <ClCompile Include="source\dummy.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="source\imgui\imgui.cpp">
-      <Filter>source\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\imgui\imgui_draw.cpp">
-      <Filter>source\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\imgui\imgui_tables.cpp">
-      <Filter>source\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="source\imgui\imgui_widgets.cpp">
-      <Filter>source\imgui</Filter>
-    </ClCompile>
     <ClCompile Include="source\universal\dvar_api.cpp">
       <Filter>source\universal</Filter>
     </ClCompile>
@@ -63,9 +48,6 @@
     <ClCompile Include="source\Core\geometry.cpp">
       <Filter>source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="source\Core\imgui_impl_glfw.cpp">
-      <Filter>source\Core</Filter>
-    </ClCompile>
     <ClCompile Include="source\Core\main.cpp">
       <Filter>source\Core</Filter>
     </ClCompile>
@@ -82,9 +64,6 @@
       <Filter>source\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="source\Graphics\GpuTexture.cpp">
-      <Filter>source\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Graphics\imgui_impl_opengl3.cpp">
       <Filter>source\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="source\Graphics\MainRenderer.cpp">
@@ -141,26 +120,14 @@
     <ClCompile Include="source\Core\AssimpLoader.cpp">
       <Filter>source\Core</Filter>
     </ClCompile>
+    <ClCompile Include="source\RHI\imgui_impl_opengl3.cpp">
+      <Filter>source\RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Core\imgui_impl_glfw.cpp">
+      <Filter>source\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\imgui\imconfig.h">
-      <Filter>source\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="source\imgui\imgui.h">
-      <Filter>source\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="source\imgui\imgui_internal.h">
-      <Filter>source\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="source\imgui\imstb_rectpack.h">
-      <Filter>source\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="source\imgui\imstb_textedit.h">
-      <Filter>source\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="source\imgui\imstb_truetype.h">
-      <Filter>source\imgui</Filter>
-    </ClInclude>
     <ClInclude Include="source\universal\dvar_api.h">
       <Filter>source\universal</Filter>
     </ClInclude>
@@ -188,9 +155,6 @@
     <ClInclude Include="source\Core\geometry.h">
       <Filter>source\Core</Filter>
     </ClInclude>
-    <ClInclude Include="source\Core\imgui_impl_glfw.h">
-      <Filter>source\Core</Filter>
-    </ClInclude>
     <ClInclude Include="source\Core\WindowManager.h">
       <Filter>source\Core</Filter>
     </ClInclude>
@@ -210,9 +174,6 @@
       <Filter>source\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="source\Graphics\GraphicsManager.hpp">
-      <Filter>source\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Graphics\imgui_impl_opengl3.h">
       <Filter>source\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="source\Graphics\MainRenderer.h">
@@ -274,6 +235,15 @@
     </ClInclude>
     <ClInclude Include="source\Core\AssimpLoader.hpp">
       <Filter>source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RHI\imgui_impl_opengl3.h">
+      <Filter>source\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Core\imgui_impl_glfw.h">
+      <Filter>source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RHI\imgui_impl_opengl3_loader.h">
+      <Filter>source\RHI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

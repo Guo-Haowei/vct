@@ -2,16 +2,17 @@
 
 #include <set>
 
+#include "OpenGLPipelineStateManager.hpp"
+#include "imgui_impl_opengl3.h"
+
 #include "Base/Asserts.h"
 
 #include "Core/com_dvars.h"
-
-#include "OpenGLPipelineStateManager.hpp"
+#include "Core/WindowManager.h"
+#include "Core/imgui_impl_glfw.h"
 
 #include "Graphics/gl_utils.h"
-
-#include "Graphics/imgui_impl_opengl3.h"
-#include "Core/WindowManager.h"
+#include "GLFW/glfw3.h"
 
 // @TODO: remove
 #include "DrawPass/ShadowMapPass.hpp"
@@ -31,6 +32,9 @@ bool OpenGLGraphicsManager::Initialize()
     if ( !GraphicsManager::Initialize() ) {
         return false;
     }
+
+    m_pGlfwWindow = g_wndMgr->GetHandle();
+    ASSERT( m_pGlfwWindow );
 
     if ( gladLoadGL() == 0 ) {
         LOG_FATAL( "[glad] failed to load gl functions" );
@@ -64,11 +68,15 @@ bool OpenGLGraphicsManager::Initialize()
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new OverlayPass( this, psm, nullptr, CLEAR_FLAG_COLOR_DPETH ) ) );
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new GuiPass( this, psm, nullptr, 0 ) ) );
 
+    // @TODO: config
+    ImGui_ImplOpenGL3_Init( "#version 460 core" );
+
     return ( m_bInitialized = true );
 }
 
 void OpenGLGraphicsManager::Finalize()
 {
+    ImGui_ImplOpenGL3_Shutdown();
     m_bInitialized = false;
 }
 
@@ -240,7 +248,13 @@ void OpenGLGraphicsManager::BeginFrame( Frame &frame )
     GraphicsManager::BeginFrame( frame );
 
     SetPerFrameConstants( frame.frameContexts );
-    // ImGui_ImplOpenGL3_NewFrame
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+}
+
+void OpenGLGraphicsManager::EndFrame( Frame &frame )
+{
+    ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
 }
 
 void OpenGLGraphicsManager::Draw()
@@ -254,9 +268,9 @@ void OpenGLGraphicsManager::Draw()
     }
 }
 
-void OpenGLGraphicsManager::EndFrame( Frame &frame )
+void OpenGLGraphicsManager::Present()
 {
-    ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
+    glfwSwapBuffers( m_pGlfwWindow );
 }
 
 static void APIENTRY debug_callback(

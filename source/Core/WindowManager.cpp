@@ -3,7 +3,7 @@
 #include <GLFW/glfw3.h>
 
 #include "com_dvars.h"
-#include "imgui/imgui.h"
+#include "imgui_impl_glfw.h"
 
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
@@ -37,11 +37,14 @@ bool WindowManager::Initialize()
     glfwMakeContextCurrent( m_window );
     glfwGetFramebufferSize( m_window, &m_frameSize.x, &m_frameSize.y );
 
+    ImGui_ImplGlfw_InitForOpenGL( m_window, true );
+
     return ( m_initialized = true );
 }
 
 void WindowManager::Finalize()
 {
+    ImGui_ImplGlfw_Shutdown();
     glfwDestroyWindow( m_window );
     glfwTerminate();
     m_initialized = false;
@@ -81,6 +84,8 @@ void WindowManager::NewFrame()
               int( m_mousePos.x ), int( m_mousePos.y ),
               ImGui::GetIO().Framerate );
     glfwSetWindowTitle( m_window, buffer );
+
+    ImGui_ImplGlfw_NewFrame();
 }
 
 ivec2 WindowManager::FrameSize()
@@ -89,18 +94,13 @@ ivec2 WindowManager::FrameSize()
     return m_frameSize;
 }
 
-void WindowManager::Present()
-{
-    glfwSwapBuffers( m_window );
-}
-
 vec2 WindowManager::MousePos()
 {
     ASSERT( m_initialized && m_window );
     return m_mousePos;
 }
 
-bool WindowManager::IsKeyDown( int code )
+bool WindowManager::IsKeyDown( ImGuiKey code )
 {
     return ImGui::IsKeyDown( code );
 }

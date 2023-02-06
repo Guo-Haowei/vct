@@ -1,21 +1,24 @@
 #pragma once
 #include "Graphics/GraphicsManager.hpp"
 
+struct GLFWwindow;
+
 class OpenGLGraphicsManager : public GraphicsManager {
 public:
     virtual bool Initialize() override;
     virtual void Finalize() override;
 
-    virtual void SetPipelineState( const std::shared_ptr<PipelineState>& pipelineState ) final;
+    virtual void SetPipelineState( const std::shared_ptr<PipelineState>& pipelineState ) override;
 
-    virtual void DrawBatch( const Frame& frame ) final;
+    virtual void DrawBatch( const Frame& frame ) override;
 
-    virtual void InitializeGeometries( const Scene& scene ) final;
+    virtual void InitializeGeometries( const Scene& scene ) override;
 
-    virtual void BeginFrame( Frame& frame ) final;
-    virtual void EndFrame( Frame& frame ) final;
+    virtual void BeginFrame( Frame& frame ) override;
+    virtual void EndFrame( Frame& frame ) override;
 
-    virtual void Draw() final;
+    virtual void Draw() override;
+    virtual void Present() override;
 
 protected:
     void SetPerFrameConstants( const DrawFrameContext& context );
@@ -31,4 +34,6 @@ protected:
 
     uint32_t m_uboDrawFrameConstant = { 0 };
     uint32_t m_uboDrawBatchConstant = { 0 };
+
+    GLFWwindow* m_pGlfwWindow;
 };
