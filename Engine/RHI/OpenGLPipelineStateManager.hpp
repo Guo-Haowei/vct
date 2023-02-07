@@ -1,5 +1,5 @@
 #pragma once
-#include "Graphics/PipelineStateManager.hpp"
+#include "Manager/PipelineStateManager.hpp"
 
 struct OpenGLPipelineState : public PipelineState {
     uint32_t shaderProgram = 0;
@@ -9,10 +9,10 @@ struct OpenGLPipelineState : public PipelineState {
         : PipelineState( std::move( rhs ) ) {}
 };
 
-class GLPipelineStateManager : public PipelineStateManager {
+class OpenGLPipelineStateManager : public PipelineStateManager {
 public:
     using PipelineStateManager::PipelineStateManager;
-    virtual ~GLPipelineStateManager() = default;
+    virtual ~OpenGLPipelineStateManager() = default;
 
 protected:
     bool InitializePipelineState( PipelineState** ppPipelineState ) final;

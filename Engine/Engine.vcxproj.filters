@@ -22,6 +22,9 @@
     <Filter Include="Base">
       <UniqueIdentifier>{d87e43d4-ea49-49e2-b38b-c2aa2b283447}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Manager">
+      <UniqueIdentifier>{ea50f017-600a-490e-a8e3-a008b0de28b3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\AssimpLoader.cpp">
@@ -33,16 +36,7 @@
     <ClCompile Include="Core\camera.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Core\com_misc.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Core\dvar_api.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\editor.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\FileManager.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\geometry.cpp">
@@ -54,7 +48,7 @@
     <ClCompile Include="Core\imgui_impl_glfw.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Core\WindowManager.cpp">
+    <ClCompile Include="Core\GlfwApplication.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="SceneGraph\Entity.cpp">
@@ -78,13 +72,7 @@
     <ClCompile Include="Graphics\GpuTexture.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\GraphicsManager.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Graphics\MainRenderer.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\PipelineStateManager.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\r_cbuffers.cpp">
@@ -123,6 +111,21 @@
     <ClCompile Include="Base\Logger.cpp">
       <Filter>Base</Filter>
     </ClCompile>
+    <ClCompile Include="Manager\BaseApplication.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\GraphicsManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\PipelineStateManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\AssetLoader.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\SceneManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\AssimpLoader.hpp">
@@ -137,9 +140,6 @@
     <ClInclude Include="Core\com_dvars.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Core\com_misc.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="Core\dvar_api.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -147,12 +147,6 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Core\dvar_end.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\editor.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\FileManager.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Core\geometry.h">
@@ -164,7 +158,7 @@
     <ClInclude Include="Core\imgui_impl_glfw.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Core\WindowManager.h">
+    <ClInclude Include="Core\GlfwApplication.hpp">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="SceneGraph\Entity.hpp">
@@ -203,13 +197,7 @@
     <ClInclude Include="Graphics\GpuTexture.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\GraphicsManager.hpp">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Graphics\MainRenderer.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\PipelineStateManager.hpp">
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\r_cbuffers.h">
@@ -256,6 +244,36 @@
     </ClInclude>
     <ClInclude Include="Graphics\cbuffer.glsl">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\BaseApplication.hpp">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\GraphicsManager.hpp">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\PipelineStateManager.hpp">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\AssetLoader.hpp">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Interface\IAssetLoader.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Interface\IApplication.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Interface\ISceneManager.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\SceneManager.hpp">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Interface\IGameLogic.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\GameLogic.hpp">
+      <Filter>Manager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

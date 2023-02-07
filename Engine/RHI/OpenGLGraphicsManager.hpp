@@ -1,5 +1,5 @@
 #pragma once
-#include "Graphics/GraphicsManager.hpp"
+#include "Manager/GraphicsManager.hpp"
 
 struct GLFWwindow;
 

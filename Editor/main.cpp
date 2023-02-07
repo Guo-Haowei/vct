@@ -1,60 +1,67 @@
-#include "imgui/imgui.h"
-
 #include "Engine/Base/Asserts.h"
 #include "Engine/Base/Logger.h"
 
-#include "Engine/Core/dvar_api.h"
-#include "Engine/Core/FileManager.h"
-#include "Engine/Core/com_misc.h"
-#include "Engine/Core/editor.h"
-#include "Engine/Core/WindowManager.h"
+#include "Engine/Core/com_dvars.h"
+#include "Engine/Core/GlfwApplication.hpp"
 
-#include "Engine/Graphics/GraphicsManager.hpp"
-#include "Engine/Graphics/PipelineStateManager.hpp"
+#include "Engine/Manager/AssetLoader.hpp"
+#include "Engine/Manager/BaseApplication.hpp"
+#include "Engine/Manager/SceneManager.hpp"
+#include "Engine/Interface/IGraphicsManager.hpp"
 
-static int app_main( int argc, const char** argv )
-{
-    bool ok = true;
+#include "Engine/RHI/OpenGLPipelineStateManager.hpp"
 
-    ok = ok && Com_RegisterDvars();
-    ok = ok && dvar_process_from_cmdline( argc - 1, argv + 1 );
+#include "imgui/imgui.h"
 
-    ok = ok && manager_init( g_fileMgr );
-
-    ok = ok && Com_LoadScene();
-    ok = ok && Com_ImGuiInit();
-
-    ok = ok && manager_init( g_wndMgr );
-    ok = ok && g_gfxMgr->Initialize();
-
-    // TODO: refactor
-    ok = ok && g_pPipelineStateManager->Initialize();
-
-    g_gfxMgr->InitializeGeometries( Com_GetScene() );
-
-    while ( !g_wndMgr->ShouldClose() ) {
-        g_wndMgr->NewFrame();
-
-        Com_UpdateWorld();
-        EditorSetup();
-
-        g_gfxMgr->Tick();
-
-        Com_GetScene().dirty = false;
-    }
-
-    g_pPipelineStateManager->Finalize();
-
-    g_gfxMgr->Finalize();
-    manager_deinit( g_wndMgr );
-    ImGui::DestroyContext();
-
-    manager_deinit( g_fileMgr );
-
-    return ok ? 0 : 1;
-}
+#include "EditorLogic.hpp"
 
 int main( int argc, const char** argv )
 {
-    return app_main( argc, argv );
+    AssetLoader assetLoader;
+    SceneManager sceneManager;
+    OpenGLPipelineStateManager pipelineStateManager;
+    EditorLogic logic;
+
+    GlfwApplication app;
+
+    app.RegisterManagerModule( &assetLoader );
+    app.RegisterManagerModule( &sceneManager );
+    app.RegisterManagerModule( g_gfxMgr );
+    app.RegisterManagerModule( &pipelineStateManager );
+    app.RegisterManagerModule( &logic );
+
+    // Initialize Imgui
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    [[maybe_unused]] ImGuiIO& io = ImGui::GetIO();
+    ImGui::StyleColorsDark();
+
+    if ( !app.ProcessCommandLine( argc, argv ) ) {
+        return -1;
+    }
+
+    // @TODO: stream load
+    if ( !sceneManager.LoadScene( Dvar_GetString( scene ) ) ) {
+        return -1;
+    }
+
+    if ( !app.CreateMainWindow() ) {
+        return -1;
+    }
+
+    if ( !app.Initialize() ) {
+        return -1;
+    }
+
+    while ( !app.ShouldQuit() ) {
+        app.Tick();
+
+        // @TODO: remove
+        Com_GetScene().dirty = false;
+    }
+
+    app.Finalize();
+    ImGui::DestroyContext();
+
+    return 0;
 }

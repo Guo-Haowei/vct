@@ -1,15 +1,16 @@
 #include "GBufferPass.hpp"
 
-// @TODO: remove
-#include "Core/WindowManager.h"
+#include "Interface/IApplication.hpp"
 
 void GBufferPass::Draw( Frame& frame )
 {
     auto PSO = m_pPipelineStateManager->GetPipelineState( "GBUFFER" );
     m_pGraphicsManager->SetPipelineState( PSO );
 
-    ivec2 extent = g_wndMgr->FrameSize();
-    glViewport( 0, 0, extent.x, extent.y );
+    auto pApp = m_pPipelineStateManager->GetAppPointer();
+    uint32_t width = 0, height = 0;
+    pApp->GetFramebufferSize( width, height );
+    glViewport( 0, 0, width, height );
 
     m_pGraphicsManager->DrawBatch( frame );
 }

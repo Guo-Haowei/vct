@@ -3,8 +3,6 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include "Core/com_misc.h"
-#include "Core/WindowManager.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 
@@ -12,6 +10,7 @@
 #include "Base/Logger.h"
 
 #include "Graphics/r_cbuffers.h"
+#include "Manager/SceneManager.hpp"
 
 // @TODO: refactor
 class Editor {

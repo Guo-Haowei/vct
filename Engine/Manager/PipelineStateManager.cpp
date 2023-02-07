@@ -3,6 +3,9 @@
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
 
+#include "Interface/IAssetLoader.hpp"
+#include "Manager/BaseApplication.hpp"
+
 #define VS_HUD_LINE3D_SOURCE_FILE       "hud/line3d.vert"
 #define PS_HUD_LINE3D_SOURCE_FILE       "hud/line3d.frag"
 #define VS_HUD_IMAGE_SOURCE_FILE        "hud/image.vert"
@@ -89,7 +92,7 @@ const std::shared_ptr<PipelineState> PipelineStateManager::GetPipelineState( con
     }
     else {
         ASSERT( !m_pipelineStates.empty() );
-        LOG_ERROR( "Pipeline State %s not found", name.c_str() );
+        LOG_FATAL( "Pipeline State %s not found", name.c_str() );
         return m_pipelineStates.begin()->second;
     }
 }
@@ -106,6 +109,10 @@ bool PipelineStateManager::Initialize()
             stencilTestMode = STENCIL_TEST_MODE::NONE;
         }
     };
+
+    auto assetLoader = dynamic_cast<BaseApplication*>(m_pApp)->GetAssetLoader();
+    assetLoader->AddSearchPath( "Shaders" );
+    assetLoader->AddSearchPath( "Engine/Graphics" );
 
     {
         PipelineStateEx pipelineState{ "LINE3D" };
@@ -177,6 +184,9 @@ bool PipelineStateManager::Initialize()
         pipelineState.pixelShaderName = PS_HUD_OVERLAY_SOURCE_FILE;
         RegisterPipelineState( pipelineState );
     }
+
+    assetLoader->RemoveSearchPath( "Engine/Graphics" );
+    assetLoader->RemoveSearchPath( "Shaders" );
 
     LOG_OK( "Pipeline State Manager Initialized. [%zu]", m_pipelineStates.size() );
     return true;

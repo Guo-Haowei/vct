@@ -4,10 +4,11 @@
 
 #include "Base/Asserts.h"
 
-#include "Core/WindowManager.h"
+//#include "Core/GlfwApplication.hpp"
 #include "Core/com_dvars.h"
-#include "Core/com_misc.h"
 #include "Graphics/gl_utils.h"
+
+#include "Manager/SceneManager.hpp"
 
 static void DrawDebugWindow()
 {

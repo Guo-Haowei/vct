@@ -7,40 +7,28 @@
 
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
-#include "Core/FileManager.h"
 
-// TODO: remove
-IPipelineStateManager *g_pPipelineStateManager = new GLPipelineStateManager();
+#include "Interface/IAssetLoader.hpp"
+#include "Manager/BaseApplication.hpp"
 
 using std::pair;
 using std::string;
 using std::vector;
 
-static std::string ProcessShader( const std::string &source )
+static std::string ProcessShader( const std::string &source, IAssetLoader *assetLoader )
 {
-    std::string result;
+    string result;
     std::stringstream ss( source );
     for ( std::string line; std::getline( ss, line ); ) {
         constexpr const char pattern[] = "#include";
         if ( line.find( pattern ) == 0 ) {
-            std::string include = line.substr( line.find( '"' ) );
+            string include = line.substr( line.find( '"' ) );
             ASSERT( include.front() == '"' && include.back() == '"' );
             include.pop_back();
-            SystemFile sysFile;
-            constexpr char cbufferFile [] = "cbuffer.glsl";
-            const char *removeQuote = include.c_str() + 1;
-            if ( strncmp( cbufferFile, removeQuote, sizeof( cbufferFile ) ) == 0 ) {
-                sysFile = ( g_fileMgr->OpenRead( removeQuote, "Engine/Graphics" ) );
-            }
-            else {
-                sysFile = ( g_fileMgr->OpenRead( removeQuote, "Shaders" ) );
-            }
-            SystemFileWrapper fhandle( sysFile );
-            std::vector<char> extra;
-            if ( fhandle.Read( extra ) != SystemFile::Result::Ok ) {
-                LOG_ERROR( "[filesystem] failed to read shader '%s'", include.c_str() );
-            }
-            result.append( extra.data() );
+            constexpr char cbufferFile[] = "cbuffer.glsl";
+
+            vector<char> includeSource = assetLoader->SyncOpenAndReadText( include.c_str() + 1 );
+            result.append( includeSource.data() );
         }
         else {
             result.append( line );
@@ -52,21 +40,13 @@ static std::string ProcessShader( const std::string &source )
     return result;
 }
 
-static bool LoadShaderFromFile( const char *file, const GLenum shaderType,
-                                GLuint &shader )
+static bool LoadShaderFromFile( const char *file, const GLenum shaderType, GLuint &shader, IAssetLoader *assetLoader )
 {
-    // @TODO: resource management
-    std::string filename( file );
+    string filename( file );
     filename.append( ".glsl" );
-    SystemFileWrapper fhandle( g_fileMgr->OpenRead( filename.c_str(), "Shaders" ) );
-    std::string source;
-    const SystemFile::Result result = fhandle.Read( source );
-    if ( result != SystemFile::Result::Ok ) {
-        LOG_FATAL( "Failed to read shader '%s'", filename.c_str() );
-        return false;
-    }
+    vector<char> source = assetLoader->SyncOpenAndReadText( filename.c_str() );
+    ASSERT( source.data() );
 
-    std::string fullsource = ProcessShader( source );
     constexpr const char extras[] =
         "#version 460 core\n"
         "#extension GL_NV_gpu_shader5 : require\n"
@@ -74,8 +54,9 @@ static bool LoadShaderFromFile( const char *file, const GLenum shaderType,
         "#extension GL_NV_shader_atomic_fp16_vector : enable\n"
         "#extension GL_ARB_bindless_texture : require\n"
         "";
-    const char *sources[] = { extras, fullsource.c_str() };
+    string fullsource = ProcessShader( source.data(), assetLoader );
 
+    const char *sources[] = { extras, fullsource.c_str() };
     shader = glCreateShader( shaderType );
     glShaderSource( shader, array_length( sources ), sources, nullptr );
     glCompileShader( shader );
@@ -99,7 +80,7 @@ static bool LoadShaderFromFile( const char *file, const GLenum shaderType,
 }
 
 typedef vector<pair<GLenum, string>> ShaderSourceList;
-static bool LoadShaderProgram( const ShaderSourceList &source, GLuint &shaderProgram )
+static bool LoadShaderProgram( const ShaderSourceList &source, GLuint &shaderProgram, IAssetLoader *assetLoader )
 {
     // Create a shader program object.
     shaderProgram = glCreateProgram();
@@ -107,7 +88,7 @@ static bool LoadShaderProgram( const ShaderSourceList &source, GLuint &shaderPro
     for ( auto it = source.cbegin(); it != source.cend(); it++ ) {
         if ( !it->second.empty() ) {
             GLuint shader;
-            if ( !LoadShaderFromFile( ( it->second ).c_str(), it->first, shader ) ) {
+            if ( !LoadShaderFromFile( ( it->second ).c_str(), it->first, shader, assetLoader ) ) {
                 return false;
             }
 
@@ -135,38 +116,36 @@ static bool LoadShaderProgram( const ShaderSourceList &source, GLuint &shaderPro
     return true;
 }
 
-bool GLPipelineStateManager::InitializePipelineState(
+bool OpenGLPipelineStateManager::InitializePipelineState(
     PipelineState **ppPipelineState )
 {
     OpenGLPipelineState *pnew_state = new OpenGLPipelineState( **ppPipelineState );
     ShaderSourceList list;
 
     if ( !( *ppPipelineState )->vertexShaderName.empty() ) {
-        list.emplace_back( GL_VERTEX_SHADER,
-                           ( *ppPipelineState )->vertexShaderName );
+        list.emplace_back( GL_VERTEX_SHADER, ( *ppPipelineState )->vertexShaderName );
     }
 
     if ( !( *ppPipelineState )->pixelShaderName.empty() ) {
-        list.emplace_back( GL_FRAGMENT_SHADER,
-                           ( *ppPipelineState )->pixelShaderName );
+        list.emplace_back( GL_FRAGMENT_SHADER, ( *ppPipelineState )->pixelShaderName );
     }
 
     if ( !( *ppPipelineState )->geometryShaderName.empty() ) {
-        list.emplace_back( GL_GEOMETRY_SHADER,
-                           ( *ppPipelineState )->geometryShaderName );
+        list.emplace_back( GL_GEOMETRY_SHADER, ( *ppPipelineState )->geometryShaderName );
     }
 
     if ( !( *ppPipelineState )->computeShaderName.empty() ) {
-        list.emplace_back( GL_COMPUTE_SHADER,
-                           ( *ppPipelineState )->computeShaderName );
+        list.emplace_back( GL_COMPUTE_SHADER, ( *ppPipelineState )->computeShaderName );
     }
 
-    bool result = LoadShaderProgram( list, pnew_state->shaderProgram );
+    auto assetLoader = dynamic_cast<BaseApplication *>( m_pApp )->GetAssetLoader();
+    bool result = LoadShaderProgram( list, pnew_state->shaderProgram, assetLoader );
+
     *ppPipelineState = pnew_state;
     return result;
 }
 
-void GLPipelineStateManager::DestroyPipelineState(
+void OpenGLPipelineStateManager::DestroyPipelineState(
     PipelineState &pipelineState )
 {
     OpenGLPipelineState *pPipelineState = dynamic_cast<OpenGLPipelineState *>( &pipelineState );
