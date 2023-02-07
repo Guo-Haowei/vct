@@ -8,7 +8,6 @@
 #include "Base/Asserts.h"
 
 #include "Core/com_dvars.h"
-#include "Core/imgui_impl_glfw.h"
 #include "Core/GlfwApplication.hpp"
 
 #include "Graphics/gl_utils.h"
@@ -17,18 +16,8 @@
 #include "Manager/BaseApplication.hpp"
 #include "Manager/SceneManager.hpp"
 
-// @TODO: remove
-#include "DrawPass/ShadowMapPass.hpp"
-#include "DrawPass/SSAOPass.hpp"
-#include "DrawPass/GBufferPass.hpp"
-#include "DrawPass/DeferredPass.hpp"
-#include "DrawPass/OverlayPass.hpp"
-#include "DrawPass/VoxelizationPass.hpp"
-#include "DrawPass/GuiPass.hpp"
-
 #include "Graphics/MainRenderer.h"
 static MainRenderer g_renderer;
-IGraphicsManager *g_gfxMgr = new OpenGLGraphicsManager();
 
 static void APIENTRY debug_callback( GLenum, GLenum, unsigned int, GLenum, GLsizei, const char *, const void * );
 
@@ -37,9 +26,6 @@ bool OpenGLGraphicsManager::Initialize()
     if ( !GraphicsManager::Initialize() ) {
         return false;
     }
-
-    m_pGlfwWindow = reinterpret_cast<GLFWwindow *>( m_pApp->GetMainWindowHandler() );
-    ASSERT( m_pGlfwWindow );
 
     if ( gladLoadGL() == 0 ) {
         LOG_FATAL( "[glad] failed to load gl functions" );
@@ -62,7 +48,7 @@ bool OpenGLGraphicsManager::Initialize()
     }
 
     // @TODO: move to GraphicsManager
-    auto pipelineStateManager = dynamic_cast<BaseApplication*>(m_pApp)->GetPipelineStateManager();
+    auto pipelineStateManager = dynamic_cast<BaseApplication *>( m_pApp )->GetPipelineStateManager();
 
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new ShadowMapPass( this, pipelineStateManager, &g_shadowRT, CLEAR_FLAG_DEPTH ) ) );
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new VoxelizationPass( this, pipelineStateManager, nullptr, CLEAR_FLAG_NONE ) ) );
@@ -72,11 +58,33 @@ bool OpenGLGraphicsManager::Initialize()
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new OverlayPass( this, pipelineStateManager, nullptr, CLEAR_FLAG_COLOR_DPETH ) ) );
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new GuiPass( this, pipelineStateManager, nullptr, 0 ) ) );
 
-    // @TODO: config
+    char version[256] = { 0 };
+    snprintf( version, sizeof( version ), "#version %d%d0 core", OPENGL_DEFAULT_VERSION_MAJOR, OPENGL_DEFAULT_VERSION_MINOR );
+    if ( !ImGui_ImplOpenGL3_Init( version ) ) {
+        LOG_FATAL( "OpenGLGraphicsManager::Initialize: ImGui_ImplOpenGL3_Init(\"%s\") failed!", version );
+        return false;
+    }
 
-    char glsl_version[256] = { 0 };
-    snprintf( glsl_version, sizeof( glsl_version ), "#version %d%d0 core", OPENGL_DEFAULT_VERSION_MAJOR, OPENGL_DEFAULT_VERSION_MINOR );
-    ImGui_ImplOpenGL3_Init( glsl_version );
+    if ( !ImGui_ImplOpenGL3_CreateDeviceObjects() ) {
+        LOG_FATAL( "OpenGLGraphicsManager::Initialize: ImGui_ImplOpenGL3_CreateDeviceObjects() failed!" );
+        return false;
+    }
+
+    // create render targets
+    {
+        int w = 0, h = 0;
+        GetAppPointer()->GetFramebufferSize( w, h );
+
+        const int res = Dvar_GetInt( r_shadowRes );
+        ASSERT( is_power_of_two( res ) );
+
+        // g_shadowRT.Create( NUM_CASCADES * res, res );
+        g_shadowRT.Create( res, res );
+        g_gbufferRT.Create( w, h );
+        g_ssaoRT.Create( w, h );
+        g_finalImageRT.Create( w, h );
+    }
+
     g_renderer.createGpuResources();
 
     InitializeGeometries( Com_GetScene() );
@@ -88,12 +96,11 @@ void OpenGLGraphicsManager::Finalize()
 {
     g_renderer.destroyGpuResources();
     ImGui_ImplOpenGL3_Shutdown();
-    m_bInitialized = false;
 }
 
-void OpenGLGraphicsManager::SetPipelineState( const std::shared_ptr<PipelineState> &pipelineState )
+void OpenGLGraphicsManager::SetPipelineState( const std::shared_ptr<PipelineState> &pipeline_state )
 {
-    const OpenGLPipelineState *pPipelineState = dynamic_cast<const OpenGLPipelineState *>( pipelineState.get() );
+    const OpenGLPipelineState *pPipelineState = dynamic_cast<const OpenGLPipelineState *>( pipeline_state.get() );
 
     // m_CurrentShader = pPipelineState->shaderProgram;
 
@@ -101,7 +108,7 @@ void OpenGLGraphicsManager::SetPipelineState( const std::shared_ptr<PipelineStat
     // that it will use for rendering.
     glUseProgram( pPipelineState->shaderProgram );
 
-    switch ( pipelineState->cullFaceMode ) {
+    switch ( pipeline_state->cullFaceMode ) {
         case CULL_FACE_MODE::NONE:
             glDisable( GL_CULL_FACE );
             break;
@@ -118,7 +125,7 @@ void OpenGLGraphicsManager::SetPipelineState( const std::shared_ptr<PipelineStat
             break;
     }
 
-    switch ( pipelineState->depthTestMode ) {
+    switch ( pipeline_state->depthTestMode ) {
         case DEPTH_TEST_MODE::NONE:
             glDisable( GL_DEPTH_TEST );
             break;
@@ -259,8 +266,6 @@ void OpenGLGraphicsManager::BeginFrame( Frame &frame )
     GraphicsManager::BeginFrame( frame );
 
     SetPerFrameConstants( frame.frameContexts );
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
 }
 
 void OpenGLGraphicsManager::EndFrame( Frame & )
@@ -268,20 +273,11 @@ void OpenGLGraphicsManager::EndFrame( Frame & )
     ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
 }
 
-void OpenGLGraphicsManager::Draw()
-{
-    Frame &frame = m_frame;
-
-    for ( auto &drawPass : m_drawPasses ) {
-        drawPass->BeginPass( frame );
-        drawPass->Draw( frame );
-        drawPass->EndPass( frame );
-    }
-}
-
 void OpenGLGraphicsManager::Present()
 {
-    glfwSwapBuffers( m_pGlfwWindow );
+    GLFWwindow *pGlfwWindow = reinterpret_cast<GLFWwindow *>( m_pApp->GetMainWindowHandler() );
+    ASSERT( pGlfwWindow );
+    glfwSwapBuffers( pGlfwWindow );
 }
 
 static void APIENTRY debug_callback(

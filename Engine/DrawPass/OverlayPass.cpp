@@ -16,7 +16,7 @@ void OverlayPass::Draw( Frame& frame )
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     auto pApp = m_pPipelineStateManager->GetAppPointer();
-    uint32_t width = 0, height = 0;
+    int width = 0, height = 0;
     pApp->GetFramebufferSize( width, height );
     glViewport( 0, 0, width, height );
 

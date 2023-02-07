@@ -8,13 +8,6 @@ class IAssetLoader : public IRuntimeModule {
     IAssetLoader() = default;
     virtual ~IAssetLoader() = default;
 
-    virtual std::string BuildSysPath( const char* filename, const char* extraPath ) = 0;
-
-    std::string BuildSysPath( const char* filename )
-    {
-        return BuildSysPath( filename, nullptr );
-    };
-
     virtual bool AddSearchPath( const std::string& path ) = 0;
 
     virtual bool RemoveSearchPath( const std::string& path ) = 0;

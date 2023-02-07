@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdint>
 
 class IApplication {
 public:
@@ -14,5 +13,5 @@ public:
     virtual bool CreateMainWindow() = 0;
     virtual void* GetMainWindowHandler() = 0;
 
-    virtual void GetFramebufferSize( uint32_t& width, uint32_t& height ) = 0;
+    virtual void GetFramebufferSize( int& width, int& height ) = 0;
 };

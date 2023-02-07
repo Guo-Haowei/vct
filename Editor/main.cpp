@@ -9,7 +9,14 @@
 #include "Engine/Manager/SceneManager.hpp"
 #include "Engine/Interface/IGraphicsManager.hpp"
 
-#include "Engine/RHI/OpenGLPipelineStateManager.hpp"
+#include "Engine/RHI/OpenGL/OpenGLGraphicsManager.hpp"
+#include "Engine/RHI/OpenGL/OpenGLPipelineStateManager.hpp"
+
+#include "Engine/RHI/D3d11/D3d11GraphicsManager.hpp"
+#include "Engine/RHI/D3d11/D3d11PipelineStateManager.hpp"
+
+#define USE_DX11
+#include "Engine/RHI/ConfigBackend.hpp"
 
 #include "imgui/imgui.h"
 
@@ -17,16 +24,19 @@
 
 int main( int argc, const char** argv )
 {
+    const GfxBackend backend = USING( DX11_PROGRAM ) ? GfxBackend::D3d11 : GfxBackend::OpenGL;
+    Configuration config( backend, "Editor", 800, 600 );
+    GlfwApplication app( config );
+
     AssetLoader assetLoader;
     SceneManager sceneManager;
-    OpenGLPipelineStateManager pipelineStateManager;
+    TGraphicsManager graphicsManager;
+    TPipelineStateManager pipelineStateManager;
     EditorLogic logic;
-
-    GlfwApplication app;
 
     app.RegisterManagerModule( &assetLoader );
     app.RegisterManagerModule( &sceneManager );
-    app.RegisterManagerModule( g_gfxMgr );
+    app.RegisterManagerModule( &graphicsManager );
     app.RegisterManagerModule( &pipelineStateManager );
     app.RegisterManagerModule( &logic );
 

@@ -53,5 +53,4 @@ extern GBuffer g_gbufferRT;
 extern SsaoRT g_ssaoRT;
 extern FinalImageRT g_finalImageRT;
 
-void R_CreateRT();
 void R_DestroyRT();

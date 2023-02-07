@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 #include "Base/Logger.h"
 
@@ -21,6 +22,11 @@ using std::string;
 static void RegisterDvars();
 static bool ProcessDvarFromCmdLine( int argc, const char** argv );
 
+BaseApplication::BaseApplication( const Configuration& config )
+    : m_config( config )
+{
+}
+
 bool BaseApplication::ProcessCommandLine( int argc, const char** argv )
 {
     RegisterDvars();
@@ -30,6 +36,8 @@ bool BaseApplication::ProcessCommandLine( int argc, const char** argv )
 
 bool BaseApplication::Initialize()
 {
+    std::cout << m_config << std::endl;
+
     int i = 0;
     for ( auto& module : m_runtimeModules ) {
         LOG_DEBUG( "BaseApplication::Initialize(): Initializing module %i", i++ );

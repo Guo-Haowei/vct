@@ -39,6 +39,13 @@ void GraphicsManager::Tick()
 
 void GraphicsManager::Draw()
 {
+    Frame& frame = m_frame;
+
+    for ( auto& drawPass : m_drawPasses ) {
+        drawPass->BeginPass( frame );
+        drawPass->Draw( frame );
+        drawPass->EndPass( frame );
+    }
 }
 
 void GraphicsManager::CalculateCameraMatrix()
@@ -87,7 +94,7 @@ void GraphicsManager::UpdateConstants()
     frameConstats.LightPV = R_HackLightSpaceMatrix( scene.light.direction );
 
     const Camera& camera = scene.camera;
-    uint32_t w, h;
+    int w, h;
     m_pApp->GetFramebufferSize( w, h );
 
     // update constants

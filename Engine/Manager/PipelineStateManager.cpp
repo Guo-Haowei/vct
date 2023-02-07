@@ -6,6 +6,8 @@
 #include "Interface/IAssetLoader.hpp"
 #include "Manager/BaseApplication.hpp"
 
+#define VS_SIMPLE_SOURCE_FILE           "simple.vert"
+#define PS_SIMPLE_SOURCE_FILE           "simple.frag"
 #define VS_HUD_LINE3D_SOURCE_FILE       "hud/line3d.vert"
 #define PS_HUD_LINE3D_SOURCE_FILE       "hud/line3d.frag"
 #define VS_HUD_IMAGE_SOURCE_FILE        "hud/image.vert"
@@ -51,11 +53,11 @@ bool PipelineStateManager::RegisterPipelineState( PipelineState& pipelineState )
     PipelineState* pPipelineState = &pipelineState;
     if ( InitializePipelineState( &pPipelineState ) ) {
         m_pipelineStates.emplace( pipelineState.pipelineStateName, pPipelineState );
-        LOG_DEBUG( "PipelineState %s registered.", pipelineState.pipelineStateName.c_str() );
+        LOG_OK( "PipelineState [%s].", pipelineState.pipelineStateName.c_str() );
         return true;
     }
 
-    LOG_ERROR( "PipelineState %s registered failed.", pipelineState.pipelineStateName.c_str() );
+    LOG_ERROR( "Failed to register PipelineState [%s].", pipelineState.pipelineStateName.c_str() );
     return false;
 }
 
@@ -110,9 +112,14 @@ bool PipelineStateManager::Initialize()
         }
     };
 
-    auto assetLoader = dynamic_cast<BaseApplication*>(m_pApp)->GetAssetLoader();
-    assetLoader->AddSearchPath( "Shaders" );
-    assetLoader->AddSearchPath( "Engine/Graphics" );
+    BaseApplication* pApp = dynamic_cast<BaseApplication*>( m_pApp );
+
+    if ( pApp->GetGfxBackend() == GfxBackend::D3d11 ) {
+        PipelineStateEx pipelineState{ "SIMPLE" };
+        pipelineState.vertexShaderName = VS_SIMPLE_SOURCE_FILE;
+        pipelineState.pixelShaderName = PS_SIMPLE_SOURCE_FILE;
+        RegisterPipelineState( pipelineState );
+    }
 
     {
         PipelineStateEx pipelineState{ "LINE3D" };
@@ -184,9 +191,6 @@ bool PipelineStateManager::Initialize()
         pipelineState.pixelShaderName = PS_HUD_OVERLAY_SOURCE_FILE;
         RegisterPipelineState( pipelineState );
     }
-
-    assetLoader->RemoveSearchPath( "Engine/Graphics" );
-    assetLoader->RemoveSearchPath( "Shaders" );
 
     LOG_OK( "Pipeline State Manager Initialized. [%zu]", m_pipelineStates.size() );
     return true;

@@ -2,8 +2,15 @@
 #include "Interface/IGraphicsManager.hpp"
 
 #include "Graphics/FrameStructure.hpp"
-#include "DrawPass/BaseDrawPass.hpp"
 #include "SceneGraph/Scene.hpp"
+
+#include "DrawPass/ShadowMapPass.hpp"
+#include "DrawPass/SSAOPass.hpp"
+#include "DrawPass/GBufferPass.hpp"
+#include "DrawPass/DeferredPass.hpp"
+#include "DrawPass/OverlayPass.hpp"
+#include "DrawPass/VoxelizationPass.hpp"
+#include "DrawPass/GuiPass.hpp"
 
 struct GLFWwindow;
 
@@ -14,6 +21,8 @@ public:
 
     virtual void Draw() override;
     virtual void Present() override {}
+
+    virtual void ResizeCanvas( int, int ) override {}
 
     virtual void SetPipelineState( const std::shared_ptr<PipelineState>& ) {}
 

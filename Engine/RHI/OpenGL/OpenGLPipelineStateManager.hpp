@@ -1,5 +1,6 @@
 #pragma once
 #include "Manager/PipelineStateManager.hpp"
+#include <vector>
 
 struct OpenGLPipelineState : public PipelineState {
     uint32_t shaderProgram = 0;
