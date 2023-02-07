@@ -51,7 +51,7 @@ bool GlfwApplication::CreateMainWindowInternal( bool isOpenGL )
     glfwInit();
 
     glfwWindowHint( GLFW_DECORATED, !Dvar_GetBool( wnd_frameless ) );
-    glfwWindowHint( GLFW_RESIZABLE, GLFW_FALSE );
+    glfwWindowHint( GLFW_RESIZABLE, m_config.m_resizable );
 
     if ( isOpenGL ) {
         glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, OPENGL_DEFAULT_VERSION_MAJOR );
@@ -64,12 +64,16 @@ bool GlfwApplication::CreateMainWindowInternal( bool isOpenGL )
         glfwWindowHint( GLFW_CLIENT_API, GLFW_NO_API );
     }
 
+    // @TODO: config size
     const GLFWvidmode* vidmode = glfwGetVideoMode( glfwGetPrimaryMonitor() );
-    const float s = 0.9f;
+    const float s = 0.8f;
     ivec2 size{ s * vidmode->width, s * vidmode->height };
+    // size.x = m_config.m_width;
+    // size.y = m_config.m_height;
 
     GLFWwindow* window = glfwCreateWindow( size.x, size.y, m_config.m_appName, 0, 0 );
     if ( !window ) {
+        LOG_ERROR( "glfwCreateWindow(%d, %d, %s) failed!", size.x, size.y, m_config.m_appName );
         return false;
     }
 
@@ -90,10 +94,6 @@ bool GlfwApplication::CreateMainWindowInternal( bool isOpenGL )
     }
 
     glfwSetFramebufferSizeCallback( window, []( GLFWwindow* window, int width, int height ) {
-        auto pApp = reinterpret_cast<GlfwApplication*>( glfwGetWindowUserPointer( window ) );
-        pApp->ResizeWindow( width, height );
-    } );
-    glfwSetWindowSizeCallback( window, []( GLFWwindow* window, int width, int height ) {
         auto pApp = reinterpret_cast<GlfwApplication*>( glfwGetWindowUserPointer( window ) );
         pApp->ResizeWindow( width, height );
     } );

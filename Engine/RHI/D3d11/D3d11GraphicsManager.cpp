@@ -92,7 +92,7 @@ void D3d11GraphicsManager::Finalize()
 void D3d11GraphicsManager::ResizeCanvas( int new_width, int new_height )
 {
     DestroyRenderTarget();
-    m_pSwapChain->ResizeBuffers( 0, new_height, new_width, DXGI_FORMAT_UNKNOWN, 0 );
+    m_pSwapChain->ResizeBuffers( 0, new_width, new_height, DXGI_FORMAT_UNKNOWN, 0 );
     CreateRenderTarget();
 }
 
@@ -240,7 +240,6 @@ void D3d11GraphicsManager::Present()
 bool D3d11GraphicsManager::CreateDeviceAndSwapChain()
 {
     GLFWwindow *pGlfwWindow = reinterpret_cast<GLFWwindow *>( m_pApp->GetMainWindowHandler() );
-
     // create device and swap chain
     DXGI_SWAP_CHAIN_DESC sd{};
     sd.BufferCount = 2;
