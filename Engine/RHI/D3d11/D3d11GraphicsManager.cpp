@@ -1,6 +1,9 @@
 #include "D3d11GraphicsManager.hpp"
 
+#include "D3d11PipelineStateManager.hpp"
+
 #include "Base/Asserts.h"
+#include "Base/Logger.h"
 
 #include "Core/com_dvars.h"
 #include "Core/GlfwApplication.hpp"
@@ -14,12 +17,20 @@
 #include "Manager/BaseApplication.hpp"
 #include "Manager/SceneManager.hpp"
 
-#include "D3dCommon.hpp"
+class DummyPass : public BaseDrawPass {
+public:
+    using BaseDrawPass::BaseDrawPass;
 
-// @TODO: move to sln
-#pragma comment( lib, "dxgi.lib" )
-#pragma comment( lib, "d3d11.lib" )
-#pragma comment( lib, "d3dcompiler.lib" )
+    virtual void BeginPass( Frame & ) override {}
+
+    virtual void Draw( Frame & ) override
+    {
+    }
+
+    virtual void EndPass( Frame & ) override {}
+};
+
+static ID3D11Buffer *vertex_buffer_ptr = NULL;
 
 bool D3d11GraphicsManager::Initialize()
 {
@@ -35,7 +46,7 @@ bool D3d11GraphicsManager::Initialize()
         return false;
     }
 
-    if ( !ImGui_ImplDX11_Init( m_pDevice, m_pCtx ) ) {
+    if ( !ImGui_ImplDX11_Init( m_pDevice.Get(), m_pCtx.Get() ) ) {
         LOG_FATAL( "D3d11GraphicsManager::Initialize: ImGui_ImplDX11_Init() failed!" );
         return false;
     }
@@ -46,23 +57,36 @@ bool D3d11GraphicsManager::Initialize()
     }
 
     auto pipelineStateManager = dynamic_cast<BaseApplication *>( m_pApp )->GetPipelineStateManager();
+    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new DummyPass( this, pipelineStateManager, nullptr, 0 ) ) );
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new GuiPass( this, pipelineStateManager, nullptr, 0 ) ) );
+
+    // @TODO: temp
+    { /*** load mesh data into vertex buffer **/
+        float vertex_data_array[] = {
+            0.0f, 0.5f, 0.0f,    // point at top
+            0.5f, -0.5f, 0.0f,   // point at bottom-right
+            -0.5f, -0.5f, 0.0f,  // point at bottom-left
+        };
+
+        D3D11_BUFFER_DESC vertex_buff_descr = {};
+        vertex_buff_descr.ByteWidth = sizeof( vertex_data_array );
+        vertex_buff_descr.Usage = D3D11_USAGE_DEFAULT;
+        vertex_buff_descr.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+        D3D11_SUBRESOURCE_DATA sr_data = { 0 };
+        sr_data.pSysMem = vertex_data_array;
+        HRESULT hr = m_pDevice->CreateBuffer(
+            &vertex_buff_descr,
+            &sr_data,
+            &vertex_buffer_ptr );
+        assert( SUCCEEDED( hr ) );
+    }
 
     return ( m_bInitialized = true );
 }
 
 void D3d11GraphicsManager::Finalize()
 {
-    //g_renderer.destroyGpuResources();
     ImGui_ImplDX11_Shutdown();
-
-    SafeRelease( m_pSwapChain );
-    SafeRelease( m_pDevice );
-    SafeRelease( m_pCtx );
-
-    SafeRelease( m_pDxgiDevice );
-    SafeRelease( m_pDxgiAdapter );
-    SafeRelease( m_pDxgiFactory );
 }
 
 void D3d11GraphicsManager::ResizeCanvas( int new_width, int new_height )
@@ -72,9 +96,27 @@ void D3d11GraphicsManager::ResizeCanvas( int new_width, int new_height )
     CreateRenderTarget();
 }
 
-void D3d11GraphicsManager::SetPipelineState( const std::shared_ptr<PipelineState> &pipelineState )
+void D3d11GraphicsManager::SetPipelineState( const std::shared_ptr<PipelineState> &pipeline_state )
 {
-    //const OpenGLPipelineState *pPipelineState = dynamic_cast<const OpenGLPipelineState *>( pipelineState.get() );
+    const D3d11PipelineState *pPipelineState = dynamic_cast<const D3d11PipelineState *>( pipeline_state.get() );
+
+    auto &ctx = m_pCtx;
+    if ( pipeline_state->pipelineType == PIPELINE_TYPE::GRAPHIC ) {
+        ASSERT( pPipelineState->m_vs && pPipelineState->m_ps );
+        ctx->VSSetShader( pPipelineState->m_vs, 0, 0 );
+        ctx->PSSetShader( pPipelineState->m_ps, 0, 0 );
+        if ( pPipelineState->m_gs ) {
+            ctx->GSSetShader( pPipelineState->m_gs, 0, 0 );
+        }
+    }
+    else {
+        ASSERT( 0 && "TODO" );
+    }
+
+    ctx->IASetInputLayout( pPipelineState->m_layout );
+    ctx->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+
+    // TODO: modes
 }
 
 void D3d11GraphicsManager::DrawBatch( const Frame & )
@@ -156,20 +198,38 @@ void D3d11GraphicsManager::InitializeGeometries( const Scene &scene )
 
 void D3d11GraphicsManager::BeginFrame( Frame &frame )
 {
-    //GraphicsManager::BeginFrame( frame );
+    GraphicsManager::BeginFrame( frame );
 
     //SetPerFrameConstants( frame.frameContexts );
-    //ImGui_ImplOpenGL3_NewFrame();
-    //ImGui_ImplGlfw_NewFrame();
 }
 
-void D3d11GraphicsManager::EndFrame( Frame & )
+void D3d11GraphicsManager::EndFrame( Frame &frame )
 {
+    auto &ctx = m_pCtx;
+    int w, h;
+    m_pApp->GetFramebufferSize( w, h );
+    D3D11_VIEWPORT viewport = { 0.0f, 0.0f, (FLOAT)w, (FLOAT)h, 0.0f, 1.0f };
+    ctx->RSSetViewports( 1, &viewport );
+
+    /**** Output Merger *****/
+    ctx->OMSetRenderTargets( 1, &m_immediate.rtv, NULL );
     const float clearColor[4] = { 0.3f, 0.4f, 0.3f, 1.0f };
-    m_pCtx->OMSetRenderTargets( 1, &m_immediate.rtv, m_immediate.dsv );
-    m_pCtx->ClearRenderTargetView( m_immediate.rtv, clearColor );
-    // m_pCtx->ClearDepthStencilView()
+    ctx->ClearRenderTargetView( m_immediate.rtv, clearColor );
+
+    /***** Input Assembler (map how the vertex shader inputs should be read from vertex buffer) ******/
+    IPipelineStateManager *pPipelineStateManager = dynamic_cast<BaseApplication *>( m_pApp )->GetPipelineStateManager();
+    auto PSO = pPipelineStateManager->GetPipelineState( "SIMPLE" );
+    SetPipelineState( PSO );
+
+    /*** draw the vertex buffer with the shaders ****/
+    UINT vertex_stride = 3 * sizeof( float );
+    UINT vertex_offset = 0;
+    m_pCtx->IASetVertexBuffers( 0, 1, &vertex_buffer_ptr, &vertex_stride, &vertex_offset );
+    m_pCtx->Draw( 3, 0 );
+
     ImGui_ImplDX11_RenderDrawData( ImGui::GetDrawData() );
+
+    GraphicsManager::EndFrame( frame );
 }
 
 void D3d11GraphicsManager::Present()

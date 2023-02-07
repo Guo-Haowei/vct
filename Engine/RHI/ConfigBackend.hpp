@@ -1,7 +1,7 @@
 #pragma once
 #include "../Base/Defines.h"
 
-#if 0
+#if defined( USE_DX11 )
 #define DX11_PROGRAM   IN_USE
 #define OPENGL_PROGRAM NOT_IN_USE
 #else

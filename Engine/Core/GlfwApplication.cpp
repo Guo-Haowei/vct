@@ -31,8 +31,9 @@ void GlfwApplication::Tick()
 
     char buffer[1024]{ 0 };
     snprintf( buffer, sizeof( buffer ),
-              "%s | Size: %d x %d | FSP: %.2f",
+              "%s | %s | Size: %d x %d | FSP: %.2f",
               m_config.m_appName,
+              GfxBackendToString( m_config.m_gfxBackend ),
               m_config.m_width,
               m_config.m_height,
               ImGui::GetIO().Framerate );

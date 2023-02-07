@@ -7,7 +7,6 @@
 #include "Interface/ISceneManager.hpp"
 #include "Interface/IGameLogic.hpp"
 
-
 #include "Core/Configuration.hpp"
 
 class BaseApplication : public IApplication {
@@ -58,6 +57,11 @@ public:
     IGameLogic* GetGameLogic()
     {
         return m_pGameLogic;
+    }
+
+    GfxBackend GetGfxBackend() const
+    {
+        return m_config.m_gfxBackend;
     }
 
 protected:

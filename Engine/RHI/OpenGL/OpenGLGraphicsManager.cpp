@@ -98,9 +98,9 @@ void OpenGLGraphicsManager::Finalize()
     ImGui_ImplOpenGL3_Shutdown();
 }
 
-void OpenGLGraphicsManager::SetPipelineState( const std::shared_ptr<PipelineState> &pipelineState )
+void OpenGLGraphicsManager::SetPipelineState( const std::shared_ptr<PipelineState> &pipeline_state )
 {
-    const OpenGLPipelineState *pPipelineState = dynamic_cast<const OpenGLPipelineState *>( pipelineState.get() );
+    const OpenGLPipelineState *pPipelineState = dynamic_cast<const OpenGLPipelineState *>( pipeline_state.get() );
 
     // m_CurrentShader = pPipelineState->shaderProgram;
 
@@ -108,7 +108,7 @@ void OpenGLGraphicsManager::SetPipelineState( const std::shared_ptr<PipelineStat
     // that it will use for rendering.
     glUseProgram( pPipelineState->shaderProgram );
 
-    switch ( pipelineState->cullFaceMode ) {
+    switch ( pipeline_state->cullFaceMode ) {
         case CULL_FACE_MODE::NONE:
             glDisable( GL_CULL_FACE );
             break;
@@ -125,7 +125,7 @@ void OpenGLGraphicsManager::SetPipelineState( const std::shared_ptr<PipelineStat
             break;
     }
 
-    switch ( pipelineState->depthTestMode ) {
+    switch ( pipeline_state->depthTestMode ) {
         case DEPTH_TEST_MODE::NONE:
             glDisable( GL_DEPTH_TEST );
             break;
@@ -266,7 +266,6 @@ void OpenGLGraphicsManager::BeginFrame( Frame &frame )
     GraphicsManager::BeginFrame( frame );
 
     SetPerFrameConstants( frame.frameContexts );
-    ImGui_ImplOpenGL3_NewFrame();
 }
 
 void OpenGLGraphicsManager::EndFrame( Frame & )

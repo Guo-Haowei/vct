@@ -302,5 +302,8 @@
     <ClInclude Include="RHI\OpenGL\OpenGLPipelineStateManager.hpp">
       <Filter>RHI\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="RHI\ConfigBackend.hpp">
+      <Filter>RHI</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

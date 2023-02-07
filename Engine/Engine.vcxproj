@@ -92,6 +92,7 @@
     <ClInclude Include="Manager\GraphicsManager.hpp" />
     <ClInclude Include="Manager\PipelineStateManager.hpp" />
     <ClInclude Include="Manager\SceneManager.hpp" />
+    <ClInclude Include="RHI\ConfigBackend.hpp" />
     <ClInclude Include="RHI\D3d11\D3d11GraphicsManager.hpp" />
     <ClInclude Include="RHI\D3d11\D3d11PipelineStateManager.hpp" />
     <ClInclude Include="RHI\D3d11\D3dCommon.hpp" />
@@ -162,7 +163,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>glfw3.lib;glad.lib;ImGui.lib;assimp-vc142-mtd.lib;IrrXMLd.lib;zlibstaticd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;dxgi.lib;glfw3.lib;glad.lib;ImGui.lib;assimp-vc142-mtd.lib;IrrXMLd.lib;zlibstaticd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)\external\lib\$(Configuration);$(SolutionDir)\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -190,7 +191,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>glfw3.lib;glad.lib;ImGui.lib;assimp-vc142-mt.lib;IrrXML.lib;zlibstatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;dxgi.lib;glfw3.lib;glad.lib;ImGui.lib;assimp-vc142-mt.lib;IrrXML.lib;zlibstatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)\external\lib\$(Configuration);$(SolutionDir)\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>

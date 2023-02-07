@@ -6,7 +6,7 @@ public:
     virtual bool Initialize() override;
     virtual void Finalize() override;
 
-    virtual void SetPipelineState( const std::shared_ptr<PipelineState>& pipelineState ) override;
+    virtual void SetPipelineState( const std::shared_ptr<PipelineState>& pipeline_state ) override;
 
     virtual void DrawBatch( const Frame& frame ) override;
 

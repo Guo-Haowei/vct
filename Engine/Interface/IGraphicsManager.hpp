@@ -14,7 +14,7 @@ public:
 
     virtual void ResizeCanvas( int new_width, int new_height ) = 0;
 
-    virtual void SetPipelineState( const std::shared_ptr<PipelineState>& pipelineState ) = 0;
+    virtual void SetPipelineState( const std::shared_ptr<PipelineState>& pipeline_state ) = 0;
     virtual void DrawBatch( const Frame& frame ) = 0;
 
     virtual void BeginPass( Frame& frame ) = 0;

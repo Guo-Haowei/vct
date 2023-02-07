@@ -4,6 +4,7 @@
 enum class GfxBackend {
     OpenGL,
     D3d11,
+    D3d12,
 };
 
 struct Configuration {
@@ -23,23 +24,24 @@ struct Configuration {
     bool m_frameless{ false };
 };
 
-inline std::ostream& operator<<( std::ostream& os, const GfxBackend& backend )
+inline const char* GfxBackendToString( const GfxBackend& backend )
 {
     switch ( backend ) {
         case GfxBackend::OpenGL:
-            os << "OpenGL";
-            break;
+            return "OpenGL";
         case GfxBackend::D3d11:
-            os << "Direct3D11";
-            break;
+            return "D3d11";
+        case GfxBackend::D3d12:
+            return "D3d12";
+        default:
+            return "Unknown";
     }
-    return os;
 }
 
 inline std::ostream& operator<<( std::ostream& os, const Configuration& config )
 {
     os << "Configuration:";
-    os << "\n\tGraphics Backend : " << config.m_gfxBackend;
+    os << "\n\tGraphics Backend : " << GfxBackendToString( config.m_gfxBackend );
     os << "\n\tApp Name         : " << config.m_appName;
     os << "\n\tWidth            : " << config.m_width;
     os << "\n\tHeight           : " << config.m_height;

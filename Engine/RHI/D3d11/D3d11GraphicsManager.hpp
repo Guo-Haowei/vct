@@ -1,8 +1,9 @@
 #pragma once
 #include "Manager/GraphicsManager.hpp"
 
-#include <d3d11.h>
 #include <dxgi.h>
+
+#include "D3dCommon.hpp"
 
 struct ImmediateRenderTarget {
     ID3D11RenderTargetView* rtv;
@@ -16,7 +17,7 @@ public:
 
     virtual void ResizeCanvas( int new_width, int new_height ) override;
 
-    virtual void SetPipelineState( const std::shared_ptr<PipelineState>& pipelineState ) override;
+    virtual void SetPipelineState( const std::shared_ptr<PipelineState>& pipeline_state ) override;
 
     virtual void DrawBatch( const Frame& frame ) override;
 
@@ -37,15 +38,20 @@ private:
     bool CreateRenderTarget();
     void DestroyRenderTarget();
 
-    IDXGISwapChain* m_pSwapChain{ nullptr };
-    ID3D11Device* m_pDevice{ nullptr };
-    ID3D11DeviceContext* m_pCtx{ nullptr };
+    ID3D11Device* GetDevice() { return m_pDevice.Get(); }
 
-    IDXGIDevice* m_pDxgiDevice{ nullptr };
-    IDXGIAdapter* m_pDxgiAdapter{ nullptr };
-    IDXGIFactory* m_pDxgiFactory{ nullptr };
+    ComPtr<IDXGISwapChain> m_pSwapChain;
+    ComPtr<ID3D11Device> m_pDevice;
+    ComPtr<ID3D11DeviceContext> m_pCtx;
+
+    ComPtr<IDXGIDevice> m_pDxgiDevice;
+    ComPtr<IDXGIAdapter> m_pDxgiAdapter;
+    ComPtr<IDXGIFactory> m_pDxgiFactory;
+
     DXGI_ADAPTER_DESC m_adapterDesc{};
 
     // render target
     ImmediateRenderTarget m_immediate;
+
+    friend class D3d11PipelineStateManager;
 };

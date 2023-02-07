@@ -7,49 +7,20 @@
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
 
-#include "Interface/IAssetLoader.hpp"
+#include "Manager/AssetLoader.hpp"
 #include "Manager/BaseApplication.hpp"
 
 using std::pair;
 using std::string;
 using std::vector;
 
-bool OpenGLPipelineStateManager::InitializePipelineState( PipelineState **ppPipelineState )
+using ShaderSourceList = std::vector<std::pair<uint32_t, std::string>>;
+
+static std::string ProcessShader( const std::string &source )
 {
-    OpenGLPipelineState *pnew_state = new OpenGLPipelineState( **ppPipelineState );
-    ShaderSourceList list;
-
-    if ( !( *ppPipelineState )->vertexShaderName.empty() ) {
-        list.emplace_back( GL_VERTEX_SHADER, ( *ppPipelineState )->vertexShaderName );
-    }
-
-    if ( !( *ppPipelineState )->pixelShaderName.empty() ) {
-        list.emplace_back( GL_FRAGMENT_SHADER, ( *ppPipelineState )->pixelShaderName );
-    }
-
-    if ( !( *ppPipelineState )->geometryShaderName.empty() ) {
-        list.emplace_back( GL_GEOMETRY_SHADER, ( *ppPipelineState )->geometryShaderName );
-    }
-
-    if ( !( *ppPipelineState )->computeShaderName.empty() ) {
-        list.emplace_back( GL_COMPUTE_SHADER, ( *ppPipelineState )->computeShaderName );
-    }
-
-    bool result = LoadShaderProgram( list, pnew_state->shaderProgram );
-
-    *ppPipelineState = pnew_state;
-    return result;
-}
-
-void OpenGLPipelineStateManager::DestroyPipelineState( PipelineState &pipelineState )
-{
-    OpenGLPipelineState *pPipelineState = dynamic_cast<OpenGLPipelineState *>( &pipelineState );
-    glDeleteProgram( pPipelineState->shaderProgram );
-}
-
-std::string OpenGLPipelineStateManager::ProcessShader( const std::string &source )
-{
-    auto assetLoader = dynamic_cast<BaseApplication *>( m_pApp )->GetAssetLoader();
+    AssetLoader assetLoader;
+    assetLoader.AddSearchPath( "Engine/Shader/GLSL" );
+    assetLoader.AddSearchPath( "Engine/Graphics/" );
 
     string result;
     std::stringstream ss( source );
@@ -61,7 +32,7 @@ std::string OpenGLPipelineStateManager::ProcessShader( const std::string &source
             include.pop_back();
             constexpr char cbufferFile[] = "cbuffer.glsl";
 
-            vector<char> includeSource = assetLoader->SyncOpenAndReadText( include.c_str() + 1 );
+            vector<char> includeSource = assetLoader.SyncOpenAndReadText( include.c_str() + 1 );
             result.append( includeSource.data() );
         }
         else {
@@ -74,14 +45,15 @@ std::string OpenGLPipelineStateManager::ProcessShader( const std::string &source
     return result;
 }
 
-bool OpenGLPipelineStateManager::LoadShaderFromFile( const char *file, const uint32_t shaderType, uint32_t &shader )
+static bool LoadShaderFromFile( const char *shader_name, const uint32_t shader_type, uint32_t &shader_handle )
 {
-    auto assetLoader = dynamic_cast<BaseApplication *>( m_pApp )->GetAssetLoader();
+    AssetLoader assetLoader;
+    assetLoader.AddSearchPath( "Engine/Shader/GLSL" );
 
-    string filename( file );
-    filename.append( ".glsl" );
-    vector<char> source = assetLoader->SyncOpenAndReadText( filename.c_str() );
-    ASSERT( source.data() );
+    string fileName( shader_name );
+    fileName.append( ".glsl" );
+    vector<char> sourceBuffer = assetLoader.SyncOpenAndReadText( fileName.c_str() );
+    ASSERT( sourceBuffer.data() );
 
     constexpr const char extras[] =
         "#version 460 core\n"
@@ -90,32 +62,32 @@ bool OpenGLPipelineStateManager::LoadShaderFromFile( const char *file, const uin
         "#extension GL_NV_shader_atomic_fp16_vector : enable\n"
         "#extension GL_ARB_bindless_texture : require\n"
         "";
-    string fullsource = ProcessShader( source.data() );
+    string preprocessedSource = ProcessShader( sourceBuffer.data() );
 
-    const char *sources[] = { extras, fullsource.c_str() };
-    shader = glCreateShader( shaderType );
-    glShaderSource( shader, array_length( sources ), sources, nullptr );
-    glCompileShader( shader );
+    const char *sources[] = { extras, preprocessedSource.c_str() };
+    shader_handle = glCreateShader( shader_type );
+    glShaderSource( shader_handle, array_length( sources ), sources, nullptr );
+    glCompileShader( shader_handle );
 
     GLint status = GL_FALSE;
     GLint length = 0;
-    glGetShaderiv( shader, GL_COMPILE_STATUS, &status );
-    glGetShaderiv( shader, GL_INFO_LOG_LENGTH, &length );
+    glGetShaderiv( shader_handle, GL_COMPILE_STATUS, &status );
+    glGetShaderiv( shader_handle, GL_INFO_LOG_LENGTH, &length );
     if ( length > 0 ) {
         std::vector<char> buffer( length + 1 );
-        glGetShaderInfoLog( shader, length, nullptr, buffer.data() );
-        LOG_FATAL( "[glsl] failed to compile shader '%s'\ndetails:\n%s", filename.c_str(), buffer.data() );
+        glGetShaderInfoLog( shader_handle, length, nullptr, buffer.data() );
+        LOG_FATAL( "[glsl] failed to compile shader '%s'\ndetails:\n%s", fileName.c_str(), buffer.data() );
     }
 
     if ( status == GL_FALSE ) {
-        glDeleteShader( shader );
+        glDeleteShader( shader_handle );
         return false;
     }
 
     return true;
 }
 
-bool OpenGLPipelineStateManager::LoadShaderProgram( const ShaderSourceList &source, uint32_t &shaderProgram )
+static bool LoadShaderProgram( const ShaderSourceList &source, uint32_t &shaderProgram )
 {
     // Create a shader program object.
     shaderProgram = glCreateProgram();
@@ -149,4 +121,37 @@ bool OpenGLPipelineStateManager::LoadShaderProgram( const ShaderSourceList &sour
     }
 
     return true;
+}
+
+bool OpenGLPipelineStateManager::InitializePipelineState( PipelineState **ppPipelineState )
+{
+    OpenGLPipelineState *pnew_state = new OpenGLPipelineState( **ppPipelineState );
+    ShaderSourceList list;
+
+    if ( !( *ppPipelineState )->vertexShaderName.empty() ) {
+        list.emplace_back( GL_VERTEX_SHADER, ( *ppPipelineState )->vertexShaderName );
+    }
+
+    if ( !( *ppPipelineState )->pixelShaderName.empty() ) {
+        list.emplace_back( GL_FRAGMENT_SHADER, ( *ppPipelineState )->pixelShaderName );
+    }
+
+    if ( !( *ppPipelineState )->geometryShaderName.empty() ) {
+        list.emplace_back( GL_GEOMETRY_SHADER, ( *ppPipelineState )->geometryShaderName );
+    }
+
+    if ( !( *ppPipelineState )->computeShaderName.empty() ) {
+        list.emplace_back( GL_COMPUTE_SHADER, ( *ppPipelineState )->computeShaderName );
+    }
+
+    bool result = LoadShaderProgram( list, pnew_state->shaderProgram );
+
+    *ppPipelineState = pnew_state;
+    return result;
+}
+
+void OpenGLPipelineStateManager::DestroyPipelineState( PipelineState &pipelineState )
+{
+    OpenGLPipelineState *pPipelineState = dynamic_cast<OpenGLPipelineState *>( &pipelineState );
+    glDeleteProgram( pPipelineState->shaderProgram );
 }

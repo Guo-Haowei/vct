@@ -1,9 +1,7 @@
 #pragma once
-
 #include <type_traits>
 #include <d3d11.h>
 #include <wrl/client.h>
-
 #include "Base/Logger.h"
 
 using Microsoft::WRL::ComPtr;

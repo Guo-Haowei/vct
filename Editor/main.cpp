@@ -14,6 +14,8 @@
 
 #include "Engine/RHI/D3d11/D3d11GraphicsManager.hpp"
 #include "Engine/RHI/D3d11/D3d11PipelineStateManager.hpp"
+
+#define USE_DX11
 #include "Engine/RHI/ConfigBackend.hpp"
 
 #include "imgui/imgui.h"

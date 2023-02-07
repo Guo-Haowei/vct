@@ -13,8 +13,6 @@ using std::vector;
 
 bool AssetLoader::Initialize()
 {
-    m_base = Dvar_GetString( fs_base );
-    LOG_DEBUG( "AssetLoader base path is '%s'", m_base.c_str() );
     return true;
 }
 
@@ -59,31 +57,29 @@ static void ReadTextFileToString(const string& syspath, vector<char>& out) {
     ifs.read( out.data(), size );
 }
 
-std::vector<char> AssetLoader::SyncOpenAndReadText( const char* fileName )
+std::vector<char> AssetLoader::SyncOpenAndReadText( const char* file_name )
 {
-    fs::path possiblePath = fs::path( m_base ) / fileName;
+    fs::path base = fs::path( Dvar_GetString( fs_base ) );
+    fs::path possiblePath = base / file_name;
     vector<char> buffer;
+    bool found = false;
     if ( fs::exists( possiblePath ) ) {
+        found = true;
         ReadTextFileToString( possiblePath.string(), buffer );
     }
     else {
         for ( const string& searchPath : m_searchPaths ) {
-            possiblePath = fs::path( m_base ) / searchPath / fileName;
+            possiblePath = base / searchPath / file_name;
             if ( fs::exists( possiblePath ) ) {
                 ReadTextFileToString( possiblePath.string(), buffer );
+                found = true;
                 break;
             }
         }
     }
 
-    if ( buffer.empty() ) {
-        LOG_FATAL( "AssetLoader::SyncOpenAndReadTextFileToString: Failed to open text file '%s'", fileName );
+    if ( !found ) {
+        LOG_ERROR( "AssetLoader::SyncOpenAndReadTextFileToString: Failed to open text file '%s'", file_name );
     }
     return buffer;
-}
-
-std::string AssetLoader::BuildSysPath( const char* filename, const char* extraPath )
-{
-    fs::path absPath = fs::path( m_base ) / string( extraPath ? extraPath : "" ) / filename;
-    return absPath.string();
 }
