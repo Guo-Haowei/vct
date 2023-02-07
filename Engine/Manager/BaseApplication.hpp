@@ -1,10 +1,10 @@
 #pragma once
 #include <vector>
 #include "Interface/IApplication.hpp"
+#include "Interface/IAssetLoader.hpp"
 #include "Interface/IGraphicsManager.hpp"
 #include "Interface/IPipelineStateManager.hpp"
-
-#include "Manager/AssetLoader.hpp"
+#include "Interface/ISceneManager.hpp"
 
 class BaseApplication : public IApplication {
 public:
@@ -25,12 +25,18 @@ public:
     void* GetMainWindowHandler() override { return nullptr; }
 
     void RegisterManagerModule( IAssetLoader* mgr );
+    void RegisterManagerModule( ISceneManager* mgr );
     void RegisterManagerModule( IGraphicsManager* mgr );
     void RegisterManagerModule( IPipelineStateManager* mgr );
 
     IAssetLoader* GetAssetLoader()
     {
         return m_pAssetLoader;
+    }
+
+    ISceneManager* GetSceneManager()
+    {
+        return m_pSceneManager;
     }
 
     IGraphicsManager* GetGraphicsManager()
@@ -47,9 +53,10 @@ protected:
     // Flag if need quit the main loop of the application
     bool m_bQuit = false;
 
+    IAssetLoader* m_pAssetLoader = nullptr;
+    ISceneManager* m_pSceneManager = nullptr;
     IGraphicsManager* m_pGraphicsManager = nullptr;
     IPipelineStateManager* m_pPipelineStateManager = nullptr;
-    IAssetLoader* m_pAssetLoader = nullptr;
 
 private:
     std::vector<IRuntimeModule*> m_runtimeModules;

@@ -20,7 +20,6 @@ namespace fs = std::filesystem;
 
 void AssimpLoader::loadGltf( const char* path, Scene& scene, bool flipUVs )
 {
-    
     fs::path sysPath = fs::path( Dvar_GetString( fs_base ) ) / path;
     string fullpath = sysPath.string();
 

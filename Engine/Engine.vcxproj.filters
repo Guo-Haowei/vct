@@ -36,9 +36,6 @@
     <ClCompile Include="Core\camera.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Core\com_misc.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Core\dvar_api.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -129,6 +126,9 @@
     <ClCompile Include="Manager\AssetLoader.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
+    <ClCompile Include="Manager\SceneManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\AssimpLoader.hpp">
@@ -141,9 +141,6 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Core\com_dvars.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\com_misc.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Core\dvar_api.h">
@@ -271,6 +268,12 @@
     </ClInclude>
     <ClInclude Include="Interface\IApplication.hpp">
       <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Interface\ISceneManager.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\SceneManager.hpp">
+      <Filter>Manager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

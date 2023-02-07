@@ -7,7 +7,6 @@
 
 #include "Base/Asserts.h"
 
-#include "Core/com_misc.h"
 #include "Core/com_dvars.h"
 #include "Core/WindowManager.h"
 #include "Core/imgui_impl_glfw.h"
@@ -16,6 +15,7 @@
 #include "GLFW/glfw3.h"
 
 #include "Manager/BaseApplication.hpp"
+#include "Manager/SceneManager.hpp"
 
 // @TODO: remove
 #include "DrawPass/ShadowMapPass.hpp"

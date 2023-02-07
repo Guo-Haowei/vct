@@ -5,11 +5,12 @@
 #include "Base/Asserts.h"
 
 #include "Core/com_dvars.h"
-#include "Core/com_misc.h"
 #include "Core/editor.h"
 #include "Core/geometry.h"
 #include "Core/WindowManager.h"
 #include "r_rendertarget.h"
+
+#include "Manager/SceneManager.hpp"
 
 #include "DrawPass/BaseDrawPass.hpp"
 

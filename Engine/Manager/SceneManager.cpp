@@ -1,10 +1,8 @@
-#include "com_misc.h"
+#include "SceneManager.hpp"
 
 #include <filesystem>
 
 #include "imgui/imgui.h"
-#include "WindowManager.h"
-#include "AssimpLoader.hpp"
 
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
@@ -14,7 +12,9 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include "com_dvars.h"
+#include "Core/com_dvars.h"
+#include "Core/AssimpLoader.hpp"
+#include "Core/WindowManager.h"
 
 #ifdef max
 #undef max
@@ -24,12 +24,17 @@ static Scene g_scene;
 
 static void ControlCamera( Camera& camera );
 
-bool Com_LoadScene()
+bool SceneManager::Initialize()
+{
+    return LoadScene( Dvar_GetString( scene ) );
+}
+
+bool SceneManager::LoadScene( const char* sceneName )
 {
     AssimpLoader loader;
     Scene& scene = g_scene;
 
-    const char* scenePath = Dvar_GetString( scene );
+    const char* scenePath = sceneName;
 
     if ( !scenePath[0] ) {
         LOG_FATAL( "Scene not specified, set it by +set scene <name> or +exec <lua-file>" );

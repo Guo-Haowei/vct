@@ -1,13 +1,13 @@
 #include "Engine/Base/Asserts.h"
 #include "Engine/Base/Logger.h"
 
-#include "Engine/Core/dvar_api.h"
-#include "Engine/Core/com_misc.h"
+#include "Engine/Core/com_dvars.h"
 #include "Engine/Core/editor.h"
 #include "Engine/Core/WindowManager.h"
 
-#include "Engine/Manager/BaseApplication.hpp"
 #include "Engine/Manager/AssetLoader.hpp"
+#include "Engine/Manager/BaseApplication.hpp"
+#include "Engine/Manager/SceneManager.hpp"
 #include "Engine/Interface/IGraphicsManager.hpp"
 
 #include "Engine/RHI/OpenGLPipelineStateManager.hpp"
@@ -18,10 +18,12 @@ int main( int argc, const char** argv )
 {
     OpenGLPipelineStateManager pipelineStateManager;
     AssetLoader assetLoader;
+    SceneManager sceneManager;
 
     BaseApplication app;
 
     app.RegisterManagerModule( &assetLoader );
+    app.RegisterManagerModule( &sceneManager );
     app.RegisterManagerModule( g_gfxMgr );
     app.RegisterManagerModule( &pipelineStateManager );
 
@@ -46,10 +48,9 @@ int main( int argc, const char** argv )
         Com_GetScene().dirty = false;
     }
 
-    pipelineStateManager.Finalize();
-    g_gfxMgr->Finalize();
+    app.Finalize();
+
     manager_deinit( g_wndMgr );
-    assetLoader.Finalize();
 
     ImGui::DestroyContext();
 

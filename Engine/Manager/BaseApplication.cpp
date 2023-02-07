@@ -8,8 +8,9 @@
 
 #include "Base/Logger.h"
 
-#include "Core/com_misc.h"
 #include "Core/WindowManager.h"
+
+#include "Manager/SceneManager.hpp"
 
 #define DEFINE_DVAR
 #include "Core/com_dvars.h"
@@ -23,33 +24,33 @@ static bool ProcessDvarFromCmdLine( int argc, const char** argv );
 bool BaseApplication::Initialize( int argc, const char** argv )
 {
     RegisterDvars();
+
     if ( !ProcessDvarFromCmdLine( argc - 1, argv + 1 ) ) {
         return false;
     }
-    // for ( auto& module : m_runtimeModules ) {
-    //     if (!module->Initialize()) {
-    //         LOG_ERROR( "Failed to initialize module" );
-    //         return false;
-    //     }
-    // }
 
-    bool ok = true;
-    ok = ok && m_pAssetLoader->Initialize();
+    if ( !g_wndMgr->Initialize() ) {
+        return false;
+    }
 
-    ok = ok && Com_LoadScene();
+    int i = 0;
+    for ( auto& module : m_runtimeModules ) {
+        LOG_DEBUG( "BaseApplication::Initialize(): Initializing module %i", i++ );
+        if ( !module->Initialize() ) {
+            LOG_FATAL( "BaseApplication::Initialize(): Failed to initialize module" );
+            return false;
+        }
+    }
 
-    ok = ok && g_wndMgr->Initialize();
-
-    ok = ok && m_pGraphicsManager->Initialize();
-    ok = ok && m_pPipelineStateManager->Initialize();
-    return ok;
+    return true;
 }
-
 
 void BaseApplication::Finalize()
 {
-    for (auto module : m_runtimeModules) {
-        module->Finalize();
+    int i = 0;
+    for ( auto it = m_runtimeModules.rbegin(); it != m_runtimeModules.rend(); ++it ) {
+        LOG_DEBUG( "BaseApplication::Initialize(): Finalizing module %i", i++ );
+        ( *it )->Finalize();
     }
 
     m_runtimeModules.clear();
@@ -64,6 +65,20 @@ bool BaseApplication::IsQuit() const
     return m_bQuit;
 }
 
+void BaseApplication::RegisterManagerModule( IAssetLoader* mgr )
+{
+    m_pAssetLoader = mgr;
+    mgr->SetAppPointer( this );
+    m_runtimeModules.push_back( mgr );
+}
+
+void BaseApplication::RegisterManagerModule( ISceneManager* mgr )
+{
+    m_pSceneManager = mgr;
+    mgr->SetAppPointer( this );
+    m_runtimeModules.push_back( mgr );
+}
+
 void BaseApplication::RegisterManagerModule( IGraphicsManager* mgr )
 {
     m_pGraphicsManager = mgr;
@@ -74,13 +89,6 @@ void BaseApplication::RegisterManagerModule( IGraphicsManager* mgr )
 void BaseApplication::RegisterManagerModule( IPipelineStateManager* mgr )
 {
     m_pPipelineStateManager = mgr;
-    mgr->SetAppPointer( this );
-    m_runtimeModules.push_back( mgr );
-}
-
-void BaseApplication::RegisterManagerModule( IAssetLoader* mgr )
-{
-    m_pAssetLoader = mgr;
     mgr->SetAppPointer( this );
     m_runtimeModules.push_back( mgr );
 }
