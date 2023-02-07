@@ -3,7 +3,6 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include "Core/WindowManager.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 

@@ -2,8 +2,7 @@
 #include "Engine/Base/Logger.h"
 
 #include "Engine/Core/com_dvars.h"
-#include "Engine/Core/editor.h"
-#include "Engine/Core/WindowManager.h"
+#include "Engine/Core/GlfwApplication.hpp"
 
 #include "Engine/Manager/AssetLoader.hpp"
 #include "Engine/Manager/BaseApplication.hpp"
@@ -14,18 +13,22 @@
 
 #include "imgui/imgui.h"
 
+#include "EditorLogic.hpp"
+
 int main( int argc, const char** argv )
 {
-    OpenGLPipelineStateManager pipelineStateManager;
     AssetLoader assetLoader;
     SceneManager sceneManager;
+    OpenGLPipelineStateManager pipelineStateManager;
+    EditorLogic logic;
 
-    BaseApplication app;
+    GlfwApplication app;
 
     app.RegisterManagerModule( &assetLoader );
     app.RegisterManagerModule( &sceneManager );
     app.RegisterManagerModule( g_gfxMgr );
     app.RegisterManagerModule( &pipelineStateManager );
+    app.RegisterManagerModule( &logic );
 
     // Initialize Imgui
     IMGUI_CHECKVERSION();
@@ -33,25 +36,31 @@ int main( int argc, const char** argv )
     [[maybe_unused]] ImGuiIO& io = ImGui::GetIO();
     ImGui::StyleColorsDark();
 
-    if ( !app.Initialize( argc, argv ) ) {
+    if ( !app.ProcessCommandLine( argc, argv ) ) {
         return -1;
     }
 
-    while ( !g_wndMgr->ShouldClose() ) {
-        g_wndMgr->NewFrame();
+    // @TODO: stream load
+    if ( !sceneManager.LoadScene( Dvar_GetString( scene ) ) ) {
+        return -1;
+    }
 
-        Com_UpdateWorld();
-        EditorSetup();
+    if ( !app.CreateMainWindow() ) {
+        return -1;
+    }
 
-        g_gfxMgr->Tick();
+    if ( !app.Initialize() ) {
+        return -1;
+    }
 
+    while ( !app.ShouldQuit() ) {
+        app.Tick();
+
+        // @TODO: remove
         Com_GetScene().dirty = false;
     }
 
     app.Finalize();
-
-    manager_deinit( g_wndMgr );
-
     ImGui::DestroyContext();
 
     return 0;

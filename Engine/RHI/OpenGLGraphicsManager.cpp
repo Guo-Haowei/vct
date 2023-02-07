@@ -8,8 +8,8 @@
 #include "Base/Asserts.h"
 
 #include "Core/com_dvars.h"
-#include "Core/WindowManager.h"
 #include "Core/imgui_impl_glfw.h"
+#include "Core/GlfwApplication.hpp"
 
 #include "Graphics/gl_utils.h"
 #include "GLFW/glfw3.h"
@@ -38,7 +38,7 @@ bool OpenGLGraphicsManager::Initialize()
         return false;
     }
 
-    m_pGlfwWindow = g_wndMgr->GetHandle();
+    m_pGlfwWindow = reinterpret_cast<GLFWwindow *>( m_pApp->GetMainWindowHandler() );
     ASSERT( m_pGlfwWindow );
 
     if ( gladLoadGL() == 0 ) {

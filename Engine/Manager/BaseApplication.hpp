@@ -5,29 +5,32 @@
 #include "Interface/IGraphicsManager.hpp"
 #include "Interface/IPipelineStateManager.hpp"
 #include "Interface/ISceneManager.hpp"
+#include "Interface/IGameLogic.hpp"
 
 class BaseApplication : public IApplication {
 public:
     BaseApplication() = default;
     ~BaseApplication() override = default;
 
-    virtual bool Initialize( int argc, const char** argv ) override;
+    virtual bool ProcessCommandLine( int argc, const char** argv ) override;
+    virtual bool Initialize() override;
     virtual void Finalize();
 
     virtual void Tick();
 
-    bool IsQuit() const override;
-    void RequestQuit() override { m_bQuit = true; }
+    virtual bool ShouldQuit() override;
+    virtual void RequestQuit() override { m_bShouldQuit = true; }
 
     void GetFramebufferSize( uint32_t&, uint32_t& ) override {}
 
-    void CreateMainWindow() override {}
+    bool CreateMainWindow() override { return false; }
     void* GetMainWindowHandler() override { return nullptr; }
 
     void RegisterManagerModule( IAssetLoader* mgr );
     void RegisterManagerModule( ISceneManager* mgr );
     void RegisterManagerModule( IGraphicsManager* mgr );
     void RegisterManagerModule( IPipelineStateManager* mgr );
+    void RegisterManagerModule( IGameLogic* mgr );
 
     IAssetLoader* GetAssetLoader()
     {
@@ -49,14 +52,20 @@ public:
         return m_pPipelineStateManager;
     }
 
+    IGameLogic* GetGameLogic()
+    {
+        return m_pGameLogic;
+    }
+
 protected:
     // Flag if need quit the main loop of the application
-    bool m_bQuit = false;
+    bool m_bShouldQuit = false;
 
     IAssetLoader* m_pAssetLoader = nullptr;
     ISceneManager* m_pSceneManager = nullptr;
     IGraphicsManager* m_pGraphicsManager = nullptr;
     IPipelineStateManager* m_pPipelineStateManager = nullptr;
+    IGameLogic* m_pGameLogic = nullptr;
 
 private:
     std::vector<IRuntimeModule*> m_runtimeModules;

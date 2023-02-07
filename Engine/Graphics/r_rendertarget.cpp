@@ -3,7 +3,7 @@
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
 
-#include "Core/WindowManager.h"
+#include "Core/GlfwApplication.hpp"
 #include "Core/com_dvars.h"
 
 #include "r_cbuffers.h"
@@ -221,9 +221,8 @@ FinalImageRT g_finalImageRT;
 
 void R_CreateRT()
 {
-    const ivec2 extent = g_wndMgr->FrameSize();
-    const int w = extent.x;
-    const int h = extent.y;
+    uint32_t w = 0, h = 0;
+    g_gfxMgr->GetAppPointer()->GetFramebufferSize( w, h );
 
     const int res = Dvar_GetInt( r_shadowRes );
     ASSERT( is_power_of_two( res ) );

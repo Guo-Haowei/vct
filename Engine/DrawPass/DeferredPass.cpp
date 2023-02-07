@@ -1,7 +1,8 @@
 #include "DeferredPass.hpp"
 
+#include "Interface/IApplication.hpp"
+
 // @TODO: remove
-#include "Core/WindowManager.h"
 extern void R_DrawQuad();
 
 void DeferredPass::Draw( Frame& frame )
@@ -11,8 +12,10 @@ void DeferredPass::Draw( Frame& frame )
     auto PSO = m_pPipelineStateManager->GetPipelineState( "VCT" );
     m_pGraphicsManager->SetPipelineState( PSO );
 
-    ivec2 extent = g_wndMgr->FrameSize();
-    glViewport( 0, 0, extent.x, extent.y );
+    auto pApp = m_pPipelineStateManager->GetAppPointer();
+    uint32_t width = 0, height = 0;
+    pApp->GetFramebufferSize( width, height );
+    glViewport( 0, 0, width, height );
 
     R_DrawQuad();
 }

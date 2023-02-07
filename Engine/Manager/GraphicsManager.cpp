@@ -3,10 +3,10 @@
 #include "Base/Asserts.h"
 
 #include "Core/com_dvars.h"
-#include "Core/WindowManager.h"
 
 #include "imgui/imgui.h"
 
+#include "Interface/IApplication.hpp"
 #include "Manager/SceneManager.hpp"
 
 #ifdef max
@@ -87,7 +87,8 @@ void GraphicsManager::UpdateConstants()
     frameConstats.LightPV = R_HackLightSpaceMatrix( scene.light.direction );
 
     const Camera& camera = scene.camera;
-    const ivec2 extent = g_wndMgr->FrameSize();
+    uint32_t w, h;
+    m_pApp->GetFramebufferSize( w, h );
 
     // update constants
     frameConstats.SunDir = scene.light.direction;
@@ -97,8 +98,8 @@ void GraphicsManager::UpdateConstants()
     frameConstats.Proj = camera.Proj();
     frameConstats.EnableGI = Dvar_GetBool( r_enableVXGI );
     frameConstats.NoTexture = Dvar_GetBool( r_noTexture );
-    frameConstats.ScreenWidth = extent.x;
-    frameConstats.ScreenHeight = extent.y;
+    frameConstats.ScreenWidth = w;
+    frameConstats.ScreenHeight = h;
 
     // SSAO
     frameConstats.SSAOKernelSize = Dvar_GetInt( r_ssaoKernelSize );

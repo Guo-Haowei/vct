@@ -13,6 +13,7 @@ public:
     virtual void Tick() = 0;
 
     void SetAppPointer( IApplication* pApp ) { m_pApp = pApp; }
+    IApplication* GetAppPointer() { return m_pApp; }
 
 protected:
     IApplication* m_pApp;

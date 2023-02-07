@@ -5,8 +5,6 @@
 
 Scene& Com_GetScene();
 
-void Com_UpdateWorld();
-
 class SceneManager : public ISceneManager {
 public:
     virtual bool Initialize() override;

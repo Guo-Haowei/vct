@@ -8,7 +8,7 @@
 
 #include "Base/Logger.h"
 
-#include "Core/WindowManager.h"
+#include "Core/GlfwApplication.hpp"
 
 #include "Manager/SceneManager.hpp"
 
@@ -21,18 +21,15 @@ using std::string;
 static void RegisterDvars();
 static bool ProcessDvarFromCmdLine( int argc, const char** argv );
 
-bool BaseApplication::Initialize( int argc, const char** argv )
+bool BaseApplication::ProcessCommandLine( int argc, const char** argv )
 {
     RegisterDvars();
 
-    if ( !ProcessDvarFromCmdLine( argc - 1, argv + 1 ) ) {
-        return false;
-    }
+    return ProcessDvarFromCmdLine( argc - 1, argv + 1 );
+}
 
-    if ( !g_wndMgr->Initialize() ) {
-        return false;
-    }
-
+bool BaseApplication::Initialize()
+{
     int i = 0;
     for ( auto& module : m_runtimeModules ) {
         LOG_DEBUG( "BaseApplication::Initialize(): Initializing module %i", i++ );
@@ -49,7 +46,7 @@ void BaseApplication::Finalize()
 {
     int i = 0;
     for ( auto it = m_runtimeModules.rbegin(); it != m_runtimeModules.rend(); ++it ) {
-        LOG_DEBUG( "BaseApplication::Initialize(): Finalizing module %i", i++ );
+        LOG_DEBUG( "BaseApplication::Finalize(): Finalizing module %i", i++ );
         ( *it )->Finalize();
     }
 
@@ -58,11 +55,14 @@ void BaseApplication::Finalize()
 
 void BaseApplication::Tick()
 {
+    for ( auto it = m_runtimeModules.rbegin(); it != m_runtimeModules.rend(); ++it ) {
+        ( *it )->Tick();
+    }
 }
 
-bool BaseApplication::IsQuit() const
+bool BaseApplication::ShouldQuit()
 {
-    return m_bQuit;
+    return m_bShouldQuit;
 }
 
 void BaseApplication::RegisterManagerModule( IAssetLoader* mgr )
@@ -89,6 +89,13 @@ void BaseApplication::RegisterManagerModule( IGraphicsManager* mgr )
 void BaseApplication::RegisterManagerModule( IPipelineStateManager* mgr )
 {
     m_pPipelineStateManager = mgr;
+    mgr->SetAppPointer( this );
+    m_runtimeModules.push_back( mgr );
+}
+
+void BaseApplication::RegisterManagerModule( IGameLogic* mgr )
+{
+    m_pGameLogic = mgr;
     mgr->SetAppPointer( this );
     m_runtimeModules.push_back( mgr );
 }
