@@ -15,7 +15,7 @@ DVAR_FLOAT( cam_fov, 60.0f );
 DVAR_VEC3( light_dir, -8.0f, 25.0f, 5.0f );
 DVAR_FLOAT( light_power, 20.0f );
 
-DVAR_INT( r_debug, 1 );
+DVAR_INT( r_debug, USING( DEBUG_GFX ) ? 1 : 0 );
 DVAR_INT( r_enableVXGI, 1 );
 DVAR_INT( r_forceVXGI, 1 );
 DVAR_INT( r_showDebugTexture, 0 );

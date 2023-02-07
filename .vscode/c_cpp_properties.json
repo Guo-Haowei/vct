@@ -7,7 +7,9 @@
                 "${workspaceFolder}\\Engine\\",
                 "${workspaceFolder}\\external\\",
                 "${workspaceFolder}\\external\\glm",
-                "${workspaceFolder}\\external\\include"
+                "${workspaceFolder}\\external\\imgui",
+                "${workspaceFolder}\\external\\include",
+                "${workspaceFolder}\\external\\assimp\\include"
             ],
             "intelliSenseMode": "windows-msvc-x64",
             "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Professional/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe",

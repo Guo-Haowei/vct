@@ -1,0 +1,254 @@
+#include "D3d11GraphicsManager.hpp"
+
+#include "Base/Asserts.h"
+
+#include "Core/com_dvars.h"
+#include "Core/GlfwApplication.hpp"
+
+#include "imgui_impl_dx11.h"
+
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include "GLFW/glfw3.h"
+#include "GLFW/glfw3native.h"
+
+#include "Manager/BaseApplication.hpp"
+#include "Manager/SceneManager.hpp"
+
+#include "D3dCommon.hpp"
+
+// @TODO: move to sln
+#pragma comment( lib, "dxgi.lib" )
+#pragma comment( lib, "d3d11.lib" )
+#pragma comment( lib, "d3dcompiler.lib" )
+
+bool D3d11GraphicsManager::Initialize()
+{
+    if ( !GraphicsManager::Initialize() ) {
+        return false;
+    }
+
+    if ( !CreateDeviceAndSwapChain() ) {
+        return false;
+    }
+
+    if ( !CreateRenderTarget() ) {
+        return false;
+    }
+
+    if ( !ImGui_ImplDX11_Init( m_pDevice, m_pCtx ) ) {
+        LOG_FATAL( "D3d11GraphicsManager::Initialize: ImGui_ImplDX11_Init() failed!" );
+        return false;
+    }
+
+    if ( !ImGui_ImplDX11_CreateDeviceObjects() ) {
+        LOG_FATAL( "D3d11GraphicsManager::Initialize: ImGui_ImplDX11_CreateDeviceObjects() failed!" );
+        return false;
+    }
+
+    auto pipelineStateManager = dynamic_cast<BaseApplication *>( m_pApp )->GetPipelineStateManager();
+    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new GuiPass( this, pipelineStateManager, nullptr, 0 ) ) );
+
+    return ( m_bInitialized = true );
+}
+
+void D3d11GraphicsManager::Finalize()
+{
+    //g_renderer.destroyGpuResources();
+    ImGui_ImplDX11_Shutdown();
+
+    SafeRelease( m_pSwapChain );
+    SafeRelease( m_pDevice );
+    SafeRelease( m_pCtx );
+
+    SafeRelease( m_pDxgiDevice );
+    SafeRelease( m_pDxgiAdapter );
+    SafeRelease( m_pDxgiFactory );
+}
+
+void D3d11GraphicsManager::ResizeCanvas( int new_width, int new_height )
+{
+    DestroyRenderTarget();
+    m_pSwapChain->ResizeBuffers( 0, new_height, new_width, DXGI_FORMAT_UNKNOWN, 0 );
+    CreateRenderTarget();
+}
+
+void D3d11GraphicsManager::SetPipelineState( const std::shared_ptr<PipelineState> &pipelineState )
+{
+    //const OpenGLPipelineState *pPipelineState = dynamic_cast<const OpenGLPipelineState *>( pipelineState.get() );
+}
+
+void D3d11GraphicsManager::DrawBatch( const Frame & )
+{
+    // @TODO: culling
+    const Frame &frame = m_frame;
+    //for ( auto &pDbc : frame.batchContexts ) {
+    //    SetPerBatchConstants( *pDbc );
+
+    //    const auto &dbc = dynamic_cast<const GLDrawBatchContext &>( *pDbc );
+
+    //    const MaterialData *matData = reinterpret_cast<MaterialData *>( pDbc->pEntity->m_material->gpuResource );
+
+    //    FillMaterialCB( matData, g_materialCache.cache );
+    //    g_materialCache.Update();
+
+    //    glBindVertexArray( dbc.vao );
+    //    glDrawElements( dbc.mode, dbc.count, dbc.type, nullptr );
+    //}
+
+    //glBindVertexArray( 0 );
+}
+
+void D3d11GraphicsManager::SetPerFrameConstants( const DrawFrameContext &context )
+{
+    // glBindBuffer( GL_UNIFORM_BUFFER, m_uboDrawFrameConstant );
+
+    // const auto &constants = static_cast<const PerFrameConstants &>( context );
+
+    // glBufferData( GL_UNIFORM_BUFFER, kSizePerFrameConstantBuffer, &constants, GL_DYNAMIC_DRAW );
+
+    // glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+}
+
+void D3d11GraphicsManager::SetPerBatchConstants( const DrawBatchContext &context )
+{
+    // glBindBuffer( GL_UNIFORM_BUFFER, m_uboDrawBatchConstant );
+
+    // const auto &constant = static_cast<const PerBatchConstants &>( context );
+
+    // glBufferData( GL_UNIFORM_BUFFER, kSizePerBatchConstantBuffer, &constant, GL_DYNAMIC_DRAW );
+
+    // glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+}
+
+void D3d11GraphicsManager::InitializeGeometries( const Scene &scene )
+{
+    //uint32_t batch_index = 0;
+    //for ( const auto &entity : scene.m_entities ) {
+    //    if ( !( entity->m_flag & Entity::FLAG_GEOMETRY ) ) {
+    //        continue;
+    //    }
+
+    //    const MeshData *drawData = reinterpret_cast<MeshData *>( entity->m_mesh->gpuResource );
+
+    //    auto dbc = std::make_shared<GLDrawBatchContext>();
+    //    dbc->batchIndex = batch_index++;
+    //    dbc->vao = drawData->vao;
+    //    dbc->mode = GL_TRIANGLES;
+    //    dbc->type = GL_UNSIGNED_INT;
+    //    dbc->count = drawData->count;
+
+    //    dbc->pEntity = entity.get();
+    //    dbc->Model = mat4( 1 );
+
+    //    m_frame.batchContexts.push_back( dbc );
+    //}
+
+    //auto createUBO = []( int slot ) {
+    //    GLuint handle = 0;
+    //    glGenBuffers( 1, &handle );
+    //    glBindBufferBase( GL_UNIFORM_BUFFER, slot, handle );
+    //    glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+    //    return handle;
+    //};
+    //m_uboDrawFrameConstant = createUBO( 0 );
+    //m_uboDrawBatchConstant = createUBO( 1 );
+}
+
+void D3d11GraphicsManager::BeginFrame( Frame &frame )
+{
+    //GraphicsManager::BeginFrame( frame );
+
+    //SetPerFrameConstants( frame.frameContexts );
+    //ImGui_ImplOpenGL3_NewFrame();
+    //ImGui_ImplGlfw_NewFrame();
+}
+
+void D3d11GraphicsManager::EndFrame( Frame & )
+{
+    const float clearColor[4] = { 0.3f, 0.4f, 0.3f, 1.0f };
+    m_pCtx->OMSetRenderTargets( 1, &m_immediate.rtv, m_immediate.dsv );
+    m_pCtx->ClearRenderTargetView( m_immediate.rtv, clearColor );
+    // m_pCtx->ClearDepthStencilView()
+    ImGui_ImplDX11_RenderDrawData( ImGui::GetDrawData() );
+}
+
+void D3d11GraphicsManager::Present()
+{
+    m_pSwapChain->Present( 1, 0 );
+}
+
+bool D3d11GraphicsManager::CreateDeviceAndSwapChain()
+{
+    GLFWwindow *pGlfwWindow = reinterpret_cast<GLFWwindow *>( m_pApp->GetMainWindowHandler() );
+
+    // create device and swap chain
+    DXGI_SWAP_CHAIN_DESC sd{};
+    sd.BufferCount = 2;
+    sd.BufferDesc.Width = 0;
+    sd.BufferDesc.Height = 0;
+    sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    sd.BufferDesc.RefreshRate.Numerator = 60;
+    sd.BufferDesc.RefreshRate.Denominator = 1;
+    sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+    sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    sd.OutputWindow = glfwGetWin32Window( pGlfwWindow );
+    sd.SampleDesc.Count = 1;
+    sd.SampleDesc.Quality = 0;
+    sd.Windowed = TRUE;
+    sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+
+    UINT createDeviceFlags = Dvar_GetBool( r_debug ) ? D3D11_CREATE_DEVICE_DEBUG : 0;
+    D3D_FEATURE_LEVEL featureLevel;
+    const D3D_FEATURE_LEVEL featureLevelArray[] = { D3D_FEATURE_LEVEL_11_0 };
+
+    DX_CALL( D3D11CreateDeviceAndSwapChain(
+        NULL,
+        D3D_DRIVER_TYPE_HARDWARE,
+        NULL,
+        createDeviceFlags,
+        featureLevelArray,
+        array_length( featureLevelArray ),
+        D3D11_SDK_VERSION,
+        &sd,
+        &m_pSwapChain,
+        &m_pDevice,
+        &featureLevel,
+        &m_pCtx ) );
+
+    DX_CALL( m_pDevice->QueryInterface( IID_PPV_ARGS( &m_pDxgiDevice ) ) );
+    DX_CALL( m_pDxgiDevice->GetParent( IID_PPV_ARGS( &m_pDxgiAdapter ) ) );
+    DX_CALL( m_pDxgiAdapter->GetParent( IID_PPV_ARGS( &m_pDxgiFactory ) ) );
+
+    return true;
+}
+
+bool D3d11GraphicsManager::CreateRenderTarget()
+{
+    ComPtr<ID3D11Texture2D> backbuffer;
+    m_pSwapChain->GetBuffer( 0, IID_PPV_ARGS( &backbuffer ) );
+    DX_CALL( m_pDevice->CreateRenderTargetView( backbuffer.Get(), nullptr, &m_immediate.rtv ) );
+
+    D3D11_TEXTURE2D_DESC backBufferDesc;
+    backbuffer->GetDesc( &backBufferDesc );
+
+    D3D11_TEXTURE2D_DESC desc{};
+    desc.Width = backBufferDesc.Width;
+    desc.Height = backBufferDesc.Height;
+    desc.MipLevels = desc.ArraySize = 1;
+    desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    desc.SampleDesc.Count = 1;
+    desc.SampleDesc.Quality = 0;
+    desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+
+    ComPtr<ID3D11Texture2D> depthBuffer;
+
+    DX_CALL( m_pDevice->CreateTexture2D( &desc, 0, &depthBuffer ) );
+    DX_CALL( m_pDevice->CreateDepthStencilView( depthBuffer.Get(), nullptr, &m_immediate.dsv ) );
+    return true;
+}
+
+void D3d11GraphicsManager::DestroyRenderTarget()
+{
+    SafeRelease( m_immediate.rtv );
+    SafeRelease( m_immediate.dsv );
+}

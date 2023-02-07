@@ -219,21 +219,6 @@ GBuffer g_gbufferRT;
 SsaoRT g_ssaoRT;
 FinalImageRT g_finalImageRT;
 
-void R_CreateRT()
-{
-    uint32_t w = 0, h = 0;
-    g_gfxMgr->GetAppPointer()->GetFramebufferSize( w, h );
-
-    const int res = Dvar_GetInt( r_shadowRes );
-    ASSERT( is_power_of_two( res ) );
-
-    // g_shadowRT.Create( NUM_CASCADES * res, res );
-    g_shadowRT.Create( res, res );
-    g_gbufferRT.Create( w, h );
-    g_ssaoRT.Create( w, h );
-    g_finalImageRT.Create( w, h );
-}
-
 void R_DestroyRT()
 {
     for ( auto& rt : g_rts ) {

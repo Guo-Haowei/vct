@@ -25,12 +25,15 @@
     <Filter Include="Manager">
       <UniqueIdentifier>{ea50f017-600a-490e-a8e3-a008b0de28b3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RHI\OpenGL">
+      <UniqueIdentifier>{7ab9ccb6-5680-472c-823c-3275b241b8eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RHI\D3d11">
+      <UniqueIdentifier>{1e1c8820-c031-4e7c-be98-d573d1254d9c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\AssimpLoader.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\BaseManager.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\camera.cpp">
@@ -56,15 +59,6 @@
     </ClCompile>
     <ClCompile Include="SceneGraph\Scene.cpp">
       <Filter>SceneGraph</Filter>
-    </ClCompile>
-    <ClCompile Include="RHI\imgui_impl_opengl3.cpp">
-      <Filter>RHI</Filter>
-    </ClCompile>
-    <ClCompile Include="RHI\OpenGLGraphicsManager.cpp">
-      <Filter>RHI</Filter>
-    </ClCompile>
-    <ClCompile Include="RHI\OpenGLPipelineStateManager.cpp">
-      <Filter>RHI</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\gl_utils.cpp">
       <Filter>Graphics</Filter>
@@ -126,12 +120,30 @@
     <ClCompile Include="Manager\SceneManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
+    <ClCompile Include="RHI\D3d11\D3d11GraphicsManager.cpp">
+      <Filter>RHI\D3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\D3d11\D3d11PipelineStateManager.cpp">
+      <Filter>RHI\D3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\D3d11\D3dCommon.cpp">
+      <Filter>RHI\D3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\D3d11\imgui_impl_dx11.cpp">
+      <Filter>RHI\D3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\OpenGL\imgui_impl_opengl3.cpp">
+      <Filter>RHI\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\OpenGL\OpenGLGraphicsManager.cpp">
+      <Filter>RHI\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\OpenGL\OpenGLPipelineStateManager.cpp">
+      <Filter>RHI\OpenGL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\AssimpLoader.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\BaseManager.hpp">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Core\camera.h">
@@ -166,18 +178,6 @@
     </ClInclude>
     <ClInclude Include="SceneGraph\Scene.hpp">
       <Filter>SceneGraph</Filter>
-    </ClInclude>
-    <ClInclude Include="RHI\imgui_impl_opengl3.h">
-      <Filter>RHI</Filter>
-    </ClInclude>
-    <ClInclude Include="RHI\imgui_impl_opengl3_loader.h">
-      <Filter>RHI</Filter>
-    </ClInclude>
-    <ClInclude Include="RHI\OpenGLGraphicsManager.hpp">
-      <Filter>RHI</Filter>
-    </ClInclude>
-    <ClInclude Include="RHI\OpenGLPipelineStateManager.hpp">
-      <Filter>RHI</Filter>
     </ClInclude>
     <ClInclude Include="Interface\IGraphicsManager.hpp">
       <Filter>Interface</Filter>
@@ -274,6 +274,33 @@
     </ClInclude>
     <ClInclude Include="Manager\GameLogic.hpp">
       <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Configuration.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\D3d11\D3d11GraphicsManager.hpp">
+      <Filter>RHI\D3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\D3d11\D3d11PipelineStateManager.hpp">
+      <Filter>RHI\D3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\D3d11\D3dCommon.hpp">
+      <Filter>RHI\D3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\D3d11\imgui_impl_dx11.h">
+      <Filter>RHI\D3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\OpenGL\imgui_impl_opengl3.h">
+      <Filter>RHI\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\OpenGL\imgui_impl_opengl3_loader.h">
+      <Filter>RHI\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\OpenGL\OpenGLGraphicsManager.hpp">
+      <Filter>RHI\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\OpenGL\OpenGLPipelineStateManager.hpp">
+      <Filter>RHI\OpenGL</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

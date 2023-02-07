@@ -12,7 +12,7 @@ public:
     virtual void Draw() = 0;
     virtual void Present() = 0;
 
-    // virtual void ResizeCanvas( int32_t width, int32_t height ) = 0;
+    virtual void ResizeCanvas( int new_width, int new_height ) = 0;
 
     virtual void SetPipelineState( const std::shared_ptr<PipelineState>& pipelineState ) = 0;
     virtual void DrawBatch( const Frame& frame ) = 0;
@@ -60,5 +60,3 @@ public:
 
     // virtual void MSAAResolve( std::optional<std::reference_wrapper<Texture2D>> target, Texture2D& source ) = 0;
 };
-
-extern IGraphicsManager* g_gfxMgr;

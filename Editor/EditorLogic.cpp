@@ -48,7 +48,7 @@ void EditorLogic::Tick()
     Scene& scene = Com_GetScene();
 
     // update camera
-    uint32_t w, h;
+    int w, h;
     m_pApp->GetFramebufferSize( w, h );
     const float aspect = (float)w / h;
     ASSERT( aspect > 0.0f );

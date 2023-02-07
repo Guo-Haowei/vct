@@ -7,9 +7,12 @@
 #include "Interface/ISceneManager.hpp"
 #include "Interface/IGameLogic.hpp"
 
+
+#include "Core/Configuration.hpp"
+
 class BaseApplication : public IApplication {
 public:
-    BaseApplication() = default;
+    BaseApplication( const Configuration& config );
     ~BaseApplication() override = default;
 
     virtual bool ProcessCommandLine( int argc, const char** argv ) override;
@@ -21,7 +24,7 @@ public:
     virtual bool ShouldQuit() override;
     virtual void RequestQuit() override { m_bShouldQuit = true; }
 
-    void GetFramebufferSize( uint32_t&, uint32_t& ) override {}
+    void GetFramebufferSize( int&, int& ) override {}
 
     bool CreateMainWindow() override { return false; }
     void* GetMainWindowHandler() override { return nullptr; }
@@ -58,7 +61,8 @@ public:
     }
 
 protected:
-    // Flag if need quit the main loop of the application
+    Configuration m_config;
+
     bool m_bShouldQuit = false;
 
     IAssetLoader* m_pAssetLoader = nullptr;

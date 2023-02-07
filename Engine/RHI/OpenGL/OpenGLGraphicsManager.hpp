@@ -1,8 +1,6 @@
 #pragma once
 #include "Manager/GraphicsManager.hpp"
 
-struct GLFWwindow;
-
 class OpenGLGraphicsManager : public GraphicsManager {
 public:
     virtual bool Initialize() override;
@@ -17,7 +15,6 @@ public:
     virtual void BeginFrame( Frame& frame ) override;
     virtual void EndFrame( Frame& frame ) override;
 
-    virtual void Draw() override;
     virtual void Present() override;
 
 protected:
@@ -34,6 +31,4 @@ protected:
 
     uint32_t m_uboDrawFrameConstant{ 0 };
     uint32_t m_uboDrawBatchConstant{ 0 };
-
-    GLFWwindow* m_pGlfwWindow{ nullptr };
 };

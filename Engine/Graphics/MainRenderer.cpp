@@ -117,7 +117,6 @@ void MainRenderer::createGpuResources()
     R_Create_Pass_Resources();
 
     R_Alloc_Cbuffers();
-    R_CreateRT();
 
     Scene& scene = Com_GetScene();
 
