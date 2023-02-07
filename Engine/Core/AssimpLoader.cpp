@@ -12,7 +12,7 @@
 #include "Base/Logger.h"
 
 #include "com_dvars.h"
-#include "FileManager.h"
+#include "Manager/AssetLoader.hpp"
 
 using std::string;
 using std::vector;

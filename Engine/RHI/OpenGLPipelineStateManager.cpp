@@ -7,10 +7,8 @@
 
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
-#include "Core/FileManager.h"
 
-// TODO: remove
-IPipelineStateManager *g_pPipelineStateManager = new GLPipelineStateManager();
+#include "Manager/AssetLoader.hpp"
 
 using std::pair;
 using std::string;
@@ -27,7 +25,7 @@ static std::string ProcessShader( const std::string &source )
             ASSERT( include.front() == '"' && include.back() == '"' );
             include.pop_back();
             SystemFile sysFile;
-            constexpr char cbufferFile [] = "cbuffer.glsl";
+            constexpr char cbufferFile[] = "cbuffer.glsl";
             const char *removeQuote = include.c_str() + 1;
             if ( strncmp( cbufferFile, removeQuote, sizeof( cbufferFile ) ) == 0 ) {
                 sysFile = ( g_fileMgr->OpenRead( removeQuote, "Engine/Graphics" ) );
@@ -135,7 +133,7 @@ static bool LoadShaderProgram( const ShaderSourceList &source, GLuint &shaderPro
     return true;
 }
 
-bool GLPipelineStateManager::InitializePipelineState(
+bool OpenGLPipelineStateManager::InitializePipelineState(
     PipelineState **ppPipelineState )
 {
     OpenGLPipelineState *pnew_state = new OpenGLPipelineState( **ppPipelineState );
@@ -166,7 +164,7 @@ bool GLPipelineStateManager::InitializePipelineState(
     return result;
 }
 
-void GLPipelineStateManager::DestroyPipelineState(
+void OpenGLPipelineStateManager::DestroyPipelineState(
     PipelineState &pipelineState )
 {
     OpenGLPipelineState *pPipelineState = dynamic_cast<OpenGLPipelineState *>( &pipelineState );

@@ -9,3 +9,6 @@ Debug/
 Release/
 *.vcxproj.user
 *.args.json
+
+# imgui
+imgui.ini

@@ -9,8 +9,6 @@
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
 
-#include "Core/FileManager.h"
-
 #include "cbuffer.glsl"
 
 MeshData g_quad;

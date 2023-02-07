@@ -1,7 +1,7 @@
 #pragma once
 #include "Interface/IGraphicsManager.hpp"
 
-#include "FrameStructure.hpp"
+#include "Graphics/FrameStructure.hpp"
 #include "DrawPass/BaseDrawPass.hpp"
 #include "SceneGraph/Scene.hpp"
 
@@ -40,5 +40,3 @@ protected:
     bool m_bInitialized{ false };
     std::vector<std::shared_ptr<BaseDrawPass>> m_drawPasses;
 };
-
-extern GraphicsManager* g_gfxMgr;

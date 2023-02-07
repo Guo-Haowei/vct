@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-#include "BaseManager.hpp"
+#include "Interface/IRuntimeModule.hpp"
 
 struct SystemFile {
     enum class Result {
@@ -58,14 +58,12 @@ public:
     inline SystemFile::Result Write( char* buffer, size_t size ) { return file.Write( buffer, size ); }
 };
 
-class FileManager : public BaseManager {
+class FileManager : public IRuntimeModule {
 public:
-    FileManager()
-        : BaseManager( "FileManager" )
-    {
-    }
+    FileManager() = default;
 
     virtual bool Initialize() override;
+    virtual void Tick() override {}
     virtual void Finalize() override;
 
     SystemFile OpenRead( const char* filename, const char* path = nullptr );

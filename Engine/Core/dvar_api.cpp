@@ -1,21 +1,15 @@
 #include "dvar_api.h"
 
-#include <filesystem>
-#include <fstream>
 #include <list>
 #include <unordered_map>
-#include <sstream>
 #include <string>
 
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
 
-using std::list;
-using std::string;
 
 static std::unordered_map<std::string, dvar_t*> s_dvarLookupTable;
 
-#define PRINT_CMDLINE_DVARS IN_USE
 #define DVAR_VERBOSE        NOT_IN_USE
 
 #if USING( DVAR_VERBOSE )
@@ -261,113 +255,4 @@ DvarError Dvar_SetStringByName_Internal( const char* name, const char* value )
     }
 
     return Dvar_SetString_Internal( *dvar, value );
-}
-
-class CommandHelper {
-    list<string> commands_;
-
-public:
-    void SetFromCommandLine( int argc, const char** argv )
-    {
-        for ( int idx = 0; idx < argc; ++idx ) {
-            commands_.emplace_back( string( argv[idx] ) );
-        }
-    }
-
-    void PushCfg( const char* file )
-    {
-        if ( !std::filesystem::exists( file ) ) {
-            LOG_WARN( "[filesystem] file '%s' does not exist", file );
-            return;
-        }
-
-        std::ifstream fs( file );
-        list<string> cfg;
-        string line;
-        while ( std::getline( fs, line ) ) {
-            std::istringstream iss( line );
-            string token;
-            if ( iss >> token ) {
-                if ( token.front() == '#' ) {
-                    continue;
-                }
-            }
-
-            do {
-                cfg.emplace_back( token );
-            } while ( iss >> token );
-        }
-        cfg.insert( cfg.end(), commands_.begin(), commands_.end() );
-        commands_ = std::move( cfg );
-    }
-
-    bool TryConsume( string& str )
-    {
-        if ( commands_.empty() ) {
-            str.clear();
-            return false;
-        }
-
-        str = commands_.front();
-        commands_.pop_front();
-        return true;
-    }
-
-    bool Consume( string& str )
-    {
-        if ( commands_.empty() ) {
-            LOG_ERROR( "Unexpected EOF" );
-            str.clear();
-            return false;
-        }
-
-        return TryConsume( str );
-    }
-};
-
-bool dvar_process_from_cmdline( int argc, const char** argv )
-{
-    CommandHelper cmdHelper;
-    cmdHelper.SetFromCommandLine( argc, argv );
-    
-#if USING( PRINT_CMDLINE_DVARS )
-    string debugBuffer;
-#endif
-
-    string str;
-    while ( cmdHelper.TryConsume( str ) ) {
-        if ( str == "+set" ) {
-            cmdHelper.Consume( str );
-
-            dvar_t* dvar = Dvar_FindByName_Internal( str.c_str() );
-
-#if USING( PRINT_CMDLINE_DVARS )
-            debugBuffer.append( "\n\t+set " ).append( str );
-#endif
-            if ( dvar == nullptr ) {
-                LOG_ERROR( "[dvar] Dvar '%s' not found", str.c_str() );
-                return false;
-            }
-            cmdHelper.Consume( str );
-            Dvar_SetFromString_Internal( *dvar, str.c_str() );
-#if USING( PRINT_CMDLINE_DVARS )
-            debugBuffer.append( " " ).append( str );
-#endif
-        }
-        else if ( str == "+exec" ) {
-            cmdHelper.Consume( str );
-            LOG_INFO( "Executing '%s'", str.c_str() );
-            cmdHelper.PushCfg( str.c_str() );
-        }
-        else {
-            LOG_ERROR( "Unknown command '%s'", str.c_str() );
-            return false;
-        }
-    }
-
-#if USING( PRINT_CMDLINE_DVARS )
-    LOG_INFO( "Debug variables from command lines:%s", debugBuffer.c_str() );
-#endif
-
-    return true;
 }

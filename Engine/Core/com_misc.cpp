@@ -2,7 +2,6 @@
 
 #include <filesystem>
 
-#include "FileManager.h"
 #include "imgui/imgui.h"
 #include "WindowManager.h"
 #include "AssimpLoader.hpp"
@@ -15,7 +14,6 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#define DEFINE_DVAR
 #include "com_dvars.h"
 
 #ifdef max
@@ -25,13 +23,6 @@
 static Scene g_scene;
 
 static void ControlCamera( Camera& camera );
-
-bool Com_RegisterDvars()
-{
-#define REGISTER_DVAR
-#include "com_dvars.h"
-    return true;
-}
 
 bool Com_LoadScene()
 {

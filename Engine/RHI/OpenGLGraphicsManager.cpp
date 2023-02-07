@@ -7,12 +7,15 @@
 
 #include "Base/Asserts.h"
 
+#include "Core/com_misc.h"
 #include "Core/com_dvars.h"
 #include "Core/WindowManager.h"
 #include "Core/imgui_impl_glfw.h"
 
 #include "Graphics/gl_utils.h"
 #include "GLFW/glfw3.h"
+
+#include "Manager/BaseApplication.hpp"
 
 // @TODO: remove
 #include "DrawPass/ShadowMapPass.hpp"
@@ -25,7 +28,7 @@
 
 #include "Graphics/MainRenderer.h"
 static MainRenderer g_renderer;
-GraphicsManager *g_gfxMgr = new OpenGLGraphicsManager();
+IGraphicsManager *g_gfxMgr = new OpenGLGraphicsManager();
 
 static void APIENTRY debug_callback( GLenum, GLenum, unsigned int, GLenum, GLsizei, const char *, const void * );
 
@@ -59,16 +62,15 @@ bool OpenGLGraphicsManager::Initialize()
     }
 
     // @TODO: move to GraphicsManager
-    ASSERT( g_pPipelineStateManager );
-    IPipelineStateManager *psm = g_pPipelineStateManager;
+    auto pipelineStateManager = dynamic_cast<BaseApplication*>(m_pApp)->GetPipelineStateManager();
 
-    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new ShadowMapPass( this, psm, &g_shadowRT, CLEAR_FLAG_DEPTH ) ) );
-    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new VoxelizationPass( this, psm, nullptr, CLEAR_FLAG_NONE ) ) );
-    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new GBufferPass( this, psm, &g_gbufferRT, CLEAR_FLAG_COLOR_DPETH ) ) );
-    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new SSAOPass( this, psm, &g_ssaoRT, CLEAR_FLAG_COLOR ) ) );
-    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new DeferredPass( this, psm, &g_finalImageRT, CLEAR_FLAG_COLOR ) ) );
-    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new OverlayPass( this, psm, nullptr, CLEAR_FLAG_COLOR_DPETH ) ) );
-    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new GuiPass( this, psm, nullptr, 0 ) ) );
+    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new ShadowMapPass( this, pipelineStateManager, &g_shadowRT, CLEAR_FLAG_DEPTH ) ) );
+    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new VoxelizationPass( this, pipelineStateManager, nullptr, CLEAR_FLAG_NONE ) ) );
+    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new GBufferPass( this, pipelineStateManager, &g_gbufferRT, CLEAR_FLAG_COLOR_DPETH ) ) );
+    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new SSAOPass( this, pipelineStateManager, &g_ssaoRT, CLEAR_FLAG_COLOR ) ) );
+    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new DeferredPass( this, pipelineStateManager, &g_finalImageRT, CLEAR_FLAG_COLOR ) ) );
+    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new OverlayPass( this, pipelineStateManager, nullptr, CLEAR_FLAG_COLOR_DPETH ) ) );
+    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new GuiPass( this, pipelineStateManager, nullptr, 0 ) ) );
 
     // @TODO: config
 
@@ -76,6 +78,8 @@ bool OpenGLGraphicsManager::Initialize()
     snprintf( glsl_version, sizeof( glsl_version ), "#version %d%d0 core", OPENGL_DEFAULT_VERSION_MAJOR, OPENGL_DEFAULT_VERSION_MINOR );
     ImGui_ImplOpenGL3_Init( glsl_version );
     g_renderer.createGpuResources();
+
+    InitializeGeometries( Com_GetScene() );
 
     return ( m_bInitialized = true );
 }
@@ -91,7 +95,7 @@ void OpenGLGraphicsManager::SetPipelineState( const std::shared_ptr<PipelineStat
 {
     const OpenGLPipelineState *pPipelineState = dynamic_cast<const OpenGLPipelineState *>( pipelineState.get() );
 
-    //m_CurrentShader = pPipelineState->shaderProgram;
+    // m_CurrentShader = pPipelineState->shaderProgram;
 
     // Set the color shader as the current shader program and set the matrices
     // that it will use for rendering.

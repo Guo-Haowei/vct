@@ -74,5 +74,3 @@ DvarError Dvar_SetStringByName_Internal( const char* name, const char* value );
 #define Dvar_SetVec3( name, x, y, z )    Dvar_SetVec_Internal( DVAR_##name, x, y, z, 0.0f, 3 )
 #define Dvar_SetVec4( name, x, y, z, w ) Dvar_SetVec_Internal( DVAR_##name, x, y, z, w, 4 )
 #define Dvar_SetString( name, value )    Dvar_SetString_Internal( DVAR_##name, value )
-
-bool dvar_process_from_cmdline( int argc, const char** argv );

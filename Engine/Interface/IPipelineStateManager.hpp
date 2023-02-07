@@ -57,5 +57,3 @@ public:
 
     virtual const std::shared_ptr<PipelineState> GetPipelineState( const std::string& name ) const = 0;
 };
-
-extern IPipelineStateManager* g_pPipelineStateManager;

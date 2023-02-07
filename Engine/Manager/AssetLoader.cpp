@@ -1,4 +1,4 @@
-#include "FileManager.h"
+#include "AssetLoader.hpp"
 
 #include <filesystem>
 
@@ -53,18 +53,13 @@ SystemFile::Result SystemFile::Write( char* buffer, size_t size )
 }
 bool FileManager::Initialize()
 {
-    if ( m_initialized ) {
-        return true;
-    }
-
     m_base = Dvar_GetString( fs_base );
     LOG_DEBUG( "base path is '%s'", m_base.c_str() );
-    return ( m_initialized = true );
+    return true;
 }
 
 void FileManager::Finalize()
 {
-    m_initialized = false;
 }
 
 SystemFile FileManager::OpenRead( const char* filename, const char* path )
@@ -106,7 +101,6 @@ SystemFile FileManager::OpenWrite( const char* filename )
 
 std::string FileManager::BuildAbsPath( const char* filename, const char* extraPath )
 {
-    ASSERT( m_initialized );
     fs::path absPath = fs::path( m_base ) / string( extraPath ? extraPath : "" ) / filename;
     return absPath.string();
 }

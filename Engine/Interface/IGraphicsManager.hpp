@@ -60,3 +60,5 @@ public:
 
     // virtual void MSAAResolve( std::optional<std::reference_wrapper<Texture2D>> target, Texture2D& source ) = 0;
 };
+
+extern IGraphicsManager* g_gfxMgr;

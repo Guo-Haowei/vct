@@ -22,6 +22,9 @@
     <Filter Include="Base">
       <UniqueIdentifier>{d87e43d4-ea49-49e2-b38b-c2aa2b283447}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Manager">
+      <UniqueIdentifier>{ea50f017-600a-490e-a8e3-a008b0de28b3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\AssimpLoader.cpp">
@@ -40,9 +43,6 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\editor.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\FileManager.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\geometry.cpp">
@@ -78,13 +78,7 @@
     <ClCompile Include="Graphics\GpuTexture.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\GraphicsManager.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Graphics\MainRenderer.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\PipelineStateManager.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\r_cbuffers.cpp">
@@ -123,6 +117,18 @@
     <ClCompile Include="Base\Logger.cpp">
       <Filter>Base</Filter>
     </ClCompile>
+    <ClCompile Include="Manager\BaseApplication.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\GraphicsManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\PipelineStateManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\AssetLoader.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\AssimpLoader.hpp">
@@ -150,9 +156,6 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Core\editor.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\FileManager.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Core\geometry.h">
@@ -203,13 +206,7 @@
     <ClInclude Include="Graphics\GpuTexture.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\GraphicsManager.hpp">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Graphics\MainRenderer.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\PipelineStateManager.hpp">
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\r_cbuffers.h">
@@ -256,6 +253,18 @@
     </ClInclude>
     <ClInclude Include="Graphics\cbuffer.glsl">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\BaseApplication.hpp">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\GraphicsManager.hpp">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\PipelineStateManager.hpp">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\AssetLoader.hpp">
+      <Filter>Manager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
