@@ -20,19 +20,23 @@ using std::string;
 static void RegisterDvars();
 static bool ProcessDvarFromCmdLine( int argc, const char** argv );
 
-bool BaseApplication::Initialize()
+bool BaseApplication::Initialize( int argc, const char** argv )
 {
+    RegisterDvars();
+    if ( !ProcessDvarFromCmdLine( argc - 1, argv + 1 ) ) {
+        return false;
+    }
     // for ( auto& module : m_runtimeModules ) {
     //     if (!module->Initialize()) {
     //         LOG_ERROR( "Failed to initialize module" );
     //         return false;
     //     }
     // }
+
     bool ok = true;
     ok = ok && m_pAssetLoader->Initialize();
 
     ok = ok && Com_LoadScene();
-    ok = ok && Com_ImGuiInit();
 
     ok = ok && g_wndMgr->Initialize();
 
@@ -40,6 +44,7 @@ bool BaseApplication::Initialize()
     ok = ok && m_pPipelineStateManager->Initialize();
     return ok;
 }
+
 
 void BaseApplication::Finalize()
 {
@@ -52,12 +57,6 @@ void BaseApplication::Finalize()
 
 void BaseApplication::Tick()
 {
-}
-
-bool BaseApplication::ProcessCommandLineParameters( int argc, const char** argv )
-{
-    RegisterDvars();
-    return ProcessDvarFromCmdLine( argc - 1, argv + 1 );
 }
 
 bool BaseApplication::IsQuit() const
@@ -79,7 +78,7 @@ void BaseApplication::RegisterManagerModule( IPipelineStateManager* mgr )
     m_runtimeModules.push_back( mgr );
 }
 
-void BaseApplication::RegisterManagerModule( FileManager* mgr )
+void BaseApplication::RegisterManagerModule( IAssetLoader* mgr )
 {
     m_pAssetLoader = mgr;
     mgr->SetAppPointer( this );

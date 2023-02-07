@@ -20,7 +20,10 @@ namespace fs = std::filesystem;
 
 void AssimpLoader::loadGltf( const char* path, Scene& scene, bool flipUVs )
 {
-    string fullpath = g_fileMgr->BuildAbsPath( path );
+    
+    fs::path sysPath = fs::path( Dvar_GetString( fs_base ) ) / path;
+    string fullpath = sysPath.string();
+
     LOG_DEBUG( "[assimp] loading model from '%s'", fullpath.c_str() );
 
     Assimp::Importer importer;

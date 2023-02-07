@@ -10,12 +10,11 @@ class BaseApplication : public IApplication {
 public:
     BaseApplication() = default;
     ~BaseApplication() override = default;
-    virtual bool Initialize();
+
+    virtual bool Initialize( int argc, const char** argv ) override;
     virtual void Finalize();
 
     virtual void Tick();
-
-    virtual bool ProcessCommandLineParameters( int argc, const char** argv ) override;
 
     bool IsQuit() const override;
     void RequestQuit() override { m_bQuit = true; }
@@ -25,14 +24,20 @@ public:
     void CreateMainWindow() override {}
     void* GetMainWindowHandler() override { return nullptr; }
 
+    void RegisterManagerModule( IAssetLoader* mgr );
     void RegisterManagerModule( IGraphicsManager* mgr );
     void RegisterManagerModule( IPipelineStateManager* mgr );
-    void RegisterManagerModule( FileManager* mgr );
+
+    IAssetLoader* GetAssetLoader()
+    {
+        return m_pAssetLoader;
+    }
 
     IGraphicsManager* GetGraphicsManager()
     {
         return m_pGraphicsManager;
     }
+
     IPipelineStateManager* GetPipelineStateManager()
     {
         return m_pPipelineStateManager;
@@ -44,7 +49,7 @@ protected:
 
     IGraphicsManager* m_pGraphicsManager = nullptr;
     IPipelineStateManager* m_pPipelineStateManager = nullptr;
-    FileManager* m_pAssetLoader = nullptr;
+    IAssetLoader* m_pAssetLoader = nullptr;
 
 private:
     std::vector<IRuntimeModule*> m_runtimeModules;

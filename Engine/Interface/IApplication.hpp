@@ -4,7 +4,7 @@
 class IApplication {
 public:
     virtual ~IApplication() = default;
-    virtual bool ProcessCommandLineParameters( int argc, const char** argv ) = 0;
+    virtual bool Initialize( int argc, const char** argv ) = 0;
 
     virtual bool IsQuit() const = 0;
     virtual void RequestQuit() = 0;

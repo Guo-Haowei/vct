@@ -79,6 +79,8 @@
     <ClInclude Include="Graphics\r_cbuffers.h" />
     <ClInclude Include="Graphics\r_rendertarget.h" />
     <ClInclude Include="Graphics\stb_image.h" />
+    <ClInclude Include="Interface\IApplication.hpp" />
+    <ClInclude Include="Interface\IAssetLoader.hpp" />
     <ClInclude Include="Interface\IGraphicsManager.hpp" />
     <ClInclude Include="Interface\IPipelineStateManager.hpp" />
     <ClInclude Include="Interface\IRuntimeModule.hpp" />

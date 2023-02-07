@@ -1,5 +1,3 @@
-#include "imgui/imgui.h"
-
 #include "Engine/Base/Asserts.h"
 #include "Engine/Base/Logger.h"
 
@@ -14,20 +12,26 @@
 
 #include "Engine/RHI/OpenGLPipelineStateManager.hpp"
 
+#include "imgui/imgui.h"
+
 int main( int argc, const char** argv )
 {
     OpenGLPipelineStateManager pipelineStateManager;
+    AssetLoader assetLoader;
 
     BaseApplication app;
 
-    if ( !app.ProcessCommandLineParameters( argc, argv ) ) {
-        return false;
-    }
-
-    app.RegisterManagerModule( g_fileMgr );
+    app.RegisterManagerModule( &assetLoader );
     app.RegisterManagerModule( g_gfxMgr );
     app.RegisterManagerModule( &pipelineStateManager );
-    if ( !app.Initialize() ) {
+
+    // Initialize Imgui
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    [[maybe_unused]] ImGuiIO& io = ImGui::GetIO();
+    ImGui::StyleColorsDark();
+
+    if ( !app.Initialize( argc, argv ) ) {
         return -1;
     }
 
@@ -43,12 +47,11 @@ int main( int argc, const char** argv )
     }
 
     pipelineStateManager.Finalize();
-
     g_gfxMgr->Finalize();
     manager_deinit( g_wndMgr );
-    ImGui::DestroyContext();
+    assetLoader.Finalize();
 
-    g_fileMgr->Finalize();
+    ImGui::DestroyContext();
 
     return 0;
 }

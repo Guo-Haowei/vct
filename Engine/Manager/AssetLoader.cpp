@@ -1,105 +1,88 @@
 #include "AssetLoader.hpp"
 
 #include <filesystem>
+#include <fstream>
 
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
-
 #include "Core/com_dvars.h"
-
-#define PRINT_FILESYSTEM IN_USE
-#if USING( PRINT_FILESYSTEM )
-#define FS_PRINT_WARN( fmt, ... ) ::base::Log( ::base::Level::Warn, "[filesystem] " fmt, ##__VA_ARGS__ )
-#else
-#define FS_PRINT_WARN( fmt, ... ) ( (void)0 )
-#endif
 
 namespace fs = std::filesystem;
 using std::string;
+using std::vector;
 
-FileManager* g_fileMgr = new FileManager();
-
-void SystemFile::Close()
-{
-    if ( handle ) {
-        std::fclose( reinterpret_cast<FILE*>( handle ) );
-    }
-}
-
-size_t SystemFile::Size()
-{
-    ASSERT( handle );
-    FILE* fp = reinterpret_cast<FILE*>( handle );
-    fseek( fp, 0L, SEEK_END );
-    size_t ret = ftell( fp );
-    fseek( fp, 0L, SEEK_SET );
-    return ret;
-}
-
-SystemFile::Result SystemFile::Read( char* buffer, size_t size )
-{
-    ASSERT( handle );
-    FILE* file = reinterpret_cast<FILE*>( handle );
-    std::fread( buffer, 1, size, file );
-    return Result::Ok;
-}
-
-SystemFile::Result SystemFile::Write( char* buffer, size_t size )
-{
-    ASSERT( handle );
-    FILE* file = reinterpret_cast<FILE*>( handle );
-    std::fwrite( buffer, size, 1, file );
-    return Result::Ok;
-}
-bool FileManager::Initialize()
+bool AssetLoader::Initialize()
 {
     m_base = Dvar_GetString( fs_base );
-    LOG_DEBUG( "base path is '%s'", m_base.c_str() );
+    LOG_DEBUG( "AssetLoader base path is '%s'", m_base.c_str() );
     return true;
 }
 
-void FileManager::Finalize()
+void AssetLoader::Finalize()
 {
 }
 
-SystemFile FileManager::OpenRead( const char* filename, const char* path )
+bool AssetLoader::AddSearchPath( const string& path )
 {
-    ASSERT( filename );
+    if ( m_searchPaths.find( path ) != m_searchPaths.end() ) {
+        LOG_WARN( "AssetLoader::AddSearchPath path '%s' already exists", path.c_str() );
+        return false;
+    }
+    m_searchPaths.insert( path );
+    return true;
+}
 
-    // try relative
-    std::string fullpath;
-    char tmp[1024];
-    snprintf( tmp, sizeof( fullpath ), "%s/%s", path ? path : ".", filename );
+bool AssetLoader::RemoveSearchPath( const string& path )
+{
+    if ( m_searchPaths.find( path ) == m_searchPaths.end() ) {
+        LOG_WARN( "AssetLoader::RemoveSearchPath: path '%s' does not exist", path.c_str() );
+        return false;
+    }
+    m_searchPaths.erase( path );
+    return true;
+}
 
-    if ( std::filesystem::exists( fullpath ) ) {
-        fullpath = tmp;
+void AssetLoader::ClearSearchPath()
+{
+    m_searchPaths.clear();
+}
+
+static void ReadTextFileToString(const string& syspath, vector<char>& out) {
+    std::ifstream ifs( syspath );
+    if ( !ifs.is_open() ) {
+        return;
+    }
+    ifs.seekg( 0, std::ios::end );
+    const size_t size = ifs.tellg();
+    ifs.seekg( 0 );
+    out.resize( size );
+    ifs.read( out.data(), size );
+}
+
+std::vector<char> AssetLoader::SyncOpenAndReadText( const char* fileName )
+{
+    fs::path possiblePath = fs::path( m_base ) / fileName;
+    vector<char> buffer;
+    if ( fs::exists( possiblePath ) ) {
+        ReadTextFileToString( possiblePath.string(), buffer );
     }
     else {
-        fullpath = BuildAbsPath( filename, path );
+        for ( const string& searchPath : m_searchPaths ) {
+            possiblePath = fs::path( m_base ) / searchPath / fileName;
+            if ( fs::exists( possiblePath ) ) {
+                ReadTextFileToString( possiblePath.string(), buffer );
+                break;
+            }
+        }
     }
 
-    SystemFile file;
-    file.handle = std::fopen( fullpath.c_str(), "r" );
-    if ( file.handle == nullptr ) {
-        FS_PRINT_WARN( "failed to open file '%s'", fullpath.c_str() );
+    if ( buffer.empty() ) {
+        LOG_FATAL( "AssetLoader::SyncOpenAndReadTextFileToString: Failed to open text file '%s'", fileName );
     }
-    return file;
+    return buffer;
 }
 
-SystemFile FileManager::OpenWrite( const char* filename )
-{
-    ASSERT( filename );
-
-    SystemFile file;
-    file.handle = std::fopen( filename, "w" );
-
-    if ( file.handle == nullptr ) {
-        FS_PRINT_WARN( "failed to open file '%s'", filename );
-    }
-    return file;
-}
-
-std::string FileManager::BuildAbsPath( const char* filename, const char* extraPath )
+std::string AssetLoader::BuildSysPath( const char* filename, const char* extraPath )
 {
     fs::path absPath = fs::path( m_base ) / string( extraPath ? extraPath : "" ) / filename;
     return absPath.string();

@@ -1,78 +1,24 @@
 #pragma once
-#include <string>
+#include <set>
+#include "Interface/IAssetLoader.hpp"
 
-#include "Interface/IRuntimeModule.hpp"
-
-struct SystemFile {
-    enum class Result {
-        Ok
-    };
-
-    enum class Mode {
-        ReadOnly,
-        ReadWrite,
-    };
-
-    void* handle;
-
-    void Close();
-    size_t Size();
-    Result Read( char* buffer, size_t size );
-    template<class T>
-    Result Read( T& buffer )
-    {
-        const size_t size = Size();
-        buffer.resize( size );
-        return Read( buffer.data(), size );
-    }
-
-    Result Write( char* buffer, size_t size );
-};
-
-class SystemFileWrapper {
-    SystemFile file;
-
+class AssetLoader : public IAssetLoader {
 public:
-    SystemFileWrapper( SystemFile file )
-        : file( file )
-    {
-    }
-
-    SystemFileWrapper( const SystemFileWrapper& ) = delete;
-
-    ~SystemFileWrapper()
-    {
-        file.Close();
-    }
-
-    bool IsGood() const { return file.handle != nullptr; }
-
-    inline size_t Size() { return file.Size(); }
-    inline SystemFile::Result Read( char* buffer, size_t size ) { return file.Read( buffer, size ); }
-    template<class T>
-    inline SystemFile::Result Read( T& buffer )
-    {
-        return file.Read<T>( buffer );
-    }
-
-    inline SystemFile::Result Write( char* buffer, size_t size ) { return file.Write( buffer, size ); }
-};
-
-class FileManager : public IRuntimeModule {
-public:
-    FileManager() = default;
-
     virtual bool Initialize() override;
     virtual void Tick() override {}
     virtual void Finalize() override;
 
-    SystemFile OpenRead( const char* filename, const char* path = nullptr );
-    SystemFile OpenWrite( const char* filename );
+    virtual std::string BuildSysPath( const char* filename, const char* extraPath ) override;
 
-    std::string BuildAbsPath( const char* filename, const char* extraPath = nullptr );
+    virtual bool AddSearchPath( const std::string& path ) override;
+
+    virtual bool RemoveSearchPath( const std::string& path ) override;
+
+    virtual void ClearSearchPath() override;
+
+    virtual std::vector<char> SyncOpenAndReadText( const char* fileName ) override;
 
 private:
     std::string m_base;
+    std::set<std::string> m_searchPaths;
 };
-
-extern FileManager* g_fileMgr;

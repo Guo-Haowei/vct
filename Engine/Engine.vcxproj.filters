@@ -266,5 +266,11 @@
     <ClInclude Include="Manager\AssetLoader.hpp">
       <Filter>Manager</Filter>
     </ClInclude>
+    <ClInclude Include="Interface\IAssetLoader.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Interface\IApplication.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
