@@ -117,8 +117,8 @@ bool OpenGLGraphicsManager::Initialize()
         return handle;
     };
 
-    m_uboDrawFrameConstant = createUBO( 0 );
-    m_uboDrawBatchConstant = createUBO( 1 );
+    m_uboDrawBatchConstant = createUBO( 0 );
+    m_uboDrawFrameConstant = createUBO( 1 );
 
     return ( m_bInitialized = true );
 }
@@ -224,7 +224,7 @@ void OpenGLGraphicsManager::DrawBatch( const Frame & )
         SetPerBatchConstants( dbc );
 
         const Entity &entity = *dbc.pEntity;
-        const MaterialTextures &textures = *reinterpret_cast<const MaterialTextures *>( entity.m_material->gpuResource );
+        const MaterialTextures &textures = *( entity.m_material->gpuResource );
 
         int textureOffset = 5;
         SetShaderParameter( "UniformAlbedoMap", textureOffset );
@@ -359,7 +359,7 @@ void OpenGLGraphicsManager::InitializeGeometries( const Scene &scene )
             ret->normalMap = uploadTexture( scene.GetImage( key ) );
         }
 
-        key = material->metallicRoughnessTexture;
+        key = material->pbrTexture;
         if ( !key.empty() ) {
             ret->pbrMap = uploadTexture( scene.GetImage( key ) );
         }

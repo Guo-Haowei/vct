@@ -36,7 +36,24 @@ struct MaterialTextures {
 
 #endif
 
-CBUFFER( PerFrameConstants, 0 )
+CBUFFER( PerBatchConstants, 0 )
+{
+    mat4 Model;
+
+    vec4 AlbedoColor;
+
+    float Metallic;
+    float Roughness;
+    float HasAlbedoMap;
+    float HasPbrMap;
+
+    float HasNormalMap;
+    float TextureMapIdx;
+    float ReflectPower;
+    int _padint0;
+};
+
+CBUFFER( PerFrameConstants, 1 )
 {
     mat4 View;
     mat4 Proj;
@@ -56,32 +73,10 @@ CBUFFER( PerFrameConstants, 0 )
     vec3 WorldCenter;
     float WorldSizeHalf;
 
-    int _placeholder0;
+    float TexelSize;
     int NoTexture;
     int ScreenWidth;
     int ScreenHeight;
-
-    float TexelSize;
-    int _dummy12;
-    int _dummy13;
-    int _dummy14;
-};
-
-CBUFFER( PerBatchConstants, 1 )
-{
-    mat4 Model;
-
-    vec4 AlbedoColor;
-
-    float Metallic;
-    float Roughness;
-    float HasAlbedoMap;
-    float HasPbrMap;
-
-    float HasNormalMap;
-    float TextureMapIdx;
-    float ReflectPower;
-    int _padint0;
 };
 
 #ifndef __cplusplus

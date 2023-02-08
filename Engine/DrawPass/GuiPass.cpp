@@ -1,14 +1,16 @@
 #include "GuiPass.hpp"
 
+#include <filesystem>
+
 #include "imgui/imgui.h"
 
 #include "Base/Asserts.h"
 
-//#include "Core/GlfwApplication.hpp"
 #include "Core/com_dvars.h"
-#include "Graphics/gl_utils.h"
 
 #include "Manager/SceneManager.hpp"
+
+namespace fs = std::filesystem;
 
 static void DrawDebugWindow()
 {
@@ -33,14 +35,6 @@ static void DrawDebugWindow()
         dirty |= ImGui::SliderFloat( "x", lightDir, -20.f, 20.f );
         dirty |= ImGui::SliderFloat( "z", lightDir + 2, -20.f, 20.f );
 
-        ImGui::Text( "Floor" );
-        //if ( scene.selected ) {
-        //    void* mat = scene.selected->material->gpuResource;
-        //    MaterialData* drawData = reinterpret_cast<MaterialData*>( mat );
-        //    dirty |= ImGui::SliderFloat( "metallic", &drawData->metallic, 0.0f, 1.0f );
-        //    dirty |= ImGui::SliderFloat( "roughness", &drawData->roughness, 0.0f, 1.0f );
-        //}
-
         scene.light.direction = glm::normalize( Dvar_GetVec3( light_dir ) );
         scene.dirty = dirty;
     }
@@ -50,8 +44,36 @@ static void DrawDebugWindow()
 static void DrawEntity( Entity* entity )
 {
     if ( ImGui::TreeNode( entity->m_name.c_str() ) ) {
+        if ( entity->m_flag & Entity::FLAG_GEOMETRY ) {
+            //MeshComponent& mesh = *entity->m_mesh;
+            MaterialComponent& mat = *entity->m_material;
+            auto materialTextures = mat.gpuResource;
+
+            constexpr float scale = 0.35f;
+            ImVec2 imageSize = ImGui::GetWindowSize();
+            imageSize.x *= scale;
+            imageSize.y *= scale;
+            if ( !mat.albedoTexture.empty() ) {
+                auto name = fs::path( mat.albedoTexture ).filename();
+                ImGui::Text( "Albedo: %s", name.string().c_str() );
+
+                ImGui::Image( (ImTextureID)materialTextures->albedoMap.handle, imageSize, ImVec2( 0, 1 ), ImVec2( 1, 0 ) );
+            }
+            if ( !mat.normalTexture.empty() ) {
+                auto name = fs::path( mat.normalTexture ).filename();
+                ImGui::Text( "Normal: %s", name.string().c_str() );
+
+                ImGui::Image( (ImTextureID)materialTextures->normalMap.handle, imageSize, ImVec2( 0, 1 ), ImVec2( 1, 0 ) );
+            }
+            if ( !mat.pbrTexture.empty() ) {
+                auto name = fs::path( mat.pbrTexture ).filename();
+                ImGui::Text( "PBR: %s", name.string().c_str() );
+
+                ImGui::Image( (ImTextureID)materialTextures->pbrMap.handle, imageSize, ImVec2( 0, 1 ), ImVec2( 1, 0 ) );
+            }
+        }
+
         for ( Entity* child : entity->m_children ) {
-            ASSERT( child );
             DrawEntity( child );
         }
         ImGui::TreePop();

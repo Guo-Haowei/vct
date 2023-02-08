@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Core/GeomMath.hpp"
+#include "Graphics/FrameStructure.hpp"
 
 struct MeshComponent {
     enum Flag {
@@ -32,14 +33,14 @@ struct MeshComponent {
 struct MaterialComponent {
     /// only support albedo color for now
     std::string albedoTexture;
-    std::string metallicRoughnessTexture;
+    std::string pbrTexture;
     std::string normalTexture;
     vec4 albedoColor{ 1 };
     float metallic{ 0.0f };
     float roughness{ 1.0f };
     float reflectPower{ 0.0f };
 
-    mutable void* gpuResource = nullptr;
+    mutable MaterialTextures* gpuResource = nullptr;
 };
 
 class Entity {

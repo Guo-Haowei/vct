@@ -200,9 +200,6 @@
     <ClInclude Include="Interface\IRuntimeModule.hpp">
       <Filter>Interface</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\FrameStructure.hpp">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Graphics\gl_utils.h">
       <Filter>Graphics</Filter>
     </ClInclude>
@@ -327,6 +324,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\cbuffer.shader.hpp">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\FrameStructure.hpp">
       <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
