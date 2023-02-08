@@ -12,6 +12,8 @@
 
 #include "DrawPass/BaseDrawPass.hpp"
 
+using std::string;
+
 static std::vector<std::shared_ptr<MaterialData>> g_materialdata;
 
 GpuTexture m_albedoVoxel;
@@ -47,19 +49,21 @@ void createGpuResources()
 
     for ( int idx = 0; idx < scene.m_materials.size(); ++idx ) {
         const auto& mat = scene.m_materials.at( idx );
+        auto matData = std::make_shared<MaterialData>();
 
-        std::shared_ptr<MaterialData> matData( new MaterialData() );
-        if ( !mat->albedoTexture.empty() ) {
+        string& key = mat->albedoTexture;
+        if ( !key.empty() ) {
             matData->albedoColor = vec4( 0 );
-            matData->albedoMap.create2DImageFromFile( mat->albedoTexture.c_str() );
+            matData->albedoMap.createTextureFromImage( *scene.GetImage( key ) );
             g_constantCache.cache.AlbedoMaps[idx].data = gl::MakeTextureResident( matData->albedoMap.GetHandle() );
         }
         else {
             matData->albedoColor = vec4( mat->albedo, 1.0f );
         }
 
-        if ( !mat->metallicRoughnessTexture.empty() ) {
-            matData->materialMap.create2DImageFromFile( mat->metallicRoughnessTexture.c_str() );
+        key = mat->metallicRoughnessTexture;
+        if ( !key.empty() ) {
+            matData->materialMap.createTextureFromImage( *scene.GetImage( key ) );
             g_constantCache.cache.PbrMaps[idx].data = gl::MakeTextureResident( matData->materialMap.GetHandle() );
         }
         else {
@@ -67,8 +71,9 @@ void createGpuResources()
             matData->roughness = mat->roughness;
         }
 
-        if ( !mat->normalTexture.empty() ) {
-            matData->normalMap.create2DImageFromFile( mat->normalTexture.c_str() );
+        key = mat->normalTexture;
+        if ( !key.empty() ) {
+            matData->normalMap.createTextureFromImage( *scene.GetImage( key ) );
             g_constantCache.cache.NormalMaps[idx].data = gl::MakeTextureResident( matData->normalMap.GetHandle() );
         }
 

@@ -6,8 +6,7 @@
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "Core/stb_image.h"
 
 using std::string;
 
@@ -65,15 +64,14 @@ void GpuTexture::create3DEmpty( const Texture3DCreateInfo& info )
     glTexStorage3D( m_type, info.mipLevel, m_format, info.size, info.size, info.size );
 }
 
-void GpuTexture::create2DImageFromFile( const char* path )
+void GpuTexture::createTextureFromImage( const Image& image )
 {
     m_type = GL_TEXTURE_2D;
-    int width, height, channel;
-    unsigned char* image = stbi_load( path, &width, &height, &channel, 4 );
+    const int width = image.m_width;
+    const int height = image.m_height;
+    const uint8_t* pixels = image.m_pPixels;
+    ASSERT( pixels );
 
-    if ( !image ) {
-        LOG_ERROR( "stb: failed to load image '%s'", path );
-    }
 
     glGenTextures( 1, &mHandle );
     glBindTexture( m_type, mHandle );
@@ -83,16 +81,16 @@ void GpuTexture::create2DImageFromFile( const char* path )
     glTexParameteri( m_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
     GLenum format = GL_RGBA;
-    // switch ( channel )
-    // {
-    //     case 4: format = GL_RGBA; break;
-    //     case 3: format = GL_RGB; break;
-    //     case 2: format = GL_RG; break;
-    //     case 1: format = GL_RED; break;
-    //     default: unreachable();
-    // }
+    switch ( image.m_pixelFormat ) {
+        case PIXEL_FORMAT::RGB8:
+            format = GL_RGB;
+            break;
+        default:
+            LOG_WARN( "Unsupported format %d", (int)image.m_pixelFormat );
+            break;
+    }
 
-    glTexImage2D( m_type, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, image );
+    glTexImage2D( m_type, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, pixels );
     glGenerateMipmap( m_type );
     glBindTexture( m_type, 0 );
 }

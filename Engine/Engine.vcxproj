@@ -18,6 +18,7 @@
     <ClCompile Include="Core\dvar_api.cpp" />
     <ClCompile Include="Core\geometry.cpp" />
     <ClCompile Include="Core\GeomMath.cpp" />
+    <ClCompile Include="Core\Image.cpp" />
     <ClCompile Include="Core\imgui_impl_glfw.cpp" />
     <ClCompile Include="Core\GlfwApplication.cpp" />
     <ClCompile Include="DrawPass\BaseDrawPass.cpp" />
@@ -64,8 +65,10 @@
     <ClInclude Include="Core\dvar_end.h" />
     <ClInclude Include="Core\geometry.h" />
     <ClInclude Include="Core\GeomMath.hpp" />
+    <ClInclude Include="Core\Image.hpp" />
     <ClInclude Include="Core\imgui_impl_glfw.h" />
     <ClInclude Include="Core\GlfwApplication.hpp" />
+    <ClInclude Include="Core\stb_image.h" />
     <ClInclude Include="DrawPass\BaseDrawPass.hpp" />
     <ClInclude Include="DrawPass\DeferredPass.hpp" />
     <ClInclude Include="DrawPass\ForwardPass.hpp" />
@@ -80,7 +83,6 @@
     <ClInclude Include="Graphics\MainRenderer.h" />
     <ClInclude Include="Graphics\r_cbuffers.h" />
     <ClInclude Include="Graphics\r_rendertarget.h" />
-    <ClInclude Include="Graphics\stb_image.h" />
     <ClInclude Include="Interface\IApplication.hpp" />
     <ClInclude Include="Interface\IAssetLoader.hpp" />
     <ClInclude Include="Interface\IGameLogic.hpp" />

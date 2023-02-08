@@ -1,6 +1,26 @@
 #pragma once
 #include <glad/glad.h>
 
+#include "Core/Image.hpp"
+
+// @TODO: move to cbuffer
+using TextureHandler = intptr_t;
+using TextureFormat = intptr_t;
+
+struct TextureBase {
+    TextureHandler handler{ 0 };
+    TextureFormat format{ 0 };
+    PIXEL_FORMAT pixel_format{ PIXEL_FORMAT::UNKNOWN };
+
+    uint32_t width{ 0 };
+    uint32_t height{ 0 };
+    uint32_t mips{ 0 };
+    uint32_t samples{ 0 };
+};
+
+struct Texture2D : virtual TextureBase {
+};
+
 struct Texture2DCreateInfo {
     GLenum wrapS = 0;
     GLenum wrapT = 0;
@@ -25,7 +45,8 @@ class GpuTexture {
 public:
     void create2DEmpty( const Texture2DCreateInfo& info );
     void create3DEmpty( const Texture3DCreateInfo& info );
-    void create2DImageFromFile( const char* path );
+
+    void createTextureFromImage( const Image& image );
 
     void destroy();
     void bindImageTexture( int i, int mipLevel = 0 );

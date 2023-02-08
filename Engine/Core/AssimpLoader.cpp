@@ -79,6 +79,25 @@ void AssimpLoader::loadGltf( const char* path, Scene& scene, bool flipUVs )
         scene.m_meshes.emplace_back( mesh );
         scene.m_aabb.Union( box );
     }
+
+    // load images
+    auto loadImage = [&scene]( const string& key ) {
+        if ( key.empty() ) {
+            return false;
+        }
+        auto image = std::make_shared<Image>();
+        if ( !Image::Load( key, *image.get() ) ) {
+            return false;
+        }
+        scene.m_images.insert( std::make_pair( key, image ) );
+        return true;
+    };
+
+    for ( const auto& material : scene.m_materials ) {
+        loadImage( material->albedoTexture );
+        loadImage( material->normalTexture );
+        loadImage( material->metallicRoughnessTexture );
+    }
 }
 
 Material* AssimpLoader::processMaterial( const aiMaterial* aimaterial )

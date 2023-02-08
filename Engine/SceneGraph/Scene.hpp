@@ -1,7 +1,9 @@
 #pragma once
 #include <memory>
+#include <unordered_map>
 
 #include "Core/camera.h"
+#include "Core/Image.hpp"
 #include "SceneGraph/Entity.hpp"
 
 // TODO: light
@@ -12,7 +14,6 @@ struct Light {
 
 class Scene {
 public:
-    Entity* RegisterEntity( const char* name, uint32_t flag );
 
     Light light;
     Camera camera;
@@ -26,7 +27,13 @@ public:
     std::vector<std::shared_ptr<Entity>> m_entities;
     std::vector<std::shared_ptr<MeshComponent>> m_meshes;
     std::vector<std::shared_ptr<Material>> m_materials;
+    std::unordered_map<std::string, std::shared_ptr<Image>> m_images;
 
     Scene( const Scene& ) = delete;
     Scene() = default;
+
+    Entity* RegisterEntity( const char* name, uint32_t flag );
+
+    const std::shared_ptr<Image>& GetImage( const std::string& key );
+private:
 };

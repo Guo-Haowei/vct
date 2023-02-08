@@ -150,6 +150,9 @@
     <ClCompile Include="RHI\D3d12\imgui_impl_dx12.cpp">
       <Filter>RHI\D3d12</Filter>
     </ClCompile>
+    <ClCompile Include="Core\Image.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\AssimpLoader.hpp">
@@ -213,9 +216,6 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\r_rendertarget.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\stb_image.h">
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="DrawPass\BaseDrawPass.hpp">
@@ -322,6 +322,12 @@
     </ClInclude>
     <ClInclude Include="RHI\D3d12\imgui_impl_dx12.h">
       <Filter>RHI\D3d12</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Image.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\stb_image.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
