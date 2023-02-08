@@ -16,7 +16,7 @@
 #include "Engine/RHI/D3d11/D3d11PipelineStateManager.hpp"
 
 #define _USE_OPENGL
-// #define _USE_DX11
+ //#define _USE_DX11
 // #define _USE_DX12
 #include "Engine/RHI/ConfigBackend.hpp"
 
@@ -66,9 +66,6 @@ int main( int argc, const char** argv )
 
     while ( !app.ShouldQuit() ) {
         app.Tick();
-
-        // @TODO: remove
-        Com_GetScene().dirty = false;
     }
 
     app.Finalize();

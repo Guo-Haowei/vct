@@ -153,6 +153,9 @@
     <ClCompile Include="Core\Image.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Base\Profiler.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\AssimpLoader.hpp">
@@ -328,6 +331,9 @@
     </ClInclude>
     <ClInclude Include="Graphics\FrameStructure.hpp">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\Profiler.hpp">
+      <Filter>Base</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -3,6 +3,8 @@
 
 #include "IPipelineStateManager.hpp"
 
+#include "Graphics/FrameStructure.hpp"
+
 struct Frame;
 
 class IGraphicsManager : public IRuntimeModule {
@@ -33,7 +35,7 @@ public:
 
     // virtual void GenerateTextureArray( Texture2DArray& texture_array ) = 0;
 
-    // virtual void ReleaseTexture( TextureBase& texture ) = 0;
+    virtual void ReleaseTexture( TextureBase& texture ) = 0;
 
     // virtual void BeginShadowMap(
     //     const int32_t light_index, const TextureBase* pShadowmap,

@@ -45,7 +45,8 @@ static void ControlCamera( Camera& camera )
 
 void EditorLogic::Tick()
 {
-    Scene& scene = Com_GetScene();
+    auto* app = dynamic_cast<BaseApplication*>( GetAppPointer() );
+    Scene* scene = app->GetSceneManager()->GetScene();
 
     // update camera
     int w, h;
@@ -53,7 +54,7 @@ void EditorLogic::Tick()
     const float aspect = (float)w / h;
     ASSERT( aspect > 0.0f );
 
-    Camera& camera = scene.camera;
+    Camera& camera = scene->camera;
     ControlCamera( camera );
     camera.SetAspect( aspect );
     camera.UpdatePV();

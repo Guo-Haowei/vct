@@ -107,8 +107,6 @@ bool OpenGLGraphicsManager::Initialize()
 
     createGpuResources();
 
-    InitializeGeometries( Com_GetScene() );
-
     auto createUBO = []( int slot ) {
         GLuint handle = 0;
         glGenBuffers( 1, &handle );
@@ -310,8 +308,7 @@ void OpenGLGraphicsManager::InitializeGeometries( const Scene &scene )
         return ret;
     };
 
-    auto createMaterialTextures = []( const std::shared_ptr<MaterialComponent> &material ) {
-        Scene &scene = Com_GetScene();
+    auto createMaterialTextures = [&scene]( const std::shared_ptr<MaterialComponent> &material ) {
         auto ret = std::make_shared<MaterialTextures>();
 
         auto uploadTexture = []( const std::shared_ptr<Image> &image ) {
