@@ -22,11 +22,10 @@
     <ClCompile Include="Core\GlfwApplication.cpp" />
     <ClCompile Include="DrawPass\BaseDrawPass.cpp" />
     <ClCompile Include="DrawPass\DeferredPass.cpp" />
-    <ClCompile Include="DrawPass\GBufferPass.cpp" />
+    <ClCompile Include="DrawPass\ForwardPass.cpp" />
     <ClCompile Include="DrawPass\GuiPass.cpp" />
     <ClCompile Include="DrawPass\OverlayPass.cpp" />
     <ClCompile Include="DrawPass\ShadowMapPass.cpp" />
-    <ClCompile Include="DrawPass\SSAOPass.cpp" />
     <ClCompile Include="DrawPass\VoxelizationPass.cpp" />
     <ClCompile Include="Graphics\gl_utils.cpp" />
     <ClCompile Include="Graphics\GpuTexture.cpp" />
@@ -69,11 +68,10 @@
     <ClInclude Include="Core\GlfwApplication.hpp" />
     <ClInclude Include="DrawPass\BaseDrawPass.hpp" />
     <ClInclude Include="DrawPass\DeferredPass.hpp" />
-    <ClInclude Include="DrawPass\GBufferPass.hpp" />
+    <ClInclude Include="DrawPass\ForwardPass.hpp" />
     <ClInclude Include="DrawPass\GuiPass.hpp" />
     <ClInclude Include="DrawPass\OverlayPass.hpp" />
     <ClInclude Include="DrawPass\ShadowMapPass.hpp" />
-    <ClInclude Include="DrawPass\SSAOPass.hpp" />
     <ClInclude Include="DrawPass\VoxelizationPass.hpp" />
     <ClInclude Include="Graphics\cbuffer.glsl" />
     <ClInclude Include="Graphics\FrameStructure.hpp" />

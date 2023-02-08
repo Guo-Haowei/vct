@@ -5,8 +5,7 @@
 #include "SceneGraph/Scene.hpp"
 
 #include "DrawPass/ShadowMapPass.hpp"
-#include "DrawPass/SSAOPass.hpp"
-#include "DrawPass/GBufferPass.hpp"
+#include "DrawPass/ForwardPass.hpp"
 #include "DrawPass/DeferredPass.hpp"
 #include "DrawPass/OverlayPass.hpp"
 #include "DrawPass/VoxelizationPass.hpp"
@@ -49,3 +48,4 @@ protected:
     bool m_bInitialized{ false };
     std::vector<std::shared_ptr<BaseDrawPass>> m_drawPasses;
 };
+

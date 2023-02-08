@@ -14,10 +14,8 @@
 #define PS_HUD_IMAGE_SOURCE_FILE        "hud/image.frag"
 #define VS_SHADOWMAP_SOURCE_FILE        "shadowmap.vert"
 #define PS_SHADOWMAP_SOURCE_FILE        "shadowmap.frag"
-#define VS_GBUFFER_SOURCE_FILE          "gbuffer.vert"
-#define PS_GBUFFER_SOURCE_FILE          "gbuffer.frag"
-#define VS_SSAO_SOURCE_FILE             "fullscreen.vert"
-#define PS_SSAO_SOURCE_FILE             "ssao.frag"
+#define VS_FORWARD_SOURCE_FILE          "forward.vert"
+#define PS_FORWARD_SOURCE_FILE          "forward.pixel"
 #define VS_DEFFERED_VCT_SOURCE_FILE     "fullscreen.vert"
 #define PS_DEFFERED_VCT_SOURCE_FILE     "vct_deferred.frag"
 #define VS_VOXEL_SOURCE_FILE            "voxel/voxel.vert"
@@ -139,23 +137,9 @@ bool PipelineStateManager::Initialize()
     }
 
     {
-        PipelineStateEx pipelineState{ "GBUFFER" };
-        pipelineState.vertexShaderName = VS_GBUFFER_SOURCE_FILE;
-        pipelineState.pixelShaderName = PS_GBUFFER_SOURCE_FILE;
-        RegisterPipelineState( pipelineState );
-    }
-
-    {
-        PipelineStateEx pipelineState{ "SSAO" };
-        pipelineState.vertexShaderName = VS_SSAO_SOURCE_FILE;
-        pipelineState.pixelShaderName = PS_SSAO_SOURCE_FILE;
-        RegisterPipelineState( pipelineState );
-    }
-
-    {
-        PipelineStateEx pipelineState{ "VCT" };
-        pipelineState.vertexShaderName = VS_DEFFERED_VCT_SOURCE_FILE;
-        pipelineState.pixelShaderName = PS_DEFFERED_VCT_SOURCE_FILE;
+        PipelineStateEx pipelineState{ "FORWARD" };
+        pipelineState.vertexShaderName = VS_FORWARD_SOURCE_FILE;
+        pipelineState.pixelShaderName = PS_FORWARD_SOURCE_FILE;
         RegisterPipelineState( pipelineState );
     }
 
@@ -189,6 +173,7 @@ bool PipelineStateManager::Initialize()
         PipelineStateEx pipelineState{ "OVERLAY" };
         pipelineState.vertexShaderName = VS_HUD_OVERLAY_SOURCE_FILE;
         pipelineState.pixelShaderName = PS_HUD_OVERLAY_SOURCE_FILE;
+        pipelineState.depthTestMode = DEPTH_TEST_MODE::ALWAYS;
         RegisterPipelineState( pipelineState );
     }
 

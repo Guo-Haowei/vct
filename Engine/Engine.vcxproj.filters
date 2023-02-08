@@ -84,7 +84,7 @@
     <ClCompile Include="DrawPass\DeferredPass.cpp">
       <Filter>DrawPass</Filter>
     </ClCompile>
-    <ClCompile Include="DrawPass\GBufferPass.cpp">
+    <ClCompile Include="DrawPass\ForwardPass.cpp">
       <Filter>DrawPass</Filter>
     </ClCompile>
     <ClCompile Include="DrawPass\GuiPass.cpp">
@@ -94,9 +94,6 @@
       <Filter>DrawPass</Filter>
     </ClCompile>
     <ClCompile Include="DrawPass\ShadowMapPass.cpp">
-      <Filter>DrawPass</Filter>
-    </ClCompile>
-    <ClCompile Include="DrawPass\SSAOPass.cpp">
       <Filter>DrawPass</Filter>
     </ClCompile>
     <ClCompile Include="DrawPass\VoxelizationPass.cpp">
@@ -227,7 +224,7 @@
     <ClInclude Include="DrawPass\DeferredPass.hpp">
       <Filter>DrawPass</Filter>
     </ClInclude>
-    <ClInclude Include="DrawPass\GBufferPass.hpp">
+    <ClInclude Include="DrawPass\ForwardPass.hpp">
       <Filter>DrawPass</Filter>
     </ClInclude>
     <ClInclude Include="DrawPass\GuiPass.hpp">
@@ -237,9 +234,6 @@
       <Filter>DrawPass</Filter>
     </ClInclude>
     <ClInclude Include="DrawPass\ShadowMapPass.hpp">
-      <Filter>DrawPass</Filter>
-    </ClInclude>
-    <ClInclude Include="DrawPass\SSAOPass.hpp">
       <Filter>DrawPass</Filter>
     </ClInclude>
     <ClInclude Include="DrawPass\VoxelizationPass.hpp">

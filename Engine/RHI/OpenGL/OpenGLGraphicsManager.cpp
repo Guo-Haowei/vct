@@ -18,7 +18,31 @@
 #include "Manager/SceneManager.hpp"
 
 #include "Graphics/MainRenderer.h"
-static MainRenderer g_renderer;
+OpenGLMeshData g_quad;
+
+// @TODO: refactor
+void R_CreateQuad()
+{
+    // clang-format off
+    float points[] = { -1.0f, +1.0f, -1.0f, -1.0f, +1.0f, +1.0f, +1.0f, +1.0f, -1.0f, -1.0f, +1.0f, -1.0f, };
+    // clang-format on
+    glGenVertexArrays( 1, &g_quad.vao );
+    glGenBuffers( 1, g_quad.vbos );
+    glBindVertexArray( g_quad.vao );
+
+    glBindBuffer( GL_ARRAY_BUFFER, g_quad.vbos[0] );
+    glBufferData( GL_ARRAY_BUFFER, sizeof( points ), points, GL_STATIC_DRAW );
+    glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( float ), 0 );
+    glEnableVertexAttribArray( 0 );
+}
+
+void R_DrawQuad()
+{
+    ASSERT( g_quad.vao );
+    glBindVertexArray( g_quad.vao );
+    glDrawArrays( GL_TRIANGLES, 0, 6 );
+    // glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
+}
 
 static void APIENTRY debug_callback( GLenum, GLenum, unsigned int, GLenum, GLsizei, const char *, const void * );
 
@@ -53,10 +77,8 @@ bool OpenGLGraphicsManager::Initialize()
 
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new ShadowMapPass( this, pipelineStateManager, &g_shadowRT, CLEAR_FLAG_DEPTH ) ) );
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new VoxelizationPass( this, pipelineStateManager, nullptr, CLEAR_FLAG_NONE ) ) );
-    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new GBufferPass( this, pipelineStateManager, &g_gbufferRT, CLEAR_FLAG_COLOR_DPETH ) ) );
-    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new SSAOPass( this, pipelineStateManager, &g_ssaoRT, CLEAR_FLAG_COLOR ) ) );
-    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new DeferredPass( this, pipelineStateManager, &g_finalImageRT, CLEAR_FLAG_COLOR ) ) );
-    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new OverlayPass( this, pipelineStateManager, nullptr, CLEAR_FLAG_COLOR_DPETH ) ) );
+    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new ForwardPass( this, pipelineStateManager, nullptr, CLEAR_FLAG_COLOR_DPETH ) ) );
+    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new OverlayPass( this, pipelineStateManager, nullptr, 0 ) ) );
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new GuiPass( this, pipelineStateManager, nullptr, 0 ) ) );
 
     char version[256];
@@ -81,21 +103,41 @@ bool OpenGLGraphicsManager::Initialize()
 
         // g_shadowRT.Create( NUM_CASCADES * res, res );
         g_shadowRT.Create( res, res );
-        g_gbufferRT.Create( w, h );
-        g_ssaoRT.Create( w, h );
-        g_finalImageRT.Create( w, h );
     }
 
-    g_renderer.createGpuResources();
+    createGpuResources();
 
     InitializeGeometries( Com_GetScene() );
+
+    auto createUBO = []( int slot ) {
+        GLuint handle = 0;
+        glGenBuffers( 1, &handle );
+        glBindBufferBase( GL_UNIFORM_BUFFER, slot, handle );
+        glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+        return handle;
+    };
+    m_uboDrawFrameConstant = createUBO( 0 );
+    m_uboDrawBatchConstant = createUBO( 1 );
 
     return ( m_bInitialized = true );
 }
 
 void OpenGLGraphicsManager::Finalize()
 {
-    g_renderer.destroyGpuResources();
+    for ( auto &it : m_sceneGpuMeshes ) {
+        glDeleteVertexArrays( 1, &it->vao );
+        for ( int i = 0; i < array_length( it->vbos ); ++i ) {
+            if ( it->vbos[i] ) {
+                glDeleteBuffers( 1, &it->vbos[i] );
+            }
+        }
+        if ( it->ebo ) {
+            glDeleteBuffers( 1, &it->ebo );
+        }
+    }
+    m_sceneGpuMeshes.clear();
+
+    destroyGpuResources();
     ImGui_ImplOpenGL3_Shutdown();
 }
 
@@ -190,7 +232,7 @@ void OpenGLGraphicsManager::DrawBatch( const Frame & )
     for ( auto &pDbc : frame.batchContexts ) {
         SetPerBatchConstants( *pDbc );
 
-        const auto &dbc = dynamic_cast<const GLDrawBatchContext &>( *pDbc );
+        const auto &dbc = dynamic_cast<const OpenGLDrawBatchContext &>( *pDbc );
 
         const MaterialData *matData = reinterpret_cast<MaterialData *>( pDbc->pEntity->m_material->gpuResource );
 
@@ -228,17 +270,59 @@ void OpenGLGraphicsManager::SetPerBatchConstants(
     glBindBuffer( GL_UNIFORM_BUFFER, 0 );
 }
 
+static std::shared_ptr<OpenGLMeshData> CreateMeshData( const MeshComponent& mesh )
+{
+    auto ret = std::make_shared<OpenGLMeshData>();
+
+    const bool hasNormals = !mesh.normals.empty();
+    const bool hasUVs = !mesh.uvs.empty();
+    const bool hasTangent = !mesh.tangents.empty();
+    const bool hasBitangent = !mesh.bitangents.empty();
+
+    glGenVertexArrays( 1, &ret->vao );
+    glGenBuffers( 2 + hasNormals + hasUVs + hasTangent + hasBitangent, &ret->ebo );
+    glBindVertexArray( ret->vao );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ret->ebo );
+    gl::BindToSlot( ret->vbos[0], 0, 3 );
+    gl::NamedBufferStorage( ret->vbos[0], mesh.positions );
+    if ( hasNormals ) {
+        gl::BindToSlot( ret->vbos[1], 1, 3 );
+        gl::NamedBufferStorage( ret->vbos[1], mesh.normals );
+    }
+    if ( hasUVs ) {
+        gl::BindToSlot( ret->vbos[2], 2, 2 );
+        gl::NamedBufferStorage( ret->vbos[2], mesh.uvs );
+    }
+    if ( hasTangent ) {
+        gl::BindToSlot( ret->vbos[3], 3, 3 );
+        gl::NamedBufferStorage( ret->vbos[3], mesh.tangents );
+        gl::BindToSlot( ret->vbos[4], 4, 3 );
+        gl::NamedBufferStorage( ret->vbos[4], mesh.bitangents );
+    }
+
+    gl::NamedBufferStorage( ret->ebo, mesh.indices );
+    ret->count = static_cast<uint32_t>( mesh.indices.size() );
+
+    glBindVertexArray( 0 );
+    return ret;
+}
+
 void OpenGLGraphicsManager::InitializeGeometries( const Scene &scene )
 {
+    // create gpu meshes
+    for ( const auto &mesh : scene.m_meshes ) {
+        m_sceneGpuMeshes.emplace_back( CreateMeshData( *mesh.get() ) );
+        mesh->gpuResource = m_sceneGpuMeshes.back().get();
+    }
+
     uint32_t batch_index = 0;
     for ( const auto &entity : scene.m_entities ) {
         if ( !( entity->m_flag & Entity::FLAG_GEOMETRY ) ) {
             continue;
         }
 
-        const MeshData *drawData = reinterpret_cast<MeshData *>( entity->m_mesh->gpuResource );
-
-        auto dbc = std::make_shared<GLDrawBatchContext>();
+        const OpenGLMeshData *drawData = reinterpret_cast<OpenGLMeshData *>( entity->m_mesh->gpuResource );
+        auto dbc = std::make_shared<OpenGLDrawBatchContext>();
         dbc->batchIndex = batch_index++;
         dbc->vao = drawData->vao;
         dbc->mode = GL_TRIANGLES;
@@ -250,16 +334,6 @@ void OpenGLGraphicsManager::InitializeGeometries( const Scene &scene )
 
         m_frame.batchContexts.push_back( dbc );
     }
-
-    auto createUBO = []( int slot ) {
-        GLuint handle = 0;
-        glGenBuffers( 1, &handle );
-        glBindBufferBase( GL_UNIFORM_BUFFER, slot, handle );
-        glBindBuffer( GL_UNIFORM_BUFFER, 0 );
-        return handle;
-    };
-    m_uboDrawFrameConstant = createUBO( 0 );
-    m_uboDrawBatchConstant = createUBO( 1 );
 }
 
 void OpenGLGraphicsManager::BeginFrame( Frame &frame )

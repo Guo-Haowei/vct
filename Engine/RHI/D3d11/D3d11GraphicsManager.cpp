@@ -114,7 +114,7 @@ void D3d11GraphicsManager::DrawBatch( const Frame & )
     //for ( auto &pDbc : frame.batchContexts ) {
     //    SetPerBatchConstants( *pDbc );
 
-    //    const auto &dbc = dynamic_cast<const GLDrawBatchContext &>( *pDbc );
+    //    const auto &dbc = dynamic_cast<const OpenGLDrawBatchContext &>( *pDbc );
 
     //    const MaterialData *matData = reinterpret_cast<MaterialData *>( pDbc->pEntity->m_material->gpuResource );
 
@@ -160,7 +160,7 @@ void D3d11GraphicsManager::InitializeGeometries( const Scene &scene )
 
     //    const MeshData *drawData = reinterpret_cast<MeshData *>( entity->m_mesh->gpuResource );
 
-    //    auto dbc = std::make_shared<GLDrawBatchContext>();
+    //    auto dbc = std::make_shared<OpenGLDrawBatchContext>();
     //    dbc->batchIndex = batch_index++;
     //    dbc->vao = drawData->vao;
     //    dbc->mode = GL_TRIANGLES;

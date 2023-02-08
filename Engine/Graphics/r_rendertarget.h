@@ -33,24 +33,6 @@ public:
     virtual void Create( int width, int height ) override;
 };
 
-class GBuffer : public RenderTarget {
-public:
-    virtual void Create( int width, int height ) override;
-};
-
-class SsaoRT : public RenderTarget {
-public:
-    virtual void Create( int width, int height ) override;
-};
-
-class FinalImageRT : public RenderTarget {
-public:
-    virtual void Create( int width, int height ) override;
-};
-
 extern DepthRenderTarget g_shadowRT;
-extern GBuffer g_gbufferRT;
-extern SsaoRT g_ssaoRT;
-extern FinalImageRT g_finalImageRT;
 
 void R_DestroyRT();

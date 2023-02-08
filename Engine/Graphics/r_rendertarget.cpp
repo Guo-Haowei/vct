@@ -81,15 +81,16 @@ void RenderTarget::CheckError()
     }
 }
 
-// TODO: expose
-enum {
-    POSISION = 0,
-    NORMAL = 1,
-    ALBEDO = 2,
-    FINALIMAGE = 0,
-    SSAO = 0
-};
+DepthRenderTarget g_shadowRT;
 
+void R_DestroyRT()
+{
+    for ( auto& rt : g_rts ) {
+        rt->Destroy();
+    }
+}
+
+#if 0
 void GBuffer::Create( int width, int height )
 {
     RenderTarget::Create( width, height );
@@ -214,14 +215,4 @@ void FinalImageRT::Create( int width, int height )
     Unbind();
 }
 
-DepthRenderTarget g_shadowRT;
-GBuffer g_gbufferRT;
-SsaoRT g_ssaoRT;
-FinalImageRT g_finalImageRT;
-
-void R_DestroyRT()
-{
-    for ( auto& rt : g_rts ) {
-        rt->Destroy();
-    }
-}
+#endif

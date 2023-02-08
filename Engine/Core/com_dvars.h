@@ -27,12 +27,6 @@ DVAR_INT( r_voxelSize, 64 );
 // CSM
 DVAR_INT( r_shadowRes, 1024 );
 
-// SSAO
-DVAR_INT( r_enableSsao, 1 );
-DVAR_INT( r_ssaoKernelSize, 32 );
-DVAR_INT( r_ssaoNoiseSize, 4 );
-DVAR_FLOAT( r_ssaoKernelRadius, 0.5f );
-
 // SSR
 DVAR_INT( r_mirrorFloor, 0 );  // for testing reflection
 

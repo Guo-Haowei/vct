@@ -27,12 +27,6 @@ static void DrawDebugWindow()
         ImGui::Checkbox( "Default mesh", (bool*)( Dvar_GetPtr( r_noTexture ) ) );
         ImGui::Separator();
 
-        ImGui::Text( "SSAO" );
-        ImGui::Checkbox( "Enable SSAO", (bool*)( Dvar_GetPtr( r_enableSsao ) ) );
-        ImGui::Text( "SSAO Kernal Radius" );
-        ImGui::SliderFloat( "Kernal Radius", (float*)( Dvar_GetPtr( r_ssaoKernelRadius ) ), 0.1f, 5.0f );
-        ImGui::Separator();
-
         ImGui::Separator();
         ImGui::Text( "Light" );
         float* lightDir = (float*)Dvar_GetPtr( light_dir );

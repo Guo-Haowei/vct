@@ -1,8 +1,12 @@
-#include "cbuffer.glsl"
-
 layout( location = 0 ) out vec4 out_color;
-layout( location = 0 ) in vec2 pass_uv;
 
+in struct PS_INPUT {
+    vec3 position;
+    vec2 uv;
+    mat3 TBN;
+} ps_in;
+
+#include "cbuffer.glsl"
 #include "common.glsl"
 #include "pbr.glsl"
 #include "shadow.glsl"
@@ -90,30 +94,51 @@ vec3 indirectSpecular( vec3 position, vec3 direction, float roughness )
 
 void main()
 {
-    const vec2 uv = pass_uv;
-    float depth = texture( GbufferDepthMap, uv ).r;
+    // setup
+    vec4 albedo = AlbedoColor;
 
-    if ( depth > 0.999 )
+    if ( HasAlbedoMap != 0 )
+    {
+        albedo = texture( AlbedoMaps[TextureMapIdx], ps_in.uv );
+    }
+    if ( albedo.a < 0.001 )
+    {
         discard;
+    }
 
-    gl_FragDepth = depth;
+    float metallic  = Metallic;
+    float roughness = Roughness;
+    if ( HasPbrMap != 0 )
+    {
+        // g roughness, b metallic
+        vec3 mr   = texture( PbrMaps[TextureMapIdx], ps_in.uv ).rgb;
+        metallic  = mr.b;
+        roughness = mr.g;
+    }
 
-    const vec4 normal_roughness = texture( GbufferNormalRoughnessMap, uv );
-    const vec4 position_metallic = texture( GbufferPositionMetallicMap, uv );
-    const vec4 worldPos = vec4( position_metallic.xyz, 1.0 );
-    float roughness = normal_roughness.w;
-    float metallic = position_metallic.w;
+    // TODO: get rid of branching
+    vec3 N;
+    if ( HasNormalMap != 0 )
+    {
+        N = normalize( ps_in.TBN * ( 2.0 * texture( NormalMaps[TextureMapIdx], ps_in.uv ).xyz - 1.0 ) );
+    }
+    else
+    {
+        N = ps_in.TBN[2];
+    }
 
-    vec4 albedo = texture( GbufferAlbedoMap, uv );
-    vec3 F0 = mix( vec3( 0.04 ), albedo.rgb, metallic );
-    vec3 Lo = vec3( 0.0 );
+    /// shading
 
     if ( NoTexture != 0 ) {
         albedo.rgb = vec3( 0.6 );
     }
 
-    const vec3 N = normal_roughness.xyz;
+    vec3 F0 = mix( vec3( 0.04 ), albedo.rgb, metallic );
+    vec3 Lo = vec3( 0.0 );
+
+    const vec4 worldPos = vec4(ps_in.position, 1.0);
     const vec3 L = SunDir;
+
     const vec3 V = normalize( CamPos - worldPos.xyz );
     const vec3 H = normalize( V + L );
 
@@ -146,7 +171,8 @@ void main()
 
     Lo += ( 1.0 - shadow ) * directLight;
 
-    const float ao = EnableSSAO == 0 ? 1.0 : texture( SSAOMap, uv ).r;
+    const float ao = 1.0;
+    // EnableSSAO == 0 ? 1.0 : texture( SSAOMap, uv ).r;
 
     if ( EnableGI == 1 )
     // indirect light

@@ -1,15 +1,10 @@
-#include "SSAOPass.hpp"
+#include "ForwardPass.hpp"
 
 #include "Interface/IApplication.hpp"
 
-// @TODO: remove
-extern void R_DrawQuad();
-
-void SSAOPass::Draw( Frame& frame )
+void ForwardPass::Draw( Frame& frame )
 {
-    unused( frame );
-
-    auto PSO = m_pPipelineStateManager->GetPipelineState( "SSAO" );
+    auto PSO = m_pPipelineStateManager->GetPipelineState( "FORWARD" );
     m_pGraphicsManager->SetPipelineState( PSO );
 
     auto pApp = m_pPipelineStateManager->GetAppPointer();
@@ -17,5 +12,5 @@ void SSAOPass::Draw( Frame& frame )
     pApp->GetFramebufferSize( width, height );
     glViewport( 0, 0, width, height );
 
-    R_DrawQuad();
+    m_pGraphicsManager->DrawBatch( frame );
 }

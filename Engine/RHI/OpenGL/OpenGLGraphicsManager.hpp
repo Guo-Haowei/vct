@@ -1,6 +1,13 @@
 #pragma once
 #include "Manager/GraphicsManager.hpp"
 
+struct OpenGLMeshData {
+    uint32_t vao{ 0 };
+    uint32_t ebo{ 0 };
+    uint32_t vbos[5]{ 0 };
+    uint32_t count{ 0 };
+};
+
 class OpenGLGraphicsManager : public GraphicsManager {
 public:
     virtual bool Initialize() override;
@@ -22,7 +29,7 @@ protected:
     void SetPerBatchConstants( const DrawBatchContext& context );
 
     // @TODO: rename this to OpenGLDrawBatchContext
-    struct GLDrawBatchContext : public DrawBatchContext {
+    struct OpenGLDrawBatchContext : public DrawBatchContext {
         uint32_t vao{ 0 };
         uint32_t mode{ 0 };
         uint32_t type{ 0 };
@@ -31,4 +38,8 @@ protected:
 
     uint32_t m_uboDrawFrameConstant{ 0 };
     uint32_t m_uboDrawBatchConstant{ 0 };
+
+    std::vector<std::shared_ptr<OpenGLMeshData>> m_sceneGpuMeshes;
 };
+
+extern OpenGLMeshData g_quad;

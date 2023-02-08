@@ -107,10 +107,4 @@ void GraphicsManager::UpdateConstants()
     frameConstats.NoTexture = Dvar_GetBool( r_noTexture );
     frameConstats.ScreenWidth = w;
     frameConstats.ScreenHeight = h;
-
-    // SSAO
-    frameConstats.SSAOKernelSize = Dvar_GetInt( r_ssaoKernelSize );
-    frameConstats.SSAOKernelRadius = Dvar_GetFloat( r_ssaoKernelRadius );
-    frameConstats.SSAONoiseSize = Dvar_GetInt( r_ssaoNoiseSize );
-    frameConstats.EnableSSAO = Dvar_GetBool( r_enableSsao );
 }

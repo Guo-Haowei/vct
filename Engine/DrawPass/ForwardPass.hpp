@@ -1,7 +1,7 @@
 #pragma once
 #include "BaseDrawPass.hpp"
 
-class GBufferPass : public BaseDrawPass {
+class ForwardPass : public BaseDrawPass {
 public:
     using BaseDrawPass::BaseDrawPass;
 

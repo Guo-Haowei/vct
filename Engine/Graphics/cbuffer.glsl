@@ -77,14 +77,10 @@ CBUFFER( PerFrameConstants, 0 )
     int ScreenWidth;
     int ScreenHeight;
 
-    int SSAOKernelSize;
-    float SSAOKernelRadius;
-    int SSAONoiseSize;
     float TexelSize;
-
-    vec2 padding0;
-    int EnableSSAO;
-    int EnableFXAA;
+    int _dummy12;
+    int _dummy13;
+    int _dummy14;
 };
 
 CBUFFER( PerBatchConstants, 1 )
@@ -110,7 +106,7 @@ layout( std140, binding = 2 ) uniform MaterialCB
     int _padint0;
 };
 
-#define NUM_OVERLAYS 8
+#define NUM_OVERLAYS 4
 
 #ifdef __cplusplus
 using sampler2D = uint64_t;
@@ -134,10 +130,10 @@ layout( std140, binding = 3 ) uniform ConstantCB
     sampler2D GbufferPositionMetallicMap;
     sampler2D GbufferNormalRoughnessMap;
     sampler2D GbufferDepthMap;
-    sampler2D SSAOMap;
-    sampler2D NoiseMap;
-    sampler2D FinalImage;
-    sampler2D FXAA;
+    sampler2D pad31;
+    sampler2D pad32;
+    sampler2D pad34;
+    sampler2D pad33;
     Sampler2DArray AlbedoMaps[MAX_MATERIALS];
     Sampler2DArray NormalMaps[MAX_MATERIALS];
     Sampler2DArray PbrMaps[MAX_MATERIALS];
