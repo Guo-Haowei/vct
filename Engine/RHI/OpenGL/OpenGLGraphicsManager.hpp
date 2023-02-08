@@ -28,7 +28,8 @@ protected:
     void SetPerFrameConstants( const DrawFrameContext& context );
     void SetPerBatchConstants( const DrawBatchContext& context );
 
-    // @TODO: rename this to OpenGLDrawBatchContext
+    bool SetShaderParameter( const char* param_name, const int32_t value );
+
     struct OpenGLDrawBatchContext : public DrawBatchContext {
         uint32_t vao{ 0 };
         uint32_t mode{ 0 };
@@ -39,7 +40,9 @@ protected:
     uint32_t m_uboDrawFrameConstant{ 0 };
     uint32_t m_uboDrawBatchConstant{ 0 };
 
-    std::vector<std::shared_ptr<OpenGLMeshData>> m_sceneGpuMeshes;
+    uint32_t m_currentShader;
+    std::vector<std::shared_ptr<OpenGLMeshData>> m_sceneMeshData;
+    std::vector<std::shared_ptr<MaterialTextures>> m_sceneTextures;
 };
 
 extern OpenGLMeshData g_quad;

@@ -1,7 +1,7 @@
 layout( rgba16f, binding = 0 ) uniform image3D u_albedo_texture;
 layout( rgba16f, binding = 1 ) uniform image3D u_normal_texture;
 
-#include "cbuffer.glsl"
+#include "cbuffer.shader.hpp"
 
 in vec3 pass_position;
 in vec3 pass_normal;
@@ -14,19 +14,19 @@ in vec4 pass_light_space_position;
 
 void main()
 {
-    vec4 albedo = AlbedoColor;
-    if ( HasAlbedoMap != 0 ) {
-        albedo = texture( AlbedoMaps[TextureMapIdx], pass_uv );
-    }
+    vec4 sampledAlbedo = texture( UniformAlbedoMap, pass_uv );
+    vec4 albedo = mix( AlbedoColor, sampledAlbedo, HasAlbedoMap );
+
     if ( albedo.a < 0.001 ) {
         discard;
     }
 
     float metallic = Metallic;
     float roughness = Roughness;
-    if ( HasPbrMap != 0 ) {
+
+    if ( HasPbrMap > 0.5 ) {
         // g roughness, b metallic
-        vec3 mr = texture( PbrMaps[TextureMapIdx], pass_uv ).rgb;
+        vec3 mr = texture( UniformPBRMap, pass_uv ).rgb;
         metallic = mr.b;
         roughness = mr.g;
     }

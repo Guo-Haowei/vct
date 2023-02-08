@@ -9,6 +9,8 @@
 #include "Base/Logger.h"
 #include "Core/GeomMath.hpp"
 
+#include "cbuffer.shader.hpp"
+
 static constexpr int kMaxShaderName = 128;
 
 struct MaterialData {

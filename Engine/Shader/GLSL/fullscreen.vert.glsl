@@ -1,7 +1,7 @@
 layout( location = 0 ) in vec2 in_position;
 layout( location = 0 ) out vec2 pass_uv;
 
-#include "cbuffer.glsl"
+#include "cbuffer.shader.hpp"
 
 void main()
 {

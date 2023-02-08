@@ -13,7 +13,7 @@ public:
 
 private:
     MeshComponent* processMesh( const aiMesh* aimesh );
-    Material* processMaterial( const aiMaterial* aimaterial );
+    MaterialComponent* processMaterial( const aiMaterial* aimaterial );
 
 private:
     std::string m_currentPath;

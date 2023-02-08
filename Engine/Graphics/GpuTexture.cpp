@@ -72,7 +72,6 @@ void GpuTexture::createTextureFromImage( const Image& image )
     const uint8_t* pixels = image.m_pPixels;
     ASSERT( pixels );
 
-
     glGenTextures( 1, &mHandle );
     glBindTexture( m_type, mHandle );
     glTexParameteri( m_type, GL_TEXTURE_WRAP_S, GL_REPEAT );
@@ -82,6 +81,8 @@ void GpuTexture::createTextureFromImage( const Image& image )
 
     GLenum format = GL_RGBA;
     switch ( image.m_pixelFormat ) {
+        case PIXEL_FORMAT::RGBA8:
+            break;
         case PIXEL_FORMAT::RGB8:
             format = GL_RGB;
             break;

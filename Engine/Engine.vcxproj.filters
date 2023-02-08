@@ -248,9 +248,6 @@
     <ClInclude Include="Base\Logger.h">
       <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\cbuffer.glsl">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Manager\BaseApplication.hpp">
       <Filter>Manager</Filter>
     </ClInclude>
@@ -328,6 +325,9 @@
     </ClInclude>
     <ClInclude Include="Core\stb_image.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\cbuffer.shader.hpp">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

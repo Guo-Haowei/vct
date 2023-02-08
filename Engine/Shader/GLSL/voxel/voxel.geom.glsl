@@ -6,7 +6,7 @@ in vec3 pass_normals[];
 in vec2 pass_uvs[];
 in vec4 pass_light_space_positions0[];
 
-#include "cbuffer.glsl"
+#include "cbuffer.shader.hpp"
 
 out vec3 pass_position;
 out vec3 pass_normal;
