@@ -2,8 +2,9 @@
 #include "Manager/GraphicsManager.hpp"
 
 #include <dxgi.h>
+#include <d3d11.h>
 
-#include "D3dCommon.hpp"
+#include "RHI/D3dCommon.hpp"
 
 struct ImmediateRenderTarget {
     ID3D11RenderTargetView* rtv;

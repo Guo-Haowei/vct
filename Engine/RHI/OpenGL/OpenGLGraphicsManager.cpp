@@ -6,6 +6,7 @@
 #include "imgui_impl_opengl3.h"
 
 #include "Base/Asserts.h"
+#include "Base/StringUtils.hpp"
 
 #include "Core/com_dvars.h"
 #include "Core/GlfwApplication.hpp"
@@ -58,8 +59,8 @@ bool OpenGLGraphicsManager::Initialize()
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new OverlayPass( this, pipelineStateManager, nullptr, CLEAR_FLAG_COLOR_DPETH ) ) );
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new GuiPass( this, pipelineStateManager, nullptr, 0 ) ) );
 
-    char version[256] = { 0 };
-    snprintf( version, sizeof( version ), "#version %d%d0 core", OPENGL_DEFAULT_VERSION_MAJOR, OPENGL_DEFAULT_VERSION_MINOR );
+    char version[256];
+    Sprintf( version, "#version %d%d0 core", OPENGL_DEFAULT_VERSION_MAJOR, OPENGL_DEFAULT_VERSION_MINOR );
     if ( !ImGui_ImplOpenGL3_Init( version ) ) {
         LOG_FATAL( "OpenGLGraphicsManager::Initialize: ImGui_ImplOpenGL3_Init(\"%s\") failed!", version );
         return false;

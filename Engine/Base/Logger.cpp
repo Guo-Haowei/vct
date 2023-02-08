@@ -2,9 +2,9 @@
 
 #include <Windows.h>
 
-#include <cstdarg>
-#include <cstdio>
 #include <ctime>
+
+#include "StringUtils.hpp"
 
 #define ENDPOINT stdout
 
@@ -52,7 +52,7 @@ void Log( Level level, const char* fmt, ... )
     strftime( timebuf, sizeof( timebuf ), "[%H:%M:%S]", timeinfo );
 
     char buffer2[2048];
-    snprintf( buffer2, sizeof( buffer2 ), "%s %s%s\n", timebuf, tag, buffer1 );
+    Sprintf( buffer2, "%s %s%s\n", timebuf, tag, buffer1 );
 
     WORD style = DEFAULT_STYLE;
     switch ( level ) {

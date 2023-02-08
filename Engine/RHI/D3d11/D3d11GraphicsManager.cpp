@@ -1,5 +1,7 @@
 #include "D3d11GraphicsManager.hpp"
 
+#include <d3d11.h>
+
 #include "D3d11PipelineStateManager.hpp"
 
 #include "Base/Asserts.h"
@@ -16,19 +18,6 @@
 
 #include "Manager/BaseApplication.hpp"
 #include "Manager/SceneManager.hpp"
-
-class DummyPass : public BaseDrawPass {
-public:
-    using BaseDrawPass::BaseDrawPass;
-
-    virtual void BeginPass( Frame & ) override {}
-
-    virtual void Draw( Frame & ) override
-    {
-    }
-
-    virtual void EndPass( Frame & ) override {}
-};
 
 static ID3D11Buffer *vertex_buffer_ptr = NULL;
 
@@ -57,7 +46,6 @@ bool D3d11GraphicsManager::Initialize()
     }
 
     auto pipelineStateManager = dynamic_cast<BaseApplication *>( m_pApp )->GetPipelineStateManager();
-    m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new DummyPass( this, pipelineStateManager, nullptr, 0 ) ) );
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new GuiPass( this, pipelineStateManager, nullptr, 0 ) ) );
 
     // @TODO: temp
@@ -92,7 +80,7 @@ void D3d11GraphicsManager::Finalize()
 void D3d11GraphicsManager::ResizeCanvas( int new_width, int new_height )
 {
     DestroyRenderTarget();
-    m_pSwapChain->ResizeBuffers( 0, new_width, new_height, DXGI_FORMAT_UNKNOWN, 0 );
+    DX_CALL( m_pSwapChain->ResizeBuffers( 0, new_width, new_height, DXGI_FORMAT_UNKNOWN, 0 ) );
     CreateRenderTarget();
 }
 

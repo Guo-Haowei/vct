@@ -15,7 +15,9 @@
 #include "Engine/RHI/D3d11/D3d11GraphicsManager.hpp"
 #include "Engine/RHI/D3d11/D3d11PipelineStateManager.hpp"
 
-#define USE_DX11
+// #define _USE_OPENGL
+#define _USE_DX11
+// #define _USE_DX12
 #include "Engine/RHI/ConfigBackend.hpp"
 
 #include "imgui/imgui.h"
@@ -24,8 +26,7 @@
 
 int main( int argc, const char** argv )
 {
-    const GfxBackend backend = USING( DX11_PROGRAM ) ? GfxBackend::D3d11 : GfxBackend::OpenGL;
-    Configuration config( backend, "Editor", 800, 600 );
+    Configuration config( DEFAULT_GFX_BACKEND, "Editor", 800, 600 );
     GlfwApplication app( config );
 
     AssetLoader assetLoader;

@@ -1,7 +1,8 @@
 #pragma once
-#include "Manager/PipelineStateManager.hpp"
+#include <d3d11.h>
 
-#include "D3dCommon.hpp"
+#include "Manager/PipelineStateManager.hpp"
+#include "RHI/D3dCommon.hpp"
 
 struct D3d11PipelineState : public PipelineState {
     D3d11PipelineState( PipelineState& rhs )

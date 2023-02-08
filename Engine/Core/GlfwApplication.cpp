@@ -7,6 +7,7 @@
 
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
+#include "Base/StringUtils.hpp"
 
 void GlfwApplication::Finalize()
 {
@@ -29,14 +30,14 @@ void GlfwApplication::Tick()
     glfwGetFramebufferSize( m_pGlfwWindow, &m_config.m_width, &m_config.m_height );
     ASSERT( m_config.m_width > 0 && m_config.m_height > 0 );
 
-    char buffer[1024]{ 0 };
-    snprintf( buffer, sizeof( buffer ),
-              "%s | %s | Size: %d x %d | FSP: %.2f",
-              m_config.m_appName,
-              GfxBackendToString( m_config.m_gfxBackend ),
-              m_config.m_width,
-              m_config.m_height,
-              ImGui::GetIO().Framerate );
+    char buffer[1024];
+    Sprintf( buffer,
+             "%s | %s | Size: %d x %d | FSP: %.2f",
+             m_config.m_appName,
+             GfxBackendToString( m_config.m_gfxBackend ),
+             m_config.m_width,
+             m_config.m_height,
+             ImGui::GetIO().Framerate );
     glfwSetWindowTitle( m_pGlfwWindow, buffer );
 
     BaseApplication::Tick();

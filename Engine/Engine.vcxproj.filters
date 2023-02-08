@@ -31,6 +31,9 @@
     <Filter Include="RHI\D3d11">
       <UniqueIdentifier>{1e1c8820-c031-4e7c-be98-d573d1254d9c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RHI\D3d12">
+      <UniqueIdentifier>{0efd67e9-7bba-47c3-8a43-48761c9e3d96}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\AssimpLoader.cpp">
@@ -126,9 +129,6 @@
     <ClCompile Include="RHI\D3d11\D3d11PipelineStateManager.cpp">
       <Filter>RHI\D3d11</Filter>
     </ClCompile>
-    <ClCompile Include="RHI\D3d11\D3dCommon.cpp">
-      <Filter>RHI\D3d11</Filter>
-    </ClCompile>
     <ClCompile Include="RHI\D3d11\imgui_impl_dx11.cpp">
       <Filter>RHI\D3d11</Filter>
     </ClCompile>
@@ -140,6 +140,18 @@
     </ClCompile>
     <ClCompile Include="RHI\OpenGL\OpenGLPipelineStateManager.cpp">
       <Filter>RHI\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\D3dCommon.cpp">
+      <Filter>RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\D3d12\D3d12GraphicsManager.cpp">
+      <Filter>RHI\D3d12</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\D3d12\D3d12PipelineStateManager.cpp">
+      <Filter>RHI\D3d12</Filter>
+    </ClCompile>
+    <ClCompile Include="RHI\D3d12\imgui_impl_dx12.cpp">
+      <Filter>RHI\D3d12</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -284,9 +296,6 @@
     <ClInclude Include="RHI\D3d11\D3d11PipelineStateManager.hpp">
       <Filter>RHI\D3d11</Filter>
     </ClInclude>
-    <ClInclude Include="RHI\D3d11\D3dCommon.hpp">
-      <Filter>RHI\D3d11</Filter>
-    </ClInclude>
     <ClInclude Include="RHI\D3d11\imgui_impl_dx11.h">
       <Filter>RHI\D3d11</Filter>
     </ClInclude>
@@ -304,6 +313,21 @@
     </ClInclude>
     <ClInclude Include="RHI\ConfigBackend.hpp">
       <Filter>RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\StringUtils.hpp">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\D3dCommon.hpp">
+      <Filter>RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\D3d12\D3d12GraphicsManager.hpp">
+      <Filter>RHI\D3d12</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\D3d12\D3d12PipelineStateManager.hpp">
+      <Filter>RHI\D3d12</Filter>
+    </ClInclude>
+    <ClInclude Include="RHI\D3d12\imgui_impl_dx12.h">
+      <Filter>RHI\D3d12</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
