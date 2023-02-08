@@ -3,7 +3,7 @@ layout( location = 1 ) in vec3 in_normal;
 
 layout( location = 0 ) out vec4 pass_color;
 
-#include "cbuffer.glsl"
+#include "cbuffer.shader.hpp"
 
 layout( rgba16f, binding = 0 ) uniform image3D u_albedo_texture;
 layout( rgba16f, binding = 1 ) uniform image3D u_normal_texture;

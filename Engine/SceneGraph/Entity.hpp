@@ -29,21 +29,15 @@ struct MeshComponent {
     mutable void* gpuResource = nullptr;
 };
 
-struct Material {
+struct MaterialComponent {
     /// only support albedo color for now
     std::string albedoTexture;
     std::string metallicRoughnessTexture;
     std::string normalTexture;
-    vec3 albedo{ 0 };
-    float metallic = 0.0f;
-    float roughness = 1.0f;
-    float reflectPower = 0.0f;
-
-    Material() = default;
-    Material( const vec3& albedo, float metallic, float roughness )
-        : albedo( albedo ), metallic( metallic ), roughness( roughness )
-    {
-    }
+    vec4 albedoColor{ 1 };
+    float metallic{ 0.0f };
+    float roughness{ 1.0f };
+    float reflectPower{ 0.0f };
 
     mutable void* gpuResource = nullptr;
 };
@@ -74,7 +68,7 @@ public:
     std::list<Entity*> m_children;
     Entity* m_pParent{ nullptr };
     MeshComponent* m_mesh{ nullptr };
-    Material* m_material{ nullptr };
+    MaterialComponent* m_material{ nullptr };
 
     friend class Scene;
 };

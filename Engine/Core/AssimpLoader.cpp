@@ -53,8 +53,8 @@ void AssimpLoader::loadGltf( const char* path, Scene& scene, bool flipUVs )
     size_t materialOffset = scene.m_materials.size();
     for ( uint32_t i = 0; i < numMaterials; ++i ) {
         const aiMaterial* aimat = aiscene->mMaterials[i];
-        Material* mat = processMaterial( aimat );
-        scene.m_materials.emplace_back( std::shared_ptr<Material>( mat ) );
+        MaterialComponent* mat = processMaterial( aimat );
+        scene.m_materials.emplace_back( std::shared_ptr<MaterialComponent>( mat ) );
     }
 
     for ( uint32_t i = 0; i < numMeshes; ++i ) {
@@ -100,9 +100,9 @@ void AssimpLoader::loadGltf( const char* path, Scene& scene, bool flipUVs )
     }
 }
 
-Material* AssimpLoader::processMaterial( const aiMaterial* aimaterial )
+MaterialComponent* AssimpLoader::processMaterial( const aiMaterial* aimaterial )
 {
-    Material* mat = new Material;
+    MaterialComponent* mat = new MaterialComponent;
 
     /// albedo
     {

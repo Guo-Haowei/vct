@@ -71,8 +71,18 @@ void GraphicsManager::UpdateConstants()
 {
     const Scene& scene = Com_GetScene();
 
-    for ( auto& pDbc : m_frame.batchContexts ) {
-        pDbc->pEntity->GetCalculatedTransform( pDbc->Model );
+    for ( auto& dbc : m_frame.batchContexts ) {
+        const Entity* entity = dbc->pEntity;
+        entity->GetCalculatedTransform( dbc->Model );
+        const MaterialComponent* mat = entity->m_material;
+        const MaterialTextures* textures = reinterpret_cast<const MaterialTextures*>( mat->gpuResource );
+        dbc->AlbedoColor = mat->albedoColor;
+        dbc->Metallic = mat->metallic;
+        dbc->Roughness = mat->roughness;
+        dbc->HasAlbedoMap = textures->albedoMap.handle ? 1.0f : 0.0f;
+        dbc->HasNormalMap = textures->normalMap.handle ? 1.0f : 0.0f;
+        dbc->HasPbrMap = textures->pbrMap.handle ? 1.0f : 0.0f;
+        dbc->ReflectPower = mat->reflectPower;
     }
 
     PerFrameConstants& frameConstats = m_frame.frameContexts;

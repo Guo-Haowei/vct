@@ -116,6 +116,7 @@ bool OpenGLGraphicsManager::Initialize()
         glBindBuffer( GL_UNIFORM_BUFFER, 0 );
         return handle;
     };
+
     m_uboDrawFrameConstant = createUBO( 0 );
     m_uboDrawBatchConstant = createUBO( 1 );
 
@@ -124,7 +125,8 @@ bool OpenGLGraphicsManager::Initialize()
 
 void OpenGLGraphicsManager::Finalize()
 {
-    for ( auto &it : m_sceneGpuMeshes ) {
+    // @TODO: move to scene
+    for ( auto &it : m_sceneMeshData ) {
         glDeleteVertexArrays( 1, &it->vao );
         for ( int i = 0; i < array_length( it->vbos ); ++i ) {
             if ( it->vbos[i] ) {
@@ -135,7 +137,13 @@ void OpenGLGraphicsManager::Finalize()
             glDeleteBuffers( 1, &it->ebo );
         }
     }
-    m_sceneGpuMeshes.clear();
+    m_sceneMeshData.clear();
+
+    for ( auto &it : m_sceneTextures ) {
+        GLuint textures[]{ (GLuint)it->albedoMap.handle, (GLuint)it->normalMap.handle, (GLuint)it->pbrMap.handle };
+        glDeleteTextures( array_length( textures ), textures );
+    }
+    m_sceneTextures.clear();
 
     destroyGpuResources();
     ImGui_ImplOpenGL3_Shutdown();
@@ -144,8 +152,7 @@ void OpenGLGraphicsManager::Finalize()
 void OpenGLGraphicsManager::SetPipelineState( const std::shared_ptr<PipelineState> &pipeline_state )
 {
     const OpenGLPipelineState *pPipelineState = dynamic_cast<const OpenGLPipelineState *>( pipeline_state.get() );
-
-    // m_CurrentShader = pPipelineState->shaderProgram;
+    m_currentShader = pPipelineState->shaderProgram;
 
     // Set the color shader as the current shader program and set the matrices
     // that it will use for rendering.
@@ -209,35 +216,30 @@ void OpenGLGraphicsManager::SetPipelineState( const std::shared_ptr<PipelineStat
     }
 }
 
-// @TODO: remove
-#include "Graphics/r_cbuffers.h"
-
-static void FillMaterialCB( const MaterialData *mat, MaterialCB &cb )
-{
-    cb.AlbedoColor = mat->albedoColor;
-    cb.Metallic = mat->metallic;
-    cb.Roughness = mat->roughness;
-    cb.HasAlbedoMap = mat->albedoMap.GetHandle() != 0;
-    cb.HasNormalMap = mat->materialMap.GetHandle() != 0;
-    cb.HasPbrMap = mat->materialMap.GetHandle() != 0;
-    cb.TextureMapIdx = mat->textureMapIdx;
-    cb.ReflectPower = mat->reflectPower;
-}
-
-// HACK:
 void OpenGLGraphicsManager::DrawBatch( const Frame & )
 {
-    // @TODO: culling
     const Frame &frame = m_frame;
-    for ( auto &pDbc : frame.batchContexts ) {
-        SetPerBatchConstants( *pDbc );
+    for ( auto &it : frame.batchContexts ) {
+        const auto &dbc = dynamic_cast<const OpenGLDrawBatchContext &>( *it );
+        SetPerBatchConstants( dbc );
 
-        const auto &dbc = dynamic_cast<const OpenGLDrawBatchContext &>( *pDbc );
+        const Entity &entity = *dbc.pEntity;
+        const MaterialTextures &textures = *reinterpret_cast<const MaterialTextures *>( entity.m_material->gpuResource );
 
-        const MaterialData *matData = reinterpret_cast<MaterialData *>( pDbc->pEntity->m_material->gpuResource );
+        int textureOffset = 5;
+        SetShaderParameter( "UniformAlbedoMap", textureOffset );
+        glActiveTexture( GL_TEXTURE0 + textureOffset );
+        glBindTexture( GL_TEXTURE_2D, (GLuint)textures.albedoMap.handle );
 
-        FillMaterialCB( matData, g_materialCache.cache );
-        g_materialCache.Update();
+        ++textureOffset;
+        SetShaderParameter( "UniformNormalMap", textureOffset );
+        glActiveTexture( GL_TEXTURE0 + textureOffset );
+        glBindTexture( GL_TEXTURE_2D, (GLuint)textures.normalMap.handle );
+
+        ++textureOffset;
+        SetShaderParameter( "UniformPBRMap", textureOffset );
+        glActiveTexture( GL_TEXTURE0 + textureOffset );
+        glBindTexture( GL_TEXTURE_2D, (GLuint)textures.pbrMap.handle );
 
         glBindVertexArray( dbc.vao );
         glDrawElements( dbc.mode, dbc.count, dbc.type, nullptr );
@@ -270,49 +272,110 @@ void OpenGLGraphicsManager::SetPerBatchConstants(
     glBindBuffer( GL_UNIFORM_BUFFER, 0 );
 }
 
-static std::shared_ptr<OpenGLMeshData> CreateMeshData( const MeshComponent& mesh )
-{
-    auto ret = std::make_shared<OpenGLMeshData>();
-
-    const bool hasNormals = !mesh.normals.empty();
-    const bool hasUVs = !mesh.uvs.empty();
-    const bool hasTangent = !mesh.tangents.empty();
-    const bool hasBitangent = !mesh.bitangents.empty();
-
-    glGenVertexArrays( 1, &ret->vao );
-    glGenBuffers( 2 + hasNormals + hasUVs + hasTangent + hasBitangent, &ret->ebo );
-    glBindVertexArray( ret->vao );
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ret->ebo );
-    gl::BindToSlot( ret->vbos[0], 0, 3 );
-    gl::NamedBufferStorage( ret->vbos[0], mesh.positions );
-    if ( hasNormals ) {
-        gl::BindToSlot( ret->vbos[1], 1, 3 );
-        gl::NamedBufferStorage( ret->vbos[1], mesh.normals );
-    }
-    if ( hasUVs ) {
-        gl::BindToSlot( ret->vbos[2], 2, 2 );
-        gl::NamedBufferStorage( ret->vbos[2], mesh.uvs );
-    }
-    if ( hasTangent ) {
-        gl::BindToSlot( ret->vbos[3], 3, 3 );
-        gl::NamedBufferStorage( ret->vbos[3], mesh.tangents );
-        gl::BindToSlot( ret->vbos[4], 4, 3 );
-        gl::NamedBufferStorage( ret->vbos[4], mesh.bitangents );
-    }
-
-    gl::NamedBufferStorage( ret->ebo, mesh.indices );
-    ret->count = static_cast<uint32_t>( mesh.indices.size() );
-
-    glBindVertexArray( 0 );
-    return ret;
-}
-
 void OpenGLGraphicsManager::InitializeGeometries( const Scene &scene )
 {
-    // create gpu meshes
+    auto createMeshData = []( const std::shared_ptr<MeshComponent> &mesh ) {
+        auto ret = std::make_shared<OpenGLMeshData>();
+
+        const bool hasNormals = !mesh->normals.empty();
+        const bool hasUVs = !mesh->uvs.empty();
+        const bool hasTangent = !mesh->tangents.empty();
+        const bool hasBitangent = !mesh->bitangents.empty();
+
+        glGenVertexArrays( 1, &ret->vao );
+        glGenBuffers( 2 + hasNormals + hasUVs + hasTangent + hasBitangent, &ret->ebo );
+        glBindVertexArray( ret->vao );
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ret->ebo );
+        gl::BindToSlot( ret->vbos[0], 0, 3 );
+        gl::NamedBufferStorage( ret->vbos[0], mesh->positions );
+        if ( hasNormals ) {
+            gl::BindToSlot( ret->vbos[1], 1, 3 );
+            gl::NamedBufferStorage( ret->vbos[1], mesh->normals );
+        }
+        if ( hasUVs ) {
+            gl::BindToSlot( ret->vbos[2], 2, 2 );
+            gl::NamedBufferStorage( ret->vbos[2], mesh->uvs );
+        }
+        if ( hasTangent ) {
+            gl::BindToSlot( ret->vbos[3], 3, 3 );
+            gl::NamedBufferStorage( ret->vbos[3], mesh->tangents );
+            gl::BindToSlot( ret->vbos[4], 4, 3 );
+            gl::NamedBufferStorage( ret->vbos[4], mesh->bitangents );
+        }
+
+        gl::NamedBufferStorage( ret->ebo, mesh->indices );
+        ret->count = static_cast<uint32_t>( mesh->indices.size() );
+
+        glBindVertexArray( 0 );
+        return ret;
+    };
+
+    auto createMaterialTextures = []( const std::shared_ptr<MaterialComponent> &material ) {
+        Scene &scene = Com_GetScene();
+        auto ret = std::make_shared<MaterialTextures>();
+
+        auto uploadTexture = []( const std::shared_ptr<Image> &image ) {
+            ASSERT( image->m_pPixels );
+
+            GLenum format = GL_RGBA;
+            switch ( image->m_pixelFormat ) {
+                case PIXEL_FORMAT::RGBA8:
+                    break;
+                case PIXEL_FORMAT::RGB8:
+                    format = GL_RGB;
+                    break;
+                default:
+                    LOG_WARN( "Unsupported format %d", (int)image->m_pixelFormat );
+                    break;
+            }
+
+            GLuint textureHandle = 0;
+            glGenTextures( 1, &textureHandle );
+            glBindTexture( GL_TEXTURE_2D, textureHandle );
+            glTexImage2D( GL_TEXTURE_2D, 0, format, image->m_width, image->m_height, 0, format, GL_UNSIGNED_BYTE, image->m_pPixels );
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+            glGenerateMipmap( GL_TEXTURE_2D );
+            glBindTexture( GL_TEXTURE_2D, 0 );
+
+            Texture2D texture;
+            texture.pixelFormat = image->m_pixelFormat;
+            texture.format = format;
+            texture.width = image->m_width;
+            texture.height = image->m_height;
+            texture.handle = textureHandle;
+            return texture;
+        };
+
+        std::string &key = material->albedoTexture;
+        if ( !key.empty() ) {
+            ret->albedoMap = uploadTexture( scene.GetImage( key ) );
+        }
+
+        key = material->normalTexture;
+        if ( !key.empty() ) {
+            ret->normalMap = uploadTexture( scene.GetImage( key ) );
+        }
+
+        key = material->metallicRoughnessTexture;
+        if ( !key.empty() ) {
+            ret->pbrMap = uploadTexture( scene.GetImage( key ) );
+        }
+        return ret;
+    };
+
+    // create meshes
     for ( const auto &mesh : scene.m_meshes ) {
-        m_sceneGpuMeshes.emplace_back( CreateMeshData( *mesh.get() ) );
-        mesh->gpuResource = m_sceneGpuMeshes.back().get();
+        m_sceneMeshData.emplace_back( createMeshData( mesh ) );
+        mesh->gpuResource = m_sceneMeshData.back().get();
+    }
+
+    // create materials
+    for ( const auto &material : scene.m_materials ) {
+        m_sceneTextures.emplace_back( createMaterialTextures( material ) );
+        material->gpuResource = m_sceneTextures.back().get();
     }
 
     uint32_t batch_index = 0;
@@ -322,6 +385,7 @@ void OpenGLGraphicsManager::InitializeGeometries( const Scene &scene )
         }
 
         const OpenGLMeshData *drawData = reinterpret_cast<OpenGLMeshData *>( entity->m_mesh->gpuResource );
+
         auto dbc = std::make_shared<OpenGLDrawBatchContext>();
         dbc->batchIndex = batch_index++;
         dbc->vao = drawData->vao;
@@ -353,6 +417,19 @@ void OpenGLGraphicsManager::Present()
     GLFWwindow *pGlfwWindow = reinterpret_cast<GLFWwindow *>( m_pApp->GetMainWindowHandler() );
     ASSERT( pGlfwWindow );
     glfwSwapBuffers( pGlfwWindow );
+}
+
+bool OpenGLGraphicsManager::SetShaderParameter( const char *param_name, const int32_t value )
+{
+    unsigned int location;
+
+    location = glGetUniformLocation( m_currentShader, param_name );
+    if ( location == -1 ) {
+        return false;
+    }
+    glUniform1i( location, value );
+
+    return true;
 }
 
 static void APIENTRY debug_callback(

@@ -14,7 +14,6 @@ struct Light {
 
 class Scene {
 public:
-
     Light light;
     Camera camera;
     bool dirty = true;
@@ -26,7 +25,7 @@ public:
 
     std::vector<std::shared_ptr<Entity>> m_entities;
     std::vector<std::shared_ptr<MeshComponent>> m_meshes;
-    std::vector<std::shared_ptr<Material>> m_materials;
+    std::vector<std::shared_ptr<MaterialComponent>> m_materials;
     std::unordered_map<std::string, std::shared_ptr<Image>> m_images;
 
     Scene( const Scene& ) = delete;
@@ -35,5 +34,6 @@ public:
     Entity* RegisterEntity( const char* name, uint32_t flag );
 
     const std::shared_ptr<Image>& GetImage( const std::string& key );
+
 private:
 };

@@ -9,7 +9,6 @@
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
 
-#include "cbuffer.glsl"
 
 namespace gl {
 

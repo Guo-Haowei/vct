@@ -76,7 +76,7 @@
     <ClInclude Include="DrawPass\OverlayPass.hpp" />
     <ClInclude Include="DrawPass\ShadowMapPass.hpp" />
     <ClInclude Include="DrawPass\VoxelizationPass.hpp" />
-    <ClInclude Include="Graphics\cbuffer.glsl" />
+    <ClInclude Include="Graphics\cbuffer.shader.hpp" />
     <ClInclude Include="Graphics\FrameStructure.hpp" />
     <ClInclude Include="Graphics\gl_utils.h" />
     <ClInclude Include="Graphics\GpuTexture.h" />

@@ -30,7 +30,7 @@ static std::string ProcessShader( const std::string &source )
             string include = line.substr( line.find( '"' ) );
             ASSERT( include.front() == '"' && include.back() == '"' );
             include.pop_back();
-            constexpr char cbufferFile[] = "cbuffer.glsl";
+            constexpr char cbufferFile[] = "cbuffer.shader.hpp";
 
             vector<char> includeSource = assetLoader.SyncOpenAndReadText( include.c_str() + 1 );
             result.append( includeSource.data() );

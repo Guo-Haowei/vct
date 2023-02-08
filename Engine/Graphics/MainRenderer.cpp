@@ -23,8 +23,6 @@ void createGpuResources()
 {
     R_Alloc_Cbuffers();
 
-    Scene& scene = Com_GetScene();
-
     // create box quad
     R_CreateQuad();
 
@@ -42,47 +40,6 @@ void createGpuResources()
 
         m_albedoVoxel.create3DEmpty( info );
         m_normalVoxel.create3DEmpty( info );
-    }
-
-    // create material
-    ASSERT( scene.m_materials.size() < array_length( g_constantCache.cache.AlbedoMaps ) );
-
-    for ( int idx = 0; idx < scene.m_materials.size(); ++idx ) {
-        const auto& mat = scene.m_materials.at( idx );
-        auto matData = std::make_shared<MaterialData>();
-
-        string& key = mat->albedoTexture;
-        if ( !key.empty() ) {
-            matData->albedoColor = vec4( 0 );
-            matData->albedoMap.createTextureFromImage( *scene.GetImage( key ) );
-            g_constantCache.cache.AlbedoMaps[idx].data = gl::MakeTextureResident( matData->albedoMap.GetHandle() );
-        }
-        else {
-            matData->albedoColor = vec4( mat->albedo, 1.0f );
-        }
-
-        key = mat->metallicRoughnessTexture;
-        if ( !key.empty() ) {
-            matData->materialMap.createTextureFromImage( *scene.GetImage( key ) );
-            g_constantCache.cache.PbrMaps[idx].data = gl::MakeTextureResident( matData->materialMap.GetHandle() );
-        }
-        else {
-            matData->metallic = mat->metallic;
-            matData->roughness = mat->roughness;
-        }
-
-        key = mat->normalTexture;
-        if ( !key.empty() ) {
-            matData->normalMap.createTextureFromImage( *scene.GetImage( key ) );
-            g_constantCache.cache.NormalMaps[idx].data = gl::MakeTextureResident( matData->normalMap.GetHandle() );
-        }
-
-        matData->textureMapIdx = idx;
-
-        matData->reflectPower = mat->reflectPower;
-
-        g_materialdata.emplace_back( matData );
-        mat->gpuResource = g_materialdata.back().get();
     }
 
     g_constantCache.cache.ShadowMap = gl::MakeTextureResident( g_shadowRT.GetDepthTexture().GetHandle() );

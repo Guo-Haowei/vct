@@ -1,6 +1,6 @@
 layout( location = 0 ) in vec3 in_position;
 
-#include "cbuffer.glsl"
+#include "cbuffer.shader.hpp"
 
 void main()
 {

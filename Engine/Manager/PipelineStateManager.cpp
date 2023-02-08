@@ -119,14 +119,14 @@ bool PipelineStateManager::Initialize()
         RegisterPipelineState( pipelineState );
     }
 
-    {
-        PipelineStateEx pipelineState{ "LINE3D" };
-        pipelineState.vertexShaderName = VS_HUD_LINE3D_SOURCE_FILE;
-        pipelineState.pixelShaderName = PS_HUD_LINE3D_SOURCE_FILE;
-        pipelineState.cullFaceMode = CULL_FACE_MODE::BACK;
-        pipelineState.depthTestMode = DEPTH_TEST_MODE::NONE;
-        RegisterPipelineState( pipelineState );
-    }
+    // {
+    //     PipelineStateEx pipelineState{ "LINE3D" };
+    //     pipelineState.vertexShaderName = VS_HUD_LINE3D_SOURCE_FILE;
+    //     pipelineState.pixelShaderName = PS_HUD_LINE3D_SOURCE_FILE;
+    //     pipelineState.cullFaceMode = CULL_FACE_MODE::BACK;
+    //     pipelineState.depthTestMode = DEPTH_TEST_MODE::NONE;
+    //     RegisterPipelineState( pipelineState );
+    // }
 
     {
         PipelineStateEx pipelineState{ "SHADOW" };
@@ -153,14 +153,14 @@ bool PipelineStateManager::Initialize()
         RegisterPipelineState( pipelineState );
     }
 
-    {
-        PipelineStateEx pipelineState{ "VOXEL_VIS" };
-        pipelineState.vertexShaderName = VS_VOXEL_VISIUALIZE_SOURCE_FILE;
-        pipelineState.pixelShaderName = PS_VOXEL_VISIUALIZE_SOURCE_FILE;
-        pipelineState.cullFaceMode = CULL_FACE_MODE::NONE;
-        pipelineState.depthTestMode = DEPTH_TEST_MODE::LESS_EQUAL;
-        RegisterPipelineState( pipelineState );
-    }
+    // {
+    //     PipelineStateEx pipelineState{ "VOXEL_VIS" };
+    //     pipelineState.vertexShaderName = VS_VOXEL_VISIUALIZE_SOURCE_FILE;
+    //     pipelineState.pixelShaderName = PS_VOXEL_VISIUALIZE_SOURCE_FILE;
+    //     pipelineState.cullFaceMode = CULL_FACE_MODE::NONE;
+    //     pipelineState.depthTestMode = DEPTH_TEST_MODE::LESS_EQUAL;
+    //     RegisterPipelineState( pipelineState );
+    // }
 
     {
         PipelineStateEx pipelineState{ "VOXEL_POST" };
