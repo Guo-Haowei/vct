@@ -61,6 +61,7 @@ static bool LoadShaderFromFile( const char *shader_name, const uint32_t shader_t
         "#extension GL_NV_shader_atomic_float : enable\n"
         "#extension GL_NV_shader_atomic_fp16_vector : enable\n"
         "#extension GL_ARB_bindless_texture : require\n"
+        "#define _IS_GLSL_LANG_\n"
         "";
     string preprocessedSource = ProcessShader( sourceBuffer.data() );
 

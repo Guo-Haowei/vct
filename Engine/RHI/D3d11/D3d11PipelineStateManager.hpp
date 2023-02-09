@@ -15,6 +15,7 @@ struct D3d11PipelineState : public PipelineState {
     ID3D11PixelShader* m_ps{ nullptr };
     ID3D11ComputeShader* m_cs{ nullptr };
     ID3D11InputLayout* m_layout{ nullptr };
+    ID3D11RasterizerState* m_rs{ nullptr };
 };
 
 class D3d11PipelineStateManager : public PipelineStateManager {

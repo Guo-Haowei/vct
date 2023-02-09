@@ -45,8 +45,7 @@ static void ControlCamera( Camera& camera )
 
 void EditorLogic::Tick()
 {
-    auto* app = dynamic_cast<BaseApplication*>( GetAppPointer() );
-    Scene* scene = app->GetSceneManager()->GetScene();
+    Scene* scene = m_pApp->GetSceneManager()->GetScene();
 
     // update camera
     int w, h;
@@ -57,5 +56,5 @@ void EditorLogic::Tick()
     Camera& camera = scene->camera;
     ControlCamera( camera );
     camera.SetAspect( aspect );
-    camera.UpdatePV();
+    camera.UpdatePV( m_pApp->GetGfxBackend() == GfxBackend::OpenGL );
 }

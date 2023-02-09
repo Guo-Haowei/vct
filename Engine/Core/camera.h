@@ -12,7 +12,7 @@ public:
     float pitch = 0.0f;
     vec3 position{ 0 };
 
-    void UpdatePV();
+    void UpdatePV( bool isGL );
 
     inline void SetAspect( float aspect ) { mAspect = aspect; }
     inline float GetAspect() const { return mAspect; }

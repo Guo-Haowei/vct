@@ -1,6 +1,6 @@
 #pragma once
 
-class IApplication;
+class BaseApplication;
 
 class IRuntimeModule {
 public:
@@ -12,9 +12,9 @@ public:
 
     virtual void Tick() = 0;
 
-    void SetAppPointer( IApplication* pApp ) { m_pApp = pApp; }
-    IApplication* GetAppPointer() { return m_pApp; }
+    void SetAppPointer( BaseApplication* pApp ) { m_pApp = pApp; }
+    BaseApplication* GetAppPointer() { return m_pApp; }
 
 protected:
-    IApplication* m_pApp;
+    BaseApplication* m_pApp;
 };

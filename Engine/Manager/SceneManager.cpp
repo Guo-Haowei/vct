@@ -34,16 +34,17 @@ Scene* SceneManager::GetScene() const
 bool SceneManager::LoadScene( const char* scene_name )
 {
     bool ok = false;
-    SCOPE_PROFILER( LoadScene, [&]( uint64_t duration ) {
+    SCOPE_PROFILER( LoadScene, [&]( uint64_t ms ) {
         if ( ok ) {
-            LOG_OK( "[SceneManager] Loaded scene '%s' in %s", scene_name, FormatTime( duration ).c_str() );
+            LOG_OK( "[SceneManager] Loaded scene '%s' in %s", scene_name, FormatTime( ms ).c_str() );
         }
         else {
             LOG_ERROR( "[SceneManager] Failed to load scene '%s'", scene_name );
         }
     } );
 
-    if ( ( ok = LoadAssimp( scene_name ) ) ) {
+    if ( LoadAssimp( scene_name ) ) {
+        ok = true;
         ++m_nSceneRevision;
     }
 
@@ -71,8 +72,8 @@ bool SceneManager::LoadAssimp( const char* scene_name )
     Camera& camera = scene.camera;
 
     camera.fovy = glm::radians( Dvar_GetFloat( cam_fov ) );
-    camera.zNear = 1.f;
-    camera.zFar = 1000.f;
+    camera.zNear = 0.1f;
+    camera.zFar = 100.f;
 
     camera.yaw = glm::radians( 180.0f );
     camera.pitch = 0.0f;

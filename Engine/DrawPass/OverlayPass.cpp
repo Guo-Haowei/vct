@@ -2,7 +2,7 @@
 
 #include "Graphics/gl_utils.h"
 
-#include "Interface/IApplication.hpp"
+#include "Manager/BaseApplication.hpp"
 
 #include "RHI/OpenGL/OpenGLGraphicsManager.hpp"
 

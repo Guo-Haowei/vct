@@ -1,17 +1,12 @@
+#include "../../Graphics/cbuffer.shader.hpp"
 #include "vsoutput.hlsl"
 
 struct simple_vert_input {
   float3 pos : POSITION;
-  //   float3 normal : NORMAL;
+  float3 normal : NORMAL;
   //   float2 uv : TEXCOORD;
   //   float3 tangent : TANGENT;
   //   float3 bitangent : BITANGENT;
-};
-
-cbuffer PerFrameConstants : register(b0) {
-  float4x4 Model; // 64 bytes
-  float4x4 View;  // 64 bytes
-  float4x4 Proj;  // 64 bytes
 };
 
 simple_vert_output vs_main(simple_vert_input i) {
@@ -20,5 +15,7 @@ simple_vert_output vs_main(simple_vert_input i) {
   o.pos = mul(Proj, mul(View, worldPos));
   o.worldPos = worldPos.xyz;
 
+  float4 normal4 = mul(Model, float4(i.normal, 0.0));
+  o.normal = normalize(normal4.xzy);
   return o;
 }

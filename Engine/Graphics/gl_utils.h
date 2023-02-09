@@ -13,12 +13,6 @@
 
 namespace gl {
 
-template<typename T>
-void NamedBufferStorage( GLuint buffer, const std::vector<T>& data )
-{
-    glNamedBufferStorage( buffer, sizeof( T ) * data.size(), data.data(), 0 );
-}
-
 static inline void BindToSlot( GLuint buffer, int slot, int size )
 {
     glBindBuffer( GL_ARRAY_BUFFER, buffer );

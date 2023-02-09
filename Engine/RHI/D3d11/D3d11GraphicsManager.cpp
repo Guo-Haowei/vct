@@ -19,8 +19,6 @@
 #include "Manager/BaseApplication.hpp"
 #include "Manager/SceneManager.hpp"
 
-static ID3D11Buffer *vertex_buffer_ptr = NULL;
-
 bool D3d11GraphicsManager::Initialize()
 {
     if ( !GraphicsManager::Initialize() ) {
@@ -45,49 +43,25 @@ bool D3d11GraphicsManager::Initialize()
         return false;
     }
 
-    auto pipelineStateManager = dynamic_cast<BaseApplication *>( m_pApp )->GetPipelineStateManager();
+    auto pipelineStateManager = m_pApp->GetPipelineStateManager();
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new GuiPass( this, pipelineStateManager, nullptr, 0 ) ) );
 
-    // @TODO: temp
-    { /*** load mesh data into vertex buffer **/
-        float s = 10.0f;
-        vec3 vertex_data_array[] = {
-            s * vec3( 0.0f, 0.5f, 0.0f ),    // point at top
-            s * vec3( 0.5f, -0.5f, 0.0f ),   // point at bottom-right
-            s * vec3( -0.5f, -0.5f, 0.0f ),  // point at bottom-left
-        };
-
-        D3D11_BUFFER_DESC vertex_buff_descr = {};
-        vertex_buff_descr.ByteWidth = sizeof( vertex_data_array );
-        vertex_buff_descr.Usage = D3D11_USAGE_DEFAULT;
-        vertex_buff_descr.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-        D3D11_SUBRESOURCE_DATA sr_data = { 0 };
-        sr_data.pSysMem = vertex_data_array;
-        HRESULT hr = m_pDevice->CreateBuffer(
-            &vertex_buff_descr,
-            &sr_data,
-            &vertex_buffer_ptr );
-        assert( SUCCEEDED( hr ) );
-    }
-
     // create constant buffers
-    {
-        auto createConstantBuffer = [](ID3D11Device* device) {
-            D3D11_BUFFER_DESC desc{};
-            desc.ByteWidth = 16;
-            desc.Usage = D3D11_USAGE_DYNAMIC;
-            desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-            desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-            desc.MiscFlags = 0;
+    auto createConstantBuffer = []( ID3D11Device *device, UINT size ) {
+        D3D11_BUFFER_DESC desc{};
+        desc.ByteWidth = size;
+        desc.Usage = D3D11_USAGE_DYNAMIC;
+        desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+        desc.MiscFlags = 0;
 
-            ID3D11Buffer* constantBuffer = nullptr;
-            DX_CALL( device->CreateBuffer( &desc, nullptr, &constantBuffer ) );
-            return constantBuffer;
-        };
+        ID3D11Buffer *constantBuffer = nullptr;
+        DX_CALL( device->CreateBuffer( &desc, nullptr, &constantBuffer ) );
+        return constantBuffer;
+    };
 
-        m_drawBatchConstant = createConstantBuffer( m_pDevice.Get() );
-        m_drawFrameConstant = createConstantBuffer( m_pDevice.Get() );
-    }
+    m_drawBatchConstant = createConstantBuffer( m_pDevice.Get(), kSizePerBatchConstantBuffer );
+    m_drawFrameConstant = createConstantBuffer( m_pDevice.Get(), kSizePerFrameConstantBuffer );
 
     return ( m_bInitialized = true );
 }
@@ -123,14 +97,26 @@ void D3d11GraphicsManager::SetPipelineState( const std::shared_ptr<PipelineState
 
     ctx->IASetInputLayout( pPipelineState->m_layout );
     ctx->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+    ctx->RSSetState( pPipelineState->m_rs );
 
     // TODO: modes
 }
 
-void D3d11GraphicsManager::DrawBatch( const Frame & )
+void D3d11GraphicsManager::DrawBatch( const Frame &frame )
 {
-    const Frame &frame = m_frame;
-    unused(frame);
+    auto &ctx = m_pCtx;
+
+    for ( auto &it : frame.batchContexts ) {
+        auto &dbc = dynamic_cast<D3dDrawBatchContext &>( *it );
+        SetPerBatchConstants( dbc );
+
+        UINT stride = sizeof( vec3 );
+        UINT offset = 0;
+        ctx->IASetIndexBuffer( dbc.indexBuffer, DXGI_FORMAT_R32_UINT, 0 );
+        ctx->IASetVertexBuffers( 0, 1, &dbc.positionBuffer, &stride, &offset );
+        ctx->IASetVertexBuffers( 1, 1, &dbc.normalBuffer, &stride, &offset );
+        ctx->DrawIndexed( dbc.indexCount, 0, 0 );
+    }
 }
 
 void D3d11GraphicsManager::SetPerFrameConstants( const DrawFrameContext &context )
@@ -155,6 +141,67 @@ void D3d11GraphicsManager::SetPerBatchConstants( const DrawBatchContext &context
 
 void D3d11GraphicsManager::InitializeGeometries( const Scene &scene )
 {
+    auto createMeshBuffers = []( const std::shared_ptr<MeshComponent> &mesh, ID3D11Device *device ) {
+        auto createStaticBuffer = []( D3D11_BIND_FLAG flag, const void *data, size_t size_in_byte, ID3D11Device *device ) -> ID3D11Buffer * {
+            ID3D11Buffer *buffer = nullptr;
+
+            D3D11_BUFFER_DESC desc{};
+            desc.Usage = D3D11_USAGE_IMMUTABLE;
+            desc.ByteWidth = static_cast<uint32_t>( size_in_byte );
+            desc.BindFlags = flag;
+            desc.CPUAccessFlags = 0;
+            desc.MiscFlags = 0;
+
+            D3D11_SUBRESOURCE_DATA subResoureData{};
+            subResoureData.pSysMem = data;
+
+            if ( FAILED( DX_CALL( device->CreateBuffer( &desc, &subResoureData, &buffer ) ) ) ) {
+                return nullptr;
+            }
+
+            return buffer;
+        };
+
+        auto ret = std::make_shared<D3dMeshData>();
+
+        const bool hasNormals = !mesh->normals.empty();
+        const bool hasUVs = !mesh->uvs.empty();
+        const bool hasTangent = !mesh->tangents.empty();
+        const bool hasBitangent = !mesh->bitangents.empty();
+
+#define DATA_AND_SIZE( VEC ) ( VEC ).data(), VecSizeInBytes( ( VEC ) )
+        ret->indexBuffer = createStaticBuffer( D3D11_BIND_INDEX_BUFFER, DATA_AND_SIZE( mesh->indices ), device );
+        ret->positionBuffer = createStaticBuffer( D3D11_BIND_VERTEX_BUFFER, DATA_AND_SIZE( mesh->positions ), device );
+        ret->normalBuffer = createStaticBuffer( D3D11_BIND_VERTEX_BUFFER, DATA_AND_SIZE( mesh->normals ), device );
+#undef DATA_AND_SIZE
+        ret->indexCount = (uint32_t)mesh->indices.size() * 3;
+        return ret;
+    };
+
+    for ( const auto &mesh : scene.m_meshes ) {
+        m_sceneMeshData.emplace_back( createMeshBuffers( mesh, m_pDevice.Get() ) );
+        mesh->gpuResource = m_sceneMeshData.back().get();
+    }
+
+    for ( const auto &entity : scene.m_entities ) {
+        if ( !( entity->m_flag & Entity::FLAG_GEOMETRY ) ) {
+            continue;
+        }
+
+        const D3dMeshData *drawData = reinterpret_cast<D3dMeshData *>( entity->m_mesh->gpuResource );
+
+        auto dbc = std::make_shared<D3dDrawBatchContext>();
+
+        dbc->indexCount = drawData->indexCount;
+        dbc->indexBuffer = drawData->indexBuffer;
+        dbc->positionBuffer = drawData->positionBuffer;
+        dbc->normalBuffer = drawData->normalBuffer;
+
+        dbc->pEntity = entity.get();
+        dbc->Model = mat4( 1 );
+
+        m_frame.batchContexts.push_back( dbc );
+    }
 }
 
 void D3d11GraphicsManager::BeginFrame( Frame &frame )
@@ -162,51 +209,37 @@ void D3d11GraphicsManager::BeginFrame( Frame &frame )
     GraphicsManager::BeginFrame( frame );
 
     SetPerFrameConstants( frame.frameContexts );
+}
 
-    auto dummy = std::make_shared<D3dDrawBatchContext>();
-    dummy->Model = mat4(1);
-    frame.batchContexts.clear();
-    frame.batchContexts.emplace_back(dummy);
+void D3d11GraphicsManager::EndFrame( Frame &frame )
+{
+    auto &ctx = m_pCtx;
 
     for ( auto &it : frame.batchContexts ) {
         const auto &dbc = dynamic_cast<const D3dDrawBatchContext &>( *it );
         SetPerBatchConstants( dbc );
     }
 
-    frame.batchContexts.clear();
-
-    // viewport
-    auto &ctx = m_pCtx;
-    int w, h;
-    m_pApp->GetFramebufferSize( w, h );
-    D3D11_VIEWPORT viewport = { 0.0f, 0.0f, (FLOAT)w, (FLOAT)h, 0.0f, 1.0f };
-    ctx->RSSetViewports( 1, &viewport );
-}
-
-void D3d11GraphicsManager::EndFrame( Frame &frame )
-{
-    //SetPerFrameConstants( frame.frameContexts );
-
-    auto &ctx = m_pCtx;
-
-    ctx->VSSetConstantBuffers( 0, 1, &m_drawFrameConstant );
-
-    /**** Output Merger *****/
+    // render target
     ctx->OMSetRenderTargets( 1, &m_immediate.rtv, m_immediate.dsv );
     const float clearColor[4] = { 0.3f, 0.4f, 0.3f, 1.0f };
     ctx->ClearRenderTargetView( m_immediate.rtv, clearColor );
     ctx->ClearDepthStencilView( m_immediate.dsv, D3D11_CLEAR_DEPTH, 1.0f, 0 );
 
-    /***** Input Assembler (map how the vertex shader inputs should be read from vertex buffer) ******/
-    IPipelineStateManager *pPipelineStateManager = dynamic_cast<BaseApplication *>( m_pApp )->GetPipelineStateManager();
+    // viewport
+    int w, h;
+    m_pApp->GetFramebufferSize( w, h );
+    D3D11_VIEWPORT viewport = { 0.0f, 0.0f, (FLOAT)w, (FLOAT)h, 0.0f, 1.0f };
+    ctx->RSSetViewports( 1, &viewport );
+
+    IPipelineStateManager *pPipelineStateManager = m_pApp->GetPipelineStateManager();
     auto PSO = pPipelineStateManager->GetPipelineState( "SIMPLE" );
     SetPipelineState( PSO );
 
-    /*** draw the vertex buffer with the shaders ****/
-    UINT vertex_stride = 3 * sizeof( float );
-    UINT vertex_offset = 0;
-    m_pCtx->IASetVertexBuffers( 0, 1, &vertex_buffer_ptr, &vertex_stride, &vertex_offset );
-    m_pCtx->Draw( 3, 0 );
+    ctx->VSSetConstantBuffers( 0, 1, &m_drawBatchConstant );
+    ctx->VSSetConstantBuffers( 1, 1, &m_drawFrameConstant );
+
+    DrawBatch( frame );
 
     ImGui_ImplDX11_RenderDrawData( ImGui::GetDrawData() );
     GraphicsManager::EndFrame( frame );

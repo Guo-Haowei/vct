@@ -51,7 +51,7 @@ bool D3d12GraphicsManager::Initialize()
         return false;
     }
 
-    auto pipelineStateManager = dynamic_cast<BaseApplication *>( m_pApp )->GetPipelineStateManager();
+    auto pipelineStateManager = m_pApp->GetPipelineStateManager();
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new GuiPass( this, pipelineStateManager, nullptr, 0 ) ) );
 
     return ( m_bInitialized = true );

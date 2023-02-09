@@ -73,7 +73,7 @@ bool OpenGLGraphicsManager::Initialize()
     }
 
     // @TODO: move to GraphicsManager
-    auto pipelineStateManager = dynamic_cast<BaseApplication *>( m_pApp )->GetPipelineStateManager();
+    auto pipelineStateManager = m_pApp->GetPipelineStateManager();
 
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new ShadowMapPass( this, pipelineStateManager, &g_shadowRT, CLEAR_FLAG_DEPTH ) ) );
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new VoxelizationPass( this, pipelineStateManager, nullptr, CLEAR_FLAG_NONE ) ) );
@@ -291,7 +291,7 @@ void OpenGLGraphicsManager::SetPerBatchConstants(
 
 void OpenGLGraphicsManager::InitializeGeometries( const Scene &scene )
 {
-    auto createMeshData = []( const std::shared_ptr<MeshComponent> &mesh ) {
+    auto createMeshBuffers = []( const std::shared_ptr<MeshComponent> &mesh ) {
         auto ret = std::make_shared<OpenGLMeshData>();
 
         const bool hasNormals = !mesh->normals.empty();
@@ -304,23 +304,23 @@ void OpenGLGraphicsManager::InitializeGeometries( const Scene &scene )
         glBindVertexArray( ret->vao );
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ret->ebo );
         gl::BindToSlot( ret->vbos[0], 0, 3 );
-        gl::NamedBufferStorage( ret->vbos[0], mesh->positions );
+        glNamedBufferStorage( ret->vbos[0], VecSizeInBytes( mesh->positions ), mesh->positions.data(), 0 );
         if ( hasNormals ) {
             gl::BindToSlot( ret->vbos[1], 1, 3 );
-            gl::NamedBufferStorage( ret->vbos[1], mesh->normals );
+            glNamedBufferStorage( ret->vbos[1], VecSizeInBytes( mesh->normals ), mesh->normals.data(), 0 );
         }
         if ( hasUVs ) {
             gl::BindToSlot( ret->vbos[2], 2, 2 );
-            gl::NamedBufferStorage( ret->vbos[2], mesh->uvs );
+            glNamedBufferStorage( ret->vbos[2], VecSizeInBytes( mesh->uvs ), mesh->uvs.data(), 0 );
         }
         if ( hasTangent ) {
             gl::BindToSlot( ret->vbos[3], 3, 3 );
-            gl::NamedBufferStorage( ret->vbos[3], mesh->tangents );
+            glNamedBufferStorage( ret->vbos[3], VecSizeInBytes( mesh->tangents ), mesh->tangents.data(), 0 );
             gl::BindToSlot( ret->vbos[4], 4, 3 );
-            gl::NamedBufferStorage( ret->vbos[4], mesh->bitangents );
+            glNamedBufferStorage( ret->vbos[4], VecSizeInBytes( mesh->bitangents ), mesh->bitangents.data(), 0 );
         }
 
-        gl::NamedBufferStorage( ret->ebo, mesh->indices );
+        glNamedBufferStorage( ret->ebo, VecSizeInBytes( mesh->indices ), mesh->indices.data(), 0 );
         ret->count = static_cast<uint32_t>( mesh->indices.size() );
 
         glBindVertexArray( 0 );
@@ -384,7 +384,7 @@ void OpenGLGraphicsManager::InitializeGeometries( const Scene &scene )
 
     // create meshes
     for ( const auto &mesh : scene.m_meshes ) {
-        m_sceneMeshData.emplace_back( createMeshData( mesh ) );
+        m_sceneMeshData.emplace_back( createMeshBuffers( mesh ) );
         mesh->gpuResource = m_sceneMeshData.back().get();
     }
 
