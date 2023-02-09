@@ -16,8 +16,6 @@ class Scene {
 public:
     Light light;
     Camera camera;
-    bool dirty = true;
-    // const Geometry* selected = nullptr;
 
     Entity* m_root;
 
@@ -33,7 +31,8 @@ public:
 
     Entity* RegisterEntity( const char* name, uint32_t flag );
 
-    const std::shared_ptr<Image>& GetImage( const std::string& key );
+    // @TODO: move to AssetManager
+    const std::shared_ptr<Image>& GetImage( const std::string& key ) const;
 
 private:
 };

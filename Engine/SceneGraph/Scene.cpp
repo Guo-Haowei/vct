@@ -7,7 +7,7 @@ Entity* Scene::RegisterEntity( const char* name, uint32_t flag )
     return entity;
 }
 
-const std::shared_ptr<Image>& Scene::GetImage( const std::string& key )
+const std::shared_ptr<Image>& Scene::GetImage( const std::string& key ) const
 {
     auto it = m_images.find( key );
     if ( it == m_images.end() ) {

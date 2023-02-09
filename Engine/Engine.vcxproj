@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="Base\Asserts.cpp" />
     <ClCompile Include="Base\Logger.cpp" />
+    <ClCompile Include="Base\Profiler.cpp" />
     <ClCompile Include="Core\AssimpLoader.cpp" />
     <ClCompile Include="Core\camera.cpp" />
     <ClCompile Include="Core\dvar_api.cpp" />
@@ -55,6 +56,7 @@
     <ClInclude Include="Base\Asserts.h" />
     <ClInclude Include="Base\Defines.h" />
     <ClInclude Include="Base\Logger.h" />
+    <ClInclude Include="Base\Profiler.hpp" />
     <ClInclude Include="Base\StringUtils.hpp" />
     <ClInclude Include="Core\AssimpLoader.hpp" />
     <ClInclude Include="Core\camera.h" />

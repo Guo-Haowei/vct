@@ -42,7 +42,6 @@ protected:
 
     uint32_t m_currentShader;
     std::vector<std::shared_ptr<OpenGLMeshData>> m_sceneMeshData;
-    std::vector<std::shared_ptr<MaterialTextures>> m_sceneTextures;
 };
 
 extern OpenGLMeshData g_quad;

@@ -96,7 +96,7 @@ void AssimpLoader::loadGltf( const char* path, Scene& scene, bool flipUVs )
     for ( const auto& material : scene.m_materials ) {
         loadImage( material->albedoTexture );
         loadImage( material->normalTexture );
-        loadImage( material->metallicRoughnessTexture );
+        loadImage( material->pbrTexture );
     }
 }
 
@@ -124,8 +124,8 @@ MaterialComponent* AssimpLoader::processMaterial( const aiMaterial* aimaterial )
     {
         aiString path;
         if ( aimaterial->GetTexture( AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE, &path ) == AI_SUCCESS ) {
-            mat->metallicRoughnessTexture = m_currentPath;
-            mat->metallicRoughnessTexture.append( path.C_Str() );
+            mat->pbrTexture = m_currentPath;
+            mat->pbrTexture.append( path.C_Str() );
         }
     }
 

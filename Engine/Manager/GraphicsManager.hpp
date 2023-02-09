@@ -1,7 +1,6 @@
 #pragma once
 #include "Interface/IGraphicsManager.hpp"
 
-#include "Graphics/FrameStructure.hpp"
 #include "SceneGraph/Scene.hpp"
 
 #include "DrawPass/ShadowMapPass.hpp"
@@ -16,6 +15,8 @@ struct GLFWwindow;
 class GraphicsManager : public IGraphicsManager {
 public:
     virtual bool Initialize() override;
+    virtual void Finalize() override;
+
     virtual void Tick() override;
 
     virtual void Draw() override;
@@ -27,13 +28,18 @@ public:
 
     virtual void DrawBatch( const Frame& ) = 0;
 
-    virtual void BeginFrame( Frame& ) {}
-    virtual void EndFrame( Frame& ) {}
-
     virtual void BeginPass( Frame& ) override {}
     virtual void EndPass( Frame& ) override {}
 
-public:
+    virtual void ReleaseTexture( TextureBase& ) override {}
+
+protected:
+    virtual void BeginScene( const Scene& scene );
+    virtual void EndScene();
+
+    virtual void BeginFrame( Frame& ) {}
+    virtual void EndFrame( Frame& ) {}
+
     // @TODO: make protected:
     virtual void InitializeGeometries( const Scene& ) {}
 
@@ -45,7 +51,8 @@ private:
 
 protected:
     Frame m_frame;
+    uint64_t m_nSceneRevision{0};
     bool m_bInitialized{ false };
     std::vector<std::shared_ptr<BaseDrawPass>> m_drawPasses;
+    std::vector<std::shared_ptr<MaterialTextures>> m_sceneTextures;
 };
-

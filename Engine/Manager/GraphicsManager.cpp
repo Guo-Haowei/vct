@@ -1,13 +1,15 @@
 #include "GraphicsManager.hpp"
 
 #include "Base/Asserts.h"
+#include "Base/Logger.h"
 
 #include "Core/com_dvars.h"
 
 #include "imgui/imgui.h"
 
 #include "Interface/IApplication.hpp"
-#include "Manager/SceneManager.hpp"
+#include "Interface/ISceneManager.hpp"
+#include "Manager/BaseApplication.hpp"
 
 #ifdef max
 #undef max
@@ -18,8 +20,31 @@ bool GraphicsManager::Initialize()
     return true;
 }
 
+void GraphicsManager::Finalize()
+{
+    EndScene();
+}
+
 void GraphicsManager::Tick()
 {
+    auto pSceneManager = dynamic_cast<BaseApplication*>( m_pApp )->GetSceneManager();
+
+    if ( pSceneManager ) {
+        auto rev = pSceneManager->GetSceneRevision();
+        if ( rev == 0 ) {
+            return;  // scene is not loaded yet
+        }
+        ASSERT( m_nSceneRevision <= rev );
+        if ( m_nSceneRevision < rev ) {
+            EndScene();
+            LOG_DEBUG( "[GraphicsManager] Detected Scene Change, reinitialize buffers..." );
+            const auto scene = pSceneManager->GetScene();
+            ASSERT( scene );
+            BeginScene( *scene );
+            m_nSceneRevision = rev;
+        }
+    }
+
     UpdateConstants();
 
     // Frame& frame = m_frames[];
@@ -48,6 +73,20 @@ void GraphicsManager::Draw()
     }
 }
 
+void GraphicsManager::BeginScene( const Scene& scene )
+{
+    InitializeGeometries( scene );
+}
+
+void GraphicsManager::EndScene()
+{
+    for ( auto& it : m_sceneTextures ) {
+        ReleaseTexture( it->albedoMap );
+        ReleaseTexture( it->normalMap );
+        ReleaseTexture( it->pbrMap );
+    }
+}
+
 void GraphicsManager::CalculateCameraMatrix()
 {
 }
@@ -56,9 +95,9 @@ void GraphicsManager::CalculateLights()
 {
 }
 
-static mat4 R_HackLightSpaceMatrix( const vec3& lightDir )
+static mat4 R_HackLightSpaceMatrix( const Scene& scene )
 {
-    const Scene& scene = Com_GetScene();
+    const vec3& lightDir = scene.light.direction;
     const vec3 center = scene.m_aabb.Center();
     const vec3 extents = scene.m_aabb.Size();
     const float size = 0.5f * glm::max( extents.x, glm::max( extents.y, extents.z ) );
@@ -69,7 +108,8 @@ static mat4 R_HackLightSpaceMatrix( const vec3& lightDir )
 
 void GraphicsManager::UpdateConstants()
 {
-    const Scene& scene = Com_GetScene();
+    auto* app = dynamic_cast<BaseApplication*>( GetAppPointer() );
+    const Scene* scene = app->GetSceneManager()->GetScene();
 
     for ( auto& dbc : m_frame.batchContexts ) {
         const Entity* entity = dbc->pEntity;
@@ -91,8 +131,8 @@ void GraphicsManager::UpdateConstants()
     const int voxelTextureSize = Dvar_GetInt( r_voxelSize );
     ASSERT( is_power_of_two( voxelTextureSize ) );
     ASSERT( voxelTextureSize <= 256 );
-    const vec3 center = scene.m_aabb.Center();
-    const vec3 size = scene.m_aabb.Size();
+    const vec3 center = scene->m_aabb.Center();
+    const vec3 size = scene->m_aabb.Size();
     const float worldSize = glm::max( size.x, glm::max( size.y, size.z ) );
     const float texelSize = 1.0f / static_cast<float>( voxelTextureSize );
     const float voxelSize = worldSize * texelSize;
@@ -101,15 +141,15 @@ void GraphicsManager::UpdateConstants()
     frameConstats.WorldSizeHalf = 0.5f * worldSize;
     frameConstats.TexelSize = texelSize;
     frameConstats.VoxelSize = voxelSize;
-    frameConstats.LightPV = R_HackLightSpaceMatrix( scene.light.direction );
+    frameConstats.LightPV = R_HackLightSpaceMatrix( *scene );
 
-    const Camera& camera = scene.camera;
+    const Camera& camera = scene->camera;
     int w, h;
     m_pApp->GetFramebufferSize( w, h );
 
     // update constants
-    frameConstats.SunDir = scene.light.direction;
-    frameConstats.LightColor = scene.light.color;
+    frameConstats.SunDir = scene->light.direction;
+    frameConstats.LightColor = scene->light.color;
     frameConstats.CamPos = camera.position;
     frameConstats.View = camera.View();
     frameConstats.Proj = camera.Proj();

@@ -4,6 +4,7 @@
 
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
+#include "Base/Profiler.hpp"
 
 #include "Core/com_dvars.h"
 #include "Core/AssimpLoader.hpp"
@@ -12,21 +13,51 @@
 #undef max
 #endif
 
-static Scene g_scene;
-
 bool SceneManager::Initialize()
 {
     return true;
 }
 
-bool SceneManager::LoadScene( const char* sceneName )
+void SceneManager::Finalize()
+{
+}
+
+void SceneManager::Tick()
+{
+}
+
+Scene* SceneManager::GetScene() const
+{
+    return m_pScene.get();
+};
+
+bool SceneManager::LoadScene( const char* scene_name )
+{
+    bool ok = false;
+    SCOPE_PROFILER( LoadScene, [&]( uint64_t duration ) {
+        if ( ok ) {
+            LOG_OK( "[SceneManager] Loaded scene '%s' in %s", scene_name, FormatTime( duration ).c_str() );
+        }
+        else {
+            LOG_ERROR( "[SceneManager] Failed to load scene '%s'", scene_name );
+        }
+    } );
+
+    if ( ( ok = LoadAssimp( scene_name ) ) ) {
+        ++m_nSceneRevision;
+    }
+
+    return ok;
+}
+
+bool SceneManager::LoadAssimp( const char* scene_name )
 {
     AssimpLoader loader;
-    Scene& scene = g_scene;
 
-    const char* scenePath = sceneName;
+    auto pScene = std::make_shared<Scene>();
+    Scene& scene = *pScene;
 
-    if ( !scenePath[0] ) {
+    if ( !scene_name[0] ) {
         LOG_FATAL( "Scene not specified, set it by +set scene <name> or +exec <lua-file>" );
         return false;
     }
@@ -34,7 +65,7 @@ bool SceneManager::LoadScene( const char* sceneName )
     scene.m_root = scene.RegisterEntity( "world", Entity::FLAG_NONE );
     scene.m_root->m_trans = glm::scale( vec3( Dvar_GetFloat( scene_scale ) ) );
 
-    loader.loadGltf( scenePath, scene );
+    loader.loadGltf( scene_name, scene );
     scene.m_aabb.ApplyMatrix( scene.m_root->m_trans );
 
     Camera& camera = scene.camera;
@@ -49,11 +80,6 @@ bool SceneManager::LoadScene( const char* sceneName )
 
     scene.light.color = vec3( glm::clamp( Dvar_GetFloat( light_power ), 5.0f, 30.0f ) );
 
-    LOG_OK( "Scene '%s' loaded", scenePath );
+    m_pScene = std::move( pScene );
     return true;
-}
-
-Scene& Com_GetScene()
-{
-    return g_scene;
 }
