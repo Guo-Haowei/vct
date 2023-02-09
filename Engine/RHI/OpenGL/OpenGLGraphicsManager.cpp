@@ -18,10 +18,10 @@
 #include "Manager/SceneManager.hpp"
 
 #include "Graphics/MainRenderer.h"
-OpenGLMeshData g_quad;
 
 // @TODO: refactor
-void R_CreateQuad()
+OpenGLMeshData g_quad;
+static void R_CreateQuad()
 {
     // clang-format off
     float points[] = { -1.0f, +1.0f, -1.0f, -1.0f, +1.0f, +1.0f, +1.0f, +1.0f, -1.0f, -1.0f, +1.0f, -1.0f, };
@@ -73,7 +73,7 @@ bool OpenGLGraphicsManager::Initialize()
     }
 
     // @TODO: move to GraphicsManager
-    auto pipelineStateManager = dynamic_cast<BaseApplication *>( m_pApp )->GetPipelineStateManager();
+    auto pipelineStateManager = m_pApp->GetPipelineStateManager();
 
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new ShadowMapPass( this, pipelineStateManager, &g_shadowRT, CLEAR_FLAG_DEPTH ) ) );
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new VoxelizationPass( this, pipelineStateManager, nullptr, CLEAR_FLAG_NONE ) ) );
@@ -105,9 +105,10 @@ bool OpenGLGraphicsManager::Initialize()
         g_shadowRT.Create( res, res );
     }
 
+    R_CreateQuad();
     createGpuResources();
 
-    auto createUBO = []( int slot ) {
+    auto createConstantBuffer = []( int slot ) {
         GLuint handle = 0;
         glGenBuffers( 1, &handle );
         glBindBufferBase( GL_UNIFORM_BUFFER, slot, handle );
@@ -115,8 +116,27 @@ bool OpenGLGraphicsManager::Initialize()
         return handle;
     };
 
-    m_uboDrawBatchConstant = createUBO( 0 );
-    m_uboDrawFrameConstant = createUBO( 1 );
+    m_uboDrawBatchConstant = createConstantBuffer( 0 );
+    m_uboDrawFrameConstant = createConstantBuffer( 1 );
+
+    // @TODO: refactor
+    {
+        GLuint cb = createConstantBuffer( 2 );
+        PerSceneConstants cache;
+        {
+            constexpr float s = 0.14f;
+            float h = 1.0f - s;
+            int i = 0;
+            cache.OverlayPositions[i++] = vec4( vec2( 1.0f - s, h ), vec2( s - 0.01f ) );
+        }
+        cache.ShadowMap = gl::MakeTextureResident( g_shadowRT.GetDepthTexture().GetHandle() );
+        cache.VoxelAlbedoMap = gl::MakeTextureResident( m_albedoVoxel.GetHandle() );
+        cache.VoxelNormalMap = gl::MakeTextureResident( m_normalVoxel.GetHandle() );
+
+        glBindBuffer( GL_UNIFORM_BUFFER, cb );
+        glBufferData( GL_UNIFORM_BUFFER, kSizePerSceneConstantBuffer, &cache, GL_DYNAMIC_DRAW );
+        glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+    }
 
     return ( m_bInitialized = true );
 }
@@ -214,9 +234,8 @@ void OpenGLGraphicsManager::SetPipelineState( const std::shared_ptr<PipelineStat
     }
 }
 
-void OpenGLGraphicsManager::DrawBatch( const Frame & )
+void OpenGLGraphicsManager::DrawBatch( const Frame &frame )
 {
-    const Frame &frame = m_frame;
     for ( auto &it : frame.batchContexts ) {
         const auto &dbc = dynamic_cast<const OpenGLDrawBatchContext &>( *it );
         SetPerBatchConstants( dbc );
@@ -272,7 +291,7 @@ void OpenGLGraphicsManager::SetPerBatchConstants(
 
 void OpenGLGraphicsManager::InitializeGeometries( const Scene &scene )
 {
-    auto createMeshData = []( const std::shared_ptr<MeshComponent> &mesh ) {
+    auto createMeshBuffers = []( const std::shared_ptr<MeshComponent> &mesh ) {
         auto ret = std::make_shared<OpenGLMeshData>();
 
         const bool hasNormals = !mesh->normals.empty();
@@ -285,23 +304,23 @@ void OpenGLGraphicsManager::InitializeGeometries( const Scene &scene )
         glBindVertexArray( ret->vao );
         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ret->ebo );
         gl::BindToSlot( ret->vbos[0], 0, 3 );
-        gl::NamedBufferStorage( ret->vbos[0], mesh->positions );
+        glNamedBufferStorage( ret->vbos[0], VecSizeInBytes( mesh->positions ), mesh->positions.data(), 0 );
         if ( hasNormals ) {
             gl::BindToSlot( ret->vbos[1], 1, 3 );
-            gl::NamedBufferStorage( ret->vbos[1], mesh->normals );
+            glNamedBufferStorage( ret->vbos[1], VecSizeInBytes( mesh->normals ), mesh->normals.data(), 0 );
         }
         if ( hasUVs ) {
             gl::BindToSlot( ret->vbos[2], 2, 2 );
-            gl::NamedBufferStorage( ret->vbos[2], mesh->uvs );
+            glNamedBufferStorage( ret->vbos[2], VecSizeInBytes( mesh->uvs ), mesh->uvs.data(), 0 );
         }
         if ( hasTangent ) {
             gl::BindToSlot( ret->vbos[3], 3, 3 );
-            gl::NamedBufferStorage( ret->vbos[3], mesh->tangents );
+            glNamedBufferStorage( ret->vbos[3], VecSizeInBytes( mesh->tangents ), mesh->tangents.data(), 0 );
             gl::BindToSlot( ret->vbos[4], 4, 3 );
-            gl::NamedBufferStorage( ret->vbos[4], mesh->bitangents );
+            glNamedBufferStorage( ret->vbos[4], VecSizeInBytes( mesh->bitangents ), mesh->bitangents.data(), 0 );
         }
 
-        gl::NamedBufferStorage( ret->ebo, mesh->indices );
+        glNamedBufferStorage( ret->ebo, VecSizeInBytes( mesh->indices ), mesh->indices.data(), 0 );
         ret->count = static_cast<uint32_t>( mesh->indices.size() );
 
         glBindVertexArray( 0 );
@@ -365,7 +384,7 @@ void OpenGLGraphicsManager::InitializeGeometries( const Scene &scene )
 
     // create meshes
     for ( const auto &mesh : scene.m_meshes ) {
-        m_sceneMeshData.emplace_back( createMeshData( mesh ) );
+        m_sceneMeshData.emplace_back( createMeshBuffers( mesh ) );
         mesh->gpuResource = m_sceneMeshData.back().get();
     }
 
@@ -404,9 +423,10 @@ void OpenGLGraphicsManager::BeginFrame( Frame &frame )
     SetPerFrameConstants( frame.frameContexts );
 }
 
-void OpenGLGraphicsManager::EndFrame( Frame & )
+void OpenGLGraphicsManager::EndFrame( Frame &frame )
 {
     ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
+    GraphicsManager::EndFrame( frame );
 }
 
 void OpenGLGraphicsManager::Present()

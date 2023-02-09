@@ -92,8 +92,7 @@ static void DrawSceneHierachy( Scene* scene )
 
 void GuiPass::Draw( Frame& )
 {
-    auto* app = dynamic_cast<BaseApplication*>( m_pGraphicsManager->GetAppPointer() );
-    Scene* scene = app->GetSceneManager()->GetScene();
+    Scene* scene = m_pGraphicsManager->GetAppPointer()->GetSceneManager()->GetScene();
 
     DrawDebugWindow( scene );
     DrawSceneHierachy( scene );

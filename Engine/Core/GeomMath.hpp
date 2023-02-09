@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+
 #pragma warning( push )
 #pragma warning( disable : 4201 )
 
@@ -37,8 +39,15 @@ using glm::uvec2;
 using glm::uvec3;
 using glm::uvec4;
 
+using glm::mat2;
 using glm::mat3;
 using glm::mat4;
+
+template<typename T>
+inline size_t VecSizeInBytes( const std::vector<T>& vec )
+{
+    return vec.size() * sizeof( T );
+}
 
 inline float Lerp( float a, float b, float f )
 {

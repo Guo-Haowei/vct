@@ -2,8 +2,6 @@
 #include <memory>
 
 #include "GpuTexture.h"
-#include "r_cbuffers.h"
-#include "r_rendertarget.h"
 
 void createGpuResources();
 void destroyGpuResources();

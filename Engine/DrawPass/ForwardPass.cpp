@@ -1,6 +1,6 @@
 #include "ForwardPass.hpp"
 
-#include "Interface/IApplication.hpp"
+#include "Manager/BaseApplication.hpp"
 
 void ForwardPass::Draw( Frame& frame )
 {

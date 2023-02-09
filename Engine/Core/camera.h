@@ -12,18 +12,16 @@ public:
     float pitch = 0.0f;
     vec3 position{ 0 };
 
-    void UpdatePV();
+    void UpdatePV( bool isGL );
 
     inline void SetAspect( float aspect ) { mAspect = aspect; }
     inline float GetAspect() const { return mAspect; }
 
     inline const mat4& Proj() const { return mProj; }
     inline const mat4& View() const { return mView; }
-    inline const mat4& ProjView() const { return mProjView; }
 
 private:
     float mAspect;
     mat4 mProj;
     mat4 mView;
-    mat4 mProjView;
 };

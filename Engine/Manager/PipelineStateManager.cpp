@@ -7,7 +7,7 @@
 #include "Manager/BaseApplication.hpp"
 
 #define VS_SIMPLE_SOURCE_FILE           "simple.vert"
-#define PS_SIMPLE_SOURCE_FILE           "simple.frag"
+#define PS_SIMPLE_SOURCE_FILE           "simple.pixel"
 #define VS_HUD_LINE3D_SOURCE_FILE       "hud/line3d.vert"
 #define PS_HUD_LINE3D_SOURCE_FILE       "hud/line3d.frag"
 #define VS_HUD_IMAGE_SOURCE_FILE        "hud/image.vert"
@@ -110,9 +110,7 @@ bool PipelineStateManager::Initialize()
         }
     };
 
-    BaseApplication* pApp = dynamic_cast<BaseApplication*>( m_pApp );
-
-    if ( pApp->GetGfxBackend() == GfxBackend::D3d11 ) {
+    if ( m_pApp->GetGfxBackend() == GfxBackend::D3d11 ) {
         PipelineStateEx pipelineState{ "SIMPLE" };
         pipelineState.vertexShaderName = VS_SIMPLE_SOURCE_FILE;
         pipelineState.pixelShaderName = PS_SIMPLE_SOURCE_FILE;

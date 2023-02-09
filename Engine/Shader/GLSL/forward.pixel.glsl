@@ -190,4 +190,5 @@ void main()
     color = pow( color, vec3( gamma ) );
 
     out_color = vec4( color, 1.0 );
+    out_color = vec4( ( N + 1.0 ) * 0.5, 1.0 );
 }

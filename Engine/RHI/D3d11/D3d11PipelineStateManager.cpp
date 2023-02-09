@@ -60,8 +60,7 @@ bool D3d11PipelineStateManager::InitializePipelineState( PipelineState **ppPipel
 {
     D3d11PipelineState *pnew_state = new D3d11PipelineState( **ppPipelineState );
 
-    auto baseApp = dynamic_cast<BaseApplication *>( m_pApp );
-    D3d11GraphicsManager *pGfxMgr = dynamic_cast<D3d11GraphicsManager *>( baseApp->GetGraphicsManager() );
+    D3d11GraphicsManager *pGfxMgr = dynamic_cast<D3d11GraphicsManager *>( m_pApp->GetGraphicsManager() );
     ID3D11Device *pDevice = pGfxMgr->GetDevice();
 
     ComPtr<ID3DBlob> vsBlob;
@@ -124,6 +123,7 @@ bool D3d11PipelineStateManager::InitializePipelineState( PipelineState **ppPipel
     // input layout
     static const D3D11_INPUT_ELEMENT_DESC LAYOUT_SIMPLE[] = {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
 
     DX_CALL( pDevice->CreateInputLayout(
@@ -132,6 +132,25 @@ bool D3d11PipelineStateManager::InitializePipelineState( PipelineState **ppPipel
         vsBlob->GetBufferPointer(),
         vsBlob->GetBufferSize(),
         &pnew_state->m_layout ) );
+
+    // pipeline state
+    {
+        D3D11_RASTERIZER_DESC desc{};
+        desc.FillMode = D3D11_FILL_SOLID;
+        desc.FrontCounterClockwise = true;
+        switch ( ( *ppPipelineState )->cullFaceMode ) {
+            case CULL_FACE_MODE::NONE:
+                desc.CullMode = D3D11_CULL_NONE;
+                break;
+            case CULL_FACE_MODE::FRONT:
+                desc.CullMode = D3D11_CULL_FRONT;
+                break;
+            case CULL_FACE_MODE::BACK:
+                desc.CullMode = D3D11_CULL_BACK;
+                break;
+        }
+        pDevice->CreateRasterizerState( &desc, &pnew_state->m_rs );
+    }
 
     *ppPipelineState = pnew_state;
     return true;

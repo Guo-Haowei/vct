@@ -19,8 +19,6 @@
 #include "Manager/BaseApplication.hpp"
 #include "Manager/SceneManager.hpp"
 
-static ID3D11Buffer *vertex_buffer_ptr = NULL;
-
 bool D3d11GraphicsManager::Initialize()
 {
     if ( !GraphicsManager::Initialize() ) {
@@ -36,38 +34,34 @@ bool D3d11GraphicsManager::Initialize()
     }
 
     if ( !ImGui_ImplDX11_Init( m_pDevice.Get(), m_pCtx.Get() ) ) {
-        LOG_FATAL( "D3d11GraphicsManager::Initialize: ImGui_ImplDX11_Init() failed!" );
+        LOG_FATAL( "[D3d11GraphicsManager] ImGui_ImplDX11_Init() failed!" );
         return false;
     }
 
     if ( !ImGui_ImplDX11_CreateDeviceObjects() ) {
-        LOG_FATAL( "D3d11GraphicsManager::Initialize: ImGui_ImplDX11_CreateDeviceObjects() failed!" );
+        LOG_FATAL( "[D3d11GraphicsManager] ImGui_ImplDX11_CreateDeviceObjects() failed!" );
         return false;
     }
 
-    auto pipelineStateManager = dynamic_cast<BaseApplication *>( m_pApp )->GetPipelineStateManager();
+    auto pipelineStateManager = m_pApp->GetPipelineStateManager();
     m_drawPasses.emplace_back( std::shared_ptr<BaseDrawPass>( new GuiPass( this, pipelineStateManager, nullptr, 0 ) ) );
 
-    // @TODO: temp
-    { /*** load mesh data into vertex buffer **/
-        float vertex_data_array[] = {
-            0.0f, 0.5f, 0.0f,    // point at top
-            0.5f, -0.5f, 0.0f,   // point at bottom-right
-            -0.5f, -0.5f, 0.0f,  // point at bottom-left
-        };
+    // create constant buffers
+    auto createConstantBuffer = []( ID3D11Device *device, UINT size ) {
+        D3D11_BUFFER_DESC desc{};
+        desc.ByteWidth = size;
+        desc.Usage = D3D11_USAGE_DYNAMIC;
+        desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+        desc.MiscFlags = 0;
 
-        D3D11_BUFFER_DESC vertex_buff_descr = {};
-        vertex_buff_descr.ByteWidth = sizeof( vertex_data_array );
-        vertex_buff_descr.Usage = D3D11_USAGE_DEFAULT;
-        vertex_buff_descr.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-        D3D11_SUBRESOURCE_DATA sr_data = { 0 };
-        sr_data.pSysMem = vertex_data_array;
-        HRESULT hr = m_pDevice->CreateBuffer(
-            &vertex_buff_descr,
-            &sr_data,
-            &vertex_buffer_ptr );
-        assert( SUCCEEDED( hr ) );
-    }
+        ID3D11Buffer *constantBuffer = nullptr;
+        DX_CALL( device->CreateBuffer( &desc, nullptr, &constantBuffer ) );
+        return constantBuffer;
+    };
+
+    m_drawBatchConstant = createConstantBuffer( m_pDevice.Get(), kSizePerBatchConstantBuffer );
+    m_drawFrameConstant = createConstantBuffer( m_pDevice.Get(), kSizePerFrameConstantBuffer );
 
     return ( m_bInitialized = true );
 }
@@ -103,120 +97,151 @@ void D3d11GraphicsManager::SetPipelineState( const std::shared_ptr<PipelineState
 
     ctx->IASetInputLayout( pPipelineState->m_layout );
     ctx->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+    ctx->RSSetState( pPipelineState->m_rs );
 
     // TODO: modes
 }
 
-void D3d11GraphicsManager::DrawBatch( const Frame & )
+void D3d11GraphicsManager::DrawBatch( const Frame &frame )
 {
-    // @TODO: culling
-    const Frame &frame = m_frame;
-    //for ( auto &pDbc : frame.batchContexts ) {
-    //    SetPerBatchConstants( *pDbc );
+    auto &ctx = m_pCtx;
 
-    //    const auto &dbc = dynamic_cast<const OpenGLDrawBatchContext &>( *pDbc );
+    for ( auto &it : frame.batchContexts ) {
+        auto &dbc = dynamic_cast<D3dDrawBatchContext &>( *it );
+        SetPerBatchConstants( dbc );
 
-    //    const MaterialData *matData = reinterpret_cast<MaterialData *>( pDbc->pEntity->m_material->gpuResource );
-
-    //    FillMaterialCB( matData, g_materialCache.cache );
-    //    g_materialCache.Update();
-
-    //    glBindVertexArray( dbc.vao );
-    //    glDrawElements( dbc.mode, dbc.count, dbc.type, nullptr );
-    //}
-
-    //glBindVertexArray( 0 );
+        UINT stride = sizeof( vec3 );
+        UINT offset = 0;
+        ctx->IASetIndexBuffer( dbc.indexBuffer, DXGI_FORMAT_R32_UINT, 0 );
+        ctx->IASetVertexBuffers( 0, 1, &dbc.positionBuffer, &stride, &offset );
+        ctx->IASetVertexBuffers( 1, 1, &dbc.normalBuffer, &stride, &offset );
+        ctx->DrawIndexed( dbc.indexCount, 0, 0 );
+    }
 }
 
 void D3d11GraphicsManager::SetPerFrameConstants( const DrawFrameContext &context )
 {
-    // glBindBuffer( GL_UNIFORM_BUFFER, m_uboDrawFrameConstant );
-
-    // const auto &constants = static_cast<const PerFrameConstants &>( context );
-
-    // glBufferData( GL_UNIFORM_BUFFER, kSizePerFrameConstantBuffer, &constants, GL_DYNAMIC_DRAW );
-
-    // glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+    auto &ctx = m_pCtx;
+    const auto &constant = static_cast<const PerFrameConstants &>( context );
+    D3D11_MAPPED_SUBRESOURCE subResource;
+    DX_CALL( ctx->Map( m_drawFrameConstant, 0, D3D11_MAP_WRITE_DISCARD, 0, &subResource ) );
+    memcpy( subResource.pData, &constant, kSizePerFrameConstantBuffer );
+    ctx->Unmap( m_drawFrameConstant, 0 );
 }
 
 void D3d11GraphicsManager::SetPerBatchConstants( const DrawBatchContext &context )
 {
-    // glBindBuffer( GL_UNIFORM_BUFFER, m_uboDrawBatchConstant );
-
-    // const auto &constant = static_cast<const PerBatchConstants &>( context );
-
-    // glBufferData( GL_UNIFORM_BUFFER, kSizePerBatchConstantBuffer, &constant, GL_DYNAMIC_DRAW );
-
-    // glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+    auto &ctx = m_pCtx;
+    const auto &constant = static_cast<const PerBatchConstants &>( context );
+    D3D11_MAPPED_SUBRESOURCE subResource;
+    DX_CALL( ctx->Map( m_drawBatchConstant, 0, D3D11_MAP_WRITE_DISCARD, 0, &subResource ) );
+    memcpy( subResource.pData, &constant, kSizePerBatchConstantBuffer );
+    ctx->Unmap( m_drawBatchConstant, 0 );
 }
 
 void D3d11GraphicsManager::InitializeGeometries( const Scene &scene )
 {
-    //uint32_t batch_index = 0;
-    //for ( const auto &entity : scene.m_entities ) {
-    //    if ( !( entity->m_flag & Entity::FLAG_GEOMETRY ) ) {
-    //        continue;
-    //    }
+    auto createMeshBuffers = []( const std::shared_ptr<MeshComponent> &mesh, ID3D11Device *device ) {
+        auto createStaticBuffer = []( D3D11_BIND_FLAG flag, const void *data, size_t size_in_byte, ID3D11Device *device ) -> ID3D11Buffer * {
+            ID3D11Buffer *buffer = nullptr;
 
-    //    const MeshData *drawData = reinterpret_cast<MeshData *>( entity->m_mesh->gpuResource );
+            D3D11_BUFFER_DESC desc{};
+            desc.Usage = D3D11_USAGE_IMMUTABLE;
+            desc.ByteWidth = static_cast<uint32_t>( size_in_byte );
+            desc.BindFlags = flag;
+            desc.CPUAccessFlags = 0;
+            desc.MiscFlags = 0;
 
-    //    auto dbc = std::make_shared<OpenGLDrawBatchContext>();
-    //    dbc->batchIndex = batch_index++;
-    //    dbc->vao = drawData->vao;
-    //    dbc->mode = GL_TRIANGLES;
-    //    dbc->type = GL_UNSIGNED_INT;
-    //    dbc->count = drawData->count;
+            D3D11_SUBRESOURCE_DATA subResoureData{};
+            subResoureData.pSysMem = data;
 
-    //    dbc->pEntity = entity.get();
-    //    dbc->Model = mat4( 1 );
+            if ( FAILED( DX_CALL( device->CreateBuffer( &desc, &subResoureData, &buffer ) ) ) ) {
+                return nullptr;
+            }
 
-    //    m_frame.batchContexts.push_back( dbc );
-    //}
+            return buffer;
+        };
 
-    //auto createUBO = []( int slot ) {
-    //    GLuint handle = 0;
-    //    glGenBuffers( 1, &handle );
-    //    glBindBufferBase( GL_UNIFORM_BUFFER, slot, handle );
-    //    glBindBuffer( GL_UNIFORM_BUFFER, 0 );
-    //    return handle;
-    //};
-    //m_uboDrawFrameConstant = createUBO( 0 );
-    //m_uboDrawBatchConstant = createUBO( 1 );
+        auto ret = std::make_shared<D3dMeshData>();
+
+        const bool hasNormals = !mesh->normals.empty();
+        const bool hasUVs = !mesh->uvs.empty();
+        const bool hasTangent = !mesh->tangents.empty();
+        const bool hasBitangent = !mesh->bitangents.empty();
+
+#define DATA_AND_SIZE( VEC ) ( VEC ).data(), VecSizeInBytes( ( VEC ) )
+        ret->indexBuffer = createStaticBuffer( D3D11_BIND_INDEX_BUFFER, DATA_AND_SIZE( mesh->indices ), device );
+        ret->positionBuffer = createStaticBuffer( D3D11_BIND_VERTEX_BUFFER, DATA_AND_SIZE( mesh->positions ), device );
+        ret->normalBuffer = createStaticBuffer( D3D11_BIND_VERTEX_BUFFER, DATA_AND_SIZE( mesh->normals ), device );
+#undef DATA_AND_SIZE
+        ret->indexCount = (uint32_t)mesh->indices.size() * 3;
+        return ret;
+    };
+
+    for ( const auto &mesh : scene.m_meshes ) {
+        m_sceneMeshData.emplace_back( createMeshBuffers( mesh, m_pDevice.Get() ) );
+        mesh->gpuResource = m_sceneMeshData.back().get();
+    }
+
+    for ( const auto &entity : scene.m_entities ) {
+        if ( !( entity->m_flag & Entity::FLAG_GEOMETRY ) ) {
+            continue;
+        }
+
+        const D3dMeshData *drawData = reinterpret_cast<D3dMeshData *>( entity->m_mesh->gpuResource );
+
+        auto dbc = std::make_shared<D3dDrawBatchContext>();
+
+        dbc->indexCount = drawData->indexCount;
+        dbc->indexBuffer = drawData->indexBuffer;
+        dbc->positionBuffer = drawData->positionBuffer;
+        dbc->normalBuffer = drawData->normalBuffer;
+
+        dbc->pEntity = entity.get();
+        dbc->Model = mat4( 1 );
+
+        m_frame.batchContexts.push_back( dbc );
+    }
 }
 
 void D3d11GraphicsManager::BeginFrame( Frame &frame )
 {
     GraphicsManager::BeginFrame( frame );
 
-    //SetPerFrameConstants( frame.frameContexts );
+    SetPerFrameConstants( frame.frameContexts );
 }
 
 void D3d11GraphicsManager::EndFrame( Frame &frame )
 {
     auto &ctx = m_pCtx;
+
+    for ( auto &it : frame.batchContexts ) {
+        const auto &dbc = dynamic_cast<const D3dDrawBatchContext &>( *it );
+        SetPerBatchConstants( dbc );
+    }
+
+    // render target
+    ctx->OMSetRenderTargets( 1, &m_immediate.rtv, m_immediate.dsv );
+    const float clearColor[4] = { 0.3f, 0.4f, 0.3f, 1.0f };
+    ctx->ClearRenderTargetView( m_immediate.rtv, clearColor );
+    ctx->ClearDepthStencilView( m_immediate.dsv, D3D11_CLEAR_DEPTH, 1.0f, 0 );
+
+    // viewport
     int w, h;
     m_pApp->GetFramebufferSize( w, h );
     D3D11_VIEWPORT viewport = { 0.0f, 0.0f, (FLOAT)w, (FLOAT)h, 0.0f, 1.0f };
     ctx->RSSetViewports( 1, &viewport );
 
-    /**** Output Merger *****/
-    ctx->OMSetRenderTargets( 1, &m_immediate.rtv, NULL );
-    const float clearColor[4] = { 0.3f, 0.4f, 0.3f, 1.0f };
-    ctx->ClearRenderTargetView( m_immediate.rtv, clearColor );
-
-    /***** Input Assembler (map how the vertex shader inputs should be read from vertex buffer) ******/
-    IPipelineStateManager *pPipelineStateManager = dynamic_cast<BaseApplication *>( m_pApp )->GetPipelineStateManager();
+    IPipelineStateManager *pPipelineStateManager = m_pApp->GetPipelineStateManager();
     auto PSO = pPipelineStateManager->GetPipelineState( "SIMPLE" );
     SetPipelineState( PSO );
 
-    /*** draw the vertex buffer with the shaders ****/
-    UINT vertex_stride = 3 * sizeof( float );
-    UINT vertex_offset = 0;
-    m_pCtx->IASetVertexBuffers( 0, 1, &vertex_buffer_ptr, &vertex_stride, &vertex_offset );
-    m_pCtx->Draw( 3, 0 );
+    ctx->VSSetConstantBuffers( 0, 1, &m_drawBatchConstant );
+    ctx->VSSetConstantBuffers( 1, 1, &m_drawFrameConstant );
+
+    DrawBatch( frame );
 
     ImGui_ImplDX11_RenderDrawData( ImGui::GetDrawData() );
-
     GraphicsManager::EndFrame( frame );
 }
 
@@ -242,7 +267,7 @@ bool D3d11GraphicsManager::CreateDeviceAndSwapChain()
     sd.SampleDesc.Count = 1;
     sd.SampleDesc.Quality = 0;
     sd.Windowed = TRUE;
-    sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+    sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
     UINT createDeviceFlags = Dvar_GetBool( r_debug ) ? D3D11_CREATE_DEVICE_DEBUG : 0;
     D3D_FEATURE_LEVEL featureLevel;
@@ -289,8 +314,14 @@ bool D3d11GraphicsManager::CreateRenderTarget()
 
     ComPtr<ID3D11Texture2D> depthBuffer;
 
-    DX_CALL( m_pDevice->CreateTexture2D( &desc, 0, &depthBuffer ) );
-    DX_CALL( m_pDevice->CreateDepthStencilView( depthBuffer.Get(), nullptr, &m_immediate.dsv ) );
+    if ( FAILED( DX_CALL( m_pDevice->CreateTexture2D( &desc, 0, &depthBuffer ) ) ) ) {
+        return false;
+    }
+
+    if ( FAILED( DX_CALL( m_pDevice->CreateDepthStencilView( depthBuffer.Get(), nullptr, &m_immediate.dsv ) ) ) ) {
+        return false;
+    }
+
     return true;
 }
 

@@ -6,9 +6,16 @@
 
 #include "RHI/D3dCommon.hpp"
 
+struct D3dMeshData {
+    ID3D11Buffer* indexBuffer{ nullptr };
+    ID3D11Buffer* positionBuffer{ nullptr };
+    ID3D11Buffer* normalBuffer{ nullptr };
+    uint32_t indexCount{ 0 };
+};
+
 struct ImmediateRenderTarget {
-    ID3D11RenderTargetView* rtv;
-    ID3D11DepthStencilView* dsv;
+    ID3D11RenderTargetView* rtv{ nullptr };
+    ID3D11DepthStencilView* dsv{ nullptr };
 };
 
 class D3d11GraphicsManager : public GraphicsManager {
@@ -53,6 +60,18 @@ private:
 
     // render target
     ImmediateRenderTarget m_immediate;
+
+    ID3D11Buffer* m_drawFrameConstant{ nullptr };
+    ID3D11Buffer* m_drawBatchConstant{ nullptr };
+
+    struct D3dDrawBatchContext : public DrawBatchContext {
+        uint32_t indexCount{ 0 };
+        ID3D11Buffer* indexBuffer;
+        ID3D11Buffer* positionBuffer;
+        ID3D11Buffer* normalBuffer;
+    };
+
+    std::vector<std::shared_ptr<D3dMeshData>> m_sceneMeshData;
 
     friend class D3d11PipelineStateManager;
 };

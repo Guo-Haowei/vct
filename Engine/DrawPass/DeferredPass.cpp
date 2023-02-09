@@ -1,6 +1,6 @@
 #include "DeferredPass.hpp"
 
-#include "Interface/IApplication.hpp"
+#include "Manager/BaseApplication.hpp"
 
 // @TODO: remove
 extern void R_DrawQuad();

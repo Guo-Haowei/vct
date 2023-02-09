@@ -37,10 +37,11 @@ protected:
         int32_t count{ 0 };
     };
 
+    uint32_t m_currentShader;
     uint32_t m_uboDrawFrameConstant{ 0 };
     uint32_t m_uboDrawBatchConstant{ 0 };
+    uint32_t m_ubiDrawSceneConstant{ 0 };
 
-    uint32_t m_currentShader;
     std::vector<std::shared_ptr<OpenGLMeshData>> m_sceneMeshData;
 };
 

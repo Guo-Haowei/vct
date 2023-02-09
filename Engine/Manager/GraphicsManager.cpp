@@ -2,6 +2,7 @@
 
 #include "Base/Asserts.h"
 #include "Base/Logger.h"
+#include "Base/Profiler.hpp"
 
 #include "Core/com_dvars.h"
 
@@ -36,8 +37,11 @@ void GraphicsManager::Tick()
         }
         ASSERT( m_nSceneRevision <= rev );
         if ( m_nSceneRevision < rev ) {
+            LOG_INFO( "[GraphicsManager] Detected Scene Change, reinitialize buffers..." );
+            SCOPE_PROFILER( SceneUpdate, []( uint64_t ms ) {
+                LOG_OK( "[GraphicsManager] Scene reinitialized in %s.", FormatTime( ms ).c_str() );
+            } );
             EndScene();
-            LOG_DEBUG( "[GraphicsManager] Detected Scene Change, reinitialize buffers..." );
             const auto scene = pSceneManager->GetScene();
             ASSERT( scene );
             BeginScene( *scene );
@@ -108,21 +112,22 @@ static mat4 R_HackLightSpaceMatrix( const Scene& scene )
 
 void GraphicsManager::UpdateConstants()
 {
-    auto* app = dynamic_cast<BaseApplication*>( GetAppPointer() );
-    const Scene* scene = app->GetSceneManager()->GetScene();
+    const Scene* scene = GetAppPointer()->GetSceneManager()->GetScene();
 
     for ( auto& dbc : m_frame.batchContexts ) {
         const Entity* entity = dbc->pEntity;
         entity->GetCalculatedTransform( dbc->Model );
         const MaterialComponent* mat = entity->m_material;
         const MaterialTextures* textures = reinterpret_cast<const MaterialTextures*>( mat->gpuResource );
-        dbc->AlbedoColor = mat->albedoColor;
-        dbc->Metallic = mat->metallic;
-        dbc->Roughness = mat->roughness;
-        dbc->HasAlbedoMap = textures->albedoMap.handle ? 1.0f : 0.0f;
-        dbc->HasNormalMap = textures->normalMap.handle ? 1.0f : 0.0f;
-        dbc->HasPbrMap = textures->pbrMap.handle ? 1.0f : 0.0f;
-        dbc->ReflectPower = mat->reflectPower;
+        if ( textures ) {
+            dbc->AlbedoColor = mat->albedoColor;
+            dbc->Metallic = mat->metallic;
+            dbc->Roughness = mat->roughness;
+            dbc->HasAlbedoMap = textures->albedoMap.handle ? 1.0f : 0.0f;
+            dbc->HasNormalMap = textures->normalMap.handle ? 1.0f : 0.0f;
+            dbc->HasPbrMap = textures->pbrMap.handle ? 1.0f : 0.0f;
+            dbc->ReflectPower = mat->reflectPower;
+        }
     }
 
     PerFrameConstants& frameConstats = m_frame.frameContexts;

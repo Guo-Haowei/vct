@@ -1,11 +1,14 @@
-#ifdef __cplusplus
-#define CBUFFER( NAME, SLOT ) struct NAME
-#else
-#define CBUFFER( NAME, SLOT ) layout( std140, binding = SLOT ) uniform NAME
+#if !defined( __cplusplus )
+#if !defined( _IS_GLSL_LANG_ )
+#define _IS_HLSL_LANG_
+#endif
 #endif
 
 #ifdef __cplusplus
 #pragma once
+#pragma warning( push )
+#pragma warning( disable : 4324 )
+
 #include "Core/GeomMath.hpp"
 #include "Core/Image.hpp"
 using sampler2D = uint64_t;
@@ -13,6 +16,8 @@ using sampler3D = uint64_t;
 
 using TextureHandle = intptr_t;
 using TextureFormat = intptr_t;
+
+constexpr size_t CONSTANT_BUFFER_ALIGNMENT = 32;
 
 struct TextureBase {
     TextureHandle handle{ 0 };
@@ -36,11 +41,36 @@ struct MaterialTextures {
 
 #endif
 
-CBUFFER( PerBatchConstants, 0 )
-{
-    mat4 Model;
+#if defined( __cplusplus )
+#define CBUFFER( NAME, SLOT, REG ) struct alignas( CONSTANT_BUFFER_ALIGNMENT ) NAME
+#elif defined( _IS_GLSL_LANG_ )
+#define CBUFFER( NAME, SLOT, REG ) layout( std140, binding = SLOT ) uniform NAME
+#elif defined( _IS_HLSL_LANG_ )
+#define CBUFFER( NAME, SLOT, REG ) cbuffer NAME : register( REG )
+#else
+#error "Unknown language"
+#endif
 
-    vec4 AlbedoColor;
+#if !defined( _IS_HLSL_LANG_ )
+#define float2   vec3
+#define float3   vec3
+#define float4   vec4
+#define float2x2 mat2
+#define float3x3 mat3
+#define float4x4 mat4
+#endif
+
+#if defined( _IS_GLSL_LANG_ )
+uniform sampler2D UniformAlbedoMap;
+uniform sampler2D UniformNormalMap;
+uniform sampler2D UniformPBRMap;
+#endif
+
+CBUFFER( PerBatchConstants, 0, b0 )
+{
+    float4x4 Model;
+
+    float4 AlbedoColor;
 
     float Metallic;
     float Roughness;
@@ -53,24 +83,24 @@ CBUFFER( PerBatchConstants, 0 )
     int _padint0;
 };
 
-CBUFFER( PerFrameConstants, 1 )
+CBUFFER( PerFrameConstants, 1, b1 )
 {
-    mat4 View;
-    mat4 Proj;
+    float4x4 View;
+    float4x4 Proj;
 
-    vec3 CamPos;
+    float3 CamPos;
     int DebugCSM;
 
-    vec3 SunDir;
+    float3 SunDir;
     int EnableGI;
 
-    vec3 LightColor;
+    float3 LightColor;
     float VoxelSize;
 
-    vec4 CascadedClipZ;
-    mat4 LightPV;
+    float4 CascadedClipZ;
+    float4x4 LightPV;
 
-    vec3 WorldCenter;
+    float3 WorldCenter;
     float WorldSizeHalf;
 
     float TexelSize;
@@ -79,34 +109,30 @@ CBUFFER( PerFrameConstants, 1 )
     int ScreenHeight;
 };
 
-#ifndef __cplusplus
-uniform sampler2D UniformAlbedoMap;
-uniform sampler2D UniformNormalMap;
-uniform sampler2D UniformPBRMap;
-#endif
-
+#if !defined( _IS_HLSL_LANG_ )
 // @TODO: get rid of this
 #define NUM_OVERLAYS 4
 
-#ifdef __cplusplus
-struct ConstantCB
-#else
-#define Sampler2DArray sampler2D
-layout( std140, binding = 3 ) uniform ConstantCB
-#endif
+CBUFFER( PerSceneConstants, 2, b2 )
 {
+    // @TODO remove this
     sampler2D ShadowMap;
     sampler3D VoxelAlbedoMap;
     sampler3D VoxelNormalMap;
     sampler3D VoxelEmissiveMap;
 
-    vec4 OverlayPositions[NUM_OVERLAYS];
+    float4 OverlayPositions[NUM_OVERLAYS];
 };
 
-#ifdef __cplusplus
-static_assert( sizeof( ConstantCB ) % 16 == 0 );
+#endif
 
+#if defined( __cplusplus )
 // CB size is required to be 256-byte aligned.
-const size_t kSizePerBatchConstantBuffer = ALIGN( sizeof( PerBatchConstants ), 256 );
-const size_t kSizePerFrameConstantBuffer = ALIGN( sizeof( PerFrameConstants ), 256 );
+const size_t kSizePerBatchConstantBuffer = ALIGN( sizeof( PerBatchConstants ), CONSTANT_BUFFER_ALIGNMENT );
+const size_t kSizePerFrameConstantBuffer = ALIGN( sizeof( PerFrameConstants ), CONSTANT_BUFFER_ALIGNMENT );
+const size_t kSizePerSceneConstantBuffer = ALIGN( sizeof( PerSceneConstants ), CONSTANT_BUFFER_ALIGNMENT );
+static_assert( sizeof( PerBatchConstants ) == kSizePerBatchConstantBuffer );
+static_assert( sizeof( PerFrameConstants ) == kSizePerFrameConstantBuffer );
+static_assert( sizeof( PerSceneConstants ) == kSizePerSceneConstantBuffer );
+#pragma warning( pop )
 #endif
