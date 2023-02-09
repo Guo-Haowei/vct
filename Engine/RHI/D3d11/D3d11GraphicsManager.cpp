@@ -50,10 +50,11 @@ bool D3d11GraphicsManager::Initialize()
 
     // @TODO: temp
     { /*** load mesh data into vertex buffer **/
-        float vertex_data_array[] = {
-            0.0f, 0.5f, 0.0f,    // point at top
-            0.5f, -0.5f, 0.0f,   // point at bottom-right
-            -0.5f, -0.5f, 0.0f,  // point at bottom-left
+        float s = 10.0f;
+        vec3 vertex_data_array[] = {
+            s * vec3( 0.0f, 0.5f, 0.0f ),    // point at top
+            s * vec3( 0.5f, -0.5f, 0.0f ),   // point at bottom-right
+            s * vec3( -0.5f, -0.5f, 0.0f ),  // point at bottom-left
         };
 
         D3D11_BUFFER_DESC vertex_buff_descr = {};
@@ -67,6 +68,25 @@ bool D3d11GraphicsManager::Initialize()
             &sr_data,
             &vertex_buffer_ptr );
         assert( SUCCEEDED( hr ) );
+    }
+
+    // create constant buffers
+    {
+        auto createConstantBuffer = [](ID3D11Device* device) {
+            D3D11_BUFFER_DESC desc{};
+            desc.ByteWidth = 16;
+            desc.Usage = D3D11_USAGE_DYNAMIC;
+            desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+            desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+            desc.MiscFlags = 0;
+
+            ID3D11Buffer* constantBuffer = nullptr;
+            DX_CALL( device->CreateBuffer( &desc, nullptr, &constantBuffer ) );
+            return constantBuffer;
+        };
+
+        m_drawBatchConstant = createConstantBuffer( m_pDevice.Get() );
+        m_drawFrameConstant = createConstantBuffer( m_pDevice.Get() );
     }
 
     return ( m_bInitialized = true );
@@ -115,10 +135,22 @@ void D3d11GraphicsManager::DrawBatch( const Frame & )
 
 void D3d11GraphicsManager::SetPerFrameConstants( const DrawFrameContext &context )
 {
+    auto &ctx = m_pCtx;
+    const auto &constant = static_cast<const PerFrameConstants &>( context );
+    D3D11_MAPPED_SUBRESOURCE subResource;
+    DX_CALL( ctx->Map( m_drawFrameConstant, 0, D3D11_MAP_WRITE_DISCARD, 0, &subResource ) );
+    memcpy( subResource.pData, &constant, kSizePerFrameConstantBuffer );
+    ctx->Unmap( m_drawFrameConstant, 0 );
 }
 
 void D3d11GraphicsManager::SetPerBatchConstants( const DrawBatchContext &context )
 {
+    auto &ctx = m_pCtx;
+    const auto &constant = static_cast<const PerBatchConstants &>( context );
+    D3D11_MAPPED_SUBRESOURCE subResource;
+    DX_CALL( ctx->Map( m_drawBatchConstant, 0, D3D11_MAP_WRITE_DISCARD, 0, &subResource ) );
+    memcpy( subResource.pData, &constant, kSizePerBatchConstantBuffer );
+    ctx->Unmap( m_drawBatchConstant, 0 );
 }
 
 void D3d11GraphicsManager::InitializeGeometries( const Scene &scene )
@@ -129,21 +161,41 @@ void D3d11GraphicsManager::BeginFrame( Frame &frame )
 {
     GraphicsManager::BeginFrame( frame );
 
-    // SetPerFrameConstants( frame.frameContexts );
-}
+    SetPerFrameConstants( frame.frameContexts );
 
-void D3d11GraphicsManager::EndFrame( Frame &frame )
-{
+    auto dummy = std::make_shared<D3dDrawBatchContext>();
+    dummy->Model = mat4(1);
+    frame.batchContexts.clear();
+    frame.batchContexts.emplace_back(dummy);
+
+    for ( auto &it : frame.batchContexts ) {
+        const auto &dbc = dynamic_cast<const D3dDrawBatchContext &>( *it );
+        SetPerBatchConstants( dbc );
+    }
+
+    frame.batchContexts.clear();
+
+    // viewport
     auto &ctx = m_pCtx;
     int w, h;
     m_pApp->GetFramebufferSize( w, h );
     D3D11_VIEWPORT viewport = { 0.0f, 0.0f, (FLOAT)w, (FLOAT)h, 0.0f, 1.0f };
     ctx->RSSetViewports( 1, &viewport );
+}
+
+void D3d11GraphicsManager::EndFrame( Frame &frame )
+{
+    //SetPerFrameConstants( frame.frameContexts );
+
+    auto &ctx = m_pCtx;
+
+    ctx->VSSetConstantBuffers( 0, 1, &m_drawFrameConstant );
 
     /**** Output Merger *****/
-    ctx->OMSetRenderTargets( 1, &m_immediate.rtv, NULL );
+    ctx->OMSetRenderTargets( 1, &m_immediate.rtv, m_immediate.dsv );
     const float clearColor[4] = { 0.3f, 0.4f, 0.3f, 1.0f };
     ctx->ClearRenderTargetView( m_immediate.rtv, clearColor );
+    ctx->ClearDepthStencilView( m_immediate.dsv, D3D11_CLEAR_DEPTH, 1.0f, 0 );
 
     /***** Input Assembler (map how the vertex shader inputs should be read from vertex buffer) ******/
     IPipelineStateManager *pPipelineStateManager = dynamic_cast<BaseApplication *>( m_pApp )->GetPipelineStateManager();
@@ -157,7 +209,6 @@ void D3d11GraphicsManager::EndFrame( Frame &frame )
     m_pCtx->Draw( 3, 0 );
 
     ImGui_ImplDX11_RenderDrawData( ImGui::GetDrawData() );
-
     GraphicsManager::EndFrame( frame );
 }
 
@@ -183,7 +234,7 @@ bool D3d11GraphicsManager::CreateDeviceAndSwapChain()
     sd.SampleDesc.Count = 1;
     sd.SampleDesc.Quality = 0;
     sd.Windowed = TRUE;
-    sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+    sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
     UINT createDeviceFlags = Dvar_GetBool( r_debug ) ? D3D11_CREATE_DEVICE_DEBUG : 0;
     D3D_FEATURE_LEVEL featureLevel;
@@ -230,8 +281,14 @@ bool D3d11GraphicsManager::CreateRenderTarget()
 
     ComPtr<ID3D11Texture2D> depthBuffer;
 
-    DX_CALL( m_pDevice->CreateTexture2D( &desc, 0, &depthBuffer ) );
-    DX_CALL( m_pDevice->CreateDepthStencilView( depthBuffer.Get(), nullptr, &m_immediate.dsv ) );
+    if ( FAILED( DX_CALL( m_pDevice->CreateTexture2D( &desc, 0, &depthBuffer ) ) ) ) {
+        return false;
+    }
+
+    if ( FAILED( DX_CALL( m_pDevice->CreateDepthStencilView( depthBuffer.Get(), nullptr, &m_immediate.dsv ) ) ) ) {
+        return false;
+    }
+
     return true;
 }
 

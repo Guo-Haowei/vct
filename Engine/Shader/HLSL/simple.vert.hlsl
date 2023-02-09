@@ -18,7 +18,7 @@ simple_vert_output vs_main(simple_vert_input i) {
   simple_vert_output o;
   float4 worldPos = mul(Model, float4(i.pos, 1.0));
   o.pos = mul(Proj, mul(View, worldPos));
-  o.pos = float4(i.pos, 1.0);
+  o.worldPos = worldPos.xyz;
 
   return o;
 }

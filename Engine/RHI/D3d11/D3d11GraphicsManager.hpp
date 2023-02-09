@@ -54,5 +54,16 @@ private:
     // render target
     ImmediateRenderTarget m_immediate;
 
+    ID3D11Buffer* m_drawFrameConstant{ nullptr };
+    ID3D11Buffer* m_drawBatchConstant{ nullptr };
+
+    struct D3dDrawBatchContext : public DrawBatchContext {
+        uint32_t index_count{ 0 };
+        size_t index_offset{ 0 };
+        uint32_t property_count{ 0 };
+        size_t property_offset{ 0 };
+        // size_t cbv_srv_uav_offset{ 0 };
+    };
+
     friend class D3d11PipelineStateManager;
 };

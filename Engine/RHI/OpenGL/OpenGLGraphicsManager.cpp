@@ -108,7 +108,7 @@ bool OpenGLGraphicsManager::Initialize()
     R_CreateQuad();
     createGpuResources();
 
-    auto createUBO = []( int slot ) {
+    auto createConstantBuffer = []( int slot ) {
         GLuint handle = 0;
         glGenBuffers( 1, &handle );
         glBindBufferBase( GL_UNIFORM_BUFFER, slot, handle );
@@ -116,12 +116,12 @@ bool OpenGLGraphicsManager::Initialize()
         return handle;
     };
 
-    m_uboDrawBatchConstant = createUBO( 0 );
-    m_uboDrawFrameConstant = createUBO( 1 );
+    m_uboDrawBatchConstant = createConstantBuffer( 0 );
+    m_uboDrawFrameConstant = createConstantBuffer( 1 );
 
     // @TODO: refactor
     {
-        GLuint cb = createUBO( 2 );
+        GLuint cb = createConstantBuffer( 2 );
         PerSceneConstants cache;
         {
             constexpr float s = 0.14f;
@@ -234,9 +234,8 @@ void OpenGLGraphicsManager::SetPipelineState( const std::shared_ptr<PipelineStat
     }
 }
 
-void OpenGLGraphicsManager::DrawBatch( const Frame & )
+void OpenGLGraphicsManager::DrawBatch( const Frame &frame )
 {
-    const Frame &frame = m_frame;
     for ( auto &it : frame.batchContexts ) {
         const auto &dbc = dynamic_cast<const OpenGLDrawBatchContext &>( *it );
         SetPerBatchConstants( dbc );
@@ -424,9 +423,10 @@ void OpenGLGraphicsManager::BeginFrame( Frame &frame )
     SetPerFrameConstants( frame.frameContexts );
 }
 
-void OpenGLGraphicsManager::EndFrame( Frame & )
+void OpenGLGraphicsManager::EndFrame( Frame &frame )
 {
     ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
+    GraphicsManager::EndFrame( frame );
 }
 
 void OpenGLGraphicsManager::Present()

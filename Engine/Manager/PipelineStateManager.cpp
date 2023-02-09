@@ -7,7 +7,7 @@
 #include "Manager/BaseApplication.hpp"
 
 #define VS_SIMPLE_SOURCE_FILE           "simple.vert"
-#define PS_SIMPLE_SOURCE_FILE           "simple.frag"
+#define PS_SIMPLE_SOURCE_FILE           "simple.pixel"
 #define VS_HUD_LINE3D_SOURCE_FILE       "hud/line3d.vert"
 #define PS_HUD_LINE3D_SOURCE_FILE       "hud/line3d.frag"
 #define VS_HUD_IMAGE_SOURCE_FILE        "hud/image.vert"

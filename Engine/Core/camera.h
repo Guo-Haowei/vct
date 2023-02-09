@@ -19,11 +19,9 @@ public:
 
     inline const mat4& Proj() const { return mProj; }
     inline const mat4& View() const { return mView; }
-    inline const mat4& ProjView() const { return mProjView; }
 
 private:
     float mAspect;
     mat4 mProj;
     mat4 mView;
-    mat4 mProjView;
 };
