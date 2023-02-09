@@ -18,10 +18,10 @@
 #include "Manager/SceneManager.hpp"
 
 #include "Graphics/MainRenderer.h"
-OpenGLMeshData g_quad;
 
 // @TODO: refactor
-void R_CreateQuad()
+OpenGLMeshData g_quad;
+static void R_CreateQuad()
 {
     // clang-format off
     float points[] = { -1.0f, +1.0f, -1.0f, -1.0f, +1.0f, +1.0f, +1.0f, +1.0f, -1.0f, -1.0f, +1.0f, -1.0f, };
@@ -105,6 +105,7 @@ bool OpenGLGraphicsManager::Initialize()
         g_shadowRT.Create( res, res );
     }
 
+    R_CreateQuad();
     createGpuResources();
 
     auto createUBO = []( int slot ) {
@@ -117,6 +118,25 @@ bool OpenGLGraphicsManager::Initialize()
 
     m_uboDrawBatchConstant = createUBO( 0 );
     m_uboDrawFrameConstant = createUBO( 1 );
+
+    // @TODO: refactor
+    {
+        GLuint cb = createUBO( 2 );
+        PerSceneConstants cache;
+        {
+            constexpr float s = 0.14f;
+            float h = 1.0f - s;
+            int i = 0;
+            cache.OverlayPositions[i++] = vec4( vec2( 1.0f - s, h ), vec2( s - 0.01f ) );
+        }
+        cache.ShadowMap = gl::MakeTextureResident( g_shadowRT.GetDepthTexture().GetHandle() );
+        cache.VoxelAlbedoMap = gl::MakeTextureResident( m_albedoVoxel.GetHandle() );
+        cache.VoxelNormalMap = gl::MakeTextureResident( m_normalVoxel.GetHandle() );
+
+        glBindBuffer( GL_UNIFORM_BUFFER, cb );
+        glBufferData( GL_UNIFORM_BUFFER, kSizePerSceneConstantBuffer, &cache, GL_DYNAMIC_DRAW );
+        glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+    }
 
     return ( m_bInitialized = true );
 }

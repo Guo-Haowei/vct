@@ -1,10 +1,4 @@
 #ifdef __cplusplus
-#define CBUFFER( NAME, SLOT ) struct NAME
-#else
-#define CBUFFER( NAME, SLOT ) layout( std140, binding = SLOT ) uniform NAME
-#endif
-
-#ifdef __cplusplus
 #pragma once
 #include "Core/GeomMath.hpp"
 #include "Core/Image.hpp"
@@ -34,6 +28,12 @@ struct MaterialTextures {
     Texture2D pbrMap;
 };
 
+#endif
+
+#ifdef __cplusplus
+#define CBUFFER( NAME, SLOT ) struct NAME
+#else
+#define CBUFFER( NAME, SLOT ) layout( std140, binding = SLOT ) uniform NAME
 #endif
 
 CBUFFER( PerBatchConstants, 0 )
@@ -79,22 +79,12 @@ CBUFFER( PerFrameConstants, 1 )
     int ScreenHeight;
 };
 
-#ifndef __cplusplus
-uniform sampler2D UniformAlbedoMap;
-uniform sampler2D UniformNormalMap;
-uniform sampler2D UniformPBRMap;
-#endif
-
 // @TODO: get rid of this
 #define NUM_OVERLAYS 4
 
-#ifdef __cplusplus
-struct ConstantCB
-#else
-#define Sampler2DArray sampler2D
-layout( std140, binding = 3 ) uniform ConstantCB
-#endif
+CBUFFER( PerSceneConstants, 2 )
 {
+    // @TODO remove this
     sampler2D ShadowMap;
     sampler3D VoxelAlbedoMap;
     sampler3D VoxelNormalMap;
@@ -104,9 +94,12 @@ layout( std140, binding = 3 ) uniform ConstantCB
 };
 
 #ifdef __cplusplus
-static_assert( sizeof( ConstantCB ) % 16 == 0 );
-
 // CB size is required to be 256-byte aligned.
 const size_t kSizePerBatchConstantBuffer = ALIGN( sizeof( PerBatchConstants ), 256 );
 const size_t kSizePerFrameConstantBuffer = ALIGN( sizeof( PerFrameConstants ), 256 );
+const size_t kSizePerSceneConstantBuffer = ALIGN( sizeof( PerSceneConstants ), 256 );
+#else
+uniform sampler2D UniformAlbedoMap;
+uniform sampler2D UniformNormalMap;
+uniform sampler2D UniformPBRMap;
 #endif

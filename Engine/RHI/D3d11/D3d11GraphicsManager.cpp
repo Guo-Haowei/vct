@@ -36,12 +36,12 @@ bool D3d11GraphicsManager::Initialize()
     }
 
     if ( !ImGui_ImplDX11_Init( m_pDevice.Get(), m_pCtx.Get() ) ) {
-        LOG_FATAL( "D3d11GraphicsManager::Initialize: ImGui_ImplDX11_Init() failed!" );
+        LOG_FATAL( "[D3d11GraphicsManager] ImGui_ImplDX11_Init() failed!" );
         return false;
     }
 
     if ( !ImGui_ImplDX11_CreateDeviceObjects() ) {
-        LOG_FATAL( "D3d11GraphicsManager::Initialize: ImGui_ImplDX11_CreateDeviceObjects() failed!" );
+        LOG_FATAL( "[D3d11GraphicsManager] ImGui_ImplDX11_CreateDeviceObjects() failed!" );
         return false;
     }
 
@@ -109,86 +109,27 @@ void D3d11GraphicsManager::SetPipelineState( const std::shared_ptr<PipelineState
 
 void D3d11GraphicsManager::DrawBatch( const Frame & )
 {
-    // @TODO: culling
     const Frame &frame = m_frame;
-    //for ( auto &pDbc : frame.batchContexts ) {
-    //    SetPerBatchConstants( *pDbc );
-
-    //    const auto &dbc = dynamic_cast<const OpenGLDrawBatchContext &>( *pDbc );
-
-    //    const MaterialData *matData = reinterpret_cast<MaterialData *>( pDbc->pEntity->m_material->gpuResource );
-
-    //    FillMaterialCB( matData, g_materialCache.cache );
-    //    g_materialCache.Update();
-
-    //    glBindVertexArray( dbc.vao );
-    //    glDrawElements( dbc.mode, dbc.count, dbc.type, nullptr );
-    //}
-
-    //glBindVertexArray( 0 );
+    unused(frame);
 }
 
 void D3d11GraphicsManager::SetPerFrameConstants( const DrawFrameContext &context )
 {
-    // glBindBuffer( GL_UNIFORM_BUFFER, m_uboDrawFrameConstant );
-
-    // const auto &constants = static_cast<const PerFrameConstants &>( context );
-
-    // glBufferData( GL_UNIFORM_BUFFER, kSizePerFrameConstantBuffer, &constants, GL_DYNAMIC_DRAW );
-
-    // glBindBuffer( GL_UNIFORM_BUFFER, 0 );
 }
 
 void D3d11GraphicsManager::SetPerBatchConstants( const DrawBatchContext &context )
 {
-    // glBindBuffer( GL_UNIFORM_BUFFER, m_uboDrawBatchConstant );
-
-    // const auto &constant = static_cast<const PerBatchConstants &>( context );
-
-    // glBufferData( GL_UNIFORM_BUFFER, kSizePerBatchConstantBuffer, &constant, GL_DYNAMIC_DRAW );
-
-    // glBindBuffer( GL_UNIFORM_BUFFER, 0 );
 }
 
 void D3d11GraphicsManager::InitializeGeometries( const Scene &scene )
 {
-    //uint32_t batch_index = 0;
-    //for ( const auto &entity : scene.m_entities ) {
-    //    if ( !( entity->m_flag & Entity::FLAG_GEOMETRY ) ) {
-    //        continue;
-    //    }
-
-    //    const MeshData *drawData = reinterpret_cast<MeshData *>( entity->m_mesh->gpuResource );
-
-    //    auto dbc = std::make_shared<OpenGLDrawBatchContext>();
-    //    dbc->batchIndex = batch_index++;
-    //    dbc->vao = drawData->vao;
-    //    dbc->mode = GL_TRIANGLES;
-    //    dbc->type = GL_UNSIGNED_INT;
-    //    dbc->count = drawData->count;
-
-    //    dbc->pEntity = entity.get();
-    //    dbc->Model = mat4( 1 );
-
-    //    m_frame.batchContexts.push_back( dbc );
-    //}
-
-    //auto createUBO = []( int slot ) {
-    //    GLuint handle = 0;
-    //    glGenBuffers( 1, &handle );
-    //    glBindBufferBase( GL_UNIFORM_BUFFER, slot, handle );
-    //    glBindBuffer( GL_UNIFORM_BUFFER, 0 );
-    //    return handle;
-    //};
-    //m_uboDrawFrameConstant = createUBO( 0 );
-    //m_uboDrawBatchConstant = createUBO( 1 );
 }
 
 void D3d11GraphicsManager::BeginFrame( Frame &frame )
 {
     GraphicsManager::BeginFrame( frame );
 
-    //SetPerFrameConstants( frame.frameContexts );
+    // SetPerFrameConstants( frame.frameContexts );
 }
 
 void D3d11GraphicsManager::EndFrame( Frame &frame )

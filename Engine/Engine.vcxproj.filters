@@ -72,9 +72,6 @@
     <ClCompile Include="Graphics\MainRenderer.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\r_cbuffers.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Graphics\r_rendertarget.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
@@ -210,9 +207,6 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\MainRenderer.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\r_cbuffers.h">
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\r_rendertarget.h">

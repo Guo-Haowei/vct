@@ -32,7 +32,6 @@
     <ClCompile Include="Graphics\gl_utils.cpp" />
     <ClCompile Include="Graphics\GpuTexture.cpp" />
     <ClCompile Include="Graphics\MainRenderer.cpp" />
-    <ClCompile Include="Graphics\r_cbuffers.cpp" />
     <ClCompile Include="Graphics\r_rendertarget.cpp" />
     <ClCompile Include="Manager\AssetLoader.cpp" />
     <ClCompile Include="Manager\BaseApplication.cpp" />
@@ -83,7 +82,6 @@
     <ClInclude Include="Graphics\gl_utils.h" />
     <ClInclude Include="Graphics\GpuTexture.h" />
     <ClInclude Include="Graphics\MainRenderer.h" />
-    <ClInclude Include="Graphics\r_cbuffers.h" />
     <ClInclude Include="Graphics\r_rendertarget.h" />
     <ClInclude Include="Interface\IApplication.hpp" />
     <ClInclude Include="Interface\IAssetLoader.hpp" />

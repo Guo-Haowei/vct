@@ -6,8 +6,6 @@
 #include "Core/GlfwApplication.hpp"
 #include "Core/com_dvars.h"
 
-#include "r_cbuffers.h"
-
 void RenderTarget::Bind()
 {
     glBindFramebuffer( GL_FRAMEBUFFER, mHandle );
