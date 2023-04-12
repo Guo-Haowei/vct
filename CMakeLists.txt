@@ -19,10 +19,15 @@ message("Configuring glad...")
 add_subdirectory(External/glad)
 set_target_properties(glad PROPERTIES FOLDER External)
 
+include(cmake/build-lua.cmake)
+
+# @TODO: remove
 include_directories(${PROJECT_SOURCE_DIR}/source/)
+include_directories(${PROJECT_SOURCE_DIR}/external/)
 include_directories(${PROJECT_SOURCE_DIR}/external/glm/)
 include_directories(${PROJECT_SOURCE_DIR}/external/glad/include/)
 
+# @TODO: remove
 add_definitions(-DDATA_DIR="${CMAKE_SOURCE_DIR}/data/")
 add_definitions(-DROOT_FOLDER="${CMAKE_SOURCE_DIR}/")
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
