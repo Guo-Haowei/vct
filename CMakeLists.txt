@@ -20,6 +20,7 @@ add_subdirectory(External/glad)
 set_target_properties(glad PROPERTIES FOLDER External)
 
 include(cmake/build-lua.cmake)
+include(cmake/build-imgui.cmake)
 
 # @TODO: remove
 include_directories(${PROJECT_SOURCE_DIR}/source/)

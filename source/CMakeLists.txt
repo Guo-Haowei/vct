@@ -1,5 +1,4 @@
 add_subdirectory(universal)
-add_subdirectory(imgui)
 add_subdirectory(common)
 add_subdirectory(scene)
 add_subdirectory(renderer)

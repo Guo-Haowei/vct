@@ -16,3 +16,6 @@
 [submodule "external/lua"]
 	path = external/lua
 	url = https://github.com/lua/lua.git
+[submodule "external/imgui"]
+	path = external/imgui
+	url = https://github.com/ocornut/imgui.git

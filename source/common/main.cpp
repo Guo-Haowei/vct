@@ -3,12 +3,13 @@
 #include "com_misc.h"
 #include "editor.h"
 #include "imgui/imgui.h"
-#include "imgui_impl_glfw.h"
 #include "main_window.h"
 #include "renderer/MainRenderer.h"
-#include "renderer/imgui_impl_opengl3.h"
 #include "renderer/r_graphics.h"
 #include "universal/core_math.h"
+
+#include "imgui/backends/imgui_impl_glfw.h"
+#include "imgui/backends/imgui_impl_opengl3.h"
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -29,7 +30,7 @@ int main( int argc, const char** argv )
 
     EditorSetupStyle();
 
-    ImGui_ImplGlfw_Init( MainWindow::GetRaw() );
+    ImGui_ImplGlfw_InitForOpenGL( MainWindow::GetRaw(), true );
 
     ImGui_ImplOpenGL3_Init();
     ImGui_ImplOpenGL3_CreateDeviceObjects();

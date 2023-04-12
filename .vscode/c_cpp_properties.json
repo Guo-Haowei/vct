@@ -3,11 +3,13 @@
         {
             "name": "Win32",
             "includePath": [
+                "${workspaceRoot}/external/assimp/include",
                 "${workspaceRoot}/external/glad/include",
                 "${workspaceRoot}/external/glfw/include",
                 "${workspaceRoot}/external/glm/",
                 "${workspaceRoot}/external/stb/",
-                "${workspaceRoot}/external/assimp/include",
+                "${workspaceRoot}/external/imgui/",
+                "${workspaceRoot}/external/",
                 "${workspaceRoot}/source"
             ],
             "defines": [
