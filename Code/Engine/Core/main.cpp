@@ -4,8 +4,8 @@
 #include "editor.h"
 #include "imgui/imgui.h"
 #include "main_window.h"
-#include "renderer/MainRenderer.h"
-#include "renderer/r_graphics.h"
+#include "Graphics/MainRenderer.h"
+#include "Graphics/r_graphics.h"
 #include "universal/core_math.h"
 
 #include "imgui/backends/imgui_impl_glfw.h"

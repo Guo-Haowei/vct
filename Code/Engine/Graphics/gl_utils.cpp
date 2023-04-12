@@ -6,8 +6,8 @@
 #include <set>
 #include <sstream>
 
-#include "common/com_dvars.h"
-#include "common/com_filesystem.h"
+#include "Core/com_dvars.h"
+#include "Core/com_filesystem.h"
 #include "shaders/cbuffer.glsl"
 #include "universal/core_assert.h"
 #include "universal/dvar_api.h"

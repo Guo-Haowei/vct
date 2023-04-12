@@ -4,11 +4,11 @@
 #include <GLFW/glfw3.h>
 
 #include "com_dvars.h"
-#include "common/com_misc.h"
-#include "common/main_window.h"
+#include "Core/com_misc.h"
+#include "Core/main_window.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
-#include "renderer/r_cbuffers.h"
+#include "Graphics/r_cbuffers.h"
 #include "universal/core_assert.h"
 #include "universal/dvar_api.h"
 #include "universal/print.h"

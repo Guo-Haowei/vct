@@ -1,7 +1,7 @@
 #include "r_rendertarget.h"
 
-#include "common/com_dvars.h"
-#include "common/main_window.h"
+#include "Core/com_dvars.h"
+#include "Core/main_window.h"
 #include "r_cbuffers.h"
 #include "universal/core_assert.h"
 #include "universal/dvar_api.h"

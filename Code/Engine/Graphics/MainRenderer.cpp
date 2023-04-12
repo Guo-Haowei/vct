@@ -1,12 +1,12 @@
 #pragma once
 #include "MainRenderer.h"
 
-#include "common/com_dvars.h"
-#include "common/com_filesystem.h"
-#include "common/com_misc.h"
-#include "common/editor.h"
-#include "common/geometry.h"
-#include "common/main_window.h"
+#include "Core/com_dvars.h"
+#include "Core/com_filesystem.h"
+#include "Core/com_misc.h"
+#include "Core/editor.h"
+#include "Core/geometry.h"
+#include "Core/main_window.h"
 #include "r_defines.h"
 #include "r_editor.h"
 #include "r_passes.h"

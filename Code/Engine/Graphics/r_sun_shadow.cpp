@@ -1,9 +1,9 @@
 #include "r_sun_shadow.h"
 
-#include "common/com_dvars.h"
-#include "common/com_misc.h"
-#include "common/main_window.h"
-#include "common/scene.h"
+#include "Core/com_dvars.h"
+#include "Core/com_misc.h"
+#include "Core/main_window.h"
+#include "Core/scene.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"
 #include "r_rendertarget.h"
