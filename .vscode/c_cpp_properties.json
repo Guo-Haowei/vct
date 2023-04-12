@@ -9,7 +9,8 @@
                 "${workspaceRoot}/external/glm/",
                 "${workspaceRoot}/external/imgui/",
                 "${workspaceRoot}/external/",
-                "${workspaceRoot}/source"
+                "${workspaceRoot}/Source/Engine",
+                "${workspaceRoot}/Source"
             ],
             "defines": [
                 "DATA_DIR=\"\"",

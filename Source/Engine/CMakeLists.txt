@@ -40,9 +40,9 @@ target_include_directories(${LIB_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/External/imgui
     ${PROJECT_SOURCE_DIR}/External/glm
     ${PROJECT_SOURCE_DIR}/External
-    ${PROJECT_SOURCE_DIR}/Code/Engine/Core
-    ${PROJECT_SOURCE_DIR}/Code/Engine
-    ${PROJECT_SOURCE_DIR}/Code/
+    ${PROJECT_SOURCE_DIR}/Source/Engine/Core
+    ${PROJECT_SOURCE_DIR}/Source/Engine
+    ${PROJECT_SOURCE_DIR}/Source/
 )
 
 target_compile_definitions(${LIB_NAME} PUBLIC -D_CRT_SECURE_NO_WARNINGS)
