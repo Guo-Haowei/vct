@@ -7,7 +7,6 @@
                 "${workspaceRoot}/external/glad/include",
                 "${workspaceRoot}/external/glfw/include",
                 "${workspaceRoot}/external/glm/",
-                "${workspaceRoot}/external/stb/",
                 "${workspaceRoot}/external/imgui/",
                 "${workspaceRoot}/external/",
                 "${workspaceRoot}/source"
