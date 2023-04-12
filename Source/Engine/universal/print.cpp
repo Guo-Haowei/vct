@@ -8,34 +8,35 @@
 
 #define ENDPOINT stdout
 
-namespace detail {
+namespace detail
+{
 
-void Print( Level level, const char* fmt, ... )
+void Print(Level level, const char* fmt, ...)
 {
     char buffer1[1024];
     va_list args;
-    va_start( args, fmt );
-    vsnprintf( buffer1, sizeof( buffer1 ), fmt, args );
-    va_end( args );
+    va_start(args, fmt);
+    vsnprintf(buffer1, sizeof(buffer1), fmt, args);
+    va_end(args);
 
     time_t rawtime;
     struct tm* timeinfo;
-    std::time( &rawtime );
-    timeinfo = localtime( &rawtime );
+    std::time(&rawtime);
+    timeinfo = localtime(&rawtime);
     char timebuf[128];
-    strftime( timebuf, sizeof( timebuf ), "%H:%M:%S", timeinfo );
+    strftime(timebuf, sizeof(timebuf), "%H:%M:%S", timeinfo);
 
     char buffer2[2048];
-    snprintf( buffer2, sizeof( buffer2 ), "[%s] %s\n", timebuf, buffer1 );
+    snprintf(buffer2, sizeof(buffer2), "[%s] %s\n", timebuf, buffer1);
 
     // print to debugger
-    OutputDebugStringA( buffer2 );
+    OutputDebugStringA(buffer2);
     // print to console
-    constexpr WORD defaultStyle = ( FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN );
+    constexpr WORD defaultStyle = (FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN);
 
     WORD style = defaultStyle;
 
-    switch ( level )
+    switch (level)
     {
         case Level::Fatal:
         case Level::Error:
@@ -54,12 +55,12 @@ void Print( Level level, const char* fmt, ... )
             break;
     }
 
-    HANDLE hConsole = GetStdHandle( STD_OUTPUT_HANDLE );
-    SetConsoleTextAttribute( hConsole, style );
-    fprintf( ENDPOINT, buffer2 );
-    SetConsoleTextAttribute( hConsole, defaultStyle );
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, style);
+    fprintf(ENDPOINT, buffer2);
+    SetConsoleTextAttribute(hConsole, defaultStyle);
 
-    if ( level >= Level::Error )
+    if (level >= Level::Error)
     {
         __debugbreak();
     }

@@ -7,14 +7,15 @@ struct aiMaterial;
 struct aiScene;
 struct aiAnimation;
 
-class SceneLoader {
-   public:
-    void loadGltf( const char* path, Scene& scene, const mat4& transform, bool flipUVs = true );
+class SceneLoader
+{
+public:
+    void loadGltf(const char* path, Scene& scene, const mat4& transform, bool flipUVs = true);
 
-   private:
-    MeshComponent* processMesh( const aiMesh* aimesh );
-    Material* processMaterial( const aiMaterial* aimaterial );
+private:
+    MeshComponent* processMesh(const aiMesh* aimesh);
+    Material* processMaterial(const aiMaterial* aimaterial);
 
-   private:
+private:
     std::string m_currentPath;
 };

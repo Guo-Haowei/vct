@@ -1,7 +1,8 @@
 #pragma once
 #include "gl_utils.h"
 
-enum class ProgramType {
+enum class ProgramType
+{
     IMAGE2D,
     LINE3D,
     SHADOW,
@@ -15,4 +16,4 @@ enum class ProgramType {
 void R_CreateShaderPrograms();
 void R_DestroyShaderPrograms();
 
-const gl::Program& R_GetShaderProgram( ProgramType type );
+const gl::Program& R_GetShaderProgram(ProgramType type);

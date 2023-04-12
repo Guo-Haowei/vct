@@ -7,10 +7,10 @@ gl::ConstantBuffer<ConstantCB> g_constantCache;
 
 void R_Alloc_Cbuffers()
 {
-    g_perFrameCache.CreateAndBind( 0 );
-    g_perBatchCache.CreateAndBind( 1 );
-    g_materialCache.CreateAndBind( 2 );
-    g_constantCache.CreateAndBind( 3 );
+    g_perFrameCache.CreateAndBind(0);
+    g_perBatchCache.CreateAndBind(1);
+    g_materialCache.CreateAndBind(2);
+    g_constantCache.CreateAndBind(3);
 }
 
 void R_Destroy_Cbuffers()

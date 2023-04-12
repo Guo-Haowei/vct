@@ -15,39 +15,40 @@
 using std::list;
 using std::string;
 
-class CommandHelper {
+class CommandHelper
+{
     list<string> commands_;
 
-   public:
-    void SetFromCommandLine( int argc, const char** argv )
+public:
+    void SetFromCommandLine(int argc, const char** argv)
     {
-        for ( int idx = 0; idx < argc; ++idx )
+        for (int idx = 0; idx < argc; ++idx)
         {
-            commands_.emplace_back( string( argv[idx] ) );
+            commands_.emplace_back(string(argv[idx]));
         }
     }
 
-    void PushCfg( const char* file )
+    void PushCfg(const char* file)
     {
         char path[kMaxOSPath];
-        Com_FsBuildPath( path, kMaxOSPath, file, "scripts" );
+        Com_FsBuildPath(path, kMaxOSPath, file, "scripts");
 
-        if ( !std::filesystem::exists( path ) )
+        if (!std::filesystem::exists(path))
         {
-            Com_PrintWarning( "[filesystem] file '%s' does not exist", path );
+            Com_PrintWarning("[filesystem] file '%s' does not exist", path);
             return;
         }
 
-        std::ifstream fs( path );
+        std::ifstream fs(path);
         list<string> cfg;
         string line;
-        while ( std::getline( fs, line ) )
+        while (std::getline(fs, line))
         {
-            std::istringstream iss( line );
+            std::istringstream iss(line);
             string token;
-            if ( iss >> token )
+            if (iss >> token)
             {
-                if ( token.front() == '#' )
+                if (token.front() == '#')
                 {
                     continue;
                 }
@@ -55,16 +56,16 @@ class CommandHelper {
 
             do
             {
-                cfg.emplace_back( token );
-            } while ( iss >> token );
+                cfg.emplace_back(token);
+            } while (iss >> token);
         }
-        cfg.insert( cfg.end(), commands_.begin(), commands_.end() );
-        commands_ = std::move( cfg );
+        cfg.insert(cfg.end(), commands_.begin(), commands_.end());
+        commands_ = std::move(cfg);
     }
 
-    bool TryConsume( string& str )
+    bool TryConsume(string& str)
     {
-        if ( commands_.empty() )
+        if (commands_.empty())
         {
             str.clear();
             return false;
@@ -75,45 +76,45 @@ class CommandHelper {
         return true;
     }
 
-    bool Consume( string& str )
+    bool Consume(string& str)
     {
-        if ( commands_.empty() )
+        if (commands_.empty())
         {
-            Com_PrintError( "Unexpected EOF" );
+            Com_PrintError("Unexpected EOF");
             str.clear();
             return false;
         }
 
-        return TryConsume( str );
+        return TryConsume(str);
     }
 };
 
-bool Com_ProcessCmdLine( int argc, const char** argv )
+bool Com_ProcessCmdLine(int argc, const char** argv)
 {
     CommandHelper cmdHelper;
-    cmdHelper.SetFromCommandLine( argc, argv );
+    cmdHelper.SetFromCommandLine(argc, argv);
 
     string str;
-    while ( cmdHelper.TryConsume( str ) )
+    while (cmdHelper.TryConsume(str))
     {
-        if ( str == "+set" )
+        if (str == "+set")
         {
-            cmdHelper.Consume( str );
-            dvar_t* dvar = Dvar_FindByName_Internal( str.c_str() );
-            if ( dvar == nullptr )
+            cmdHelper.Consume(str);
+            dvar_t* dvar = Dvar_FindByName_Internal(str.c_str());
+            if (dvar == nullptr)
             {
-                Com_PrintError( "[dvar] Dvar '%s' not found", str.c_str() );
+                Com_PrintError("[dvar] Dvar '%s' not found", str.c_str());
                 return false;
             }
-            cmdHelper.Consume( str );
-            Dvar_SetFromString_Internal( *dvar, str.c_str() );
+            cmdHelper.Consume(str);
+            Dvar_SetFromString_Internal(*dvar, str.c_str());
         }
-        else if ( str == "+exec" )
+        else if (str == "+exec")
         {
-            cmdHelper.Consume( str );
-            if ( !Com_ExecLua( str.c_str() ) )
+            cmdHelper.Consume(str);
+            if (!Com_ExecLua(str.c_str()))
             {
-                Com_PrintError( "[lua] failed to execute script '%s'", str.c_str() );
+                Com_PrintError("[lua] failed to execute script '%s'", str.c_str());
                 return false;
             }
             // Com_PrintInfo( "Executing '%s'", str.c_str() );
@@ -121,11 +122,11 @@ bool Com_ProcessCmdLine( int argc, const char** argv )
         }
         else
         {
-            Com_PrintError( "Unknown command '%s'", str.c_str() );
+            Com_PrintError("Unknown command '%s'", str.c_str());
             return false;
         }
     }
 
-    Com_PrintSuccess( "cmd line processed" );
+    Com_PrintSuccess("cmd line processed");
     return true;
 }

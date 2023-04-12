@@ -1,12 +1,12 @@
-#if defined( DECLARE_DVAR )
+#if defined(DECLARE_DVAR)
 #undef DECLARE_DVAR
 #endif
 
-#if defined( DEFINE_DVAR )
+#if defined(DEFINE_DVAR)
 #undef DEFINE_DVAR
 #endif
 
-#if defined( REGISTER_DVAR )
+#if defined(REGISTER_DVAR)
 #undef REGISTER_DVAR
 #endif
 

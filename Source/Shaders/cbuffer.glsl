@@ -14,7 +14,7 @@
 #ifdef __cplusplus
 struct PerFrameCB
 #else
-layout( std140, binding = 0 ) uniform PerFrameCB
+layout(std140, binding = 0) uniform PerFrameCB
 #endif
 {
     mat4 View;
@@ -54,7 +54,7 @@ layout( std140, binding = 0 ) uniform PerFrameCB
 #ifdef __cplusplus
 struct PerBatchCB
 #else
-layout( std140, binding = 1 ) uniform PerBatchCB
+layout(std140, binding = 1) uniform PerBatchCB
 #endif
 {
     mat4 PVM;
@@ -64,7 +64,7 @@ layout( std140, binding = 1 ) uniform PerBatchCB
 #ifdef __cplusplus
 struct MaterialCB
 #else
-layout( std140, binding = 2 ) uniform MaterialCB
+layout(std140, binding = 2) uniform MaterialCB
 #endif
 {
     vec4 AlbedoColor;
@@ -82,14 +82,15 @@ layout( std140, binding = 2 ) uniform MaterialCB
 #ifdef __cplusplus
 using sampler2D = uint64_t;
 using sampler3D = uint64_t;
-typedef struct {
+typedef struct
+{
     uint64_t data;
     uint64_t padding;
 } Sampler2DArray;
 struct ConstantCB
 #else
 #define Sampler2DArray sampler2D
-layout( std140, binding = 3 ) uniform ConstantCB
+layout(std140, binding = 3) uniform ConstantCB
 #endif
 {
     vec4 SSAOKernels[NUM_SSAO_KERNEL];
@@ -112,8 +113,8 @@ layout( std140, binding = 3 ) uniform ConstantCB
 };
 
 #ifdef __cplusplus
-static_assert( sizeof( PerFrameCB ) % 16 == 0 );
-static_assert( sizeof( PerBatchCB ) % 16 == 0 );
-static_assert( sizeof( MaterialCB ) % 16 == 0 );
-static_assert( sizeof( ConstantCB ) % 16 == 0 );
+static_assert(sizeof(PerFrameCB) % 16 == 0);
+static_assert(sizeof(PerBatchCB) % 16 == 0);
+static_assert(sizeof(MaterialCB) % 16 == 0);
+static_assert(sizeof(ConstantCB) % 16 == 0);
 #endif

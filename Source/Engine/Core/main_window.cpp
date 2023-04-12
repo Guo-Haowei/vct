@@ -7,7 +7,8 @@
 #include "universal/core_assert.h"
 #include "universal/print.h"
 
-namespace MainWindow {
+namespace MainWindow
+{
 
 static bool g_initialized;
 static GLFWwindow* g_window;
@@ -18,60 +19,60 @@ static constexpr const char TITLE[] = "Editor";
 
 bool Init()
 {
-    core_assert( !g_initialized );
+    core_assert(!g_initialized);
 
-    glfwSetErrorCallback( []( int code, const char* desc ) {
-        Com_PrintFatal( "[glfw] error(%d): %s", code, desc );
-    } );
+    glfwSetErrorCallback([](int code, const char* desc) {
+        Com_PrintFatal("[glfw] error(%d): %s", code, desc);
+    });
 
     glfwInit();
 
-    glfwWindowHint( GLFW_DECORATED, !Dvar_GetBool( wnd_frameless ) );
+    glfwWindowHint(GLFW_DECORATED, !Dvar_GetBool(wnd_frameless));
 
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 6 );
-    glfwWindowHint( GLFW_RESIZABLE, GLFW_FALSE );
-    if ( Dvar_GetBool( r_debug ) )
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    if (Dvar_GetBool(r_debug))
     {
-        glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, 1 );
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
     }
 
-    const GLFWvidmode* vidmode = glfwGetVideoMode( glfwGetPrimaryMonitor() );
+    const GLFWvidmode* vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
-    const ivec2 maxSize = ivec2( vidmode->width, vidmode->height );
-    ivec2 size( Dvar_GetInt( wnd_width ), Dvar_GetInt( wnd_height ) );
-    if ( size.x == 0 || size.y == 0 )
+    const ivec2 maxSize = ivec2(vidmode->width, vidmode->height);
+    ivec2 size(Dvar_GetInt(wnd_width), Dvar_GetInt(wnd_height));
+    if (size.x == 0 || size.y == 0)
     {
-        size.x = int( 0.8f * maxSize.x );
-        size.y = int( 0.8f * maxSize.y );
+        size.x = int(0.8f * maxSize.x);
+        size.y = int(0.8f * maxSize.y);
     }
 
-    constexpr ivec2 MIN_FRAME_SIZE = ivec2( 800, 600 );
+    constexpr ivec2 MIN_FRAME_SIZE = ivec2(800, 600);
 
-    size = glm::clamp( size, MIN_FRAME_SIZE, maxSize );
+    size = glm::clamp(size, MIN_FRAME_SIZE, maxSize);
 
-    g_window = glfwCreateWindow( int( size.x ), int( size.y ), TITLE, 0, 0 );
-    glfwMakeContextCurrent( g_window );
+    g_window = glfwCreateWindow(int(size.x), int(size.y), TITLE, 0, 0);
+    glfwMakeContextCurrent(g_window);
 
-    Com_PrintSuccess( "MainWindow created %d x %d", size.x, size.y );
-    glfwGetFramebufferSize( g_window, &g_frameSize.x, &g_frameSize.y );
+    Com_PrintSuccess("MainWindow created %d x %d", size.x, size.y);
+    glfwGetFramebufferSize(g_window, &g_frameSize.x, &g_frameSize.y);
     return g_initialized = true;
 }
 
 bool ShouldClose()
 {
-    return glfwWindowShouldClose( g_window );
+    return glfwWindowShouldClose(g_window);
 }
 
 void Shutdown()
 {
-    glfwDestroyWindow( g_window );
+    glfwDestroyWindow(g_window);
     glfwTerminate();
 }
 
 GLFWwindow* GetRaw()
 {
-    core_assert( g_initialized && g_window );
+    core_assert(g_initialized && g_window);
     return g_window;
 }
 
@@ -79,25 +80,25 @@ void NewFrame()
 {
     glfwPollEvents();
     ivec2& size = g_frameSize;
-    glfwGetFramebufferSize( g_window, &size.x, &size.y );
+    glfwGetFramebufferSize(g_window, &size.x, &size.y);
 
     // mouse position
     {
         double x, y;
-        glfwGetCursorPos( g_window, &x, &y );
-        g_mousePos.x = static_cast<float>( x );
-        g_mousePos.y = static_cast<float>( y );
+        glfwGetCursorPos(g_window, &x, &y);
+        g_mousePos.x = static_cast<float>(x);
+        g_mousePos.y = static_cast<float>(y);
     }
 
     // title
     char buffer[1024];
-    snprintf( buffer, sizeof( buffer ),
-              "%s | Size: %d x %d | Mouse: %d x %d | FPS: %.1f",
-              TITLE,
-              size.x, size.y,
-              int( g_mousePos.x ), int( g_mousePos.y ),
-              ImGui::GetIO().Framerate );
-    glfwSetWindowTitle( g_window, buffer );
+    snprintf(buffer, sizeof(buffer),
+             "%s | Size: %d x %d | Mouse: %d x %d | FPS: %.1f",
+             TITLE,
+             size.x, size.y,
+             int(g_mousePos.x), int(g_mousePos.y),
+             ImGui::GetIO().Framerate);
+    glfwSetWindowTitle(g_window, buffer);
 }
 
 ivec2 FrameSize()
@@ -107,7 +108,7 @@ ivec2 FrameSize()
 
 void Present()
 {
-    glfwSwapBuffers( g_window );
+    glfwSwapBuffers(g_window);
 }
 
 vec2 MousePos()
@@ -115,9 +116,9 @@ vec2 MousePos()
     return g_mousePos;
 }
 
-bool IsKeyDown( int code )
+bool IsKeyDown(int code)
 {
-    return ImGui::IsKeyDown( (ImGuiKey)code );
+    return ImGui::IsKeyDown((ImGuiKey)code);
 }
 
 bool IsMouseInScreen()

@@ -13,75 +13,75 @@ using std::string;
 
 void GpuTexture::bind() const
 {
-    glBindTexture( m_type, mHandle );
+    glBindTexture(m_type, mHandle);
 }
 
 void GpuTexture::unbind() const
 {
-    glBindTexture( m_type, 0 );
+    glBindTexture(m_type, 0);
 }
 
 void GpuTexture::genMipMap()
 {
     // make sure texture is bond first
-    glGenerateMipmap( m_type );
+    glGenerateMipmap(m_type);
 }
 
-void GpuTexture::create2DEmpty( const Texture2DCreateInfo& info )
+void GpuTexture::create2DEmpty(const Texture2DCreateInfo& info)
 {
-    m_type   = GL_TEXTURE_2D;
+    m_type = GL_TEXTURE_2D;
     m_format = info.internalFormat;
 
-    glGenTextures( 1, &mHandle );
+    glGenTextures(1, &mHandle);
 
     bind();
-    glTexImage2D( m_type, 0, info.internalFormat, info.width, info.height, 0, info.format, info.dataType, 0 );
+    glTexImage2D(m_type, 0, info.internalFormat, info.width, info.height, 0, info.format, info.dataType, 0);
 
-    if ( info.wrapS )
-        glTexParameteri( m_type, GL_TEXTURE_WRAP_S, info.wrapS );
-    if ( info.wrapT )
-        glTexParameteri( m_type, GL_TEXTURE_WRAP_T, info.wrapT );
-    if ( info.minFilter )
-        glTexParameteri( m_type, GL_TEXTURE_MIN_FILTER, info.minFilter );
-    if ( info.magFilter )
-        glTexParameteri( m_type, GL_TEXTURE_MAG_FILTER, info.magFilter );
+    if (info.wrapS)
+        glTexParameteri(m_type, GL_TEXTURE_WRAP_S, info.wrapS);
+    if (info.wrapT)
+        glTexParameteri(m_type, GL_TEXTURE_WRAP_T, info.wrapT);
+    if (info.minFilter)
+        glTexParameteri(m_type, GL_TEXTURE_MIN_FILTER, info.minFilter);
+    if (info.magFilter)
+        glTexParameteri(m_type, GL_TEXTURE_MAG_FILTER, info.magFilter);
 
     unbind();
 }
 
-void GpuTexture::create3DEmpty( const Texture3DCreateInfo& info )
+void GpuTexture::create3DEmpty(const Texture3DCreateInfo& info)
 {
-    m_type   = GL_TEXTURE_3D;
+    m_type = GL_TEXTURE_3D;
     m_format = info.format;
 
-    glGenTextures( 1, &mHandle );
+    glGenTextures(1, &mHandle);
     bind();
-    glTexParameteri( m_type, GL_TEXTURE_WRAP_S, info.wrapS );
-    glTexParameteri( m_type, GL_TEXTURE_WRAP_T, info.wrapT );
-    glTexParameteri( m_type, GL_TEXTURE_WRAP_R, info.wrapR );
-    glTexParameteri( m_type, GL_TEXTURE_MIN_FILTER, info.minFilter );
-    glTexParameteri( m_type, GL_TEXTURE_MAG_FILTER, info.magFilter );
+    glTexParameteri(m_type, GL_TEXTURE_WRAP_S, info.wrapS);
+    glTexParameteri(m_type, GL_TEXTURE_WRAP_T, info.wrapT);
+    glTexParameteri(m_type, GL_TEXTURE_WRAP_R, info.wrapR);
+    glTexParameteri(m_type, GL_TEXTURE_MIN_FILTER, info.minFilter);
+    glTexParameteri(m_type, GL_TEXTURE_MAG_FILTER, info.magFilter);
 
-    glTexStorage3D( m_type, info.mipLevel, m_format, info.size, info.size, info.size );
+    glTexStorage3D(m_type, info.mipLevel, m_format, info.size, info.size, info.size);
 }
 
-void GpuTexture::create2DImageFromFile( const char* path )
+void GpuTexture::create2DImageFromFile(const char* path)
 {
     m_type = GL_TEXTURE_2D;
     int width, height, channel;
-    unsigned char* image = stbi_load( path, &width, &height, &channel, 4 );
+    unsigned char* image = stbi_load(path, &width, &height, &channel, 4);
 
-    if ( !image )
+    if (!image)
     {
-        Com_PrintError( "stb: failed to load image '%s'", path );
+        Com_PrintError("stb: failed to load image '%s'", path);
     }
 
-    glGenTextures( 1, &mHandle );
-    glBindTexture( m_type, mHandle );
-    glTexParameteri( m_type, GL_TEXTURE_WRAP_S, GL_REPEAT );
-    glTexParameteri( m_type, GL_TEXTURE_WRAP_T, GL_REPEAT );
-    glTexParameteri( m_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-    glTexParameteri( m_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glGenTextures(1, &mHandle);
+    glBindTexture(m_type, mHandle);
+    glTexParameteri(m_type, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(m_type, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(m_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(m_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     GLenum format = GL_RGBA;
     // switch ( channel )
@@ -93,29 +93,29 @@ void GpuTexture::create2DImageFromFile( const char* path )
     //     default: unreachable();
     // }
 
-    glTexImage2D( m_type, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, image );
-    glGenerateMipmap( m_type );
-    glBindTexture( m_type, 0 );
+    glTexImage2D(m_type, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, image);
+    glGenerateMipmap(m_type);
+    glBindTexture(m_type, 0);
 }
 
 void GpuTexture::destroy()
 {
-    if ( mHandle != 0 )
+    if (mHandle != 0)
     {
-        glDeleteTextures( 1, &mHandle );
+        glDeleteTextures(1, &mHandle);
     }
     mHandle = 0;
 }
 
-void GpuTexture::bindImageTexture( int i, int mipLevel )
+void GpuTexture::bindImageTexture(int i, int mipLevel)
 {
-    glBindImageTexture( i, mHandle, mipLevel, GL_TRUE, 0, GL_READ_WRITE, m_format );
+    glBindImageTexture(i, mHandle, mipLevel, GL_TRUE, 0, GL_READ_WRITE, m_format);
 }
 
 void GpuTexture::clear()
 {
     float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
     /// Hard code format for now
-    glClearTexImage( mHandle, 0, GL_RGBA, GL_FLOAT, clearColor );
+    glClearTexImage(mHandle, 0, GL_RGBA, GL_FLOAT, clearColor);
     //glClearTexImage(m_handle, 0, m_format, GL_FLOAT, clearColor);
 }

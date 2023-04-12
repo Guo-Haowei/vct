@@ -1,6 +1,7 @@
 #include "geometry.h"
 
-namespace geometry {
+namespace geometry
+{
 
 /**
  *        E__________________ H
@@ -22,18 +23,18 @@ namespace geometry {
 enum { A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7 };
 // clang-format on
 
-MeshComponent MakeBox( float size )
+MeshComponent MakeBox(float size)
 {
     MeshComponent mesh;
     mesh.positions = {
-        vec3( -size, +size, +size ),  // A
-        vec3( -size, -size, +size ),  // B
-        vec3( +size, -size, +size ),  // C
-        vec3( +size, +size, +size ),  // D
-        vec3( -size, +size, -size ),  // E
-        vec3( -size, -size, -size ),  // F
-        vec3( +size, -size, -size ),  // G
-        vec3( +size, +size, -size ),  // H
+        vec3(-size, +size, +size),  // A
+        vec3(-size, -size, +size),  // B
+        vec3(+size, -size, +size),  // C
+        vec3(+size, +size, +size),  // D
+        vec3(-size, +size, -size),  // E
+        vec3(-size, -size, -size),  // F
+        vec3(+size, -size, -size),  // G
+        vec3(+size, +size, -size),  // H
     };
 
     mesh.indices = {
@@ -56,18 +57,18 @@ MeshComponent MakeBox( float size )
 }
 
 // load scene
-MeshComponent MakeBoxWireFrame( float size )
+MeshComponent MakeBoxWireFrame(float size)
 {
     MeshComponent mesh;
     mesh.positions = {
-        vec3( -size, +size, +size ),  // A
-        vec3( -size, -size, +size ),  // B
-        vec3( +size, -size, +size ),  // C
-        vec3( +size, +size, +size ),  // D
-        vec3( -size, +size, -size ),  // E
-        vec3( -size, -size, -size ),  // F
-        vec3( +size, -size, -size ),  // G
-        vec3( +size, +size, -size ),  // H
+        vec3(-size, +size, +size),  // A
+        vec3(-size, -size, +size),  // B
+        vec3(+size, -size, +size),  // C
+        vec3(+size, +size, +size),  // D
+        vec3(-size, +size, -size),  // E
+        vec3(-size, -size, -size),  // F
+        vec3(+size, -size, -size),  // G
+        vec3(+size, +size, -size),  // H
     };
 
     mesh.indices = {

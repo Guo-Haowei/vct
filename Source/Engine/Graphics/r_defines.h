@@ -1,12 +1,13 @@
 #pragma once
 #include "universal/universal.h"
 
-inline constexpr int NUM_CASCADES            = 3;
+inline constexpr int NUM_CASCADES = 3;
 inline constexpr int IMAGE_VOXEL_ALBEDO_SLOT = 0;
 inline constexpr int IMAGE_VOXEL_NORMAL_SLOT = 1;
-inline constexpr int IMAGE_SSAO_SLOT         = 2;
+inline constexpr int IMAGE_SSAO_SLOT = 2;
 
-enum DrawTexture {
+enum DrawTexture
+{
     TEXTURE_FINAL_IMAGE,
     TEXTURE_VOXEL_ALBEDO,
     TEXTURE_VOXEL_NORMAL,

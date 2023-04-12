@@ -3,7 +3,8 @@
 
 struct GLFWwindow;
 
-namespace MainWindow {
+namespace MainWindow
+{
 
 [[nodiscard]] bool Init();
 [[nodiscard]] bool ShouldClose();
@@ -12,7 +13,7 @@ namespace MainWindow {
 [[nodiscard]] vec2 MousePos();
 [[nodiscard]] bool IsMouseInScreen();
 
-[[nodiscard]] bool IsKeyDown( int code );
+[[nodiscard]] bool IsKeyDown(int code);
 
 void NewFrame();
 void Present();

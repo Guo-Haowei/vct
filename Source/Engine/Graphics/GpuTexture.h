@@ -1,9 +1,10 @@
 #pragma once
 #include <glad/glad.h>
 
-struct Texture2DCreateInfo {
-    GLenum wrapS     = 0;
-    GLenum wrapT     = 0;
+struct Texture2DCreateInfo
+{
+    GLenum wrapS = 0;
+    GLenum wrapT = 0;
     GLenum minFilter = 0;
     GLenum magFilter = 0;
     GLenum internalFormat;
@@ -13,7 +14,8 @@ struct Texture2DCreateInfo {
     int height;
 };
 
-struct Texture3DCreateInfo {
+struct Texture3DCreateInfo
+{
     GLenum wrapS, wrapT, wrapR;
     GLenum minFilter, magFilter;
     GLenum format;
@@ -21,14 +23,15 @@ struct Texture3DCreateInfo {
     int mipLevel;
 };
 
-class GpuTexture {
-   public:
-    void create2DEmpty( const Texture2DCreateInfo& info );
-    void create3DEmpty( const Texture3DCreateInfo& info );
-    void create2DImageFromFile( const char* path );
+class GpuTexture
+{
+public:
+    void create2DEmpty(const Texture2DCreateInfo& info);
+    void create3DEmpty(const Texture3DCreateInfo& info);
+    void create2DImageFromFile(const char* path);
 
     void destroy();
-    void bindImageTexture( int i, int mipLevel = 0 );
+    void bindImageTexture(int i, int mipLevel = 0);
     void clear();
     void bind() const;
     void unbind() const;
@@ -37,7 +40,7 @@ class GpuTexture {
 
     inline GLuint GetHandle() const { return mHandle; }
 
-   protected:
+protected:
     GLenum m_type;
     GLenum m_format;
     GLuint mHandle = 0;

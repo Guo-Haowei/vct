@@ -5,12 +5,15 @@ inline constexpr size_t kMaxOSPath = 256;
 
 bool Com_FsInit();
 
-struct ComFile {
-    enum class Result {
+struct ComFile
+{
+    enum class Result
+    {
         Ok
     };
 
-    enum class Mode {
+    enum class Mode
+    {
         ReadOnly,
         ReadWrite,
     };
@@ -19,35 +22,36 @@ struct ComFile {
 
     void Close();
     size_t Size();
-    Result Read( char* buffer, size_t size );
+    Result Read(char* buffer, size_t size);
     template<class T>
-    Result Read( T& buffer )
+    Result Read(T& buffer)
     {
         const size_t size = Size();
-        buffer.resize( size );
-        return Read( buffer.data(), size );
+        buffer.resize(size);
+        return Read(buffer.data(), size);
     }
 
-    Result Write( char* buffer, size_t size );
+    Result Write(char* buffer, size_t size);
 };
 
-ComFile Com_FsOpenRead( const char* filename, const char* path = nullptr );
-ComFile Com_FsOpenWrite( const char* filename );
+ComFile Com_FsOpenRead(const char* filename, const char* path = nullptr);
+ComFile Com_FsOpenWrite(const char* filename);
 
-void Com_FsBuildPath( char* buf, size_t bufLen, const char* filename, const char* path = nullptr );
+void Com_FsBuildPath(char* buf, size_t bufLen, const char* filename, const char* path = nullptr);
 
-char* Com_FsAbsolutePath( char* path );
+char* Com_FsAbsolutePath(char* path);
 
-class ComFileWrapper {
+class ComFileWrapper
+{
     ComFile file;
 
-   public:
-    ComFileWrapper( ComFile file )
-        : file( file )
+public:
+    ComFileWrapper(ComFile file)
+        : file(file)
     {
     }
 
-    ComFileWrapper( const ComFileWrapper& ) = delete;
+    ComFileWrapper(const ComFileWrapper&) = delete;
 
     ~ComFileWrapper()
     {
@@ -57,12 +61,12 @@ class ComFileWrapper {
     bool IsGood() const { return file.handle != nullptr; }
 
     inline size_t Size() { return file.Size(); }
-    inline ComFile::Result Read( char* buffer, size_t size ) { return file.Read( buffer, size ); }
+    inline ComFile::Result Read(char* buffer, size_t size) { return file.Read(buffer, size); }
     template<class T>
-    inline ComFile::Result Read( T& buffer )
+    inline ComFile::Result Read(T& buffer)
     {
-        return file.Read<T>( buffer );
+        return file.Read<T>(buffer);
     }
 
-    inline ComFile::Result Write( char* buffer, size_t size ) { return file.Write( buffer, size ); }
+    inline ComFile::Result Write(char* buffer, size_t size) { return file.Write(buffer, size); }
 };

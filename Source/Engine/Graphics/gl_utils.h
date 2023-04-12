@@ -10,13 +10,14 @@
 
 static constexpr int kMaxShaderName = 128;
 
-struct ProgramCreateInfo {
+struct ProgramCreateInfo
+{
     std::string vs;
     std::string ps;
     std::string gs;
     std::string cs;
 
-    static ProgramCreateInfo VSPS( const std::string& name )
+    static ProgramCreateInfo VSPS(const std::string& name)
     {
         ProgramCreateInfo info;
         info.vs = name + ".vert";
@@ -24,7 +25,7 @@ struct ProgramCreateInfo {
         return info;
     }
 
-    static ProgramCreateInfo VSGSPS( const std::string& name )
+    static ProgramCreateInfo VSGSPS(const std::string& name)
     {
         ProgramCreateInfo info;
         info.vs = name + ".vert";
@@ -33,7 +34,7 @@ struct ProgramCreateInfo {
         return info;
     }
 
-    static ProgramCreateInfo VSPS( const std::string& vs, const std::string& ps )
+    static ProgramCreateInfo VSPS(const std::string& vs, const std::string& ps)
     {
         ProgramCreateInfo info;
         info.vs = vs + ".vert";
@@ -41,7 +42,7 @@ struct ProgramCreateInfo {
         return info;
     }
 
-    static ProgramCreateInfo CS( const std::string& cs )
+    static ProgramCreateInfo CS(const std::string& cs)
     {
         ProgramCreateInfo info;
         info.cs = cs + ".comp";
@@ -49,14 +50,16 @@ struct ProgramCreateInfo {
     }
 };
 
-struct MeshData {
-    GLuint vao     = 0;
-    GLuint ebo     = 0;
+struct MeshData
+{
+    GLuint vao = 0;
+    GLuint ebo = 0;
     GLuint vbos[5] = { 0, 0, 0, 0, 0 };
     uint32_t count = 0;
 };
 
-struct MaterialData {
+struct MaterialData
+{
     GpuTexture albedoMap;
     GpuTexture materialMap;
     GpuTexture normalMap;
@@ -70,32 +73,34 @@ struct MaterialData {
 void R_CreateQuad();
 void R_DrawQuad();
 
-namespace gl {
+namespace gl
+{
 
 [[nodiscard]] bool Init();
 
 template<typename T>
-void NamedBufferStorage( GLuint buffer, const std::vector<T>& data )
+void NamedBufferStorage(GLuint buffer, const std::vector<T>& data)
 {
-    glNamedBufferStorage( buffer, sizeof( T ) * data.size(), data.data(), 0 );
+    glNamedBufferStorage(buffer, sizeof(T) * data.size(), data.data(), 0);
 }
 
-static inline void BindToSlot( GLuint buffer, int slot, int size )
+static inline void BindToSlot(GLuint buffer, int slot, int size)
 {
-    glBindBuffer( GL_ARRAY_BUFFER, buffer );
-    glVertexAttribPointer( slot, size, GL_FLOAT, GL_FALSE, size * sizeof( float ), 0 );
-    glEnableVertexAttribArray( slot );
+    glBindBuffer(GL_ARRAY_BUFFER, buffer);
+    glVertexAttribPointer(slot, size, GL_FLOAT, GL_FALSE, size * sizeof(float), 0);
+    glEnableVertexAttribArray(slot);
 }
 
-GLuint CreateProgram( const ProgramCreateInfo& info );
+GLuint CreateProgram(const ProgramCreateInfo& info);
 
-class Program {
-   public:
+class Program
+{
+public:
     void Destroy()
     {
-        if ( mHandle )
+        if (mHandle)
         {
-            glDeleteProgram( mHandle );
+            glDeleteProgram(mHandle);
         }
 
         mHandle = 0;
@@ -103,20 +108,20 @@ class Program {
 
     void Use() const
     {
-        glUseProgram( mHandle );
+        glUseProgram(mHandle);
     }
     void Stop() const
     {
-        glUseProgram( 0 );
+        glUseProgram(0);
     }
 
-    Program& operator=( GLuint program )
+    Program& operator=(GLuint program)
     {
         mHandle = program;
         return *this;
     }
 
-   private:
+private:
     GLuint mHandle = 0;
 };
 
@@ -124,39 +129,40 @@ class Program {
 // Constant Buffer
 //------------------------------------------------------------------------------
 
-GLuint CreateAndBindConstantBuffer( int slot, size_t sizeInByte );
-void UpdateConstantBuffer( GLuint handle, const void* ptr, size_t sizeInByte );
+GLuint CreateAndBindConstantBuffer(int slot, size_t sizeInByte);
+void UpdateConstantBuffer(GLuint handle, const void* ptr, size_t sizeInByte);
 
 template<typename T>
-struct ConstantBuffer {
+struct ConstantBuffer
+{
     void Destroy()
     {
-        if ( mHandle != 0 )
+        if (mHandle != 0)
         {
-            Com_Printf( "[opengl] destroy cbuffer %u", mHandle );
-            glDeleteBuffers( 1, &mHandle );
+            Com_Printf("[opengl] destroy cbuffer %u", mHandle);
+            glDeleteBuffers(1, &mHandle);
         }
         mHandle = 0;
     }
 
-    void CreateAndBind( int slot )
+    void CreateAndBind(int slot)
     {
-        mHandle = CreateAndBindConstantBuffer( slot, sizeof( T ) );
+        mHandle = CreateAndBindConstantBuffer(slot, sizeof(T));
     }
 
     void Update()
     {
-        UpdateConstantBuffer( mHandle, &cache, sizeof( T ) );
+        UpdateConstantBuffer(mHandle, &cache, sizeof(T));
     }
 
     T cache;
     GLuint mHandle = 0;
 };
 
-static inline GLuint64 MakeTextureResident( GLuint texture )
+static inline GLuint64 MakeTextureResident(GLuint texture)
 {
-    GLuint64 ret = glGetTextureHandleARB( texture );
-    glMakeTextureHandleResidentARB( ret );
+    GLuint64 ret = glGetTextureHandleARB(texture);
+    glMakeTextureHandleResidentARB(ret);
     return ret;
 }
 
