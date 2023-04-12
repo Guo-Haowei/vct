@@ -3,16 +3,21 @@ project(VCT)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
-# glfw
+message("***********************************************************************")
+message(STATUS "CMAKE_CXX_COMPILER_ID   : ${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "CMAKE_BUILD_TOOL        : ${CMAKE_BUILD_TOOL}")
+
+################################################################################
 message("Configuring glfw...")
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-add_subdirectory(external/glfw)
+add_subdirectory(External/glfw)
 
-# glad
+################################################################################
 message("Configuring glad...")
-add_subdirectory(external/glad)
+add_subdirectory(External/glad)
+set_target_properties(glad PROPERTIES FOLDER External)
 
 include_directories(${PROJECT_SOURCE_DIR}/source/)
 include_directories(${PROJECT_SOURCE_DIR}/external/glm/)
