@@ -219,7 +219,7 @@ void Editor::DockSpace()
 void Editor::Update()
 {
     static bool hideUI = false;
-    if ( ImGui::IsKeyPressed( GLFW_KEY_ESCAPE ) )
+    if ( ImGui::IsKeyPressed( (ImGuiKey)GLFW_KEY_ESCAPE ) )
     {
         hideUI = !hideUI;
     }
@@ -282,7 +282,7 @@ void Editor::Update()
         }
     }
 
-    if ( scene.selected && ImGui::IsKeyPressed( GLFW_KEY_DELETE ) )
+    if ( scene.selected && ImGui::IsKeyPressed( (ImGuiKey)GLFW_KEY_DELETE ) )
     {
         if ( scene.selected->visible )
         {

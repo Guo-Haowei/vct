@@ -109,8 +109,8 @@ bool Com_ImGuiInit()
     ImGui::CreateContext();
 
     ImGuiIO& io        = ImGui::GetIO();
-    io.IniFilenameLoad = s_iniFileNameLoad;
-    io.IniFilenameSave = kDefaultIniFileName;
+    // io.IniFilenameLoad = s_iniFileNameLoad;
+    // io.IniFilenameSave = kDefaultIniFileName;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // Enable Docking
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;    // Enable Multi-Viewport / Platform Windows
@@ -176,12 +176,12 @@ static void ControlCamera( Camera& camera )
     constexpr float VIEW_SPEED = 2.0f;
     float CAMERA_SPEED         = 0.15f;
 
-    if ( ImGui::IsKeyDown( GLFW_KEY_LEFT_SHIFT ) )
+    if ( ImGui::IsKeyDown( (ImGuiKey)GLFW_KEY_LEFT_SHIFT ) )
         CAMERA_SPEED *= 3.f;
 
-    int x = ImGui::IsKeyDown( GLFW_KEY_D ) - ImGui::IsKeyDown( GLFW_KEY_A );
-    int z = ImGui::IsKeyDown( GLFW_KEY_W ) - ImGui::IsKeyDown( GLFW_KEY_S );
-    int y = ImGui::IsKeyDown( GLFW_KEY_E ) - ImGui::IsKeyDown( GLFW_KEY_Q );
+    int x = ImGui::IsKeyDown((ImGuiKey)GLFW_KEY_D ) - ImGui::IsKeyDown((ImGuiKey)GLFW_KEY_A );
+    int z = ImGui::IsKeyDown((ImGuiKey)GLFW_KEY_W ) - ImGui::IsKeyDown((ImGuiKey)GLFW_KEY_S );
+    int y = ImGui::IsKeyDown((ImGuiKey)GLFW_KEY_E ) - ImGui::IsKeyDown((ImGuiKey)GLFW_KEY_Q );
 
     if ( x != 0 || z != 0 )
     {
@@ -193,8 +193,8 @@ static void ControlCamera( Camera& camera )
 
     camera.position.y += ( CAMERA_SPEED * y );
 
-    int yaw   = ImGui::IsKeyDown( GLFW_KEY_RIGHT ) - ImGui::IsKeyDown( GLFW_KEY_LEFT );
-    int pitch = ImGui::IsKeyDown( GLFW_KEY_UP ) - ImGui::IsKeyDown( GLFW_KEY_DOWN );
+    int yaw   = ImGui::IsKeyDown( (ImGuiKey)GLFW_KEY_RIGHT ) - ImGui::IsKeyDown( (ImGuiKey)GLFW_KEY_LEFT );
+    int pitch = ImGui::IsKeyDown( (ImGuiKey)GLFW_KEY_UP ) - ImGui::IsKeyDown( (ImGuiKey)GLFW_KEY_DOWN );
 
     if ( yaw )
     {

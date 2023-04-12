@@ -117,7 +117,7 @@ vec2 MousePos()
 
 bool IsKeyDown( int code )
 {
-    return ImGui::IsKeyDown( code );
+    return ImGui::IsKeyDown( (ImGuiKey)code );
 }
 
 bool IsMouseInScreen()

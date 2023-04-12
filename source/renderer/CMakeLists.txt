@@ -20,6 +20,7 @@ target_include_directories(renderer PUBLIC
     ${PROJECT_SOURCE_DIR}/source/
     ${PROJECT_SOURCE_DIR}/external/glad/include/
     ${PROJECT_SOURCE_DIR}/external/stb/
+    ${PROJECT_SOURCE_DIR}/external/imgui/
 )
 
 add_library(vct::renderer ALIAS renderer)
