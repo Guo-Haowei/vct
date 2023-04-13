@@ -1,6 +1,6 @@
 file(GLOB IMGUI_SRC
-    "${PROJECT_SOURCE_DIR}/external/imgui/*.h"
-    "${PROJECT_SOURCE_DIR}/external/imgui/*.cpp"
+    "${PROJECT_SOURCE_DIR}/External/imgui/*.h"
+    "${PROJECT_SOURCE_DIR}/External/imgui/*.cpp"
 )
 
 add_library(imgui STATIC ${IMGUI_SRC})
