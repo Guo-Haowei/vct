@@ -3,14 +3,14 @@
 #include <string>
 #include <unordered_map>
 
-#include "core_assert.h"
-#include "print.h"
+#include "check.h"
+#include "Core/Log.h"
 
 static std::unordered_map<std::string, dvar_t*> s_dvarLookupTable;
 
 #define DVAR_VERBOSE IN_USE
 #if USING(DVAR_VERBOSE)
-#define DVAR_PRINTF(fmt, ...) Com_Printf("[dvar] " fmt, ##__VA_ARGS__)
+#define DVAR_PRINTF(fmt, ...) LOG_LEVEL(ELogLevel::Debug, "[dvar] " fmt, ##__VA_ARGS__)
 #else
 #define DVAR_PRINTF(...) ((void)0)
 #endif
@@ -21,7 +21,7 @@ static void RegisterDvar_Internal(const char* key, dvar_t* dvar)
     auto it = s_dvarLookupTable.find(keyStr);
     if (it != s_dvarLookupTable.end())
     {
-        Com_PrintError("[dvar] duplicated dvar %s detected", key);
+        LOG_ERROR("[dvar] duplicated dvar {} detected", key);
     }
 
     strncpy(dvar->debugName_, key, dvar_t::kMaxStringLengh);
@@ -32,25 +32,25 @@ static void RegisterDvar_Internal(const char* key, dvar_t* dvar)
     switch (dvar->type_)
     {
         case dvar_t::Integer:
-            DVAR_PRINTF("register dvar '%s'(int) %d", key, dvar->int_);
+            DVAR_PRINTF("register dvar '{}'(int) {}", key, dvar->int_);
             break;
         case dvar_t::Float:
-            DVAR_PRINTF("register dvar '%s'(float) %f", key, dvar->float_);
+            DVAR_PRINTF("register dvar '{}'(float) {}", key, dvar->float_);
             break;
         case dvar_t::String:
-            DVAR_PRINTF("register dvar '%s'(string) \"%s\"", key, dvar->str_);
+            DVAR_PRINTF("register dvar '{}'(string) \"{}\"", key, dvar->str_);
             break;
         case dvar_t::Vec2:
-            DVAR_PRINTF("register dvar '%s'(vec2) { %f, %f }", key, v.x, v.y);
+            DVAR_PRINTF("register dvar '{}'(vec2) {}, {}", key, v.x, v.y);
             break;
         case dvar_t::Vec3:
-            DVAR_PRINTF("register dvar '%s'(vec3) { %f, %f, %f }", key, v.x, v.y, v.z);
+            DVAR_PRINTF("register dvar '{}'(vec3) {}, {}, {}", key, v.x, v.y, v.z);
             break;
         case dvar_t::Vec4:
-            DVAR_PRINTF("register dvar '%s'(vec4) { %f, %f, %f, %f }", key, v.x, v.y, v.z, v.w);
+            DVAR_PRINTF("register dvar '{}'(vec4) {}, {}, {}, {}", key, v.x, v.y, v.z, v.w);
             break;
         default:
-            panic("Unknown dvar type %d", static_cast<int>(dvar->type_));
+            checkmsg("Unknown dvar type {}", static_cast<int>(dvar->type_));
             break;
     }
 }
@@ -60,7 +60,7 @@ static void SafeCopyDvarString(dvar_t& dvar, const char* value)
     const size_t len = strlen(value);
     if (len > dvar_t::kMaxStringLengh - 1)
     {
-        panic("string [%s] too long", value);
+        checkmsg("string [{}] too long", value);
     }
 
     strcpy(dvar.str_, value);
@@ -82,7 +82,7 @@ void Dvar_RegisterFloat_Internal(dvar_t& dvar, const char* key, float value)
 
 void Dvar_RegisterVec_Internal(dvar_t& dvar, const char* key, float x, float y, float z, float w, int n)
 {
-    core_assertrange(n, 2, 4);
+    checkrange(n, 2, 5);
     dvar.type_ = static_cast<dvar_t::Type>(dvar_t::_VecBase + n);
     dvar.vec_.x = x;
     dvar.vec_.y = y;
@@ -100,13 +100,13 @@ void Dvar_RegisterString_Internal(dvar_t& dvar, const char* key, const char* val
 
 int Dvar_GetInt_Internal(const dvar_t& dvar)
 {
-    core_assert(dvar.type_ == dvar_t::Integer);
+    check(dvar.type_ == dvar_t::Integer);
     return dvar.int_;
 }
 
 float Dvar_GetFloat_Internal(const dvar_t& dvar)
 {
-    core_assert(dvar.type_ == dvar_t::Float);
+    check(dvar.type_ == dvar_t::Float);
     return dvar.float_;
 }
 
@@ -117,13 +117,13 @@ void* Dvar_GetPtr_Internal(dvar_t& dvar)
 
 vec4 Dvar_GetVec_Internal(const dvar_t& dvar, int n)
 {
-    core_assert(dvar.type_ == static_cast<dvar_t::Type>(dvar_t::_VecBase + n));
+    check(dvar.type_ == static_cast<dvar_t::Type>(dvar_t::_VecBase + n));
     return vec4(dvar.vec_.x, dvar.vec_.y, dvar.vec_.z, dvar.vec_.w);
 }
 
 const char* Dvar_GetString_Internal(const dvar_t& dvar)
 {
-    core_assert(dvar.type_ == dvar_t::String);
+    check(dvar.type_ == dvar_t::String);
     return dvar.str_;
 }
 
@@ -195,33 +195,33 @@ DvarError Dvar_SetFromString_Internal(dvar_t& dvar, const char* str)
     {
         case dvar_t::Integer:
             dvar.int_ = atoi(str);
-            DVAR_PRINTF("change dvar '%s'(int) to %d", dvar.debugName_, dvar.int_);
+            DVAR_PRINTF("change dvar '{}'(int) to {}", dvar.debugName_, dvar.int_);
             break;
         case dvar_t::Float:
             dvar.float_ = float(atof(str));
-            DVAR_PRINTF("change dvar '%s'(float) to %f", dvar.debugName_, dvar.float_);
+            DVAR_PRINTF("change dvar '{}'(float) to {}", dvar.debugName_, dvar.float_);
             break;
         case dvar_t::String:
             SafeCopyDvarString(dvar, str);
-            DVAR_PRINTF("change dvar '%s'(string) to \"%s\"", dvar.debugName_, dvar.str_);
+            DVAR_PRINTF("change dvar '{}'(string) to \"{}\"", dvar.debugName_, dvar.str_);
             break;
         case dvar_t::Vec2:
             n = sscanf(str, "%f,%f", &v.x, &v.y);
-            core_assert(n == 2);
-            DVAR_PRINTF("change dvar '%s'(vec2) to { %f, %f } ", dvar.debugName_, v.x, v.y);
+            check(n == 2);
+            DVAR_PRINTF("change dvar '{}'(vec2) to {}, {} ", dvar.debugName_, v.x, v.y);
             break;
         case dvar_t::Vec3:
             n = sscanf(str, "%f,%f,%f", &v.x, &v.y, &v.z);
-            core_assert(n == 3);
-            DVAR_PRINTF("change dvar '%s'(vec3) to { %f, %f, %f } ", dvar.debugName_, v.x, v.y, v.z);
+            check(n == 3);
+            DVAR_PRINTF("change dvar '{}'(vec3) to {}, {}, {} ", dvar.debugName_, v.x, v.y, v.z);
             break;
         case dvar_t::Vec4:
             n = sscanf(str, "%f,%f,%f,%f", &v.x, &v.y, &v.z, &v.w);
-            core_assert(n == 4);
-            DVAR_PRINTF("change dvar '%s'(vec4) to { %f, %f, %f, %f } ", dvar.debugName_, v.x, v.y, v.z, v.w);
+            check(n == 4);
+            DVAR_PRINTF("change dvar '{}'(vec4) to {},{},{},{} ", dvar.debugName_, v.x, v.y, v.z, v.w);
             break;
         default:
-            panic("attempt to set unknown dvar type %d to %s", static_cast<int>(dvar.type_), str);
+            checkmsg("attempt to set unknown dvar type {} to {}", static_cast<int>(dvar.type_), str);
             break;
     }
 
@@ -231,7 +231,7 @@ DvarError Dvar_SetFromString_Internal(dvar_t& dvar, const char* str)
 DvarError Dvar_SetIntByName_Internal(const char* name, int value)
 {
     dvar_t* dvar = Dvar_FindByName_Internal(name);
-    core_assert(dvar);
+    check(dvar);
     if (!dvar)
     {
         return DvarError::NotExisted;
@@ -243,7 +243,7 @@ DvarError Dvar_SetIntByName_Internal(const char* name, int value)
 DvarError Dvar_SetFloatByName_Internal(const char* name, float value)
 {
     dvar_t* dvar = Dvar_FindByName_Internal(name);
-    core_assert(dvar);
+    check(dvar);
     if (!dvar)
     {
         return DvarError::NotExisted;
@@ -255,7 +255,7 @@ DvarError Dvar_SetFloatByName_Internal(const char* name, float value)
 DvarError Dvar_SetStringByName_Internal(const char* name, const char* value)
 {
     dvar_t* dvar = Dvar_FindByName_Internal(name);
-    core_assert(dvar);
+    check(dvar);
     if (!dvar)
     {
         return DvarError::NotExisted;

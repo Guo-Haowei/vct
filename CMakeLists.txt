@@ -19,6 +19,11 @@ message("Configuring glad...")
 add_subdirectory(External/glad)
 set_target_properties(glad PROPERTIES FOLDER External)
 
+################################################################################
+message(STATUS "Configuring fmt...")
+add_subdirectory(External/fmt)
+set_target_properties(fmt PROPERTIES FOLDER External)
+
 include(cmake/build-lua.cmake)
 include(cmake/build-imgui.cmake)
 

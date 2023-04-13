@@ -9,9 +9,9 @@
 #include "Core/com_dvars.h"
 #include "Core/com_filesystem.h"
 #include "shaders/cbuffer.glsl"
-#include "universal/core_assert.h"
+#include "Core/Check.h"
 #include "universal/dvar_api.h"
-#include "universal/print.h"
+#include "Core/Log.h"
 #include "universal/universal.h"
 
 static MeshData g_quad;
@@ -33,7 +33,7 @@ void R_CreateQuad()
 
 void R_DrawQuad()
 {
-    core_assert(g_quad.vao);
+    check(g_quad.vao);
     glBindVertexArray(g_quad.vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
@@ -59,12 +59,12 @@ bool Init()
 {
     if (gladLoadGL() == 0)
     {
-        Com_PrintFatal("[glad] failed to load gl functions");
+        LOG_FATAL("[glad] failed to load gl functions");
         return false;
     }
 
-    Com_Printf("[opengl] renderer: %s", glGetString(GL_RENDERER));
-    Com_Printf("[opengl] version: %s", glGetString(GL_VERSION));
+    LOG_DEBUG("[opengl] renderer: {}", (const char *)glGetString(GL_RENDERER));
+    LOG_DEBUG("[opengl] version: {}", (const char *)glGetString(GL_VERSION));
 
     if (Dvar_GetBool(r_debug))
     {
@@ -76,7 +76,7 @@ bool Init()
             glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
             glDebugMessageCallback(gl::DebugCallback, nullptr);
             glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-            Com_Printf("[opengl] debug callback enabled");
+            LOG_DEBUG("[opengl] debug callback enabled");
         }
     }
 
@@ -97,13 +97,13 @@ static std::string ProcessShader(const std::string &source)
         if (line.find(pattern) == 0)
         {
             std::string include = line.substr(line.find('"'));
-            core_assert(include.front() == '"' && include.back() == '"');
+            check(include.front() == '"' && include.back() == '"');
             include.pop_back();
             ComFileWrapper fhandle(Com_FsOpenRead(include.c_str() + 1, "source/shaders"));
             std::vector<char> extra;
             if (fhandle.Read(extra) != ComFile::Result::Ok)
             {
-                Com_PrintError("[filesystem] failed to read shader '%s'", include);
+                LOG_ERROR("[filesystem] failed to read shader '{}'", include);
             }
             result.append(extra.data());
         }
@@ -136,7 +136,7 @@ public:
 
     operator GLuint()
     {
-        core_assert(handle_);
+        check(handle_);
         return handle_;
     }
 };
@@ -148,7 +148,7 @@ static GLuint CreateShader(const char *file, GLenum type)
     const ComFile::Result result = fhandle.Read(source);
     if (result != ComFile::Result::Ok)
     {
-        Com_PrintError("[filesystem] failed to read shader '%s'", file);
+        LOG_ERROR("[filesystem] failed to read shader '{}'", file);
         return 0;
     }
 
@@ -173,7 +173,7 @@ static GLuint CreateShader(const char *file, GLenum type)
     {
         std::vector<char> buffer(length + 1);
         glGetShaderInfoLog(shader, length, nullptr, buffer.data());
-        Com_PrintError("[glsl] failed to compile shader '%s'\ndetails:\n%s", file, buffer.data());
+        LOG_ERROR("[glsl] failed to compile shader '{}'\ndetails:\n{}", file, buffer.data());
     }
 
     if (status == GL_FALSE)
@@ -194,11 +194,11 @@ GLuint CreateProgram(const ProgramCreateInfo &info)
 
     if (!info.cs.empty())
     {
-        core_assert(info.vs.empty());
-        core_assert(info.ps.empty());
-        core_assert(info.gs.empty());
+        check(info.vs.empty());
+        check(info.ps.empty());
+        check(info.gs.empty());
 
-        Com_PrintInfo("compiling compute (%s) pipeline", info.cs.c_str());
+        LOG_INFO("compiling compute ({}) pipeline", info.cs.c_str());
         program = glCreateProgram();
         name = info.cs.c_str();
         cs = CreateShader(info.cs.c_str(), GL_COMPUTE_SHADER);
@@ -206,7 +206,7 @@ GLuint CreateProgram(const ProgramCreateInfo &info)
     }
     else if (info.vs[0] && info.ps[0])
     {
-        Com_PrintInfo("compiling vertex (%s), geometry(%s), pixel(%s)", info.vs.c_str(), info.gs.c_str(), info.ps.c_str());
+        LOG_INFO("compiling vertex ({}), geometry({}), pixel({})", info.vs.c_str(), info.gs.c_str(), info.ps.c_str());
 
         program = glCreateProgram();
         name = info.vs.c_str();
@@ -222,7 +222,7 @@ GLuint CreateProgram(const ProgramCreateInfo &info)
         }
     }
 
-    core_assert(program);
+    check(program);
 
     glLinkProgram(program);
     GLint status = GL_FALSE, length = 0;
@@ -232,7 +232,7 @@ GLuint CreateProgram(const ProgramCreateInfo &info)
     {
         std::vector<char> buffer(length + 1);
         glGetProgramInfoLog(program, length, nullptr, buffer.data());
-        Com_PrintError("[glsl] failed to link program '%s'\ndetails:\n%s", name, buffer.data());
+        LOG_ERROR("[glsl] failed to link program '{}'\ndetails:\n{}", name, buffer.data());
     }
 
     if (status == GL_FALSE)
@@ -255,7 +255,7 @@ GLuint CreateAndBindConstantBuffer(int slot, size_t sizeInByte)
     glBufferData(GL_UNIFORM_BUFFER, sizeInByte, nullptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glBindBufferBase(GL_UNIFORM_BUFFER, slot, handle);
-    Com_Printf("[opengl] created buffer of size %zu (slot %d)", sizeInByte, slot);
+    LOG_DEBUG("[opengl] created buffer of size {} (slot {})", sizeInByte, slot);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     return handle;
 }
@@ -281,8 +281,6 @@ static void APIENTRY DebugCallback(
     const char *message,
     const void *userParam)
 {
-    using detail::Level;
-
     const char *sourceStr = "other";
     const char *typeStr = "other";
     switch (source)
@@ -339,6 +337,7 @@ static void APIENTRY DebugCallback(
             break;
     }
 
+#if 0
     Level level = Level::Warning;
     const char *severityStr = "low";
     switch (severity)
@@ -368,6 +367,7 @@ static void APIENTRY DebugCallback(
     {
         __debugbreak();
     }
+#endif
 }
 
 }  // namespace gl

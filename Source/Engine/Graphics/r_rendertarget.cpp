@@ -3,9 +3,9 @@
 #include "Core/com_dvars.h"
 #include "Core/main_window.h"
 #include "r_cbuffers.h"
-#include "universal/core_assert.h"
+#include "Core/Check.h"
 #include "universal/dvar_api.h"
-#include "universal/print.h"
+#include "Core/Log.h"
 #include "universal/universal.h"
 
 void RenderTarget::Bind()
@@ -79,7 +79,7 @@ void RenderTarget::CheckError()
 {
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     {
-        Com_PrintError("Frame buffer not completed");
+        LOG_ERROR("Frame buffer not completed");
     }
 }
 
@@ -230,7 +230,7 @@ void R_CreateRT()
     const int h = extent.y;
 
     const int res = Dvar_GetInt(r_shadowRes);
-    core_assert(is_power_of_two(res));
+    check(is_power_of_two(res));
 
     // g_shadowRT.Create( NUM_CASCADES * res, res );
     g_shadowRT.Create(res, res);

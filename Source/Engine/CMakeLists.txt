@@ -48,7 +48,7 @@ target_include_directories(${LIB_NAME} PUBLIC
 
 target_compile_definitions(${LIB_NAME} PUBLIC -D_CRT_SECURE_NO_WARNINGS)
 
-target_link_libraries(${LIB_NAME} PUBLIC imgui glfw glad lua)
+target_link_libraries(${LIB_NAME} PUBLIC imgui glfw glad lua fmt)
 
 if(MSVC)
     target_compile_options(${LIB_NAME} PRIVATE /W4)

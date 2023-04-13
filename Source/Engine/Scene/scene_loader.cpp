@@ -9,9 +9,9 @@
 
 #include "Core/com_dvars.h"
 #include "Core/com_filesystem.h"
-#include "universal/core_assert.h"
+#include "Core/Check.h"
 #include "universal/dvar_api.h"
-#include "universal/print.h"
+#include "Core/Log.h"
 
 using std::string;
 using std::vector;
@@ -20,7 +20,7 @@ void SceneLoader::loadGltf(const char* path, Scene& scene, const mat4& transform
 {
     char fullpath[kMaxOSPath];
     Com_FsBuildPath(fullpath, kMaxOSPath, path, "");
-    Com_Printf("[assimp] loading model from '%s'", fullpath);
+    LOG_DEBUG("[assimp] loading model from '{}'", fullpath);
 
     Assimp::Importer importer;
 
@@ -31,13 +31,13 @@ void SceneLoader::loadGltf(const char* path, Scene& scene, const mat4& transform
     // check for errors
     if (!aiscene || aiscene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !aiscene->mRootNode)  // if is Not Zero
     {
-        Com_PrintError("[assimp] failed to load scene '%s'\n\tdetails: %s", fullpath, importer.GetErrorString());
+        LOG_ERROR("[assimp] failed to load scene '{}'\n\tdetails: {}", fullpath, importer.GetErrorString());
     }
 
     const uint32_t numMeshes = aiscene->mNumMeshes;
     const uint32_t numMaterials = aiscene->mNumMaterials;
 
-    Com_Printf("scene '%s' has %u meshes, %u materials", path, numMeshes, numMaterials);
+    LOG_DEBUG("scene '{}' has {} meshes, {} materials", path, numMeshes, numMaterials);
 
     // set base path
     m_currentPath = fullpath;
@@ -128,7 +128,7 @@ Material* SceneLoader::processMaterial(const aiMaterial* aimaterial)
         }
         else
         {
-            Com_PrintWarning("[scene] mesh does not have diffuse texture");
+            LOG_WARN("[scene] mesh does not have diffuse texture");
         }
     }
 
@@ -162,7 +162,7 @@ Material* SceneLoader::processMaterial(const aiMaterial* aimaterial)
 
 MeshComponent* SceneLoader::processMesh(const aiMesh* aimesh)
 {
-    core_assert(aimesh->mNumVertices);
+    check(aimesh->mNumVertices);
 
     MeshComponent* mesh = new MeshComponent;
     mesh->positions.reserve(aimesh->mNumVertices);

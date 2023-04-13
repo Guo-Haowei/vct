@@ -8,9 +8,9 @@
 #include "r_cbuffers.h"
 #include "r_rendertarget.h"
 #include "r_shader.h"
-#include "universal/core_assert.h"
+#include "Core/Check.h"
 #include "universal/dvar_api.h"
-#include "universal/print.h"
+#include "Core/Log.h"
 
 #ifdef max
 #undef max

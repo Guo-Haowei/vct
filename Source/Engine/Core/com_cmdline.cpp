@@ -8,9 +8,9 @@
 
 #include "com_filesystem.h"
 #include "lua_script.h"
-#include "universal/core_assert.h"
+#include "Core/Check.h"
 #include "universal/dvar_api.h"
-#include "universal/print.h"
+#include "Core/Log.h"
 
 using std::list;
 using std::string;
@@ -35,7 +35,7 @@ public:
 
         if (!std::filesystem::exists(path))
         {
-            Com_PrintWarning("[filesystem] file '%s' does not exist", path);
+            LOG_WARN("[filesystem] file '{}' does not exist", path);
             return;
         }
 
@@ -80,7 +80,7 @@ public:
     {
         if (commands_.empty())
         {
-            Com_PrintError("Unexpected EOF");
+            LOG_ERROR("Unexpected EOF");
             str.clear();
             return false;
         }
@@ -103,7 +103,7 @@ bool Com_ProcessCmdLine(int argc, const char** argv)
             dvar_t* dvar = Dvar_FindByName_Internal(str.c_str());
             if (dvar == nullptr)
             {
-                Com_PrintError("[dvar] Dvar '%s' not found", str.c_str());
+                LOG_ERROR("[dvar] Dvar '{}' not found", str.c_str());
                 return false;
             }
             cmdHelper.Consume(str);
@@ -114,19 +114,19 @@ bool Com_ProcessCmdLine(int argc, const char** argv)
             cmdHelper.Consume(str);
             if (!Com_ExecLua(str.c_str()))
             {
-                Com_PrintError("[lua] failed to execute script '%s'", str.c_str());
+                LOG_ERROR("[lua] failed to execute script '{}'", str.c_str());
                 return false;
             }
-            // Com_PrintInfo( "Executing '%s'", str.c_str() );
+            // LOG_INFO( "Executing '{}'", str.c_str() );
             // cmdHelper.PushCfg( str.c_str() );
         }
         else
         {
-            Com_PrintError("Unknown command '%s'", str.c_str());
+            LOG_ERROR("Unknown command '{}'", str.c_str());
             return false;
         }
     }
 
-    Com_PrintSuccess("cmd line processed");
+    LOG_OK("cmd line processed");
     return true;
 }

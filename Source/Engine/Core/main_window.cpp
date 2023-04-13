@@ -4,8 +4,8 @@
 
 #include "com_dvars.h"
 #include "imgui/imgui.h"
-#include "universal/core_assert.h"
-#include "universal/print.h"
+#include "Core/Check.h"
+#include "Core/Log.h"
 
 namespace MainWindow
 {
@@ -19,10 +19,10 @@ static constexpr const char TITLE[] = "Editor";
 
 bool Init()
 {
-    core_assert(!g_initialized);
+    check(!g_initialized);
 
     glfwSetErrorCallback([](int code, const char* desc) {
-        Com_PrintFatal("[glfw] error(%d): %s", code, desc);
+        LOG_FATAL("[glfw] error({}): {}", code, desc);
     });
 
     glfwInit();
@@ -54,7 +54,7 @@ bool Init()
     g_window = glfwCreateWindow(int(size.x), int(size.y), TITLE, 0, 0);
     glfwMakeContextCurrent(g_window);
 
-    Com_PrintSuccess("MainWindow created %d x %d", size.x, size.y);
+    LOG_OK("MainWindow created {} x {}", size.x, size.y);
     glfwGetFramebufferSize(g_window, &g_frameSize.x, &g_frameSize.y);
     return g_initialized = true;
 }
@@ -72,7 +72,7 @@ void Shutdown()
 
 GLFWwindow* GetRaw()
 {
-    core_assert(g_initialized && g_window);
+    check(g_initialized && g_window);
     return g_window;
 }
 

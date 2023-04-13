@@ -7,7 +7,7 @@
 #include "gl_utils.h"
 #include "r_cbuffers.h"
 #include "r_shader.h"
-#include "universal/core_assert.h"
+#include "Core/Check.h"
 #include "universal/universal.h"
 
 struct VertexPoint3D
