@@ -1,3 +1,7 @@
+file(GLOB SRC_CONTAINER
+    "Container/*.h"
+)
+
 file(GLOB SRC_CORE
     "Core/*.h"
     "Core/*.cpp"
@@ -21,12 +25,14 @@ file(GLOB SRC_UNIVERSAL
 set(LIB_NAME Engine)
 
 add_library(${LIB_NAME} STATIC
+    ${SRC_CONTAINER}
     ${SRC_CORE}
     ${SRC_GRAPHICS}
     ${SRC_SCENE}
     ${SRC_UNIVERSAL}
 )
 
+source_group("Container"    FILES ${SRC_CONTAINER})
 source_group("Core"         FILES ${SRC_CORE})
 source_group("Graphics"     FILES ${SRC_GRAPHICS})
 source_group("Scene"        FILES ${SRC_SCENE})
@@ -46,7 +52,10 @@ target_include_directories(${LIB_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/Source/
 )
 
-target_compile_definitions(${LIB_NAME} PUBLIC -D_CRT_SECURE_NO_WARNINGS)
+target_compile_definitions(${LIB_NAME} PUBLIC
+    -D_CRT_SECURE_NO_WARNINGS
+    -DROOT_FOLDER="${CMAKE_SOURCE_DIR}/"
+)
 
 target_link_libraries(${LIB_NAME} PUBLIC imgui glfw glad lua fmt)
 

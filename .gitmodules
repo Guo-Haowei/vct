@@ -19,3 +19,6 @@
 [submodule "External/fmt"]
 	path = External/fmt
 	url = https://github.com/fmtlib/fmt.git
+[submodule "External/doctest"]
+	path = External/doctest
+	url = https://github.com/doctest/doctest.git
