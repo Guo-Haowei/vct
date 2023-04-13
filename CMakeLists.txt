@@ -23,7 +23,6 @@ include(cmake/build-lua.cmake)
 include(cmake/build-imgui.cmake)
 
 # @TODO: remove
-include_directories(${PROJECT_SOURCE_DIR}/source/)
 include_directories(${PROJECT_SOURCE_DIR}/external/)
 include_directories(${PROJECT_SOURCE_DIR}/external/glm/)
 include_directories(${PROJECT_SOURCE_DIR}/external/glad/include/)
@@ -35,4 +34,4 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-add_subdirectory(source)
+add_subdirectory(Source)
