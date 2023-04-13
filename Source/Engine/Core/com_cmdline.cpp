@@ -9,7 +9,7 @@
 #include "com_filesystem.h"
 #include "lua_script.h"
 #include "Core/Check.h"
-#include "universal/dvar_api.h"
+#include "Core/DynamicVariable.h"
 #include "Core/Log.h"
 
 using std::list;
@@ -100,14 +100,14 @@ bool Com_ProcessCmdLine(int argc, const char** argv)
         if (str == "+set")
         {
             cmdHelper.Consume(str);
-            dvar_t* dvar = Dvar_FindByName_Internal(str.c_str());
+            DynamicVariable* dvar = DynamicVariableManager::Find(str.c_str());
             if (dvar == nullptr)
             {
                 LOG_ERROR("[dvar] Dvar '{}' not found", str.c_str());
                 return false;
             }
             cmdHelper.Consume(str);
-            Dvar_SetFromString_Internal(*dvar, str.c_str());
+            dvar->SetFromSourceString(str.c_str());
         }
         else if (str == "+exec")
         {

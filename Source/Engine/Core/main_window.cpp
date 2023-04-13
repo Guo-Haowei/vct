@@ -2,7 +2,7 @@
 
 #include <GLFW/glfw3.h>
 
-#include "com_dvars.h"
+#include "CommonDvars.h"
 #include "imgui/imgui.h"
 #include "Core/Check.h"
 #include "Core/Log.h"
@@ -27,12 +27,12 @@ bool Init()
 
     glfwInit();
 
-    glfwWindowHint(GLFW_DECORATED, !Dvar_GetBool(wnd_frameless));
+    glfwWindowHint(GLFW_DECORATED, !DVAR_GET_BOOL(wnd_frameless));
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-    if (Dvar_GetBool(r_debug))
+    if (DVAR_GET_BOOL(r_debug))
     {
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
     }
@@ -40,7 +40,7 @@ bool Init()
     const GLFWvidmode* vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
     const ivec2 maxSize = ivec2(vidmode->width, vidmode->height);
-    ivec2 size(Dvar_GetInt(wnd_width), Dvar_GetInt(wnd_height));
+    ivec2 size(DVAR_GET_INT(wnd_width), DVAR_GET_INT(wnd_height));
     if (size.x == 0 || size.y == 0)
     {
         size.x = int(0.8f * maxSize.x);

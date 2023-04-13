@@ -1,4 +1,4 @@
-#include "universal/dvar_begin.h"
+#include "DynamicVariableBegin.h"
 
 DVAR_STRING(scene, "");
 DVAR_FLOAT(scene_scale, 1.0f);
@@ -43,4 +43,4 @@ DVAR_INT(r_enableFXAA, 1);
 // SSR
 DVAR_INT(r_mirrorFloor, 0);  // for testing reflection
 
-#include "universal/dvar_end.h"
+#include "DynamicVariableEnd.h"

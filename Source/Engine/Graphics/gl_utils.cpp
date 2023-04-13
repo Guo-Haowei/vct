@@ -6,11 +6,11 @@
 #include <set>
 #include <sstream>
 
-#include "Core/com_dvars.h"
+#include "Core/CommonDvars.h"
 #include "Core/com_filesystem.h"
 #include "shaders/cbuffer.glsl"
 #include "Core/Check.h"
-#include "universal/dvar_api.h"
+#include "Core/DynamicVariable.h"
 #include "Core/Log.h"
 #include "universal/universal.h"
 
@@ -66,7 +66,7 @@ bool Init()
     LOG_DEBUG("[opengl] renderer: {}", (const char *)glGetString(GL_RENDERER));
     LOG_DEBUG("[opengl] version: {}", (const char *)glGetString(GL_VERSION));
 
-    if (Dvar_GetBool(r_debug))
+    if (DVAR_GET_BOOL(r_debug))
     {
         int flags;
         glGetIntegerv(GL_CONTEXT_FLAGS, &flags);

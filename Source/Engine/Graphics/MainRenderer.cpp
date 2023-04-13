@@ -1,7 +1,7 @@
 #pragma once
 #include "MainRenderer.h"
 
-#include "Core/com_dvars.h"
+#include "Core/CommonDvars.h"
 #include "Core/com_filesystem.h"
 #include "Core/com_misc.h"
 #include "Core/editor.h"
@@ -14,7 +14,7 @@
 #include "r_shader.h"
 #include "r_sun_shadow.h"
 #include "Core/Check.h"
-#include "universal/dvar_api.h"
+#include "Core/DynamicVariable.h"
 
 static std::vector<std::shared_ptr<MeshData>> g_meshdata;
 static std::vector<std::shared_ptr<MaterialData>> g_materialdata;
@@ -88,7 +88,7 @@ void MainRenderer::createGpuResources()
     // create box quad
     R_CreateQuad();
 
-    const int voxelSize = Dvar_GetInt(r_voxelSize);
+    const int voxelSize = DVAR_GET_INT(r_voxelSize);
 
     /// create voxel image
     {
@@ -188,7 +188,7 @@ void MainRenderer::visualizeVoxels()
     glBindVertexArray(m_box->vao);
     program.Use();
 
-    const int size = Dvar_GetInt(r_voxelSize);
+    const int size = DVAR_GET_INT(r_voxelSize);
     glDrawElementsInstanced(GL_TRIANGLES, m_box->count, GL_UNSIGNED_INT, 0, size * size * size);
 
     program.Stop();
@@ -219,7 +219,7 @@ struct MaterialCache
 void MainRenderer::renderToVoxelTexture()
 {
     const Scene& scene = Com_GetScene();
-    const int voxelSize = Dvar_GetInt(r_voxelSize);
+    const int voxelSize = DVAR_GET_INT(r_voxelSize);
 
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
@@ -298,7 +298,7 @@ void MainRenderer::render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     R_ShadowPass();
 
-    if (scene.dirty || Dvar_GetBool(r_forceVXGI))
+    if (scene.dirty || DVAR_GET_BOOL(r_forceVXGI))
     {
         m_albedoVoxel.clear();
         m_normalVoxel.clear();
@@ -314,7 +314,7 @@ void MainRenderer::render()
         R_Gbuffer_Pass();
         R_SSAO_Pass();
 
-        const int mode = Dvar_GetInt(r_debugTexture);
+        const int mode = DVAR_GET_INT(r_debugTexture);
 
         switch (mode)
         {

@@ -1,10 +1,10 @@
 #include "r_rendertarget.h"
 
-#include "Core/com_dvars.h"
+#include "Core/CommonDvars.h"
 #include "Core/main_window.h"
 #include "r_cbuffers.h"
 #include "Core/Check.h"
-#include "universal/dvar_api.h"
+#include "Core/DynamicVariable.h"
 #include "Core/Log.h"
 #include "universal/universal.h"
 
@@ -229,7 +229,7 @@ void R_CreateRT()
     const int w = extent.x;
     const int h = extent.y;
 
-    const int res = Dvar_GetInt(r_shadowRes);
+    const int res = DVAR_GET_INT(r_shadowRes);
     check(is_power_of_two(res));
 
     // g_shadowRT.Create( NUM_CASCADES * res, res );

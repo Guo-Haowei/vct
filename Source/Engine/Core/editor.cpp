@@ -3,14 +3,14 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include "com_dvars.h"
+#include "CommonDvars.h"
 #include "Core/com_misc.h"
 #include "Core/main_window.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 #include "Graphics/r_cbuffers.h"
 #include "Core/Check.h"
-#include "universal/dvar_api.h"
+#include "Core/DynamicVariable.h"
 #include "Core/Log.h"
 
 class Editor
@@ -84,32 +84,32 @@ void Editor::DbgWindow()
         ImGui::Separator();
 
         ImGui::Text("Voxel GI");
-        ImGui::Checkbox("Enable GI", (bool*)(Dvar_GetPtr(r_enableVXGI)));
-        ImGui::Checkbox("No Texture", (bool*)(Dvar_GetPtr(r_noTexture)));
-        dirty |= ImGui::Checkbox("Force Voxel GI texture update", (bool*)(Dvar_GetPtr(r_forceVXGI)));
+        ImGui::Checkbox("Enable GI", (bool*)(DVAR_GET_POINTER(r_enableVXGI)));
+        ImGui::Checkbox("No Texture", (bool*)(DVAR_GET_POINTER(r_noTexture)));
+        dirty |= ImGui::Checkbox("Force Voxel GI texture update", (bool*)(DVAR_GET_POINTER(r_forceVXGI)));
         ImGui::Separator();
 
         ImGui::Text("CSM");
-        ImGui::Checkbox("Debug CSM", (bool*)(Dvar_GetPtr(r_debugCSM)));
+        ImGui::Checkbox("Debug CSM", (bool*)(DVAR_GET_POINTER(r_debugCSM)));
         ImGui::Separator();
 
         ImGui::Text("SSAO");
-        ImGui::Checkbox("Enable SSAO", (bool*)(Dvar_GetPtr(r_enableSsao)));
+        ImGui::Checkbox("Enable SSAO", (bool*)(DVAR_GET_POINTER(r_enableSsao)));
         ImGui::Text("SSAO Kernal Radius");
-        ImGui::SliderFloat("Kernal Radius", (float*)(Dvar_GetPtr(r_ssaoKernelRadius)), 0.1f, 5.0f);
+        ImGui::SliderFloat("Kernal Radius", (float*)(DVAR_GET_POINTER(r_ssaoKernelRadius)), 0.1f, 5.0f);
         ImGui::Separator();
 
         ImGui::Text("FXAA");
-        ImGui::Checkbox("Enable FXAA", (bool*)(Dvar_GetPtr(r_enableFXAA)));
+        ImGui::Checkbox("Enable FXAA", (bool*)(DVAR_GET_POINTER(r_enableFXAA)));
         ImGui::Separator();
 
         ImGui::Text("Display Texture");
-        ImGui::SliderInt("Display Texture", (int*)(Dvar_GetPtr(r_debugTexture)), DrawTexture::TEXTURE_FINAL_IMAGE, DrawTexture::TEXTURE_MAX);
-        ImGui::Text("%s", DrawTextureToStr(Dvar_GetInt(r_debugTexture)));
+        ImGui::SliderInt("Display Texture", (int*)(DVAR_GET_POINTER(r_debugTexture)), DrawTexture::TEXTURE_FINAL_IMAGE, DrawTexture::TEXTURE_MAX);
+        ImGui::Text("%s", DrawTextureToStr(DVAR_GET_INT(r_debugTexture)));
 
         ImGui::Separator();
         ImGui::Text("Light");
-        float* lightDir = (float*)Dvar_GetPtr(light_dir);
+        float* lightDir = (float*)DVAR_GET_POINTER(light_dir);
         dirty |= ImGui::SliderFloat("x", lightDir, -20.f, 20.f);
         dirty |= ImGui::SliderFloat("z", lightDir + 2, -20.f, 20.f);
 
@@ -122,7 +122,7 @@ void Editor::DbgWindow()
             dirty |= ImGui::SliderFloat("roughness", &drawData->roughness, 0.0f, 1.0f);
         }
 
-        scene.light.direction = glm::normalize(Dvar_GetVec3(light_dir));
+        scene.light.direction = glm::normalize(DVAR_GET_VEC3(light_dir));
         scene.dirty = dirty;
 
         ImGui::End();
