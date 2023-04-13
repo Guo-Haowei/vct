@@ -9,9 +9,9 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 #include "Graphics/r_cbuffers.h"
-#include "universal/core_assert.h"
+#include "Core/Check.h"
 #include "universal/dvar_api.h"
-#include "universal/print.h"
+#include "Core/Log.h"
 
 class Editor
 {
@@ -171,7 +171,7 @@ void Editor::DockSpace()
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 
     const auto* node = ImGui::DockBuilderGetCentralNode(dockspace_id);
-    core_assert(node);
+    check(node);
 
     pos = node->Pos;
     size = node->Size;
@@ -287,7 +287,7 @@ void Editor::Update()
     {
         if (scene.selected->visible)
         {
-            Com_PrintWarning("material %s deleted", scene.selected->mesh->name.c_str());
+            LOG_WARN("material %s deleted", scene.selected->mesh->name.c_str());
 
             scene.selected->visible = false;
             scene.dirty = true;

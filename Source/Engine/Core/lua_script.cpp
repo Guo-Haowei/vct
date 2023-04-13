@@ -6,17 +6,17 @@ extern "C" {
 #include <lua/lualib.h>
 }
 
-#include "universal/core_assert.h"
+#include "Core/Check.h"
 #include "universal/dvar_api.h"
-#include "universal/print.h"
+#include "Core/Log.h"
 
-#define CHECK_DVAR_RESULT(expr)                   \
-    {                                             \
-        DvarError _dvarErr = (expr);              \
-        if (_dvarErr != DvarError::Ok)            \
-        {                                         \
-            Com_PrintWarning("%s failed", #expr); \
-        }                                         \
+#define CHECK_DVAR_RESULT(expr)           \
+    {                                     \
+        DvarError _dvarErr = (expr);      \
+        if (_dvarErr != DvarError::Ok)    \
+        {                                 \
+            LOG_WARN("{} failed", #expr); \
+        }                                 \
     }
 
 extern "C" {
@@ -30,7 +30,7 @@ static int LuaDvarFunc_SetInt(lua_State* L)
     dvar_t* dvar = Dvar_FindByName_Internal(name);
     if (dvar == nullptr)
     {
-        Com_PrintWarning("[lua] dvar '%s' not found!", name);
+        LOG_WARN("[lua] dvar '{}' not found!", name);
         return 0;
     }
 
@@ -47,7 +47,7 @@ static int LuaDvarFunc_SetFloat(lua_State* L)
     dvar_t* dvar = Dvar_FindByName_Internal(name);
     if (dvar == nullptr)
     {
-        Com_PrintWarning("[lua] dvar '%s' not found!", name);
+        LOG_WARN("[lua] dvar '{}' not found!", name);
         return 0;
     }
 
@@ -65,7 +65,7 @@ static int LuaDvarFunc_SetVec2(lua_State* L)
     dvar_t* dvar = Dvar_FindByName_Internal(name);
     if (dvar == nullptr)
     {
-        Com_PrintWarning("[lua] dvar '%s' not found!", name);
+        LOG_WARN("[lua] dvar '{}' not found!", name);
         return 0;
     }
 
@@ -84,7 +84,7 @@ static int LuaDvarFunc_SetVec3(lua_State* L)
     dvar_t* dvar = Dvar_FindByName_Internal(name);
     if (dvar == nullptr)
     {
-        Com_PrintWarning("[lua] dvar '%s' not found!", name);
+        LOG_WARN("[lua] dvar '{}' not found!", name);
         return 0;
     }
 
@@ -104,7 +104,7 @@ static int LuaDvarFunc_SetVec4(lua_State* L)
     dvar_t* dvar = Dvar_FindByName_Internal(name);
     if (dvar == nullptr)
     {
-        Com_PrintWarning("[lua] dvar '%s' not found!", name);
+        LOG_WARN("[lua] dvar '{}' not found!", name);
         return 0;
     }
 
@@ -121,7 +121,7 @@ static int LuaDvarFunc_SetString(lua_State* L)
     dvar_t* dvar = Dvar_FindByName_Internal(name);
     if (dvar == nullptr)
     {
-        Com_PrintWarning("[lua] dvar '%s' not found!", name);
+        LOG_WARN("[lua] dvar '{}' not found!", name);
         return 0;
     }
 
@@ -153,9 +153,9 @@ static int luaopen_EngineLib(lua_State* L)
 
 bool Com_ExecLua(const char* path)
 {
-    Com_PrintInfo("[lua] executing %s", path);
+    LOG_INFO("[lua] executing {}", path);
     lua_State* L = luaL_newstate();
-    core_assert(L);
+    check(L);
     if (L == nullptr)
     {
         return false;
@@ -173,7 +173,7 @@ bool Com_ExecLua(const char* path)
         default:
             lua_error(L);
             const char* err = lua_tostring(L, -1);
-            Com_PrintError("[lua] error %d\n%s", code, err);
+            LOG_ERROR("[lua] error {}\n{}", code, err);
             break;
     }
 

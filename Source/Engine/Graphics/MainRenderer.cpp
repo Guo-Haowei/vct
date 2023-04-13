@@ -13,7 +13,7 @@
 #include "r_rendertarget.h"
 #include "r_shader.h"
 #include "r_sun_shadow.h"
-#include "universal/core_assert.h"
+#include "Core/Check.h"
 #include "universal/dvar_api.h"
 
 static std::vector<std::shared_ptr<MeshData>> g_meshdata;
@@ -112,7 +112,7 @@ void MainRenderer::createGpuResources()
     }
 
     // create material
-    core_assert(scene.materials.size() < array_length(g_constantCache.cache.AlbedoMaps));
+    check(scene.materials.size() < array_length(g_constantCache.cache.AlbedoMaps));
 
     for (int idx = 0; idx < scene.materials.size(); ++idx)
     {
@@ -145,7 +145,7 @@ void MainRenderer::createGpuResources()
         {
             matData->normalMap.create2DImageFromFile(mat->normalTexture.c_str());
             g_constantCache.cache.NormalMaps[idx].data = gl::MakeTextureResident(matData->normalMap.GetHandle());
-            Com_PrintInfo("material has bump %s", mat->normalTexture.c_str());
+            LOG_INFO("material has bump {}", mat->normalTexture.c_str());
         }
 
         matData->textureMapIdx = idx;

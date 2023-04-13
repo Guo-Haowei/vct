@@ -1,6 +1,19 @@
 #include "core_math.h"
 
-#include "core_assert.h"
+#include "check.h"
+
+#ifdef min
+#undef min
+#endif
+#ifdef max
+#undef max
+#endif
+#ifdef near
+#undef near
+#endif
+#ifdef far
+#undef far
+#endif
 
 //------------------------------------------------------------------------------
 // AABB
@@ -9,9 +22,9 @@
 constexpr AABB::AABB(const vec3& min, const vec3& max)
     : min(min), max(max)
 {
-    core_assert(min.x < max.x);
-    core_assert(min.y < max.y);
-    core_assert(min.z < max.z);
+    check(min.x < max.x);
+    check(min.y < max.y);
+    check(min.z < max.z);
 }
 
 bool AABB::Valid() const

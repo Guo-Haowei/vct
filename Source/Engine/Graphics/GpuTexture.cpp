@@ -3,8 +3,8 @@
 
 #include <string>
 
-#include "universal/core_assert.h"
-#include "universal/print.h"
+#include "Core/Check.h"
+#include "Core/Log.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -73,7 +73,7 @@ void GpuTexture::create2DImageFromFile(const char* path)
 
     if (!image)
     {
-        Com_PrintError("stb: failed to load image '%s'", path);
+        LOG_ERROR("stb: failed to load image '{}'", path);
     }
 
     glGenTextures(1, &mHandle);

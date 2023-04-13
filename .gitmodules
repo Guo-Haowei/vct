@@ -1,18 +1,21 @@
-[submodule "external/glfw"]
-	path = external/glfw
+[submodule "External/glfw"]
+	path = External/glfw
 	url = https://github.com/glfw/glfw.git
-[submodule "external/glad"]
-	path = external/glad
+[submodule "External/glad"]
+	path = External/glad
 	url = https://github.com/Guo-Haowei/glad.git
-[submodule "external/assimp"]
-	path = external/assimp
+[submodule "External/assimp"]
+	path = External/assimp
 	url = https://github.com/assimp/assimp.git
-[submodule "external/glm"]
-	path = external/glm
+[submodule "External/glm"]
+	path = External/glm
 	url = https://github.com/g-truc/glm.git
-[submodule "external/lua"]
-	path = external/lua
+[submodule "External/lua"]
+	path = External/lua
 	url = https://github.com/lua/lua.git
-[submodule "external/imgui"]
-	path = external/imgui
+[submodule "External/imgui"]
+	path = External/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "External/fmt"]
+	path = External/fmt
+	url = https://github.com/fmtlib/fmt.git

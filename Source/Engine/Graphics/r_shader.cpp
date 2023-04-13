@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "gl_utils.h"
-#include "universal/core_assert.h"
+#include "Core/Check.h"
 
 using gl::CreateProgram;
 using gl::Program;
@@ -40,6 +40,6 @@ void R_DestroyShaderPrograms()
 
 const Program& R_GetShaderProgram(ProgramType type)
 {
-    core_assert(static_cast<int>(type) < g_shaderCache.size());
+    check(static_cast<int>(type) < g_shaderCache.size());
     return g_shaderCache[static_cast<int>(type)];
 }

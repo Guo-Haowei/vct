@@ -1,10 +1,11 @@
 #pragma once
+#include "Core/Defines.h"
 
-template<typename T, int N>
-inline constexpr int array_length(T (&buffer)[N])
-{
-    return N;
-}
+// template<typename T, int N>
+// inline constexpr int array_length(T (&buffer)[N])
+// {
+//     return N;
+// }
 
 inline constexpr unsigned int log_two(unsigned int x)
 {

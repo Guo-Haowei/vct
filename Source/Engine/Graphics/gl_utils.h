@@ -6,7 +6,7 @@
 
 #include "GpuTexture.h"
 #include "universal/core_math.h"
-#include "universal/print.h"
+#include "Core/Log.h"
 
 static constexpr int kMaxShaderName = 128;
 
@@ -139,7 +139,7 @@ struct ConstantBuffer
     {
         if (mHandle != 0)
         {
-            Com_Printf("[opengl] destroy cbuffer %u", mHandle);
+            LOG_DEBUG("[opengl] destroy cbuffer {}", mHandle);
             glDeleteBuffers(1, &mHandle);
         }
         mHandle = 0;

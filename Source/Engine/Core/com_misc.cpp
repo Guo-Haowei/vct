@@ -8,8 +8,8 @@
 #include "Graphics/r_cbuffers.h"
 #include "Graphics/r_sun_shadow.h"
 #include "scene/scene_loader.h"
-#include "universal/core_assert.h"
-#include "universal/print.h"
+#include "Core/Check.h"
+#include "Core/Log.h"
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -36,8 +36,8 @@ bool Com_LoadScene()
 {
     // validate dvars
     const int voxelTextureSize = Dvar_GetInt(r_voxelSize);
-    core_assert(is_power_of_two(voxelTextureSize));
-    core_assert(voxelTextureSize <= 256);
+    check(is_power_of_two(voxelTextureSize));
+    check(voxelTextureSize <= 256);
 
     SceneLoader loader;
     Scene& scene = g_scene;
@@ -49,7 +49,7 @@ bool Com_LoadScene()
 
     if (!scenePath[0])
     {
-        Com_PrintFatal("Scene not specified, set it by +set scene <name> or +exec <lua-file>");
+        LOG_FATAL("Scene not specified, set it by +set scene <name> or +exec <lua-file>");
         return false;
     }
 
@@ -80,7 +80,7 @@ bool Com_LoadScene()
     g_perFrameCache.cache.TexelSize = texelSize;
     g_perFrameCache.cache.VoxelSize = voxelSize;
 
-    Com_PrintSuccess("Scene '%s' loaded", scenePath);
+    LOG_OK("Scene '{}' loaded", scenePath);
     return true;
 }
 
@@ -104,7 +104,7 @@ bool Com_ImGuiInit()
         Com_FsBuildPath(s_iniFileNameLoad, kMaxOSPath, kDefaultEditorLayout);
     }
 
-    Com_Printf("[imgui] loading imgui config from '%s'", s_iniFileNameLoad);
+    LOG_DEBUG("[imgui] loading imgui config from '{}'", s_iniFileNameLoad);
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
@@ -115,7 +115,7 @@ bool Com_ImGuiInit()
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // Enable Docking
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;    // Enable Multi-Viewport / Platform Windows
 
-    Com_PrintSuccess("ImGui initialized");
+    LOG_OK("ImGui initialized");
     return true;
 }
 
@@ -130,7 +130,7 @@ void Com_UpdateWorld()
     // update camera
     const ivec2 extent = MainWindow::FrameSize();
     const float aspect = (float)extent.x / extent.y;
-    core_assert(aspect > 0.0f);
+    check(aspect > 0.0f);
 
     Camera& camera = scene.camera;
     ControlCamera(camera);
