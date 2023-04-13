@@ -6,12 +6,13 @@
 #include "CommonDvars.h"
 #include "Core/com_misc.h"
 #include "Core/main_window.h"
-#include "imgui/imgui.h"
-#include "imgui/imgui_internal.h"
-#include "Graphics/r_cbuffers.h"
 #include "Core/Check.h"
 #include "Core/DynamicVariable.h"
 #include "Core/Log.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_internal.h"
+#include "Graphics/r_cbuffers.h"
+#include "Math/Ray.h"
 
 class Editor
 {
@@ -124,9 +125,8 @@ void Editor::DbgWindow()
 
         scene.light.direction = glm::normalize(DVAR_GET_VEC3(light_dir));
         scene.dirty = dirty;
-
-        ImGui::End();
     }
+    ImGui::End();
 }
 
 void Editor::DockSpace()
@@ -176,7 +176,9 @@ void Editor::DockSpace()
     pos = node->Pos;
     size = node->Size;
 
+    ImGui::End();
     return;
+#if 0
     if (ImGui::BeginMenuBar())
     {
         if (ImGui::BeginMenu("Options"))
@@ -213,8 +215,7 @@ void Editor::DockSpace()
 
         ImGui::EndMenuBar();
     }
-
-    ImGui::End();
+#endif
 }
 
 void Editor::Update()
@@ -249,8 +250,13 @@ void Editor::Update()
             pos -= 0.5f;
             pos *= 2.0f;
 
-            Ray ray{ camera.position, glm::normalize(vec3(invPV * vec4(pos.x, pos.y, 1.0f, 1.0f))) };
+            vec3 rayStart = camera.position;
+            vec3 direction = glm::normalize(vec3(invPV * vec4(pos.x, pos.y, 1.0f, 1.0f)));
+            vec3 rayEnd = rayStart + direction * camera.zFar;
+            Ray ray(rayStart, rayEnd);
 
+            // @TODO: fix selection
+#if 0
             for (const auto& node : scene.geometryNodes)
             {
                 for (const auto& geom : node.geometries)
@@ -276,6 +282,7 @@ void Editor::Update()
                     }
                 }
             }
+#endif
         }
         else if (ImGui::IsMouseClicked(GLFW_MOUSE_BUTTON_2))
         {

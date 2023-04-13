@@ -8,7 +8,6 @@
 #include "r_cbuffers.h"
 #include "r_shader.h"
 #include "Core/Check.h"
-#include "universal/universal.h"
 
 struct VertexPoint3D
 {

@@ -12,14 +12,14 @@ file(GLOB SRC_GRAPHICS
     "Graphics/*.cpp"
 )
 
+file(GLOB SRC_MATH
+    "Math/*.h"
+    "Math/*.cpp"
+)
+
 file(GLOB SRC_SCENE
     "Scene/*.h"
     "Scene/*.cpp"
-)
-
-file(GLOB SRC_UNIVERSAL
-    "universal/*.h"
-    "universal/*.cpp"
 )
 
 set(LIB_NAME Engine)
@@ -28,15 +28,15 @@ add_library(${LIB_NAME} STATIC
     ${SRC_CONTAINER}
     ${SRC_CORE}
     ${SRC_GRAPHICS}
+    ${SRC_MATH}
     ${SRC_SCENE}
-    ${SRC_UNIVERSAL}
 )
 
 source_group("Container"    FILES ${SRC_CONTAINER})
 source_group("Core"         FILES ${SRC_CORE})
 source_group("Graphics"     FILES ${SRC_GRAPHICS})
+source_group("Math"     FILES ${SRC_MATH})
 source_group("Scene"        FILES ${SRC_SCENE})
-source_group("Universal"    FILES ${SRC_UNIVERSAL})
 
 target_include_directories(${LIB_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/External/assimp/include

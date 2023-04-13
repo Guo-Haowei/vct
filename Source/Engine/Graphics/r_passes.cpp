@@ -11,6 +11,7 @@
 #include "r_shader.h"
 #include "Core/Check.h"
 #include "Core/DynamicVariable.h"
+#include "Math/Frustum.h"
 
 static GLuint g_noiseTexture;
 
@@ -42,7 +43,7 @@ void R_Gbuffer_Pass()
             {
                 continue;
             }
-            if (!frustum.Intersect(geom.boundingBox))
+            if (!frustum.Intersects(geom.boundingBox))
             {
                 continue;
             }

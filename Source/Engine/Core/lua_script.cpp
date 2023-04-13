@@ -36,7 +36,7 @@ static int LuaDvarFunc_SetInt(lua_State* L)
     lua_Integer value = luaL_checkinteger(L, 2);
 
     FIND_DVAR_OR_RETURN(dvar, name);
-    SET_DVAR(dvar->SetInt(value));
+    SET_DVAR(dvar->SetInt(static_cast<int>(value)));
     return 0;
 }
 

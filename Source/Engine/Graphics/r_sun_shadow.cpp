@@ -11,10 +11,7 @@
 #include "Core/Check.h"
 #include "Core/DynamicVariable.h"
 #include "Core/Log.h"
-
-#ifdef max
-#undef max
-#endif
+#include "Math/Frustum.h"
 
 static mat4 R_HackLightSpaceMatrix(const vec3& lightDir)
 {
@@ -90,7 +87,7 @@ void R_ShadowPass()
                 {
                     continue;
                 }
-                if (!frustum.Intersect(geom.boundingBox))
+                if (!frustum.Intersects(geom.boundingBox))
                 {
                     continue;
                 }

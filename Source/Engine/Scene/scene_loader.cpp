@@ -75,12 +75,14 @@ void SceneLoader::loadGltf(const char* path, Scene& scene, const mat4& transform
             normal = mat3(transform) * normal;
         }
 
-        box.Expand(mesh->positions.data(), mesh->positions.size());
+        for (const vec3& point : mesh->positions)
+        {
+            box.Expand(point);
+        }
 
         // slightly enlarge bounding box
         const vec3 offset = vec3(0.01f);
-        box.min -= offset;
-        box.max += offset;
+        box.MakeValid();
 
         // box.ApplyMatrix( transform );
         Geometry geom;

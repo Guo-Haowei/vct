@@ -1,5 +1,5 @@
 #pragma once
-#include "universal/universal.h"
+#include "Core/Defines.h"
 
 inline constexpr int NUM_CASCADES = 3;
 inline constexpr int IMAGE_VOXEL_ALBEDO_SLOT = 0;

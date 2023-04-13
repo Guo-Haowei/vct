@@ -5,8 +5,8 @@
 #include <vector>
 
 #include "GpuTexture.h"
-#include "universal/core_math.h"
 #include "Core/Log.h"
+#include "Math/GeoMath.h"
 
 static constexpr int kMaxShaderName = 128;
 

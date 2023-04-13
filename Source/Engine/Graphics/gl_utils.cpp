@@ -12,7 +12,6 @@
 #include "Core/Check.h"
 #include "Core/DynamicVariable.h"
 #include "Core/Log.h"
-#include "universal/universal.h"
 
 static MeshData g_quad;
 
