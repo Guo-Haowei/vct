@@ -25,13 +25,6 @@ static Scene g_scene;
 
 static void ControlCamera(Camera& camera);
 
-bool Com_RegisterDvars()
-{
-#define REGISTER_DVAR
-#include "CommonDvars.h"
-    return true;
-}
-
 bool Com_LoadScene()
 {
     // validate dvars

@@ -1,4 +1,5 @@
-#include "com_cmdline.h"
+#include "Application.h"
+
 #include "com_filesystem.h"
 #include "com_misc.h"
 #include "editor.h"
@@ -6,8 +7,6 @@
 #include "main_window.h"
 #include "Graphics/MainRenderer.h"
 #include "Graphics/r_graphics.h"
-// #include "universal/core_math.h"
-// #include "Math/GeoMath.h"
 
 #include "imgui/backends/imgui_impl_glfw.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
@@ -19,11 +18,10 @@ using namespace vct;
 
 int main(int argc, const char** argv)
 {
+    Application app;
     bool ok = true;
+    ok = ok && app.Run(argc, argv);
 
-    ok = ok && Com_FsInit();
-    ok = ok && Com_RegisterDvars();
-    ok = ok && Com_ProcessCmdLine(argc - 1, argv + 1);
     ok = ok && Com_LoadScene();
     ok = ok && Com_ImGuiInit();
     ok = ok && MainWindow::Init();
