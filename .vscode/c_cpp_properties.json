@@ -4,6 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceRoot}/External/assimp/include",
+                "${workspaceRoot}/External/doctest",
                 "${workspaceRoot}/External/fmt/include",
                 "${workspaceRoot}/External/glad/include",
                 "${workspaceRoot}/External/glfw/include",

@@ -7,10 +7,10 @@
 
 #include <assimp/Importer.hpp>
 
-#include "Core/com_dvars.h"
+#include "Core/CommonDvars.h"
 #include "Core/com_filesystem.h"
 #include "Core/Check.h"
-#include "universal/dvar_api.h"
+#include "Core/DynamicVariable.h"
 #include "Core/Log.h"
 
 using std::string;
@@ -75,12 +75,14 @@ void SceneLoader::loadGltf(const char* path, Scene& scene, const mat4& transform
             normal = mat3(transform) * normal;
         }
 
-        box.Expand(mesh->positions.data(), mesh->positions.size());
+        for (const vec3& point : mesh->positions)
+        {
+            box.Expand(point);
+        }
 
         // slightly enlarge bounding box
         const vec3 offset = vec3(0.01f);
-        box.min -= offset;
-        box.max += offset;
+        box.MakeValid();
 
         // box.ApplyMatrix( transform );
         Geometry geom;
@@ -93,7 +95,7 @@ void SceneLoader::loadGltf(const char* path, Scene& scene, const mat4& transform
         scene.boundingBox.Union(box);
 
         // HACK configure floor
-        // if ( Dvar_GetBool( r_mirrorFloor ) && mesh->name == "meshes_0-46" )
+        // if ( DVAR_GET_BOOL( r_mirrorFloor ) && mesh->name == "meshes_0-46" )
         // {
         //     mat->reflectPower = 1.0;
         //     mat->albedo       = vec3( 1.0f );

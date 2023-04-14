@@ -3,6 +3,7 @@
 
 #include "camera.h"
 #include "scene_components.h"
+#include "Math/AABB.h"
 
 struct Geometry
 {

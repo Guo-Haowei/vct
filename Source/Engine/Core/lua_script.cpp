@@ -7,16 +7,24 @@ extern "C" {
 }
 
 #include "Core/Check.h"
-#include "universal/dvar_api.h"
+#include "Core/DynamicVariable.h"
 #include "Core/Log.h"
 
-#define CHECK_DVAR_RESULT(expr)           \
-    {                                     \
-        DvarError _dvarErr = (expr);      \
-        if (_dvarErr != DvarError::Ok)    \
-        {                                 \
-            LOG_WARN("{} failed", #expr); \
-        }                                 \
+#define FIND_DVAR_OR_RETURN(variable, name)                         \
+    DynamicVariable* variable = DynamicVariableManager::Find(name); \
+    if (!variable)                                                  \
+    {                                                               \
+        LOG_ERROR("dvar '{}' not found!", name);                    \
+        return 0;                                                   \
+    }
+
+#define SET_DVAR(expr)                     \
+    {                                      \
+        EDvarError err = (expr);           \
+        if (err != EDvarError::Ok)         \
+        {                                  \
+            LOG_ERROR("{} failed", #expr); \
+        }                                  \
     }
 
 extern "C" {
@@ -27,14 +35,8 @@ static int LuaDvarFunc_SetInt(lua_State* L)
     const char* name = luaL_checkstring(L, 1);
     lua_Integer value = luaL_checkinteger(L, 2);
 
-    dvar_t* dvar = Dvar_FindByName_Internal(name);
-    if (dvar == nullptr)
-    {
-        LOG_WARN("[lua] dvar '{}' not found!", name);
-        return 0;
-    }
-
-    CHECK_DVAR_RESULT(Dvar_SetInt_Internal(*dvar, int(value)));
+    FIND_DVAR_OR_RETURN(dvar, name);
+    SET_DVAR(dvar->SetInt(static_cast<int>(value)));
     return 0;
 }
 
@@ -44,71 +46,8 @@ static int LuaDvarFunc_SetFloat(lua_State* L)
     const char* name = luaL_checkstring(L, 1);
     const lua_Number value = luaL_checknumber(L, 2);
 
-    dvar_t* dvar = Dvar_FindByName_Internal(name);
-    if (dvar == nullptr)
-    {
-        LOG_WARN("[lua] dvar '{}' not found!", name);
-        return 0;
-    }
-
-    CHECK_DVAR_RESULT(Dvar_SetFloat_Internal(*dvar, float(value)));
-    return 0;
-}
-
-// usage: Dvar.SetVec2(string, number, number)
-static int LuaDvarFunc_SetVec2(lua_State* L)
-{
-    const char* name = luaL_checkstring(L, 1);
-    const lua_Number value1 = luaL_checknumber(L, 2);
-    const lua_Number value2 = luaL_checknumber(L, 3);
-
-    dvar_t* dvar = Dvar_FindByName_Internal(name);
-    if (dvar == nullptr)
-    {
-        LOG_WARN("[lua] dvar '{}' not found!", name);
-        return 0;
-    }
-
-    CHECK_DVAR_RESULT(Dvar_SetVec_Internal(*dvar, float(value1), float(value2), 0.0f, 0.0f));
-    return 0;
-}
-
-// usage: Dvar.SetVec3(string, number, number, number)
-static int LuaDvarFunc_SetVec3(lua_State* L)
-{
-    const char* name = luaL_checkstring(L, 1);
-    const lua_Number value1 = luaL_checknumber(L, 2);
-    const lua_Number value2 = luaL_checknumber(L, 3);
-    const lua_Number value3 = luaL_checknumber(L, 4);
-
-    dvar_t* dvar = Dvar_FindByName_Internal(name);
-    if (dvar == nullptr)
-    {
-        LOG_WARN("[lua] dvar '{}' not found!", name);
-        return 0;
-    }
-
-    CHECK_DVAR_RESULT(Dvar_SetVec_Internal(*dvar, float(value1), float(value2), float(value3), 0.0f));
-    return 0;
-}
-
-// usage: Dvar.SetVec4(string, number, number, number, number)
-static int LuaDvarFunc_SetVec4(lua_State* L)
-{
-    const char* name = luaL_checkstring(L, 1);
-    const lua_Number value1 = luaL_checknumber(L, 2);
-    const lua_Number value2 = luaL_checknumber(L, 3);
-    const lua_Number value3 = luaL_checknumber(L, 4);
-    const lua_Number value4 = luaL_checknumber(L, 5);
-
-    dvar_t* dvar = Dvar_FindByName_Internal(name);
-    if (dvar == nullptr)
-    {
-        LOG_WARN("[lua] dvar '{}' not found!", name);
-        return 0;
-    }
-
-    CHECK_DVAR_RESULT(Dvar_SetVec_Internal(*dvar, float(value1), float(value2), float(value3), float(value4)));
+    FIND_DVAR_OR_RETURN(dvar, name);
+    SET_DVAR(dvar->SetFloat(static_cast<float>(value)));
     return 0;
 }
 
@@ -118,14 +57,47 @@ static int LuaDvarFunc_SetString(lua_State* L)
     const char* name = luaL_checkstring(L, 1);
     const char* value = luaL_checkstring(L, 2);
 
-    dvar_t* dvar = Dvar_FindByName_Internal(name);
-    if (dvar == nullptr)
-    {
-        LOG_WARN("[lua] dvar '{}' not found!", name);
-        return 0;
-    }
+    FIND_DVAR_OR_RETURN(dvar, name);
+    SET_DVAR(dvar->SetString(value));
+    return 0;
+}
 
-    CHECK_DVAR_RESULT(Dvar_SetString_Internal(*dvar, value));
+// usage: Dvar.SetVec2(string, number, number)
+static int LuaDvarFunc_SetVec2(lua_State* L)
+{
+    const char* name = luaL_checkstring(L, 1);
+    const lua_Number x = luaL_checknumber(L, 2);
+    const lua_Number y = luaL_checknumber(L, 3);
+
+    FIND_DVAR_OR_RETURN(dvar, name);
+    SET_DVAR(dvar->SetVec2(static_cast<float>(x), static_cast<float>(y)));
+    return 0;
+}
+
+// usage: Dvar.SetVec3(string, number, number, number)
+static int LuaDvarFunc_SetVec3(lua_State* L)
+{
+    const char* name = luaL_checkstring(L, 1);
+    const lua_Number x = luaL_checknumber(L, 2);
+    const lua_Number y = luaL_checknumber(L, 3);
+    const lua_Number z = luaL_checknumber(L, 4);
+
+    FIND_DVAR_OR_RETURN(dvar, name);
+    SET_DVAR(dvar->SetVec3(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)));
+    return 0;
+}
+
+// usage: Dvar.SetVec4(string, number, number, number, number)
+static int LuaDvarFunc_SetVec4(lua_State* L)
+{
+    const char* name = luaL_checkstring(L, 1);
+    const lua_Number x = luaL_checknumber(L, 2);
+    const lua_Number y = luaL_checknumber(L, 3);
+    const lua_Number z = luaL_checknumber(L, 4);
+    const lua_Number w = luaL_checknumber(L, 5);
+
+    FIND_DVAR_OR_RETURN(dvar, name);
+    SET_DVAR(dvar->SetVec4(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z), static_cast<float>(w)));
     return 0;
 }
 

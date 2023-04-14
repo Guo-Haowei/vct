@@ -27,11 +27,5 @@ set_target_properties(fmt PROPERTIES FOLDER External)
 include(cmake/build-lua.cmake)
 include(cmake/build-imgui.cmake)
 
-# @TODO: remove
-add_definitions(-DDATA_DIR="${CMAKE_SOURCE_DIR}/data/")
-add_definitions(-DROOT_FOLDER="${CMAKE_SOURCE_DIR}/")
-add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
 add_subdirectory(Source)
+add_subdirectory(Test)

@@ -1,6 +1,6 @@
 #include "r_sun_shadow.h"
 
-#include "Core/com_dvars.h"
+#include "Core/CommonDvars.h"
 #include "Core/com_misc.h"
 #include "Core/main_window.h"
 #include "Core/scene.h"
@@ -9,12 +9,9 @@
 #include "r_rendertarget.h"
 #include "r_shader.h"
 #include "Core/Check.h"
-#include "universal/dvar_api.h"
+#include "Core/DynamicVariable.h"
 #include "Core/Log.h"
-
-#ifdef max
-#undef max
-#endif
+#include "Math/Frustum.h"
 
 static mat4 R_HackLightSpaceMatrix(const vec3& lightDir)
 {
@@ -29,13 +26,13 @@ static mat4 R_HackLightSpaceMatrix(const vec3& lightDir)
 
 void R_LightSpaceMatrix(const Camera& camera, const vec3& lightDir, mat4 lightPVs[NUM_CASCADES])
 {
-    // if ( !Dvar_GetBool( r_enableCSM ) )
+    // if ( !DVAR_GET_BOOL( r_enableCSM ) )
     {
         lightPVs[0] = lightPVs[1] = lightPVs[2] = R_HackLightSpaceMatrix(lightDir);
         return;
     }
 
-    const vec4 cascades = Dvar_GetVec4(cam_cascades);
+    const vec4 cascades = DVAR_GET_VEC4(cam_cascades);
     const mat4 vInv = glm::inverse(camera.View());  // inversed V
     const float tanHalfHFOV = glm::tan(0.5f * camera.fovy);
     const float tanHalfVFOV = glm::tan(0.5f * camera.fovy * camera.GetAspect());
@@ -72,7 +69,7 @@ void R_ShadowPass()
     const auto& program = R_GetShaderProgram(ProgramType::SHADOW);
     program.Use();
 
-    const int res = Dvar_GetInt(r_shadowRes);
+    const int res = DVAR_GET_INT(r_shadowRes);
     // render scene 3 times
     for (int idx = 0; idx < NUM_CASCADES; ++idx)
     {
@@ -90,7 +87,7 @@ void R_ShadowPass()
                 {
                     continue;
                 }
-                if (!frustum.Intersect(geom.boundingBox))
+                if (!frustum.Intersects(geom.boundingBox))
                 {
                     continue;
                 }

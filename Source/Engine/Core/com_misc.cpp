@@ -15,7 +15,7 @@
 #include <GLFW/glfw3.h>
 
 #define DEFINE_DVAR
-#include "com_dvars.h"
+#include "CommonDvars.h"
 
 #ifdef max
 #undef max
@@ -28,24 +28,24 @@ static void ControlCamera(Camera& camera);
 bool Com_RegisterDvars()
 {
 #define REGISTER_DVAR
-#include "com_dvars.h"
+#include "CommonDvars.h"
     return true;
 }
 
 bool Com_LoadScene()
 {
     // validate dvars
-    const int voxelTextureSize = Dvar_GetInt(r_voxelSize);
+    const int voxelTextureSize = DVAR_GET_INT(r_voxelSize);
     check(is_power_of_two(voxelTextureSize));
     check(voxelTextureSize <= 256);
 
     SceneLoader loader;
     Scene& scene = g_scene;
 
-    const float worldScale = Dvar_GetFloat(scene_scale);
+    const float worldScale = DVAR_GET_FLOAT(scene_scale);
     const mat4 S = glm::scale(mat4(1), vec3(worldScale));
     const mat4 trans = S;
-    const char* scenePath = Dvar_GetString(scene);
+    const char* scenePath = DVAR_GET_STRING(scene);
 
     if (!scenePath[0])
     {
@@ -57,17 +57,17 @@ bool Com_LoadScene()
 
     Camera& camera = scene.camera;
 
-    const vec4 cascades = Dvar_GetVec4(cam_cascades);
+    const vec4 cascades = DVAR_GET_VEC4(cam_cascades);
 
-    camera.fovy = glm::radians(Dvar_GetFloat(cam_fov));
+    camera.fovy = glm::radians(DVAR_GET_FLOAT(cam_fov));
     camera.zNear = cascades[0];
     camera.zFar = cascades[3];
 
     camera.yaw = glm::radians(180.0f);
     camera.pitch = 0.0f;
-    camera.position = Dvar_GetVec3(cam_pos);
+    camera.position = DVAR_GET_VEC3(cam_pos);
 
-    scene.light.color = vec3(glm::clamp(Dvar_GetFloat(light_power), 5.0f, 30.0f));
+    scene.light.color = vec3(glm::clamp(DVAR_GET_FLOAT(light_power), 5.0f, 30.0f));
 
     const vec3 center = scene.boundingBox.Center();
     const vec3 size = scene.boundingBox.Size();
@@ -153,22 +153,22 @@ void Com_UpdateWorld()
     g_perFrameCache.cache.View = camera.View();
     g_perFrameCache.cache.Proj = camera.Proj();
     g_perFrameCache.cache.PV = camera.ProjView();
-    g_perFrameCache.cache.CascadedClipZ = Dvar_GetVec4(cam_cascades);
-    g_perFrameCache.cache.EnableGI = Dvar_GetBool(r_enableVXGI);
-    g_perFrameCache.cache.DebugCSM = Dvar_GetBool(r_debugCSM);
-    g_perFrameCache.cache.DebugTexture = Dvar_GetInt(r_debugTexture);
-    g_perFrameCache.cache.NoTexture = Dvar_GetBool(r_noTexture);
+    g_perFrameCache.cache.CascadedClipZ = DVAR_GET_VEC4(cam_cascades);
+    g_perFrameCache.cache.EnableGI = DVAR_GET_BOOL(r_enableVXGI);
+    g_perFrameCache.cache.DebugCSM = DVAR_GET_BOOL(r_debugCSM);
+    g_perFrameCache.cache.DebugTexture = DVAR_GET_INT(r_debugTexture);
+    g_perFrameCache.cache.NoTexture = DVAR_GET_BOOL(r_noTexture);
     g_perFrameCache.cache.ScreenWidth = extent.x;
     g_perFrameCache.cache.ScreenHeight = extent.y;
 
     // SSAO
-    g_perFrameCache.cache.SSAOKernelSize = Dvar_GetInt(r_ssaoKernelSize);
-    g_perFrameCache.cache.SSAOKernelRadius = Dvar_GetFloat(r_ssaoKernelRadius);
-    g_perFrameCache.cache.SSAONoiseSize = Dvar_GetInt(r_ssaoNoiseSize);
-    g_perFrameCache.cache.EnableSSAO = Dvar_GetBool(r_enableSsao);
+    g_perFrameCache.cache.SSAOKernelSize = DVAR_GET_INT(r_ssaoKernelSize);
+    g_perFrameCache.cache.SSAOKernelRadius = DVAR_GET_FLOAT(r_ssaoKernelRadius);
+    g_perFrameCache.cache.SSAONoiseSize = DVAR_GET_INT(r_ssaoNoiseSize);
+    g_perFrameCache.cache.EnableSSAO = DVAR_GET_BOOL(r_enableSsao);
 
     // FXAA
-    g_perFrameCache.cache.EnableFXAA = Dvar_GetBool(r_enableFXAA);
+    g_perFrameCache.cache.EnableFXAA = DVAR_GET_BOOL(r_enableFXAA);
 }
 
 static void ControlCamera(Camera& camera)

@@ -2,7 +2,7 @@
 
 #include <random>
 
-#include "Core/com_dvars.h"
+#include "Core/CommonDvars.h"
 #include "Core/com_misc.h"
 #include "Core/main_window.h"
 #include "gl_utils.h"
@@ -10,7 +10,8 @@
 #include "r_rendertarget.h"
 #include "r_shader.h"
 #include "Core/Check.h"
-#include "universal/dvar_api.h"
+#include "Core/DynamicVariable.h"
+#include "Math/Frustum.h"
 
 static GLuint g_noiseTexture;
 
@@ -42,7 +43,7 @@ void R_Gbuffer_Pass()
             {
                 continue;
             }
-            if (!frustum.Intersect(geom.boundingBox))
+            if (!frustum.Intersects(geom.boundingBox))
             {
                 continue;
             }
@@ -120,7 +121,7 @@ static void CreateSSAOResource()
     std::uniform_real_distribution<float> randomFloats(0.0f, 1.0f);  // generates random floats between 0.0 and 1.0
     std::default_random_engine generator;
     std::vector<glm::vec4> ssaoKernel;
-    const int kernelSize = Dvar_GetInt(r_ssaoKernelSize);
+    const int kernelSize = DVAR_GET_INT(r_ssaoKernelSize);
     for (int i = 0; i < kernelSize; ++i)
     {
         // [-1, 1], [-1, 1], [0, 1]
@@ -138,7 +139,7 @@ static void CreateSSAOResource()
     memcpy(&g_constantCache.cache.SSAOKernels, ssaoKernel.data(), sizeof(ssaoKernel.front()) * ssaoKernel.size());
 
     // generate noise texture
-    const int noiseSize = Dvar_GetInt(r_ssaoNoiseSize);
+    const int noiseSize = DVAR_GET_INT(r_ssaoNoiseSize);
 
     std::vector<glm::vec3> ssaoNoise;
     for (int i = 0; i < noiseSize * noiseSize; ++i)

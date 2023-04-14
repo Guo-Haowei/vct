@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "universal/core_math.h"
+#include "Math/GeoMath.h"
 
 struct MeshComponent
 {
