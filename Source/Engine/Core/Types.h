@@ -4,6 +4,10 @@
 #include <string>
 #include <vector>
 
+#define DISABLE_COPY(CLASS)       \
+    CLASS(const CLASS&) = delete; \
+    CLASS& operator=(const CLASS&) = delete
+
 template<typename T>
 using Ref = std::shared_ptr<T>;
 
@@ -13,10 +17,6 @@ constexpr std::underlying_type_t<T> underlying(T value)
     static_assert(std::is_enum_v<T>);
     return static_cast<std::underlying_type_t<T>>(value);
 }
-
-#define DISABLE_COPY(CLASS)       \
-    CLASS(const CLASS&) = delete; \
-    CLASS& operator=(const CLASS&) = delete
 
 using String = std::string;
 using StringVector = std::vector<String>;

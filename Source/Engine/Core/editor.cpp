@@ -5,7 +5,7 @@
 
 #include "CommonDvars.h"
 #include "Core/com_misc.h"
-#include "Core/main_window.h"
+#include "Core/WindowManager.h"
 #include "Core/Check.h"
 #include "Core/DynamicVariable.h"
 #include "Core/Log.h"
@@ -236,17 +236,17 @@ void Editor::Update()
     Scene& scene = Com_GetScene();
 
     // select object
-    if (!io.WantCaptureMouse && MainWindow::IsMouseInScreen())
+    if (!io.WantCaptureMouse && gWindowManager->IsMouseInScreen())
     {
-        const vec2 mousePos = MainWindow::MousePos();
-        const ivec2 extent = MainWindow::FrameSize();
+        auto [mouseX, mouseY] = gWindowManager->GetMousePos();
+        auto [frameW, frameH] = gWindowManager->GetFrameSize();
         if (ImGui::IsMouseClicked(GLFW_MOUSE_BUTTON_1))
         {
             const Camera& camera = scene.camera;
 
             const mat4& PV = camera.ProjView();
             const mat4 invPV = glm::inverse(PV);
-            vec2 pos(mousePos.x / extent.x, 1.0f - mousePos.y / extent.y);
+            vec2 pos(mouseX / frameW, 1.0f - mouseY / frameH);
             pos -= 0.5f;
             pos *= 2.0f;
 

@@ -3,7 +3,6 @@
 
 Scene& Com_GetScene();
 
-[[nodiscard]] bool Com_RegisterDvars();
 [[nodiscard]] bool Com_LoadScene();
 
 [[nodiscard]] bool Com_ImGuiInit();

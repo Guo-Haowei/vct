@@ -6,7 +6,7 @@
 #include "Core/com_misc.h"
 #include "Core/editor.h"
 #include "Core/geometry.h"
-#include "Core/main_window.h"
+#include "Core/WindowManager.h"
 #include "r_defines.h"
 #include "r_editor.h"
 #include "r_passes.h"
@@ -275,13 +275,13 @@ void MainRenderer::renderToVoxelTexture()
     m_normalVoxel.genMipMap();
 }
 
-void MainRenderer::renderFrameBufferTextures(const ivec2& extent)
+void MainRenderer::renderFrameBufferTextures(int width, int height)
 {
     const auto& program = m_debugTextureProgram;
 
     program.Use();
     glDisable(GL_DEPTH_TEST);
-    glViewport(0, 0, extent.x, extent.y);
+    glViewport(0, 0, width, height);
 
     R_DrawQuad();
 
@@ -305,11 +305,11 @@ void MainRenderer::render()
         renderToVoxelTexture();
     }
 
-    ivec2 extent = MainWindow::FrameSize();
-    if (extent.x * extent.y > 0)
+    auto [frameW, frameH] = gWindowManager->GetFrameSize();
+    if (frameW * frameH > 0)
     {
         // skip rendering if minimized
-        glViewport(0, 0, extent.x, extent.y);
+        glViewport(0, 0, frameW, frameH);
 
         R_Gbuffer_Pass();
         R_SSAO_Pass();
@@ -326,7 +326,7 @@ void MainRenderer::render()
                 R_Deferred_VCT_Pass();
                 R_FXAA_Pass();
 
-                renderFrameBufferTextures(extent);
+                renderFrameBufferTextures(frameW, frameH);
             }
             break;
         }
