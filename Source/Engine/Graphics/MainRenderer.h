@@ -14,7 +14,7 @@ class MainRenderer
 public:
     void createGpuResources();
     void render();
-    void renderFrameBufferTextures(const ivec2& extent);
+    void renderFrameBufferTextures(int width, int height);
     void renderToVoxelTexture();
     void visualizeVoxels();
     void destroyGpuResources();

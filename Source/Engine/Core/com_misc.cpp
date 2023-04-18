@@ -4,7 +4,7 @@
 
 #include "com_filesystem.h"
 #include "imgui/imgui.h"
-#include "main_window.h"
+#include "WindowManager.h"
 #include "Graphics/r_cbuffers.h"
 #include "Graphics/r_sun_shadow.h"
 #include "scene/scene_loader.h"
@@ -121,8 +121,8 @@ void Com_UpdateWorld()
     Scene& scene = Com_GetScene();
 
     // update camera
-    const ivec2 extent = MainWindow::FrameSize();
-    const float aspect = (float)extent.x / extent.y;
+    auto [frameW, frameH] = gWindowManager->GetFrameSize();
+    const float aspect = (float)frameW / frameH;
     check(aspect > 0.0f);
 
     Camera& camera = scene.camera;
@@ -151,8 +151,8 @@ void Com_UpdateWorld()
     g_perFrameCache.cache.DebugCSM = DVAR_GET_BOOL(r_debugCSM);
     g_perFrameCache.cache.DebugTexture = DVAR_GET_INT(r_debugTexture);
     g_perFrameCache.cache.NoTexture = DVAR_GET_BOOL(r_noTexture);
-    g_perFrameCache.cache.ScreenWidth = extent.x;
-    g_perFrameCache.cache.ScreenHeight = extent.y;
+    g_perFrameCache.cache.ScreenWidth = frameW;
+    g_perFrameCache.cache.ScreenHeight = frameH;
 
     // SSAO
     g_perFrameCache.cache.SSAOKernelSize = DVAR_GET_INT(r_ssaoKernelSize);

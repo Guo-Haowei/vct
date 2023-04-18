@@ -1,7 +1,7 @@
 #include "r_rendertarget.h"
 
 #include "Core/CommonDvars.h"
-#include "Core/main_window.h"
+#include "Core/WindowManager.h"
 #include "r_cbuffers.h"
 #include "Core/Check.h"
 #include "Core/DynamicVariable.h"
@@ -224,9 +224,7 @@ FinalImageRT g_fxaaRT;
 
 void R_CreateRT()
 {
-    const ivec2 extent = MainWindow::FrameSize();
-    const int w = extent.x;
-    const int h = extent.y;
+    auto [w, h] = gWindowManager->GetFrameSize();
 
     const int res = DVAR_GET_INT(r_shadowRes);
     check(is_power_of_two(res));

@@ -4,7 +4,7 @@
 #include "com_misc.h"
 #include "editor.h"
 #include "imgui/imgui.h"
-#include "main_window.h"
+#include "WindowManager.h"
 #include "Graphics/MainRenderer.h"
 #include "Graphics/r_graphics.h"
 
@@ -24,12 +24,12 @@ int main(int argc, const char** argv)
 
     ok = ok && Com_LoadScene();
     ok = ok && Com_ImGuiInit();
-    ok = ok && MainWindow::Init();
+    ok = ok && gWindowManager->Initialize();
     ok = ok && R_Init();
 
     EditorSetupStyle();
 
-    ImGui_ImplGlfw_InitForOpenGL(MainWindow::GetRaw(), true);
+    ImGui_ImplGlfw_InitForOpenGL(gWindowManager->GetRaw(), true);
 
     ImGui_ImplOpenGL3_Init();
     ImGui_ImplOpenGL3_CreateDeviceObjects();
@@ -37,9 +37,9 @@ int main(int argc, const char** argv)
     MainRenderer renderer;
     renderer.createGpuResources();
 
-    while (!MainWindow::ShouldClose())
+    while (!gWindowManager->ShouldClose())
     {
-        MainWindow::NewFrame();
+        gWindowManager->NewFrame();
         ImGui_ImplGlfw_NewFrame();
 
         ImGui::NewFrame();
@@ -56,7 +56,7 @@ int main(int argc, const char** argv)
         ImGui::RenderPlatformWindowsDefault();
         glfwMakeContextCurrent(backup_current_context);
 
-        MainWindow::Present();
+        gWindowManager->Present();
 
         Com_GetScene().dirty = false;
     }
@@ -66,7 +66,7 @@ int main(int argc, const char** argv)
 
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-    MainWindow::Shutdown();
+    gWindowManager->Finalize();
 
     return ok ? 0 : 1;
 }

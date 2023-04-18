@@ -106,7 +106,5 @@ bool Application::ProcessCmdLine()
         }
     }
 
-    LOG_OK("cmd line processed");
-
     return true;
 }
