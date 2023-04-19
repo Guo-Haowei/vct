@@ -1,11 +1,12 @@
 #include "r_editor.h"
 
 #include "GpuTexture.h"
+#include "Program.h"
+
 #include "Core/com_misc.h"
 #include "Core/geometry.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"
-#include "r_shader.h"
 #include "Core/Check.h"
 
 struct VertexPoint3D
@@ -113,7 +114,7 @@ void R_DrawEditor()
         const AABB box = node->boundingBox;
         const mat4 M = glm::translate(mat4(1), box.Center()) * glm::scale(mat4(1), box.Size());
 
-        R_GetShaderProgram(ProgramType::LINE3D).Use();
+        gProgramManager->GetShaderProgram(ProgramType::LINE3D).Bind();
         glBindVertexArray(g_boxWireFrame.vao);
         g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
         g_perBatchCache.cache.Model = mat4(1);
@@ -137,7 +138,7 @@ void R_DrawEditor()
         FillTextureIconBuffer(iconBuffer, lightPos2d, camera.GetAspect());
         glNamedBufferData(g_imageBuffer.vbos[0], sizeof(TextureVertex) * iconBuffer.size(), iconBuffer.data(), GL_STREAM_DRAW);
 
-        R_GetShaderProgram(ProgramType::IMAGE2D).Use();
+        gProgramManager->GetShaderProgram(ProgramType::IMAGE2D).Bind();
         glBindVertexArray(g_imageBuffer.vao);
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }

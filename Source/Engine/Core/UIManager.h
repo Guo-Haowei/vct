@@ -7,8 +7,8 @@ public:
     UIManager() : ManagerBase("UIManager") {}
 
 protected:
-    bool InitializeInternal();
-    void FinalizeInternal();
+    virtual bool InitializeInternal() override;
+    virtual void FinalizeInternal() override;
 
 private:
     void SetupStyle();

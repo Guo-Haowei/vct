@@ -7,21 +7,21 @@
 
 bool ManagerBase::Initialize()
 {
-    DEBUG_MANAGER_BASE("Initializing Manager '{}'...", mName);
+    DEBUG_MANAGER_BASE("Initializing '{}'...", mName);
     mInitialized = InitializeInternal();
     if (!mInitialized)
     {
-        LOG_FATAL(__FUNCTION__ " Failed to initialize Manager '{}'", mName);
+        LOG_FATAL(__FUNCTION__ " Failed to initialize '{}'", mName);
         return false;
     }
 
-    DEBUG_MANAGER_BASE("Manager '{}' initialized", mName);
+    DEBUG_MANAGER_BASE("'{}' initialized", mName);
     return true;
 }
 
 void ManagerBase::Finalize()
 {
-    DEBUG_MANAGER_BASE("Finalizing Manager '{}'...", mName);
+    DEBUG_MANAGER_BASE("Finalizing '{}'...", mName);
     FinalizeInternal();
     DEBUG_MANAGER_BASE("Manager '{}' finalized", mName);
 }

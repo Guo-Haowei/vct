@@ -7,8 +7,8 @@ public:
     GraphicsManager() : ManagerBase("GraphicsManager") {}
 
 protected:
-    bool InitializeInternal();
-    void FinalizeInternal();
+    virtual bool InitializeInternal() override;
+    virtual void FinalizeInternal() override;
 };
 
 extern GraphicsManager* gGraphicsManager;

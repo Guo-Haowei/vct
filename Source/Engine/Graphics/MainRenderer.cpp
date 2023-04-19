@@ -1,19 +1,20 @@
 #pragma once
 #include "MainRenderer.h"
 
-#include "Core/CommonDvars.h"
-#include "Core/com_misc.h"
-#include "Core/editor.h"
-#include "Core/geometry.h"
-#include "Core/WindowManager.h"
+#include "Program.h"
 #include "r_defines.h"
 #include "r_editor.h"
 #include "r_passes.h"
 #include "r_rendertarget.h"
-#include "r_shader.h"
 #include "r_sun_shadow.h"
+
 #include "Core/Check.h"
+#include "Core/CommonDvars.h"
 #include "Core/DynamicVariable.h"
+#include "Core/com_misc.h"
+#include "Core/editor.h"
+#include "Core/geometry.h"
+#include "Core/WindowManager.h"
 
 static std::vector<std::shared_ptr<MeshData>> g_meshdata;
 static std::vector<std::shared_ptr<MaterialData>> g_materialdata;
@@ -66,8 +67,6 @@ static std::shared_ptr<MeshData> CreateMeshData(const MeshComponent& mesh)
 
 void MainRenderer::createGpuResources()
 {
-    R_CreateShaderPrograms();
-
     R_Create_Pass_Resources();
 
     R_Alloc_Cbuffers();
@@ -77,10 +76,6 @@ void MainRenderer::createGpuResources()
     Scene& scene = Com_GetScene();
 
     // create shader
-    m_debugTextureProgram = gl::CreateProgram(ProgramCreateInfo::VSPS("fullscreen", "debug/texture"));
-    m_voxelProgram = gl::CreateProgram(ProgramCreateInfo::VSGSPS("voxel/voxelization"));
-    m_visualizeProgram = gl::CreateProgram(ProgramCreateInfo::VSPS("voxel/visualization"));
-    m_voxelPostProgram = gl::CreateProgram(ProgramCreateInfo::CS("voxel/post"));
 
     m_box = CreateMeshData(geometry::MakeBox());
 
@@ -174,15 +169,15 @@ void MainRenderer::visualizeVoxels()
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
-    const auto& program = m_visualizeProgram;
+    const auto& program = gProgramManager->GetShaderProgram(ProgramType::Visualization);
 
     glBindVertexArray(m_box->vao);
-    program.Use();
+    program.Bind();
 
     const int size = DVAR_GET_INT(r_voxelSize);
     glDrawElementsInstanced(GL_TRIANGLES, m_box->count, GL_UNSIGNED_INT, 0, size * size * size);
 
-    program.Stop();
+    program.Unbind();
 }
 
 struct MaterialCache
@@ -220,7 +215,7 @@ void MainRenderer::renderToVoxelTexture()
 
     m_albedoVoxel.bindImageTexture(IMAGE_VOXEL_ALBEDO_SLOT);
     m_normalVoxel.bindImageTexture(IMAGE_VOXEL_NORMAL_SLOT);
-    m_voxelProgram.Use();
+    gProgramManager->GetShaderProgram(ProgramType::Voxel).Bind();
 
     for (const GeometryNode& node : scene.geometryNodes)
     {
@@ -249,7 +244,7 @@ void MainRenderer::renderToVoxelTexture()
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
     // post process
-    m_voxelPostProgram.Use();
+    gProgramManager->GetShaderProgram(ProgramType::VoxelPost).Bind();
 
     constexpr GLuint workGroupX = 512;
     constexpr GLuint workGroupY = 512;
@@ -268,15 +263,15 @@ void MainRenderer::renderToVoxelTexture()
 
 void MainRenderer::renderFrameBufferTextures(int width, int height)
 {
-    const auto& program = m_debugTextureProgram;
+    const auto& program = gProgramManager->GetShaderProgram(ProgramType::DebugTexture);
 
-    program.Use();
+    program.Bind();
     glDisable(GL_DEPTH_TEST);
     glViewport(0, 0, width, height);
 
     R_DrawQuad();
 
-    program.Stop();
+    program.Unbind();
 }
 
 void MainRenderer::render()
@@ -328,20 +323,12 @@ void MainRenderer::render()
 
 void MainRenderer::destroyGpuResources()
 {
-    // gpu resource
-    m_voxelProgram.Destroy();
-    m_visualizeProgram.Destroy();
-    m_voxelPostProgram.Destroy();
-    m_debugTextureProgram.Destroy();
-
     R_DestroyRT();
 
     R_DestroyEditorResource();
     R_Destroy_Cbuffers();
 
     R_Destroy_Pass_Resources();
-
-    R_DestroyShaderPrograms();
 }
 
 }  // namespace vct

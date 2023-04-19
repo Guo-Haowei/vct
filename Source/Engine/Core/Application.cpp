@@ -5,6 +5,7 @@
 #include "UIManager.h"
 #include "WindowManager.h"
 #include "Graphics/GraphicsManager.h"
+#include "Graphics/Program.h"
 
 // @TODO: refactor
 #include "lua_script.h"
@@ -23,6 +24,7 @@ bool Application::RegisterManagers()
     mManagers.push_back(gUIManager);
     mManagers.push_back(gWindowManager);
     mManagers.push_back(gGraphicsManager);
+    mManagers.push_back(gProgramManager);
     return true;
 }
 

@@ -2,13 +2,14 @@
 
 #include <random>
 
+#include "Program.h"
+
 #include "Core/CommonDvars.h"
 #include "Core/com_misc.h"
 #include "Core/WindowManager.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"
 #include "r_rendertarget.h"
-#include "r_shader.h"
 #include "Core/Check.h"
 #include "Core/DynamicVariable.h"
 #include "Math/Frustum.h"
@@ -20,10 +21,10 @@ extern void FillMaterialCB(const MaterialData* mat, MaterialCB& cb);
 void R_Gbuffer_Pass()
 {
     Scene& scene = Com_GetScene();
-    const auto& program = R_GetShaderProgram(ProgramType::GBUFFER);
+    const auto& program = gProgramManager->GetShaderProgram(ProgramType::GBUFFER);
 
     g_gbufferRT.Bind();
-    program.Use();
+    program.Bind();
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -59,53 +60,53 @@ void R_Gbuffer_Pass()
         }
     }
 
-    program.Stop();
+    program.Unbind();
     g_gbufferRT.Unbind();
 }
 
 void R_SSAO_Pass()
 {
-    const auto& shader = R_GetShaderProgram(ProgramType::SSAO);
+    const auto& shader = gProgramManager->GetShaderProgram(ProgramType::SSAO);
 
     g_ssaoRT.Bind();
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    shader.Use();
+    shader.Bind();
 
     R_DrawQuad();
 
-    shader.Stop();
+    shader.Unbind();
 
     g_ssaoRT.Unbind();
 }
 
 void R_Deferred_VCT_Pass()
 {
-    const auto& program = R_GetShaderProgram(ProgramType::VCT_DEFERRED);
+    const auto& program = gProgramManager->GetShaderProgram(ProgramType::VCT_DEFERRED);
     g_finalImageRT.Bind();
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    program.Use();
+    program.Bind();
 
     R_DrawQuad();
 
-    program.Stop();
+    program.Unbind();
 
     g_finalImageRT.Unbind();
 }
 
 void R_FXAA_Pass()
 {
-    const auto& program = R_GetShaderProgram(ProgramType::FXAA);
+    const auto& program = gProgramManager->GetShaderProgram(ProgramType::FXAA);
 
     g_fxaaRT.Bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
-    program.Use();
+    program.Bind();
     R_DrawQuad();
-    program.Stop();
+    program.Unbind();
 
     g_fxaaRT.Unbind();
 }
