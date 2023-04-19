@@ -2,16 +2,15 @@
 
 #include <random>
 
-#include "Program.h"
-
+#include "Core/Check.h"
+#include "Core/DynamicVariable.h"
 #include "Core/CommonDvars.h"
-#include "Core/com_misc.h"
-#include "Core/WindowManager.h"
+#include "Framework/SceneManager.h"
+#include "Framework/ProgramManager.h"
+#include "Framework/WindowManager.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"
 #include "r_rendertarget.h"
-#include "Core/Check.h"
-#include "Core/DynamicVariable.h"
 #include "Math/Frustum.h"
 
 static GLuint g_noiseTexture;

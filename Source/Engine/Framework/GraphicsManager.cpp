@@ -3,7 +3,7 @@
 #include "Core/CommonDvars.h"
 #include "Core/Log.h"
 
-#include "glad/glad.h"
+#include "Graphics/GLPrerequisites.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
 
 GraphicsManager *gGraphicsManager = new GraphicsManager;

@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/ManagerBase.h"
+#include "ManagerBase.h"
 
 class GraphicsManager : public ManagerBase
 {

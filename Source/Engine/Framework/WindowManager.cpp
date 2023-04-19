@@ -1,16 +1,19 @@
 #include "WindowManager.h"
 
-#include "CommonDvars.h"
-#include "Check.h"
-#include "Log.h"
+#include "Application.h"
+#include "Core/CommonDvars.h"
+#include "Core/Check.h"
+#include "Core/Log.h"
 
 #include "imgui/backends/imgui_impl_glfw.h"
-#include <GLFW/glfw3.h>
+#include "GLFW/glfw3.h"
 
 WindowManager* gWindowManager = new WindowManager();
 
 bool WindowManager::InitializeInternal()
 {
+    const auto& info = mApplication->GetInfo();
+
     check(!mInitialized);
 
     glfwSetErrorCallback([](int code, const char* desc) {
@@ -19,7 +22,7 @@ bool WindowManager::InitializeInternal()
 
     glfwInit();
 
-    glfwWindowHint(GLFW_DECORATED, !DVAR_GET_BOOL(wnd_frameless));
+    glfwWindowHint(GLFW_DECORATED, !info.frameless);
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -30,20 +33,13 @@ bool WindowManager::InitializeInternal()
     }
 
     const GLFWvidmode* vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-
+    const ivec2 minSize = ivec2(600, 400);
     const ivec2 maxSize = ivec2(vidmode->width, vidmode->height);
-    ivec2 size(DVAR_GET_INT(wnd_width), DVAR_GET_INT(wnd_height));
-    if (size.x == 0 || size.y == 0)
-    {
-        size.x = int(0.8f * maxSize.x);
-        size.y = int(0.8f * maxSize.y);
-    }
+    const ivec2 size = glm::clamp(ivec2(info.width, info.height), minSize, maxSize);
 
-    constexpr ivec2 MIN_FRAME_SIZE = ivec2(800, 600);
+    mWindow = glfwCreateWindow(int(size.x), int(size.y), info.title, 0, 0);
+    check(mWindow);
 
-    size = glm::clamp(size, MIN_FRAME_SIZE, maxSize);
-
-    mWindow = glfwCreateWindow(int(size.x), int(size.y), "Editor", 0, 0);
     glfwMakeContextCurrent(mWindow);
 
     LOG_OK("GLFWwindow created {} x {}", size.x, size.y);
@@ -88,7 +84,7 @@ void WindowManager::NewFrame()
     char buffer[1024];
     snprintf(buffer, sizeof(buffer),
              "%s | Size: %d x %d | Mouse: %d x %d | FPS: %.1f",
-             "Editor",
+             mApplication->GetInfo().title,
              mFrameSize.x, mFrameSize.y,
              int(mMousePos.x), int(mMousePos.y),
              ImGui::GetIO().Framerate);

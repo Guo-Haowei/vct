@@ -1,30 +1,39 @@
 #include "Application.h"
 
-#include "CommonDvars.h"
-#include "Log.h"
-#include "UIManager.h"
+#include "GraphicsManager.h"
 #include "WindowManager.h"
-#include "Graphics/GraphicsManager.h"
-#include "Graphics/Program.h"
+#include "SceneManager.h"
+#include "ProgramManager.h"
+#include "UIManager.h"
+#include "Core/CommonDvars.h"
+#include "Core/Log.h"
 
 // @TODO: refactor
-#include "lua_script.h"
-#include "com_misc.h"
+#include "Core/lua_script.h"
 #include "Graphics/MainRenderer.h"
-#include "editor.h"
 
 #include "imgui/backends/imgui_impl_glfw.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
 
 #define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
+#include "GLFW/glfw3.h"
+
+#define DEFINE_DVAR
+#include "Core/CommonDvars.h"
+
+void Application::RegisterManager(ManagerBase* manager)
+{
+    mManagers.push_back(manager);
+    manager->mApplication = this;
+}
 
 bool Application::RegisterManagers()
 {
-    mManagers.push_back(gUIManager);
-    mManagers.push_back(gWindowManager);
-    mManagers.push_back(gGraphicsManager);
-    mManagers.push_back(gProgramManager);
+    RegisterManager(gUIManager);
+    RegisterManager(gWindowManager);
+    RegisterManager(gGraphicsManager);
+    RegisterManager(gProgramManager);
+    RegisterManager(gSceneManager);
     return true;
 }
 
@@ -49,6 +58,8 @@ void Application::FinalizeManagers()
     }
 }
 
+extern void EditorSetup();
+
 bool Application::Run(int argc, const char** argv)
 {
     for (int i = 1; i < argc; ++i)
@@ -60,8 +71,6 @@ bool Application::Run(int argc, const char** argv)
     ok = ok && ProcessCmdLine();
     ok = ok && RegisterManagers();
     ok = ok && InitializeManagers();
-
-    ok = ok && Com_LoadScene();
 
     if (!ok)
     {
@@ -81,7 +90,7 @@ bool Application::Run(int argc, const char** argv)
         EditorSetup();
         ImGui::Render();
 
-        Com_UpdateWorld();
+        gSceneManager->Update(0.0f);
 
         renderer.render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -106,7 +115,7 @@ bool Application::Run(int argc, const char** argv)
 static void register_common_dvars()
 {
 #define REGISTER_DVAR
-#include "CommonDvars.h"
+#include "Core/CommonDvars.h"
 }
 
 class CommandHelper

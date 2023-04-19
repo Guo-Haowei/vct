@@ -3,16 +3,17 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include "CommonDvars.h"
-#include "Core/com_misc.h"
-#include "Core/WindowManager.h"
-#include "Core/Check.h"
-#include "Core/DynamicVariable.h"
-#include "Core/Log.h"
+#include "Engine/Core/CommonDvars.h"
+#include "Engine/Core/Check.h"
+#include "Engine/Core/DynamicVariable.h"
+#include "Engine/Core/Log.h"
+#include "Engine/Graphics/r_cbuffers.h"
+#include "Engine/Math/Ray.h"
+#include "Engine/Framework/SceneManager.h"
+#include "Engine/Framework/WindowManager.h"
+
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
-#include "Graphics/r_cbuffers.h"
-#include "Math/Ray.h"
 
 class Editor
 {

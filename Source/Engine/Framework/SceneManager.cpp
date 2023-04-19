@@ -1,30 +1,26 @@
-#include "com_misc.h"
+#include "SceneManager.h"
 
-#include <filesystem>
+#include "Core/Check.h"
+#include "Core/CommonDvars.h"
+#include "Core/Log.h"
+
+#include "Framework/WindowManager.h"
 
 #include "imgui/imgui.h"
-#include "WindowManager.h"
 #include "Graphics/r_cbuffers.h"
 #include "Graphics/r_sun_shadow.h"
 #include "scene/scene_loader.h"
-#include "Core/Check.h"
-#include "Core/Log.h"
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#define DEFINE_DVAR
-#include "CommonDvars.h"
-
-#ifdef max
-#undef max
-#endif
-
 static Scene g_scene;
+
+SceneManager* gSceneManager = new SceneManager;
 
 static void ControlCamera(Camera& camera);
 
-bool Com_LoadScene()
+static bool Com_LoadScene()
 {
     // validate dvars
     const int voxelTextureSize = DVAR_GET_INT(r_voxelSize);
@@ -81,7 +77,7 @@ Scene& Com_GetScene()
     return g_scene;
 }
 
-void Com_UpdateWorld()
+static void Com_UpdateWorld()
 {
     Scene& scene = Com_GetScene();
 
@@ -164,4 +160,18 @@ static void ControlCamera(Camera& camera)
         camera.pitch += VIEW_SPEED * pitch;
         camera.pitch = glm::clamp(camera.pitch, -80.0f, 80.0f);
     }
+}
+
+bool SceneManager::InitializeInternal()
+{
+    return Com_LoadScene();
+}
+
+void SceneManager::FinalizeInternal()
+{
+}
+
+void SceneManager::Update(float dt)
+{
+    Com_UpdateWorld();
 }

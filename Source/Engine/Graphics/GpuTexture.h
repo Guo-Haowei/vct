@@ -1,5 +1,5 @@
 #pragma once
-#include <glad/glad.h>
+#include "GLPrerequisites.h"
 
 struct Texture2DCreateInfo
 {
