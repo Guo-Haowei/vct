@@ -46,7 +46,7 @@ bool WindowManager::InitializeInternal()
     mWindow = glfwCreateWindow(int(size.x), int(size.y), "Editor", 0, 0);
     glfwMakeContextCurrent(mWindow);
 
-    LOG_OK("MainWindow created {} x {}", size.x, size.y);
+    LOG_OK("GLFWwindow created {} x {}", size.x, size.y);
     glfwGetFramebufferSize(mWindow, &mFrameSize.x, &mFrameSize.y);
     return mInitialized = true;
 }

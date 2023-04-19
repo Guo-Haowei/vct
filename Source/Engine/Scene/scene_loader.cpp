@@ -8,7 +8,6 @@
 #include <assimp/Importer.hpp>
 
 #include "Core/CommonDvars.h"
-#include "Core/com_filesystem.h"
 #include "Core/Check.h"
 #include "Core/DynamicVariable.h"
 #include "Core/Log.h"
@@ -16,12 +15,8 @@
 using std::string;
 using std::vector;
 
-void SceneLoader::loadGltf(const char* path, Scene& scene, const mat4& transform, bool flipUVs)
+void SceneLoader::loadGltf(const char* fullpath, Scene& scene, const mat4& transform, bool flipUVs)
 {
-    char fullpath[kMaxOSPath];
-    Com_FsBuildPath(fullpath, kMaxOSPath, path, "");
-    LOG_DEBUG("[assimp] loading model from '{}'", fullpath);
-
     Assimp::Importer importer;
 
     unsigned int flag = aiProcess_CalcTangentSpace | aiProcess_Triangulate;
@@ -37,7 +32,7 @@ void SceneLoader::loadGltf(const char* path, Scene& scene, const mat4& transform
     const uint32_t numMeshes = aiscene->mNumMeshes;
     const uint32_t numMaterials = aiscene->mNumMaterials;
 
-    LOG_DEBUG("scene '{}' has {} meshes, {} materials", path, numMeshes, numMaterials);
+    LOG_DEBUG("scene '{}' has {} meshes, {} materials", fullpath, numMeshes, numMaterials);
 
     // set base path
     m_currentPath = fullpath;

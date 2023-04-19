@@ -3,25 +3,27 @@
 #include "ManagerBase.h"
 #include "Core/Check.h"
 
+#define DEBUG_MANAGER_BASE(FMT, ...) LOG_DEBUG(__FUNCTION__ " " FMT, ##__VA_ARGS__)
+
 bool ManagerBase::Initialize()
 {
-    LOG_INFO("[Runtime] Initializing Manager '{}'...", mName);
+    DEBUG_MANAGER_BASE("Initializing Manager '{}'...", mName);
     mInitialized = InitializeInternal();
     if (!mInitialized)
     {
-        LOG_FATAL("[Runtime] Failed to initialize Manager '{}'", mName);
+        LOG_FATAL(__FUNCTION__ " Failed to initialize Manager '{}'", mName);
         return false;
     }
 
-    LOG_INFO("[Runtime] Manager '{}' initialized", mName);
+    DEBUG_MANAGER_BASE("Manager '{}' initialized", mName);
     return true;
 }
 
 void ManagerBase::Finalize()
 {
-    LOG_INFO("[Runtime] Finalizing Manager '{}'...", mName);
+    DEBUG_MANAGER_BASE("Finalizing Manager '{}'...", mName);
     FinalizeInternal();
-    LOG_INFO("[Runtime] Manager '{}' finalized", mName);
+    DEBUG_MANAGER_BASE("Manager '{}' finalized", mName);
 }
 
 void ManagerBase::Update(float)

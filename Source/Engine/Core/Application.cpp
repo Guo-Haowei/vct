@@ -2,10 +2,49 @@
 
 #include "CommonDvars.h"
 #include "Log.h"
+#include "UIManager.h"
+#include "WindowManager.h"
 
 // @TODO: refactor
-#include "com_filesystem.h"
 #include "lua_script.h"
+#include "com_misc.h"
+#include "Graphics/r_graphics.h"
+#include "Graphics/MainRenderer.h"
+#include "editor.h"
+
+#include "imgui/backends/imgui_impl_glfw.h"
+#include "imgui/backends/imgui_impl_opengl3.h"
+
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+
+bool Application::RegisterManagers()
+{
+    mManagers.push_back(gUIManager);
+    mManagers.push_back(gWindowManager);
+    return true;
+}
+
+bool Application::InitializeManagers()
+{
+    for (auto manager : mManagers)
+    {
+        if (!manager->Initialize())
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void Application::FinalizeManagers()
+{
+    for (auto it = mManagers.rbegin(); it != mManagers.rend(); ++it)
+    {
+        (*it)->Finalize();
+    }
+}
 
 bool Application::Run(int argc, const char** argv)
 {
@@ -14,15 +53,56 @@ bool Application::Run(int argc, const char** argv)
         mCommandLine.push_back(argv[i]);
     }
 
-    if (!Com_FsInit())
+    bool ok = true;
+    ok = ok && ProcessCmdLine();
+    ok = ok && RegisterManagers();
+    ok = ok && InitializeManagers();
+
+    ok = ok && Com_LoadScene();
+    ok = ok && R_Init();
+
+    if (!ok)
     {
         return false;
     }
 
-    if (!ProcessCmdLine())
+    ImGui_ImplGlfw_InitForOpenGL(gWindowManager->GetRaw(), true);
+
+    ImGui_ImplOpenGL3_Init();
+
+    vct::MainRenderer renderer;
+    renderer.createGpuResources();
+
+    while (!gWindowManager->ShouldClose())
     {
-        return false;
+        gWindowManager->NewFrame();
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+
+        ImGui::NewFrame();
+        EditorSetup();
+        ImGui::Render();
+
+        Com_UpdateWorld();
+
+        renderer.render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        GLFWwindow* backup_current_context = glfwGetCurrentContext();
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+        glfwMakeContextCurrent(backup_current_context);
+
+        gWindowManager->Present();
+
+        Com_GetScene().dirty = false;
     }
+
+    renderer.destroyGpuResources();
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+
+    FinalizeManagers();
 
     return true;
 }

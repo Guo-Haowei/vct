@@ -3,7 +3,7 @@
 namespace base
 {
 
-void CheckImpl(const char* file, int ln, const std::string& expr)
+void check_impl(const char* file, int ln, const std::string& expr)
 {
     std::string message = fmt::format(
         "*** assertion failed ***\n"
@@ -11,7 +11,7 @@ void CheckImpl(const char* file, int ln, const std::string& expr)
         "    {}({},1)\n",
         expr, file, ln);
 
-    LogInternal(ELogLevel::Fatal, message);
+    log_impl(ELogLevel::Fatal, message);
 }
 
 }  // namespace base

@@ -2,17 +2,17 @@
 #include "Log.h"
 
 #if USING(ENABLE_CHECK)
-#define check(expr) (void)((!!(expr)) || (::base::CheckImpl(__FILE__, __LINE__, #expr), 0))
+#define check(expr) (void)((!!(expr)) || (::base::check_impl(__FILE__, __LINE__, #expr), 0))
 #define checkfmt(expr, FMT, ...)                                                             \
     do                                                                                       \
     {                                                                                        \
         if ((expr)) break;                                                                   \
         std::string message = fmt::format("{}, {}", #expr, fmt::format(FMT, ##__VA_ARGS__)); \
-        ::base::CheckImpl(__FILE__, __LINE__, message);                                      \
+        ::base::check_impl(__FILE__, __LINE__, message);                                     \
     } while (0)
-#define checkmsg(msg)          ::base::CheckImpl(__FILE__, __LINE__, msg)
+#define checkmsg(msg)          ::base::check_impl(__FILE__, __LINE__, msg)
 #define checkrange(expr, a, b) check((((int)expr >= (int)a) && ((int)expr < (int)b)))
-#define unreachable()          ::base::CheckImpl(__FILE__, __LINE__, "unreachable")
+#define unreachable()          ::base::check_impl(__FILE__, __LINE__, "unreachable")
 #else
 #define check(...)       (void)0
 #define checkfmt(...)    (void)0
@@ -24,6 +24,6 @@
 namespace base
 {
 
-void CheckImpl(const char* file, int ln, const std::string& expr);
+void check_impl(const char* file, int ln, const std::string& expr);
 
 }  // namespace base

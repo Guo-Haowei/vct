@@ -1,7 +1,6 @@
 #include "r_editor.h"
 
 #include "GpuTexture.h"
-#include "Core/com_filesystem.h"
 #include "Core/com_misc.h"
 #include "Core/geometry.h"
 #include "gl_utils.h"
