@@ -4,7 +4,6 @@
 #include "Log.h"
 
 // @TODO: refactor
-#include "com_filesystem.h"
 #include "lua_script.h"
 
 bool Application::Run(int argc, const char** argv)
@@ -12,12 +11,6 @@ bool Application::Run(int argc, const char** argv)
     for (int i = 1; i < argc; ++i)
     {
         mCommandLine.push_back(argv[i]);
-    }
-
-    // @TODO: remove
-    if (!Com_FsInit())
-    {
-        return false;
     }
 
     if (!ProcessCmdLine())

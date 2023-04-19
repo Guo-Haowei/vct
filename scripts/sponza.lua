@@ -1,7 +1,6 @@
 local windowScale = 1;
 
 -- scene
-Dvar.SetString('scene', 'data/models/Sponza/sponza.gltf');
 Dvar.SetFloat('scene_scale', 0.01);
 
 -- window

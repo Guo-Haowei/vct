@@ -7,11 +7,13 @@
 #include <sstream>
 
 #include "Core/CommonDvars.h"
-#include "Core/com_filesystem.h"
+#include "Core/Utility.h"
 #include "shaders/cbuffer.glsl"
 #include "Core/Check.h"
 #include "Core/DynamicVariable.h"
 #include "Core/Log.h"
+
+#define SHADER_FOLDER ROOT_FOLDER "/Source/Shaders"
 
 static MeshData g_quad;
 
@@ -86,7 +88,7 @@ bool Init()
 // Shader
 //------------------------------------------------------------------------------
 
-static std::string ProcessShader(const std::string &source)
+static std::string process_shader(const std::string &source)
 {
     std::string result;
     std::stringstream ss(source);
@@ -95,14 +97,16 @@ static std::string ProcessShader(const std::string &source)
         constexpr const char pattern[] = "#include";
         if (line.find(pattern) == 0)
         {
-            std::string include = line.substr(line.find('"'));
-            check(include.front() == '"' && include.back() == '"');
-            include.pop_back();
-            ComFileWrapper fhandle(Com_FsOpenRead(include.c_str() + 1, "source/shaders"));
-            std::vector<char> extra;
-            if (fhandle.Read(extra) != ComFile::Result::Ok)
+            const char *lineStr = line.c_str();
+            const char *quote1 = strchr(lineStr, '"');
+            const char *quote2 = strrchr(lineStr, '"');
+            check(quote1 && quote2 && (quote1 != quote2));
+            std::string includedFile(quote1 + 1, quote2);
+
+            std::string extra = read_file_to_buffer(fs::path(SHADER_FOLDER) / includedFile);
+            if (extra.empty())
             {
-                LOG_ERROR("[filesystem] failed to read shader '{}'", include);
+                LOG_ERROR("[filesystem] failed to read shader '{}'", includedFile);
             }
             result.append(extra.data());
         }
@@ -117,41 +121,16 @@ static std::string ProcessShader(const std::string &source)
     return result;
 }
 
-class ShaderHandleWrapper
+static GLuint create_shader(const char *file, GLenum type)
 {
-    GLuint handle_ = 0;
-
-public:
-    ShaderHandleWrapper(GLuint handle)
-        : handle_(handle) {}
-
-    ~ShaderHandleWrapper()
-    {
-        if (handle_)
-        {
-            glDeleteShader(handle_);
-        }
-    }
-
-    operator GLuint()
-    {
-        check(handle_);
-        return handle_;
-    }
-};
-
-static GLuint CreateShader(const char *file, GLenum type)
-{
-    ComFileWrapper fhandle(Com_FsOpenRead(file, "source/shaders"));
-    std::string source;
-    const ComFile::Result result = fhandle.Read(source);
-    if (result != ComFile::Result::Ok)
+    std::string source = read_file_to_buffer(fs::path(SHADER_FOLDER) / file);
+    if (source.empty())
     {
         LOG_ERROR("[filesystem] failed to read shader '{}'", file);
         return 0;
     }
 
-    std::string fullsource = ProcessShader(source);
+    std::string fullsource = process_shader(source);
     constexpr const char extras[] =
         "#version 460 core\n"
         "#extension GL_NV_gpu_shader5 : require\n"
@@ -200,7 +179,7 @@ GLuint CreateProgram(const ProgramCreateInfo &info)
         LOG_INFO("compiling compute ({}) pipeline", info.cs.c_str());
         program = glCreateProgram();
         name = info.cs.c_str();
-        cs = CreateShader(info.cs.c_str(), GL_COMPUTE_SHADER);
+        cs = create_shader(info.cs.c_str(), GL_COMPUTE_SHADER);
         glAttachShader(program, cs);
     }
     else if (info.vs[0] && info.ps[0])
@@ -210,13 +189,13 @@ GLuint CreateProgram(const ProgramCreateInfo &info)
         program = glCreateProgram();
         name = info.vs.c_str();
 
-        vs = CreateShader(info.vs.c_str(), GL_VERTEX_SHADER);
+        vs = create_shader(info.vs.c_str(), GL_VERTEX_SHADER);
         glAttachShader(program, vs);
-        ps = CreateShader(info.ps.c_str(), GL_FRAGMENT_SHADER);
+        ps = create_shader(info.ps.c_str(), GL_FRAGMENT_SHADER);
         glAttachShader(program, ps);
         if (!info.gs.empty())
         {
-            gs = CreateShader(info.gs.c_str(), GL_GEOMETRY_SHADER);
+            gs = create_shader(info.gs.c_str(), GL_GEOMETRY_SHADER);
             glAttachShader(program, gs);
         }
     }

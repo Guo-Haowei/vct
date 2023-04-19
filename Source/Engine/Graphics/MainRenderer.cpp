@@ -2,7 +2,6 @@
 #include "MainRenderer.h"
 
 #include "Core/CommonDvars.h"
-#include "Core/com_filesystem.h"
 #include "Core/com_misc.h"
 #include "Core/editor.h"
 #include "Core/geometry.h"
@@ -145,7 +144,7 @@ void MainRenderer::createGpuResources()
         {
             matData->normalMap.create2DImageFromFile(mat->normalTexture.c_str());
             g_constantCache.cache.NormalMaps[idx].data = gl::MakeTextureResident(matData->normalMap.GetHandle());
-            LOG_INFO("material has bump {}", mat->normalTexture.c_str());
+            //LOG_INFO("material has bump {}", mat->normalTexture.c_str());
         }
 
         matData->textureMapIdx = idx;
@@ -166,14 +165,6 @@ void MainRenderer::createGpuResources()
     g_constantCache.cache.SSAOMap = gl::MakeTextureResident(g_ssaoRT.GetColorAttachment().GetHandle());
     g_constantCache.cache.FinalImage = gl::MakeTextureResident(g_finalImageRT.GetColorAttachment().GetHandle());
     g_constantCache.cache.FXAA = gl::MakeTextureResident(g_fxaaRT.GetColorAttachment().GetHandle());
-
-    char buffer[kMaxOSPath];
-    for (int idx = 0; idx < 1; ++idx)
-    {
-        Com_FsBuildPath(buffer, kMaxOSPath, "pointlight.png", "data/images");
-        m_lightIcons[idx].create2DImageFromFile(buffer);
-        g_constantCache.cache.LightIconTextures[idx].data = gl::MakeTextureResident(m_lightIcons[idx].GetHandle());
-    }
 
     g_constantCache.Update();
 }
