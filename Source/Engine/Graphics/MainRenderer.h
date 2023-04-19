@@ -23,11 +23,6 @@ public:
     void vctPass();
 
 private:
-    gl::Program m_voxelProgram;
-    gl::Program m_visualizeProgram;
-    gl::Program m_voxelPostProgram;
-    gl::Program m_debugTextureProgram;
-
     /// vertex arrays
     std::shared_ptr<MeshData> m_box;  // no normals
 

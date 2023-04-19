@@ -1,11 +1,11 @@
 #include "WindowManager.h"
 
-#include <GLFW/glfw3.h>
-
 #include "CommonDvars.h"
-#include "imgui/imgui.h"
-#include "Core/Check.h"
-#include "Core/Log.h"
+#include "Check.h"
+#include "Log.h"
+
+#include "imgui/backends/imgui_impl_glfw.h"
+#include <GLFW/glfw3.h>
 
 WindowManager* gWindowManager = new WindowManager();
 
@@ -48,11 +48,14 @@ bool WindowManager::InitializeInternal()
 
     LOG_OK("GLFWwindow created {} x {}", size.x, size.y);
     glfwGetFramebufferSize(mWindow, &mFrameSize.x, &mFrameSize.y);
-    return mInitialized = true;
+
+    ImGui_ImplGlfw_InitForOpenGL(mWindow, true);
+    return true;
 }
 
 void WindowManager::FinalizeInternal()
 {
+    ImGui_ImplGlfw_Shutdown();
     glfwDestroyWindow(mWindow);
     glfwTerminate();
 }

@@ -88,19 +88,6 @@ void SceneLoader::loadGltf(const char* fullpath, Scene& scene, const mat4& trans
         node.geometries.emplace_back(geom);
         scene.meshes.emplace_back(mesh);
         scene.boundingBox.Union(box);
-
-        // HACK configure floor
-        // if ( DVAR_GET_BOOL( r_mirrorFloor ) && mesh->name == "meshes_0-46" )
-        // {
-        //     mat->reflectPower = 1.0;
-        //     mat->albedo       = vec3( 1.0f );
-        //     mat->metallic     = 0.0f;
-        //     mat->roughness    = 1.0f;
-
-        //     mat->albedoTexture            = "";
-        //     mat->metallicRoughnessTexture = "";
-        //     mat->normalTexture            = "";
-        // }
     }
 
     scene.geometryNodes.push_back(node);

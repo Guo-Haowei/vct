@@ -40,7 +40,4 @@ DVAR_FLOAT(r_ssaoKernelRadius, 0.5f);
 // FXAA
 DVAR_INT(r_enableFXAA, 1);
 
-// SSR
-DVAR_INT(r_mirrorFloor, 0);  // for testing reflection
-
 #include "DynamicVariableEnd.h"

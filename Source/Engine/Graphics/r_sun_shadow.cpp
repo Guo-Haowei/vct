@@ -1,5 +1,6 @@
 #include "r_sun_shadow.h"
 
+#include "Program.h"
 #include "Core/CommonDvars.h"
 #include "Core/com_misc.h"
 #include "Core/WindowManager.h"
@@ -7,7 +8,6 @@
 #include "gl_utils.h"
 #include "r_cbuffers.h"
 #include "r_rendertarget.h"
-#include "r_shader.h"
 #include "Core/Check.h"
 #include "Core/DynamicVariable.h"
 #include "Core/Log.h"
@@ -66,8 +66,8 @@ void R_ShadowPass()
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
     glClear(GL_DEPTH_BUFFER_BIT);
-    const auto& program = R_GetShaderProgram(ProgramType::SHADOW);
-    program.Use();
+    const auto& program = gProgramManager->GetShaderProgram(ProgramType::SHADOW);
+    program.Bind();
 
     const int res = DVAR_GET_INT(r_shadowRes);
     // render scene 3 times
