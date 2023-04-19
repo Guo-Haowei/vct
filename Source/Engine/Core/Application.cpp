@@ -4,11 +4,11 @@
 #include "Log.h"
 #include "UIManager.h"
 #include "WindowManager.h"
+#include "Graphics/GraphicsManager.h"
 
 // @TODO: refactor
 #include "lua_script.h"
 #include "com_misc.h"
-#include "Graphics/r_graphics.h"
 #include "Graphics/MainRenderer.h"
 #include "editor.h"
 
@@ -22,6 +22,7 @@ bool Application::RegisterManagers()
 {
     mManagers.push_back(gUIManager);
     mManagers.push_back(gWindowManager);
+    mManagers.push_back(gGraphicsManager);
     return true;
 }
 
@@ -59,16 +60,11 @@ bool Application::Run(int argc, const char** argv)
     ok = ok && InitializeManagers();
 
     ok = ok && Com_LoadScene();
-    ok = ok && R_Init();
 
     if (!ok)
     {
         return false;
     }
-
-    ImGui_ImplGlfw_InitForOpenGL(gWindowManager->GetRaw(), true);
-
-    ImGui_ImplOpenGL3_Init();
 
     vct::MainRenderer renderer;
     renderer.createGpuResources();
@@ -99,8 +95,6 @@ bool Application::Run(int argc, const char** argv)
     }
 
     renderer.destroyGpuResources();
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
 
     FinalizeManagers();
 
