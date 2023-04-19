@@ -3,6 +3,7 @@
 #include "com_filesystem.h"
 #include "com_misc.h"
 #include "editor.h"
+#include "UIManager.h"
 #include "imgui/imgui.h"
 #include "WindowManager.h"
 #include "Graphics/MainRenderer.h"
@@ -22,12 +23,10 @@ int main(int argc, const char** argv)
     bool ok = true;
     ok = ok && app.Run(argc, argv);
 
-    ok = ok && Com_LoadScene();
-    ok = ok && Com_ImGuiInit();
+    ok = ok && gUIManager->Initialize();
     ok = ok && gWindowManager->Initialize();
+    ok = ok && Com_LoadScene();
     ok = ok && R_Init();
-
-    EditorSetupStyle();
 
     ImGui_ImplGlfw_InitForOpenGL(gWindowManager->GetRaw(), true);
 
@@ -63,10 +62,10 @@ int main(int argc, const char** argv)
 
     renderer.destroyGpuResources();
     ImGui_ImplOpenGL3_Shutdown();
-
     ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+
     gWindowManager->Finalize();
+    gUIManager->Finalize();
 
     return ok ? 0 : 1;
 }

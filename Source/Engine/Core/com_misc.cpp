@@ -82,40 +82,6 @@ Scene& Com_GetScene()
     return g_scene;
 }
 
-bool Com_ImGuiInit()
-{
-    constexpr char* kDefaultIniFileName = "imgui.ini";
-    constexpr char kDefaultEditorLayout[] = "default/imgui.ini";
-    static char s_iniFileNameLoad[kMaxOSPath];
-
-    if (std::filesystem::exists(kDefaultIniFileName))
-    {
-        strncpy(s_iniFileNameLoad, kDefaultIniFileName, sizeof(s_iniFileNameLoad));
-    }
-    else
-    {
-        Com_FsBuildPath(s_iniFileNameLoad, kMaxOSPath, kDefaultEditorLayout);
-    }
-
-    LOG_DEBUG("[imgui] loading imgui config from '{}'", s_iniFileNameLoad);
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-
-    ImGuiIO& io = ImGui::GetIO();
-    // io.IniFilenameLoad = s_iniFileNameLoad;
-    // io.IniFilenameSave = kDefaultIniFileName;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // Enable Docking
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;    // Enable Multi-Viewport / Platform Windows
-
-    LOG_OK("ImGui initialized");
-    return true;
-}
-
-void Com_ImGuiShutdown()
-{
-}
-
 void Com_UpdateWorld()
 {
     Scene& scene = Com_GetScene();

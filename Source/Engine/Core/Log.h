@@ -4,7 +4,7 @@
 #include "Defines.h"
 
 #if USING(ENABLE_LOG)
-#define LOG_LEVEL(LEVEL, FMT, ...) ::base::Log(LEVEL, ::fmt::format(FMT, ##__VA_ARGS__));
+#define LOG_LEVEL(LEVEL, FMT, ...) ::base::log(LEVEL, ::fmt::format(FMT, ##__VA_ARGS__));
 
 #define LOG_FATAL(FMT, ...) LOG_LEVEL(ELogLevel::Fatal, FMT, ##__VA_ARGS__);
 #define LOG_ERROR(FMT, ...) LOG_LEVEL(ELogLevel::Error, FMT, ##__VA_ARGS__);
@@ -35,9 +35,7 @@ enum class ELogLevel
 namespace base
 {
 
-void Log(ELogLevel level, const std::string& message);
-void LogInternal(ELogLevel level, const std::string& message);
-
-void Assert(const char* file, int ln, const char* expr);
+void log(ELogLevel level, const std::string& message);
+void log_impl(ELogLevel level, const std::string& message);
 
 }  // namespace base

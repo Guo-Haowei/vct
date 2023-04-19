@@ -15,7 +15,7 @@
 namespace base
 {
 
-void LogInternal(ELogLevel level, const std::string& message)
+void log_impl(ELogLevel level, const std::string& message)
 {
     fmt::color color = fmt::color::silver;
     bool bold = true;
@@ -31,7 +31,7 @@ void LogInternal(ELogLevel level, const std::string& message)
         case ELogLevel::Ok:
             color = fmt::color::pale_green;
             break;
-        case ELogLevel::Debug:
+        case ELogLevel::Info:
             color = fmt::color::white;
             break;
         default:
@@ -71,7 +71,7 @@ void LogInternal(ELogLevel level, const std::string& message)
     }
 }
 
-void Log(ELogLevel level, const std::string& message)
+void log(ELogLevel level, const std::string& message)
 {
     constexpr const char* sTags[] = {
         "[FATAL]- ",
@@ -89,7 +89,7 @@ void Log(ELogLevel level, const std::string& message)
     std::time_t t = std::time(nullptr);
     std::string finalMessage = fmt::format("[{:%H:%M:%S}] {}{}\n", fmt::localtime(t), tag, message);
 
-    LogInternal(level, finalMessage);
+    log_impl(level, finalMessage);
 }
 
 }  // namespace base

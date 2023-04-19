@@ -14,6 +14,7 @@ bool Application::Run(int argc, const char** argv)
         mCommandLine.push_back(argv[i]);
     }
 
+    // @TODO: remove
     if (!Com_FsInit())
     {
         return false;

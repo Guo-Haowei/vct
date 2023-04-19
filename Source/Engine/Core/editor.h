@@ -2,5 +2,4 @@
 #pragma once
 #include "Graphics/r_graphics.h"
 
-void EditorSetupStyle();
 void EditorSetup();
