@@ -1,6 +1,12 @@
 #pragma once
-#include <string>
 #include <list>
+#include <string>
+#include <vector>
+
+#include "ManagerBase.h"
+
+class UIManager;
+class WindowManager;
 
 using CommandLine = std::list<std::string>;
 
@@ -11,6 +17,10 @@ public:
 
 private:
     bool ProcessCmdLine();
+    bool RegisterManagers();
+    bool InitializeManagers();
+    void FinalizeManagers();
 
     CommandLine mCommandLine;
+    std::vector<ManagerBase*> mManagers;
 };
