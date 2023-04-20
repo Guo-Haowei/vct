@@ -1,9 +1,15 @@
 set(EXE_NAME Editor)
 
-add_executable(${EXE_NAME}
-    Editor.cpp
-    main.cpp
+file(GLOB SRC_EDITOR
+    "*.h"
+    "*.cpp"
 )
+
+add_executable(${EXE_NAME}
+    ${SRC_EDITOR}
+)
+
+source_group("Editor" FILES ${SRC_EDITOR})
 
 target_link_libraries(${EXE_NAME} PUBLIC
     Engine

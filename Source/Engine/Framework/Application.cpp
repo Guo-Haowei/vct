@@ -1,10 +1,11 @@
 #include "Application.h"
 
 #include "GraphicsManager.h"
-#include "WindowManager.h"
-#include "SceneManager.h"
+#include "LogManager.h"
 #include "ProgramManager.h"
+#include "SceneManager.h"
 #include "UIManager.h"
+#include "WindowManager.h"
 #include "Core/CommonDvars.h"
 #include "Core/Input.h"
 #include "Core/Log.h"
@@ -25,6 +26,7 @@ void Application::RegisterManager(ManagerBase* manager)
 
 bool Application::RegisterManagers()
 {
+    RegisterManager(LogManager::GetSingletonPtr());
     RegisterManager(gUIManager);
     RegisterManager(gWindowManager);
     RegisterManager(gGraphicsManager);

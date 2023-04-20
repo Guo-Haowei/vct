@@ -1,4 +1,4 @@
-#include "Editor.h"
+#include "EditorLayer.h"
 
 #include "Engine/Core/CommonDvars.h"
 #include "Engine/Core/Check.h"
@@ -10,25 +10,7 @@
 #include "Engine/Framework/SceneManager.h"
 #include "Engine/Framework/WindowManager.h"
 
-#include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
-
-class EditorLayer : public Layer
-{
-public:
-    EditorLayer() = default;
-
-    virtual void Attach() override {}
-    virtual void Render() override {}
-    virtual void Update(float dt) override;
-
-private:
-    void DbgWindow();
-    void DockSpace();
-
-    ImVec2 pos;
-    ImVec2 size;
-};
 
 static const char* DrawTextureToStr(int mode)
 {
@@ -299,7 +281,7 @@ void EditorLayer::Update(float dt)
     }
 }
 
-Editor::Editor() : Application(Application::InitInfo{ "Editor", 1920, 1080, false })
+void EditorLayer::Render()
 {
-    AddLayer(std::make_shared<EditorLayer>());
+    mConsolePanel.Render();
 }

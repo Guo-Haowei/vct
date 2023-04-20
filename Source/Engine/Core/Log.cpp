@@ -6,7 +6,7 @@
 #include <fmt/chrono.h>
 #include <fmt/color.h>
 
-#define LOG_TO_SCREEN NOT_IN_USE
+#define LOG_TO_SCREEN IN_USE
 
 #if USING(LOG_TO_SCREEN)
 #include "Framework/LogManager.h"
