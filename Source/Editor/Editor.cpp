@@ -1,4 +1,4 @@
-#include "editor.h"
+#include "Editor.h"
 
 #include "Engine/Core/CommonDvars.h"
 #include "Engine/Core/Check.h"
@@ -13,24 +13,21 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 
-class Editor
+class EditorLayer : public Layer
 {
-    ImVec2 pos;
-    ImVec2 size;
+public:
+    EditorLayer() = default;
 
+    virtual void Attach() override {}
+    virtual void Render() override {}
+    virtual void Update(float dt) override;
+
+private:
     void DbgWindow();
     void DockSpace();
 
-    Editor() = default;
-
-public:
-    static Editor& Singleton()
-    {
-        static Editor editor;
-        return editor;
-    }
-
-    void Update();
+    ImVec2 pos;
+    ImVec2 size;
 };
 
 static const char* DrawTextureToStr(int mode)
@@ -71,7 +68,7 @@ static const char* DrawTextureToStr(int mode)
     return str;
 }
 
-void Editor::DbgWindow()
+void EditorLayer::DbgWindow()
 {
     if (ImGui::Begin("Debug"))
     {
@@ -128,7 +125,7 @@ void Editor::DbgWindow()
     ImGui::End();
 }
 
-void Editor::DockSpace()
+void EditorLayer::DockSpace()
 {
     ImGui::GetMainViewport();
 
@@ -217,7 +214,7 @@ void Editor::DockSpace()
 #endif
 }
 
-void Editor::Update()
+void EditorLayer::Update(float dt)
 {
     static bool hideUI = false;
     if (Input::IsKeyPressed(EKeyCode::ESCAPE))
@@ -293,7 +290,7 @@ void Editor::Update()
     {
         if (scene.selected->visible)
         {
-            LOG_WARN("material %s deleted", scene.selected->mesh->name.c_str());
+            LOG_WARN("material {} deleted", scene.selected->mesh->name);
 
             scene.selected->visible = false;
             scene.dirty = true;
@@ -302,7 +299,7 @@ void Editor::Update()
     }
 }
 
-void EditorSetup()
+Editor::Editor() : Application(Application::InitInfo{ "Editor", 1920, 1080, false })
 {
-    Editor::Singleton().Update();
+    AddLayer(std::make_shared<EditorLayer>());
 }
