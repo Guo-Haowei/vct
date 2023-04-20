@@ -22,11 +22,12 @@ public:
 
     inline GLuint GetHandle() const { return mHandle; }
 
+    GpuTexture mColorAttachments[MAX_COLOR_ATTACHMENT];
+
 protected:
     GLuint mHandle = 0;
 
     GpuTexture mDepthAttachment;
-    GpuTexture mColorAttachments[MAX_COLOR_ATTACHMENT];
     int mColorAttachmentCount = 0;
     int mWidth = 0;
     int mHeight = 0;

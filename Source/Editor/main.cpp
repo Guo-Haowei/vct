@@ -1,8 +1,19 @@
-#include "Engine/Framework/Application.h"
+#include "EditorLayer.h"
+
+static constexpr int WIDTH = 1920;
+static constexpr int HEIGHT = 1080;
+
+class Editor : public Application
+{
+public:
+    Editor() : Application(Application::InitInfo{ "Editor", WIDTH, HEIGHT, false })
+    {
+        AddLayer(std::make_shared<EditorLayer>());
+    }
+};
 
 int main(int argc, const char** argv)
 {
-    Application::InitInfo info{ "Editor", 1920, 1080, false };
-    Application app(info);
-    return app.Run(argc, argv);
+    Editor editor;
+    return editor.Run(argc, argv);
 }

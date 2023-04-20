@@ -9,9 +9,6 @@
     CLASS& operator=(const CLASS&) = delete
 
 template<typename T>
-using Ref = std::shared_ptr<T>;
-
-template<typename T>
 constexpr std::underlying_type_t<T> underlying(T value)
 {
     static_assert(std::is_enum_v<T>);

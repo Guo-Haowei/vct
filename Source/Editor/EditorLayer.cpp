@@ -1,4 +1,8 @@
-#include "editor.h"
+#include "EditorLayer.h"
+
+#include "ConsolePanel.h"
+#include "DebugPanel.h"
+#include "Viewer.h"
 
 #include "Engine/Core/CommonDvars.h"
 #include "Engine/Core/Check.h"
@@ -10,125 +14,16 @@
 #include "Engine/Framework/SceneManager.h"
 #include "Engine/Framework/WindowManager.h"
 
-#include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 
-class Editor
+EditorLayer::EditorLayer() : Layer("EditorLayer")
 {
-    ImVec2 pos;
-    ImVec2 size;
-
-    void DbgWindow();
-    void DockSpace();
-
-    Editor() = default;
-
-public:
-    static Editor& Singleton()
-    {
-        static Editor editor;
-        return editor;
-    }
-
-    void Update();
-};
-
-static const char* DrawTextureToStr(int mode)
-{
-    const char* str = "scene";
-    switch (mode)
-    {
-        case TEXTURE_VOXEL_ALBEDO:
-            str = "voxel color";
-            break;
-        case TEXTURE_VOXEL_NORMAL:
-            str = "voxel normal";
-            break;
-        case TEXTURE_GBUFFER_DEPTH:
-            str = "depth";
-            break;
-        case TEXTURE_GBUFFER_ALBEDO:
-            str = "albedo";
-            break;
-        case TEXTURE_GBUFFER_NORMAL:
-            str = "normal";
-            break;
-        case TEXTURE_GBUFFER_METALLIC:
-            str = "metallic";
-            break;
-        case TEXTURE_GBUFFER_ROUGHNESS:
-            str = "roughness";
-            break;
-        case TEXTURE_GBUFFER_SHADOW:
-            str = "shadow";
-            break;
-        case TEXTURE_SSAO:
-            str = "ssao";
-            break;
-        default:
-            break;
-    }
-    return str;
+    mPanels.emplace_back(std::make_shared<ConsolePanel>());
+    mPanels.emplace_back(std::make_shared<DebugPanel>());
+    mPanels.emplace_back(std::make_shared<Viewer>());
 }
 
-void Editor::DbgWindow()
-{
-    if (ImGui::Begin("Debug"))
-    {
-        Scene& scene = Com_GetScene();
-        const Camera& camera = scene.camera;
-        bool dirty = false;
-
-        const vec3& eye = camera.position;
-        ImGui::Text("eye: %.2f, %.2f, %.2f", eye.x, eye.y, eye.z);
-        ImGui::Separator();
-
-        ImGui::Text("Voxel GI");
-        ImGui::Checkbox("Enable GI", (bool*)(DVAR_GET_POINTER(r_enableVXGI)));
-        ImGui::Checkbox("No Texture", (bool*)(DVAR_GET_POINTER(r_noTexture)));
-        dirty |= ImGui::Checkbox("Force Voxel GI texture update", (bool*)(DVAR_GET_POINTER(r_forceVXGI)));
-        ImGui::Separator();
-
-        ImGui::Text("CSM");
-        ImGui::Checkbox("Debug CSM", (bool*)(DVAR_GET_POINTER(r_debugCSM)));
-        ImGui::Separator();
-
-        ImGui::Text("SSAO");
-        ImGui::Checkbox("Enable SSAO", (bool*)(DVAR_GET_POINTER(r_enableSsao)));
-        ImGui::Text("SSAO Kernal Radius");
-        ImGui::SliderFloat("Kernal Radius", (float*)(DVAR_GET_POINTER(r_ssaoKernelRadius)), 0.1f, 5.0f);
-        ImGui::Separator();
-
-        ImGui::Text("FXAA");
-        ImGui::Checkbox("Enable FXAA", (bool*)(DVAR_GET_POINTER(r_enableFXAA)));
-        ImGui::Separator();
-
-        ImGui::Text("Display Texture");
-        ImGui::SliderInt("Display Texture", (int*)(DVAR_GET_POINTER(r_debugTexture)), DrawTexture::TEXTURE_FINAL_IMAGE, DrawTexture::TEXTURE_MAX);
-        ImGui::Text("%s", DrawTextureToStr(DVAR_GET_INT(r_debugTexture)));
-
-        ImGui::Separator();
-        ImGui::Text("Light");
-        float* lightDir = (float*)DVAR_GET_POINTER(light_dir);
-        dirty |= ImGui::SliderFloat("x", lightDir, -20.f, 20.f);
-        dirty |= ImGui::SliderFloat("z", lightDir + 2, -20.f, 20.f);
-
-        ImGui::Text("Floor");
-        if (scene.selected)
-        {
-            void* mat = scene.selected->material->gpuResource;
-            MaterialData* drawData = reinterpret_cast<MaterialData*>(mat);
-            dirty |= ImGui::SliderFloat("metallic", &drawData->metallic, 0.0f, 1.0f);
-            dirty |= ImGui::SliderFloat("roughness", &drawData->roughness, 0.0f, 1.0f);
-        }
-
-        scene.light.direction = glm::normalize(DVAR_GET_VEC3(light_dir));
-        scene.dirty = dirty;
-    }
-    ImGui::End();
-}
-
-void Editor::DockSpace()
+void EditorLayer::DockSpace()
 {
     ImGui::GetMainViewport();
 
@@ -217,7 +112,7 @@ void Editor::DockSpace()
 #endif
 }
 
-void Editor::Update()
+void EditorLayer::Update(float dt)
 {
     static bool hideUI = false;
     if (Input::IsKeyPressed(EKeyCode::ESCAPE))
@@ -228,9 +123,9 @@ void Editor::Update()
     if (!hideUI)
     {
         DockSpace();
-        DbgWindow();
     }
 
+#if 0
     ImGuiIO& io = ImGui::GetIO();
     Scene& scene = Com_GetScene();
 
@@ -241,7 +136,6 @@ void Editor::Update()
         auto [frameW, frameH] = gWindowManager->GetFrameSize();
         if (Input::IsButtonPressed(EMouseButton::LEFT))
         {
-#if 0
             const Camera& camera = scene.camera;
 
             const mat4& PV = camera.ProjView();
@@ -281,7 +175,6 @@ void Editor::Update()
                     }
                 }
             }
-#endif
         }
         else if (Input::IsButtonPressed(EMouseButton::RIGHT))
         {
@@ -293,16 +186,25 @@ void Editor::Update()
     {
         if (scene.selected->visible)
         {
-            LOG_WARN("material %s deleted", scene.selected->mesh->name.c_str());
+            LOG_WARN("material {} deleted", scene.selected->mesh->name);
 
             scene.selected->visible = false;
             scene.dirty = true;
             scene.selected = nullptr;
         }
     }
+#endif
+
+    for (auto& it : mPanels)
+    {
+        it->Update(dt);
+    }
 }
 
-void EditorSetup()
+void EditorLayer::Render()
 {
-    Editor::Singleton().Update();
+    for (auto& it : mPanels)
+    {
+        it->Render();
+    }
 }

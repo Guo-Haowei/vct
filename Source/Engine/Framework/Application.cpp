@@ -1,10 +1,11 @@
 #include "Application.h"
 
 #include "GraphicsManager.h"
-#include "WindowManager.h"
-#include "SceneManager.h"
+#include "LogManager.h"
 #include "ProgramManager.h"
+#include "SceneManager.h"
 #include "UIManager.h"
+#include "WindowManager.h"
 #include "Core/CommonDvars.h"
 #include "Core/Input.h"
 #include "Core/Log.h"
@@ -19,12 +20,13 @@
 
 void Application::RegisterManager(ManagerBase* manager)
 {
-    mManagers.push_back(manager);
+    mManagers.emplace_back(manager);
     manager->mApplication = this;
 }
 
 bool Application::RegisterManagers()
 {
+    RegisterManager(LogManager::GetSingletonPtr());
     RegisterManager(gUIManager);
     RegisterManager(gWindowManager);
     RegisterManager(gGraphicsManager);
@@ -54,13 +56,16 @@ void Application::FinalizeManagers()
     }
 }
 
-extern void EditorSetup();
+void Application::AddLayer(std::shared_ptr<Layer> layer)
+{
+    mLayers.emplace_back(layer);
+}
 
 int Application::Run(int argc, const char** argv)
 {
     for (int i = 1; i < argc; ++i)
     {
-        mCommandLine.push_back(argv[i]);
+        mCommandLine.emplace_back(std::string(argv[i]));
     }
 
     bool ok = true;
@@ -76,6 +81,13 @@ int Application::Run(int argc, const char** argv)
     vct::MainRenderer renderer;
     renderer.createGpuResources();
 
+    for (auto& layer : mLayers)
+    {
+        layer->Attach();
+        LOG_OK("[Runtime] layer '{}' attached!", layer->GetName());
+    }
+
+    float dt = 0.0f;
     while (!gWindowManager->ShouldClose())
     {
         gWindowManager->NewFrame();
@@ -83,10 +95,18 @@ int Application::Run(int argc, const char** argv)
         Input::BeginFrame();
 
         ImGui::NewFrame();
-        EditorSetup();
+        for (auto& layer : mLayers)
+        {
+            layer->Update(dt);
+        }
+
+        for (auto& layer : mLayers)
+        {
+            layer->Render();
+        }
         ImGui::Render();
 
-        gSceneManager->Update(0.0f);
+        gSceneManager->Update(dt);
 
         renderer.render();
 

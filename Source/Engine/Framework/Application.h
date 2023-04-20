@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 
+#include "Layer.h"
 #include "ManagerBase.h"
 
 class UIManager;
@@ -26,6 +27,9 @@ public:
     int Run(int argc, const char** argv);
     const InitInfo& GetInfo() const { return mInitInfo; }
 
+protected:
+    void AddLayer(std::shared_ptr<Layer> layer);
+
 private:
     bool ProcessCmdLine();
     void RegisterManager(ManagerBase* manager);
@@ -36,4 +40,5 @@ private:
     InitInfo mInitInfo;
     CommandLine mCommandLine;
     std::vector<ManagerBase*> mManagers;
+    std::vector<std::shared_ptr<Layer>> mLayers;
 };

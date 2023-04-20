@@ -153,7 +153,7 @@ bool WindowManager::IsMouseInScreen()
 void WindowManager::CursorPosCallback(GLFWwindow* window, double x, double y)
 {
     ImGui_ImplGlfw_CursorPosCallback(window, x, y);
-    if (!ImGui::GetIO().WantCaptureMouse)
+    // if (!ImGui::GetIO().WantCaptureMouse)
     {
         Input::gInput.SetCursor(static_cast<float>(x), static_cast<float>(y));
     }
@@ -163,7 +163,7 @@ void WindowManager::MouseButtonCallback(GLFWwindow* window, int button, int acti
 {
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
 
-    if (!ImGui::GetIO().WantCaptureMouse)
+    // if (!ImGui::GetIO().WantCaptureMouse)
     {
         if (action == GLFW_PRESS)
         {
@@ -180,7 +180,7 @@ void WindowManager::KeyCallback(GLFWwindow* window, int keycode, int scancode, i
 {
     ImGui_ImplGlfw_KeyCallback(window, keycode, scancode, action, mods);
 
-    if (!ImGui::GetIO().WantCaptureKeyboard)
+    // if (!ImGui::GetIO().WantCaptureKeyboard)
     {
         if (action == GLFW_PRESS)
         {
@@ -197,7 +197,7 @@ void WindowManager::ScrollCallback(GLFWwindow* window, double xoffset, double yo
 {
     ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
 
-    if (!ImGui::GetIO().WantCaptureMouse)
+    // if (!ImGui::GetIO().WantCaptureMouse)
     {
         Input::gInput.SetWheel(static_cast<float>(xoffset), static_cast<float>(yoffset));
     }
