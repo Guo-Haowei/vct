@@ -222,6 +222,8 @@ SsaoRT g_ssaoRT;
 FinalImageRT g_finalImageRT;
 FinalImageRT g_fxaaRT;
 
+uint32_t gFinalImage;
+
 void R_CreateRT()
 {
     auto [w, h] = gWindowManager->GetFrameSize();
@@ -235,6 +237,8 @@ void R_CreateRT()
     g_ssaoRT.Create(w, h);
     g_finalImageRT.Create(w, h);
     g_fxaaRT.Create(w, h);
+
+    gFinalImage = g_finalImageRT.mColorAttachments[0].GetHandle();
 }
 
 void R_DestroyRT()

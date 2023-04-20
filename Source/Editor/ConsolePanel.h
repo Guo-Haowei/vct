@@ -1,12 +1,16 @@
 #pragma once
+#include "Panel.h"
 #include "Engine/Framework/LogManager.h"
 
-class ConsolePanel
+class ConsolePanel : public Panel
 {
 public:
-    void Render();
+    ConsolePanel() : Panel("Console") {}
 
 protected:
+    virtual void RenderInternal() override;
+
+private:
     bool mAutoScroll = true;
     bool mScrollToBottom = false;
     LogManager::Buffer mLogs;

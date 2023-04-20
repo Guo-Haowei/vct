@@ -1,5 +1,5 @@
 #pragma once
-#include "ConsolePanel.h"
+#include "Panel.h"
 
 #include "imgui/imgui.h"
 #include "Engine/Framework/Application.h"
@@ -7,7 +7,7 @@
 class EditorLayer : public Layer
 {
 public:
-    EditorLayer() : Layer("Editor Layer") {}
+    EditorLayer();
 
     virtual void Attach() override {}
     virtual void Update(float dt) override;
@@ -17,7 +17,7 @@ private:
     void DbgWindow();
     void DockSpace();
 
-    ConsolePanel mConsolePanel;
+    std::vector<std::shared_ptr<Panel>> mPanels;
 
     // @TODO: refactor
     ImVec2 pos;

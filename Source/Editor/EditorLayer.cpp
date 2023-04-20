@@ -1,5 +1,9 @@
 #include "EditorLayer.h"
 
+#include "ConsolePanel.h"
+#include "DebugPanel.h"
+#include "Viewer.h"
+
 #include "Engine/Core/CommonDvars.h"
 #include "Engine/Core/Check.h"
 #include "Engine/Core/DynamicVariable.h"
@@ -12,99 +16,11 @@
 
 #include "imgui/imgui_internal.h"
 
-static const char* DrawTextureToStr(int mode)
+EditorLayer::EditorLayer() : Layer("EditorLayer")
 {
-    const char* str = "scene";
-    switch (mode)
-    {
-        case TEXTURE_VOXEL_ALBEDO:
-            str = "voxel color";
-            break;
-        case TEXTURE_VOXEL_NORMAL:
-            str = "voxel normal";
-            break;
-        case TEXTURE_GBUFFER_DEPTH:
-            str = "depth";
-            break;
-        case TEXTURE_GBUFFER_ALBEDO:
-            str = "albedo";
-            break;
-        case TEXTURE_GBUFFER_NORMAL:
-            str = "normal";
-            break;
-        case TEXTURE_GBUFFER_METALLIC:
-            str = "metallic";
-            break;
-        case TEXTURE_GBUFFER_ROUGHNESS:
-            str = "roughness";
-            break;
-        case TEXTURE_GBUFFER_SHADOW:
-            str = "shadow";
-            break;
-        case TEXTURE_SSAO:
-            str = "ssao";
-            break;
-        default:
-            break;
-    }
-    return str;
-}
-
-void EditorLayer::DbgWindow()
-{
-    if (ImGui::Begin("Debug"))
-    {
-        Scene& scene = Com_GetScene();
-        const Camera& camera = scene.camera;
-        bool dirty = false;
-
-        const vec3& eye = camera.position;
-        ImGui::Text("eye: %.2f, %.2f, %.2f", eye.x, eye.y, eye.z);
-        ImGui::Separator();
-
-        ImGui::Text("Voxel GI");
-        ImGui::Checkbox("Enable GI", (bool*)(DVAR_GET_POINTER(r_enableVXGI)));
-        ImGui::Checkbox("No Texture", (bool*)(DVAR_GET_POINTER(r_noTexture)));
-        dirty |= ImGui::Checkbox("Force Voxel GI texture update", (bool*)(DVAR_GET_POINTER(r_forceVXGI)));
-        ImGui::Separator();
-
-        ImGui::Text("CSM");
-        ImGui::Checkbox("Debug CSM", (bool*)(DVAR_GET_POINTER(r_debugCSM)));
-        ImGui::Separator();
-
-        ImGui::Text("SSAO");
-        ImGui::Checkbox("Enable SSAO", (bool*)(DVAR_GET_POINTER(r_enableSsao)));
-        ImGui::Text("SSAO Kernal Radius");
-        ImGui::SliderFloat("Kernal Radius", (float*)(DVAR_GET_POINTER(r_ssaoKernelRadius)), 0.1f, 5.0f);
-        ImGui::Separator();
-
-        ImGui::Text("FXAA");
-        ImGui::Checkbox("Enable FXAA", (bool*)(DVAR_GET_POINTER(r_enableFXAA)));
-        ImGui::Separator();
-
-        ImGui::Text("Display Texture");
-        ImGui::SliderInt("Display Texture", (int*)(DVAR_GET_POINTER(r_debugTexture)), DrawTexture::TEXTURE_FINAL_IMAGE, DrawTexture::TEXTURE_MAX);
-        ImGui::Text("%s", DrawTextureToStr(DVAR_GET_INT(r_debugTexture)));
-
-        ImGui::Separator();
-        ImGui::Text("Light");
-        float* lightDir = (float*)DVAR_GET_POINTER(light_dir);
-        dirty |= ImGui::SliderFloat("x", lightDir, -20.f, 20.f);
-        dirty |= ImGui::SliderFloat("z", lightDir + 2, -20.f, 20.f);
-
-        ImGui::Text("Floor");
-        if (scene.selected)
-        {
-            void* mat = scene.selected->material->gpuResource;
-            MaterialData* drawData = reinterpret_cast<MaterialData*>(mat);
-            dirty |= ImGui::SliderFloat("metallic", &drawData->metallic, 0.0f, 1.0f);
-            dirty |= ImGui::SliderFloat("roughness", &drawData->roughness, 0.0f, 1.0f);
-        }
-
-        scene.light.direction = glm::normalize(DVAR_GET_VEC3(light_dir));
-        scene.dirty = dirty;
-    }
-    ImGui::End();
+    mPanels.emplace_back(std::make_shared<ConsolePanel>());
+    mPanels.emplace_back(std::make_shared<DebugPanel>());
+    mPanels.emplace_back(std::make_shared<Viewer>());
 }
 
 void EditorLayer::DockSpace()
@@ -207,9 +123,9 @@ void EditorLayer::Update(float dt)
     if (!hideUI)
     {
         DockSpace();
-        DbgWindow();
     }
 
+#if 0
     ImGuiIO& io = ImGui::GetIO();
     Scene& scene = Com_GetScene();
 
@@ -220,7 +136,6 @@ void EditorLayer::Update(float dt)
         auto [frameW, frameH] = gWindowManager->GetFrameSize();
         if (Input::IsButtonPressed(EMouseButton::LEFT))
         {
-#if 0
             const Camera& camera = scene.camera;
 
             const mat4& PV = camera.ProjView();
@@ -260,7 +175,6 @@ void EditorLayer::Update(float dt)
                     }
                 }
             }
-#endif
         }
         else if (Input::IsButtonPressed(EMouseButton::RIGHT))
         {
@@ -279,9 +193,18 @@ void EditorLayer::Update(float dt)
             scene.selected = nullptr;
         }
     }
+#endif
+
+    for (auto& it : mPanels)
+    {
+        it->Update(dt);
+    }
 }
 
 void EditorLayer::Render()
 {
-    mConsolePanel.Render();
+    for (auto& it : mPanels)
+    {
+        it->Render();
+    }
 }
