@@ -2,6 +2,7 @@
 
 #include "Core/Check.h"
 #include "Core/CommonDvars.h"
+#include "Core/Input.h"
 #include "Core/Log.h"
 
 #include "Framework/WindowManager.h"
@@ -10,9 +11,6 @@
 #include "Graphics/r_cbuffers.h"
 #include "Graphics/r_sun_shadow.h"
 #include "scene/scene_loader.h"
-
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
 
 static Scene g_scene;
 
@@ -130,12 +128,12 @@ static void ControlCamera(Camera& camera)
     constexpr float VIEW_SPEED = 2.0f;
     float CAMERA_SPEED = 0.15f;
 
-    if (ImGui::IsKeyDown((ImGuiKey)GLFW_KEY_LEFT_SHIFT))
+    if (Input::IsKeyDown(EKeyCode::LEFT_SHIFT))
         CAMERA_SPEED *= 3.f;
 
-    int x = ImGui::IsKeyDown((ImGuiKey)GLFW_KEY_D) - ImGui::IsKeyDown((ImGuiKey)GLFW_KEY_A);
-    int z = ImGui::IsKeyDown((ImGuiKey)GLFW_KEY_W) - ImGui::IsKeyDown((ImGuiKey)GLFW_KEY_S);
-    int y = ImGui::IsKeyDown((ImGuiKey)GLFW_KEY_E) - ImGui::IsKeyDown((ImGuiKey)GLFW_KEY_Q);
+    int x = Input::IsKeyDown(EKeyCode::D) - Input::IsKeyDown(EKeyCode::A);
+    int z = Input::IsKeyDown(EKeyCode::W) - Input::IsKeyDown(EKeyCode::S);
+    int y = Input::IsKeyDown(EKeyCode::E) - Input::IsKeyDown(EKeyCode::Q);
 
     if (x != 0 || z != 0)
     {
@@ -147,8 +145,8 @@ static void ControlCamera(Camera& camera)
 
     camera.position.y += (CAMERA_SPEED * y);
 
-    int yaw = ImGui::IsKeyDown((ImGuiKey)GLFW_KEY_RIGHT) - ImGui::IsKeyDown((ImGuiKey)GLFW_KEY_LEFT);
-    int pitch = ImGui::IsKeyDown((ImGuiKey)GLFW_KEY_UP) - ImGui::IsKeyDown((ImGuiKey)GLFW_KEY_DOWN);
+    int yaw = Input::IsKeyDown(EKeyCode::RIGHT) - Input::IsKeyDown(EKeyCode::LEFT);
+    int pitch = Input::IsKeyDown(EKeyCode::UP) - Input::IsKeyDown(EKeyCode::DOWN);
 
     if (yaw)
     {

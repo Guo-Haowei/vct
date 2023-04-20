@@ -6,17 +6,13 @@
 #include "ProgramManager.h"
 #include "UIManager.h"
 #include "Core/CommonDvars.h"
+#include "Core/Input.h"
 #include "Core/Log.h"
 
 // @TODO: refactor
 #include "Core/lua_script.h"
 #include "Graphics/MainRenderer.h"
-
-#include "imgui/backends/imgui_impl_glfw.h"
-#include "imgui/backends/imgui_impl_opengl3.h"
-
-#define GLFW_INCLUDE_NONE
-#include "GLFW/glfw3.h"
+#include "imgui/imgui.h"
 
 #define DEFINE_DVAR
 #include "Core/CommonDvars.h"
@@ -60,7 +56,7 @@ void Application::FinalizeManagers()
 
 extern void EditorSetup();
 
-bool Application::Run(int argc, const char** argv)
+int Application::Run(int argc, const char** argv)
 {
     for (int i = 1; i < argc; ++i)
     {
@@ -74,7 +70,7 @@ bool Application::Run(int argc, const char** argv)
 
     if (!ok)
     {
-        return false;
+        return -1;
     }
 
     vct::MainRenderer renderer;
@@ -83,8 +79,8 @@ bool Application::Run(int argc, const char** argv)
     while (!gWindowManager->ShouldClose())
     {
         gWindowManager->NewFrame();
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
+
+        Input::BeginFrame();
 
         ImGui::NewFrame();
         EditorSetup();
@@ -93,23 +89,19 @@ bool Application::Run(int argc, const char** argv)
         gSceneManager->Update(0.0f);
 
         renderer.render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        GLFWwindow* backup_current_context = glfwGetCurrentContext();
-        ImGui::UpdatePlatformWindows();
-        ImGui::RenderPlatformWindowsDefault();
-        glfwMakeContextCurrent(backup_current_context);
 
         gWindowManager->Present();
 
         Com_GetScene().dirty = false;
+
+        Input::EndFrame();
     }
 
     renderer.destroyGpuResources();
 
     FinalizeManagers();
 
-    return true;
+    return 0;
 }
 
 static void register_common_dvars()

@@ -1,11 +1,9 @@
 #include "editor.h"
 
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-
 #include "Engine/Core/CommonDvars.h"
 #include "Engine/Core/Check.h"
 #include "Engine/Core/DynamicVariable.h"
+#include "Engine/Core/Input.h"
 #include "Engine/Core/Log.h"
 #include "Engine/Graphics/r_cbuffers.h"
 #include "Engine/Math/Ray.h"
@@ -222,7 +220,7 @@ void Editor::DockSpace()
 void Editor::Update()
 {
     static bool hideUI = false;
-    if (ImGui::IsKeyPressed((ImGuiKey)GLFW_KEY_ESCAPE))
+    if (Input::IsKeyPressed(EKeyCode::ESCAPE))
     {
         hideUI = !hideUI;
     }
@@ -241,8 +239,9 @@ void Editor::Update()
     {
         auto [mouseX, mouseY] = gWindowManager->GetMousePos();
         auto [frameW, frameH] = gWindowManager->GetFrameSize();
-        if (ImGui::IsMouseClicked(GLFW_MOUSE_BUTTON_1))
+        if (Input::IsButtonPressed(EMouseButton::LEFT))
         {
+#if 0
             const Camera& camera = scene.camera;
 
             const mat4& PV = camera.ProjView();
@@ -257,7 +256,6 @@ void Editor::Update()
             Ray ray(rayStart, rayEnd);
 
             // @TODO: fix selection
-#if 0
             for (const auto& node : scene.geometryNodes)
             {
                 for (const auto& geom : node.geometries)
@@ -285,13 +283,13 @@ void Editor::Update()
             }
 #endif
         }
-        else if (ImGui::IsMouseClicked(GLFW_MOUSE_BUTTON_2))
+        else if (Input::IsButtonPressed(EMouseButton::RIGHT))
         {
             scene.selected = nullptr;
         }
     }
 
-    if (scene.selected && ImGui::IsKeyPressed((ImGuiKey)GLFW_KEY_DELETE))
+    if (scene.selected && Input::IsKeyPressed(EKeyCode::DELETE))
     {
         if (scene.selected->visible)
         {

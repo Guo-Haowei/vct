@@ -3,9 +3,11 @@
 #include "Application.h"
 #include "Core/CommonDvars.h"
 #include "Core/Check.h"
+#include "Core/Input.h"
 #include "Core/Log.h"
 
 #include "imgui/backends/imgui_impl_glfw.h"
+#include "imgui/backends/imgui_impl_opengl3.h"
 #include "GLFW/glfw3.h"
 
 WindowManager* gWindowManager = new WindowManager();
@@ -45,7 +47,25 @@ bool WindowManager::InitializeInternal()
     LOG_OK("GLFWwindow created {} x {}", size.x, size.y);
     glfwGetFramebufferSize(mWindow, &mFrameSize.x, &mFrameSize.y);
 
-    ImGui_ImplGlfw_InitForOpenGL(mWindow, true);
+    ImGui_ImplGlfw_InitForOpenGL(mWindow, false);
+
+    // glfwSetFramebufferSizeCallback(mGlfwWindow, [](GLFWwindow* window, int width, int height) {
+    //     auto data = reinterpret_cast<WindowData*>(glfwGetWindowUserPointer(window));
+    //     data->mWidth = width;
+    //     data->mHeight = height;
+    //     Event e = Event::Resize(width, height);
+    //     data->mFunc(e);
+    // });
+
+    glfwSetCursorPosCallback(mWindow, CursorPosCallback);
+    glfwSetMouseButtonCallback(mWindow, MouseButtonCallback);
+    glfwSetKeyCallback(mWindow, KeyCallback);
+    glfwSetScrollCallback(mWindow, ScrollCallback);
+
+    glfwSetWindowFocusCallback(mWindow, ImGui_ImplGlfw_WindowFocusCallback);
+    glfwSetCursorEnterCallback(mWindow, ImGui_ImplGlfw_CursorEnterCallback);
+    glfwSetCharCallback(mWindow, ImGui_ImplGlfw_CharCallback);
+
     return true;
 }
 
@@ -89,6 +109,8 @@ void WindowManager::NewFrame()
              int(mMousePos.x), int(mMousePos.y),
              ImGui::GetIO().Framerate);
     glfwSetWindowTitle(mWindow, buffer);
+
+    ImGui_ImplGlfw_NewFrame();
 }
 
 std::tuple<int, int> WindowManager::GetFrameSize()
@@ -103,6 +125,13 @@ std::tuple<float, float> WindowManager::GetMousePos()
 
 void WindowManager::Present()
 {
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    GLFWwindow* oldContext = glfwGetCurrentContext();
+    ImGui::UpdatePlatformWindows();
+    ImGui::RenderPlatformWindowsDefault();
+    glfwMakeContextCurrent(oldContext);
+
     glfwSwapBuffers(mWindow);
 }
 
@@ -120,3 +149,58 @@ bool WindowManager::IsMouseInScreen()
     inside &= mMousePos.y <= mFrameSize.y;
     return inside;
 }
+
+void WindowManager::CursorPosCallback(GLFWwindow* window, double x, double y)
+{
+    ImGui_ImplGlfw_CursorPosCallback(window, x, y);
+    if (!ImGui::GetIO().WantCaptureMouse)
+    {
+        Input::gInput.SetCursor(static_cast<float>(x), static_cast<float>(y));
+    }
+}
+
+void WindowManager::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+
+    if (!ImGui::GetIO().WantCaptureMouse)
+    {
+        if (action == GLFW_PRESS)
+        {
+            Input::gInput.SetButton(button, true);
+        }
+        else if (action == GLFW_RELEASE)
+        {
+            Input::gInput.SetButton(button, false);
+        }
+    }
+}
+
+void WindowManager::KeyCallback(GLFWwindow* window, int keycode, int scancode, int action, int mods)
+{
+    ImGui_ImplGlfw_KeyCallback(window, keycode, scancode, action, mods);
+
+    if (!ImGui::GetIO().WantCaptureKeyboard)
+    {
+        if (action == GLFW_PRESS)
+        {
+            Input::gInput.SetKey(keycode, true);
+        }
+        else if (action == GLFW_RELEASE)
+        {
+            Input::gInput.SetKey(keycode, false);
+        }
+    }
+}
+
+void WindowManager::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+
+    if (!ImGui::GetIO().WantCaptureMouse)
+    {
+        Input::gInput.SetWheel(static_cast<float>(xoffset), static_cast<float>(yoffset));
+    }
+}
+
+#include "imgui/backends/imgui_impl_glfw.cpp"

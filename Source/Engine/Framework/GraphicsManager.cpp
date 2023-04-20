@@ -36,7 +36,7 @@ bool GraphicsManager::InitializeInternal()
     }
 
     ImGui_ImplOpenGL3_Init();
-
+    ImGui_ImplOpenGL3_CreateDeviceObjects();
     return true;
 }
 

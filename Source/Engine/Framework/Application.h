@@ -23,7 +23,7 @@ public:
 
     Application(const InitInfo& info) : mInitInfo(info) {}
 
-    bool Run(int argc, const char** argv);
+    int Run(int argc, const char** argv);
     const InitInfo& GetInfo() const { return mInitInfo; }
 
 private:
