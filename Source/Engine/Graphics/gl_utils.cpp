@@ -1,7 +1,5 @@
 #include "gl_utils.h"
 
-#include <glad/glad.h>
-
 #include <filesystem>
 #include <set>
 

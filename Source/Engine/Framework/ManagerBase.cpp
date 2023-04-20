@@ -1,6 +1,5 @@
 #include "ManagerBase.h"
 
-#include "ManagerBase.h"
 #include "Core/Check.h"
 
 #define DEBUG_MANAGER_BASE(FMT, ...) LOG_DEBUG(__FUNCTION__ " " FMT, ##__VA_ARGS__)

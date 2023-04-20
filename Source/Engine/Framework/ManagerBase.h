@@ -1,5 +1,7 @@
 #pragma once
-#include "Types.h"
+#include "Core/Types.h"
+
+class Application;
 
 class ManagerBase
 {
@@ -25,4 +27,7 @@ protected:
 
     const char* mName = nullptr;
     bool mInitialized = false;
+    Application* mApplication = nullptr;
+
+    friend class Application;
 };

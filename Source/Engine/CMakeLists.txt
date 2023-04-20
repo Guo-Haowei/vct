@@ -7,6 +7,11 @@ file(GLOB SRC_CORE
     "Core/*.cpp"
 )
 
+file(GLOB SRC_FRAMEWORK
+    "Framework/*.h"
+    "Framework/*.cpp"
+)
+
 file(GLOB SRC_GRAPHICS
     "Graphics/*.h"
     "Graphics/*.cpp"
@@ -27,6 +32,7 @@ set(LIB_NAME Engine)
 add_library(${LIB_NAME} STATIC
     ${SRC_CONTAINER}
     ${SRC_CORE}
+    ${SRC_FRAMEWORK}
     ${SRC_GRAPHICS}
     ${SRC_MATH}
     ${SRC_SCENE}
@@ -34,8 +40,9 @@ add_library(${LIB_NAME} STATIC
 
 source_group("Container"    FILES ${SRC_CONTAINER})
 source_group("Core"         FILES ${SRC_CORE})
+source_group("Framework"    FILES ${SRC_FRAMEWORK})
 source_group("Graphics"     FILES ${SRC_GRAPHICS})
-source_group("Math"     FILES ${SRC_MATH})
+source_group("Math"         FILES ${SRC_MATH})
 source_group("Scene"        FILES ${SRC_SCENE})
 
 target_include_directories(${LIB_NAME} PUBLIC
@@ -47,7 +54,6 @@ target_include_directories(${LIB_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/External/bullet
     ${PROJECT_SOURCE_DIR}/External/imgui
     ${PROJECT_SOURCE_DIR}/External
-    ${PROJECT_SOURCE_DIR}/Source/Engine/Core
     ${PROJECT_SOURCE_DIR}/Source/Engine
     ${PROJECT_SOURCE_DIR}/Source/
 )

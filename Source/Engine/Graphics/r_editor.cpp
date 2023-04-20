@@ -1,13 +1,13 @@
 #include "r_editor.h"
 
 #include "GpuTexture.h"
-#include "Program.h"
 
-#include "Core/com_misc.h"
+#include "Core/Check.h"
 #include "Core/geometry.h"
+#include "Framework/ProgramManager.h"
+#include "Framework/SceneManager.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"
-#include "Core/Check.h"
 
 struct VertexPoint3D
 {

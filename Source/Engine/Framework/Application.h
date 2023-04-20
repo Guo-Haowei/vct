@@ -13,14 +13,27 @@ using CommandLine = std::list<std::string>;
 class Application
 {
 public:
-    bool Run(int argc, const char** argv);
+    struct InitInfo
+    {
+        const char* title;
+        uint32_t width;
+        uint32_t height;
+        bool frameless;
+    };
+
+    Application(const InitInfo& info) : mInitInfo(info) {}
+
+    int Run(int argc, const char** argv);
+    const InitInfo& GetInfo() const { return mInitInfo; }
 
 private:
     bool ProcessCmdLine();
+    void RegisterManager(ManagerBase* manager);
     bool RegisterManagers();
     bool InitializeManagers();
     void FinalizeManagers();
 
+    InitInfo mInitInfo;
     CommandLine mCommandLine;
     std::vector<ManagerBase*> mManagers;
 };

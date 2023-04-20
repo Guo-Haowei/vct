@@ -1,7 +1,6 @@
 #pragma once
 #include "MainRenderer.h"
 
-#include "Program.h"
 #include "r_defines.h"
 #include "r_editor.h"
 #include "r_passes.h"
@@ -11,10 +10,10 @@
 #include "Core/Check.h"
 #include "Core/CommonDvars.h"
 #include "Core/DynamicVariable.h"
-#include "Core/com_misc.h"
-#include "Core/editor.h"
 #include "Core/geometry.h"
-#include "Core/WindowManager.h"
+#include "Framework/SceneManager.h"
+#include "Framework/ProgramManager.h"
+#include "Framework/WindowManager.h"
 
 static std::vector<std::shared_ptr<MeshData>> g_meshdata;
 static std::vector<std::shared_ptr<MaterialData>> g_materialdata;

@@ -1,7 +1,7 @@
 #include "r_rendertarget.h"
 
 #include "Core/CommonDvars.h"
-#include "Core/WindowManager.h"
+#include "Framework/WindowManager.h"
 #include "r_cbuffers.h"
 #include "Core/Check.h"
 #include "Core/DynamicVariable.h"

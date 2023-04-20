@@ -27,6 +27,11 @@ protected:
     void FinalizeInternal();
 
 private:
+    static void CursorPosCallback(GLFWwindow* window, double x, double y);
+    static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+    static void KeyCallback(GLFWwindow* window, int keycode, int scancode, int action, int mods);
+    static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+
     GLFWwindow* mWindow = nullptr;
     struct
     {
