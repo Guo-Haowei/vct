@@ -9,6 +9,7 @@
 #include "Core/CommonDvars.h"
 #include "Core/Input.h"
 #include "Core/Log.h"
+#include "Core/JobSystem.h"
 
 // @TODO: refactor
 #include "Core/lua_script.h"
@@ -17,6 +18,25 @@
 
 #define DEFINE_DVAR
 #include "Core/CommonDvars.h"
+
+class JobSystemManager : public ManagerBase
+{
+public:
+    JobSystemManager() : ManagerBase("JobSystemManager") {}
+
+protected:
+    virtual bool InitializeInternal() override
+    {
+        return jobsystem::initialize();
+    }
+
+    virtual void FinalizeInternal() override
+    {
+        jobsystem::finalize();
+    }
+};
+
+static JobSystemManager gJobSystemManager;
 
 void Application::RegisterManager(ManagerBase* manager)
 {
@@ -27,6 +47,7 @@ void Application::RegisterManager(ManagerBase* manager)
 bool Application::RegisterManagers()
 {
     RegisterManager(LogManager::GetSingletonPtr());
+    RegisterManager(&gJobSystemManager);
     RegisterManager(gUIManager);
     RegisterManager(gWindowManager);
     RegisterManager(gGraphicsManager);

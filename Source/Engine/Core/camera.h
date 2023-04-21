@@ -28,3 +28,5 @@ private:
     mat4 mView;
     mat4 mProjView;
 };
+
+extern Camera gCamera;

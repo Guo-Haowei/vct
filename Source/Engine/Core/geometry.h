@@ -1,5 +1,5 @@
 #pragma once
-#include "scene_components.h"
+#include "Scene/MeshComponent.h"
 
 namespace geometry
 {

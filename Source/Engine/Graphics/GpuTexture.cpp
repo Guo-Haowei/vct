@@ -65,11 +65,11 @@ void GpuTexture::create3DEmpty(const Texture3DCreateInfo& info)
     glTexStorage3D(m_type, info.mipLevel, m_format, info.size, info.size, info.size);
 }
 
-void GpuTexture::create2DImageFromFile(const char* path)
+void GpuTexture::Create2DImageFromFile(const std::string& path)
 {
     m_type = GL_TEXTURE_2D;
     int width, height, channel;
-    unsigned char* image = stbi_load(path, &width, &height, &channel, 4);
+    unsigned char* image = stbi_load(path.c_str(), &width, &height, &channel, 4);
 
     if (!image)
     {

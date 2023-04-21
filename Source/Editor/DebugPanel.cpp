@@ -1,5 +1,7 @@
 #include "DebugPanel.h"
 
+#include "Engine/Core/camera.h"
+
 #include "Engine/Core/CommonDvars.h"
 #include "Engine/Framework/SceneManager.h"
 #include "Engine/Graphics/r_defines.h"
@@ -45,7 +47,7 @@ static const char* DrawTextureToStr(int mode)
 void DebugPanel::RenderInternal()
 {
     Scene& scene = Com_GetScene();
-    const Camera& camera = scene.camera;
+    const Camera& camera = gCamera;
     bool dirty = false;
 
     const vec3& eye = camera.position;

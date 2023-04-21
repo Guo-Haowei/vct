@@ -43,8 +43,8 @@ static void CreateBoxWireFrameData()
 {
     std::vector<VertexPoint3D> vertices;
     const MeshComponent box = geometry::MakeBoxWireFrame();
-    vertices.reserve(box.positions.size());
-    for (const vec3& pos : box.positions)
+    vertices.reserve(box.mPositions.size());
+    for (const vec3& pos : box.mPositions)
     {
         vertices.emplace_back(VertexPoint3D{ pos, vec3(1) });
     }
@@ -58,7 +58,7 @@ static void CreateBoxWireFrameData()
     glBindBuffer(GL_ARRAY_BUFFER, mesh.vbos[0]);
 
     gl::NamedBufferStorage(mesh.vbos[0], vertices);
-    gl::NamedBufferStorage(mesh.ebo, box.indices);
+    gl::NamedBufferStorage(mesh.ebo, box.mIndices);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexPoint3D), (void*)0);
     glEnableVertexAttribArray(0);
@@ -67,7 +67,7 @@ static void CreateBoxWireFrameData()
 
     glBindVertexArray(0);
 
-    g_boxWireFrame.count = uint32_t(box.indices.size());
+    g_boxWireFrame.count = uint32_t(box.mIndices.size());
 }
 
 void R_CreateEditorResource()
@@ -107,39 +107,39 @@ static inline void FillTextureIconBuffer(std::vector<TextureVertex>& iconBuffer,
 // draw grid, bounding box, ui
 void R_DrawEditor()
 {
-    const Scene& scene = Com_GetScene();
+    // const Scene& scene = Com_GetScene();
 
-    if (const Geometry* node = scene.selected)
-    {
-        const AABB box = node->boundingBox;
-        const mat4 M = glm::translate(mat4(1), box.Center()) * glm::scale(mat4(1), box.Size());
+    // if (const Geometry* node = scene.selected)
+    // {
+    //     const AABB box = node->boundingBox;
+    //     const mat4 M = glm::translate(mat4(1), box.Center()) * glm::scale(mat4(1), box.Size());
 
-        gProgramManager->GetShaderProgram(ProgramType::LINE3D).Bind();
-        glBindVertexArray(g_boxWireFrame.vao);
-        g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
-        g_perBatchCache.cache.Model = mat4(1);
-        g_perBatchCache.Update();
-        glDrawElements(GL_LINES, g_boxWireFrame.count, GL_UNSIGNED_INT, 0);
-    }
+    //     gProgramManager->GetShaderProgram(ProgramType::LINE3D).Bind();
+    //     glBindVertexArray(g_boxWireFrame.vao);
+    //     g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
+    //     g_perBatchCache.cache.Model = mat4(1);
+    //     g_perBatchCache.Update();
+    //     glDrawElements(GL_LINES, g_boxWireFrame.count, GL_UNSIGNED_INT, 0);
+    // }
 
-    // draw light
-    const Light& light = scene.light;
-    const Camera& camera = scene.camera;
+    // // draw light
+    // const Light& light = scene.light;
+    // const Camera& camera = scene.camera;
 
-    constexpr float distance = 10.0f;
-    vec4 lightPos = vec4(light.direction * distance, 1.0);
-    lightPos = camera.ProjView() * lightPos;
-    if (lightPos.z > 0.0f)
-    {
-        lightPos /= lightPos.w;
-        const vec2 lightPos2d(camera.Proj() * lightPos);
-        std::vector<TextureVertex> iconBuffer;
+    // constexpr float distance = 10.0f;
+    // vec4 lightPos = vec4(light.direction * distance, 1.0);
+    // lightPos = camera.ProjView() * lightPos;
+    // if (lightPos.z > 0.0f)
+    // {
+    //     lightPos /= lightPos.w;
+    //     const vec2 lightPos2d(camera.Proj() * lightPos);
+    //     std::vector<TextureVertex> iconBuffer;
 
-        FillTextureIconBuffer(iconBuffer, lightPos2d, camera.GetAspect());
-        glNamedBufferData(g_imageBuffer.vbos[0], sizeof(TextureVertex) * iconBuffer.size(), iconBuffer.data(), GL_STREAM_DRAW);
+    //     FillTextureIconBuffer(iconBuffer, lightPos2d, camera.GetAspect());
+    //     glNamedBufferData(g_imageBuffer.vbos[0], sizeof(TextureVertex) * iconBuffer.size(), iconBuffer.data(), GL_STREAM_DRAW);
 
-        gProgramManager->GetShaderProgram(ProgramType::IMAGE2D).Bind();
-        glBindVertexArray(g_imageBuffer.vao);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-    }
+    //     gProgramManager->GetShaderProgram(ProgramType::IMAGE2D).Bind();
+    //     glBindVertexArray(g_imageBuffer.vao);
+    //     glDrawArrays(GL_TRIANGLES, 0, 6);
+    // }
 }

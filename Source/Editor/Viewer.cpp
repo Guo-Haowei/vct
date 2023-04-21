@@ -9,6 +9,7 @@
 #include "imgui/imgui_internal.h"
 
 // @TODO: refactor
+#include "Engine/Core/camera.h"
 extern uint32_t gFinalImage;
 
 static void ControlCamera(Camera& camera);
@@ -17,17 +18,14 @@ void Viewer::Update(float dt)
 {
     if (IsFocused())
     {
-        Scene& scene = Com_GetScene();
-        Camera& camera = scene.camera;
-        ControlCamera(camera);
+        ControlCamera(gCamera);
     }
 }
 
 static void ray_cast(const vec2& point)
 {
-    ImGuiIO& io = ImGui::GetIO();
     Scene& scene = Com_GetScene();
-    const Camera& camera = scene.camera;
+    const Camera& camera = gCamera;
     const mat4& PV = camera.ProjView();
     const mat4 invPV = glm::inverse(PV);
 
@@ -36,59 +34,13 @@ static void ray_cast(const vec2& point)
     vec3 rayEnd = rayStart + direction * camera.zFar;
     Ray ray(rayStart, rayEnd);
 
-    // WIP: Ray casting
-    for (const auto& node : scene.geometryNodes)
+    const auto intersectionResult = scene.Intersects(ray);
+
+    if (intersectionResult.entity.IsValid())
     {
-        for (const auto& geom : node.geometries)
-        {
-            if (!geom.visible)
-            {
-                continue;
-            }
-            const AABB& box = geom.boundingBox;
-            const auto& mesh = geom.mesh;
-            if (ray.Intersects(box))
-            {
-                for (uint32_t idx = 0; idx < mesh->indices.size();)
-                {
-                    const vec3& a = mesh->positions[mesh->indices[idx++]];
-                    const vec3& b = mesh->positions[mesh->indices[idx++]];
-                    const vec3& c = mesh->positions[mesh->indices[idx++]];
-                    if (ray.Intersects(a, b, c))
-                    {
-                        scene.selected = &geom;
-                        LOG_INFO("SELECTED");
-                    }
-                }
-            }
-        }
+        LOG_INFO("{} SELECTED", intersectionResult.entity.GetID());
     }
 }
-
-#if 0
-
-    // select object
-    {
-        {
-        }
-        else if (Input::IsButtonPressed(EMouseButton::RIGHT))
-        {
-            scene.selected = nullptr;
-        }
-    }
-
-    if (scene.selected && Input::IsKeyPressed(EKeyCode::DELETE))
-    {
-        if (scene.selected->visible)
-        {
-            LOG_WARN("material {} deleted", scene.selected->mesh->name);
-
-            scene.selected->visible = false;
-            scene.dirty = true;
-            scene.selected = nullptr;
-        }
-    }
-#endif
 
 void Viewer::RenderInternal()
 {
@@ -118,11 +70,9 @@ void Viewer::RenderInternal()
             clicked *= 2.0f;
             clicked -= 1.0f;
             ray_cast(clicked);
-            LOG_INFO("Left button clicked {}, {}", clicked.x, clicked.y);
         }
     }
 
-    ImGuiWindow* window = GImGui->CurrentWindow;
     ImVec2 topLeft = GImGui->CurrentWindow->ContentRegionRect.Min;
     ImVec2 bottomRight(topLeft.x + contentSize.x, topLeft.y + contentSize.y);
 

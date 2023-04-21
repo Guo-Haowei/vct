@@ -1,5 +1,7 @@
 #include "camera.h"
 
+Camera gCamera;
+
 vec3 Camera::direction() const
 {
     return vec3(

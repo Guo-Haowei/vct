@@ -65,11 +65,7 @@ target_compile_definitions(${LIB_NAME} PUBLIC
 
 target_link_libraries(${LIB_NAME} PUBLIC imgui glfw glad lua fmt)
 
-if(MSVC)
-    target_compile_options(${LIB_NAME} PRIVATE /W4)
-else()
-    target_compile_options(${LIB_NAME} PRIVATE -Wall -Wextra -Wpedantic -Werror)
-endif()
+target_compile_options(${LIB_NAME} PRIVATE /W4)
 
 # @TODO: move to plugin
 if(MSVC)

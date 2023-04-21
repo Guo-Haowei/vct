@@ -6,6 +6,10 @@ bool Panel::IsFocused() const
 {
     ImGuiContext& g = *GImGui;
     ImGuiWindow* focusedWindow = g.NavWindow;
+    if (!focusedWindow)
+    {
+        return false;
+    }
     return strcmp(mName.c_str(), focusedWindow->Name) == 0;
 }
 
