@@ -134,8 +134,11 @@ void EditorLayer::Update(float dt)
 
 void EditorLayer::Render()
 {
+    Scene& scene = Com_GetScene();
     for (auto& it : mPanels)
     {
-        it->Render(Com_GetScene());
+        it->Render(scene);
     }
+
+    scene.mSelected = mSelected;
 }

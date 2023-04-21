@@ -107,19 +107,31 @@ static inline void FillTextureIconBuffer(std::vector<TextureVertex>& iconBuffer,
 // draw grid, bounding box, ui
 void R_DrawEditor()
 {
-    // const Scene& scene = Com_GetScene();
+    const Scene& scene = Com_GetScene();
+    auto selected = scene.mSelected;
+    if (selected.IsValid())
+    {
+        auto transformComponent = scene.GetComponent<TransformComponent>(selected);
+        check(transformComponent);
+        auto objComponent = scene.GetComponent<ObjectComponent>(selected);
+        check(objComponent);
+        auto meshComponent = scene.GetComponent<MeshComponent>(objComponent->meshID);
+        check(meshComponent);
+        AABB aabb = meshComponent->mLocalBound;
+        aabb.ApplyMatrix(transformComponent->GetWorldMatrix());
+
+        const mat4 M = glm::translate(mat4(1), aabb.Center()) * glm::scale(mat4(1), aabb.Size());
+
+        gProgramManager->GetShaderProgram(ProgramType::LINE3D).Bind();
+        glBindVertexArray(g_boxWireFrame.vao);
+        g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
+        g_perBatchCache.cache.Model = mat4(1);
+        g_perBatchCache.Update();
+        glDrawElements(GL_LINES, g_boxWireFrame.count, GL_UNSIGNED_INT, 0);
+    }
 
     // if (const Geometry* node = scene.selected)
     // {
-    //     const AABB box = node->boundingBox;
-    //     const mat4 M = glm::translate(mat4(1), box.Center()) * glm::scale(mat4(1), box.Size());
-
-    //     gProgramManager->GetShaderProgram(ProgramType::LINE3D).Bind();
-    //     glBindVertexArray(g_boxWireFrame.vao);
-    //     g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
-    //     g_perBatchCache.cache.Model = mat4(1);
-    //     g_perBatchCache.Update();
-    //     glDrawElements(GL_LINES, g_boxWireFrame.count, GL_UNSIGNED_INT, 0);
     // }
 
     // // draw light
