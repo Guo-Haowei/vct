@@ -1,5 +1,7 @@
 #include "PropertiyPanel.h"
-#if 0
+
+#include "Engine/Scene/Scene.h"
+#include "imgui/imgui_internal.h"
 #include "ImGuizmo/ImGuizmo.h"
 
 static constexpr float DEFAULT_COLUMN_WIDTH = 100.0f;
@@ -49,7 +51,6 @@ static void DrawComponent(const std::string& name, T* component, UIFunction uiFu
         }
     }
 }
-
 
 static bool draw_vec3_control(const std::string& label, glm::vec3& values, float resetValue, float columnWidth)
 {
@@ -139,159 +140,151 @@ static bool draw_drag_float(const char* tag, float* p, float speed, float min, f
     return dirty;
 }
 
-void SceneHierarchyPanel::DrawPropertiesPanel(Scene& scene)
+void PropertyPanel::RenderInternal(Scene& scene)
 {
-    do
+    ecs::Entity id = *mpSelected;
+
+    if (!id.IsValid())
     {
-        if (!ImGui::Begin("Properties"))
+        return;
+    }
+
+    TagComponent* tagComponent = scene.GetComponent<TagComponent>(id);
+    if (!tagComponent)
+    {
+        LOG_WARN("Entity {} does not have name", id.GetID());
+        return;
+    }
+
+    TagComponent::TagString tag = tagComponent->GetTag();
+    if (ImGui::InputText("##Tag", tag.data(), tag.capacity(), ImGuiInputTextFlags_EnterReturnsTrue))
+    {
+        tagComponent->GetTagRef() = tag;
+    }
+
+    ImGui::SameLine();
+    ImGui::PushItemWidth(-1);
+    if (ImGui::Button("Add Component"))
+    {
+        ImGui::OpenPopup("AddComponentPopup");
+    }
+
+    if (ImGui::BeginPopup("AddComponentPopup"))
+    {
+        if (ImGui::MenuItem("Rigid Body"))
         {
-            break;
+            LOG_ERROR("TODO: implement add component");
+            ImGui::CloseCurrentPopup();
         }
-        ecs::Entity id = *m_pSelected;
+        ImGui::EndPopup();
+    }
 
-        if (!id.IsValid())
+#if 0
+    LightComponent* lightComponent = scene.GetComponent<LightComponent>(id);
+    DrawComponent("Light", lightComponent, [&](LightComponent& light) {
+        ImGui::Text("Light Component");
+        ImGui::DragFloat3("color:", &light.color.x);
+        ImGui::DragFloat("energy:", &light.energy);
+    });
+#endif
+
+    TransformComponent* transformComponent = scene.GetComponent<TransformComponent>(id);
+    DrawComponent("Transform", transformComponent, [&](TransformComponent& transform) {
+        mat4 transformMatrix = transform.GetLocalMatrix();
+        vec3 translation;
+        vec3 rotation;
+        vec3 scale;
+        ImGuizmo::DecomposeMatrixToComponents(
+            glm::value_ptr(transformMatrix),
+            glm::value_ptr(translation),
+            glm::value_ptr(rotation),
+            glm::value_ptr(scale));
+
+        bool dirty = false;
+        bool wantTranslation = false, wantRotation = false, wantScale = false;
+        // if (lightComponent)
+        // {
+        //     switch (lightComponent->type)
+        //     {
+        //         case LIGHT_TYPE_POINT:
+        //             wantTranslation = true;
+        //             break;
+        //         case LIGHT_TYPE_OMNI:
+        //             wantRotation = true;
+        //             break;
+        //         default:
+        //             break;
+        //     }
+        // }
+        // else
         {
-            break;
+            wantTranslation = wantRotation = wantScale = true;
         }
 
-        TagComponent* tagComponent = scene.GetComponent<TagComponent>(id);
-        if (!tagComponent)
+        if (wantTranslation)
         {
-            LOG_WARN("Entity {} does not have name", id.GetID());
-            break;
+            dirty |= draw_vec3_control("translation", translation);
         }
-
-        TagComponent::TagString tag = tagComponent->GetTag();
-        if (ImGui::InputText("##Tag", tag.data(), tag.capacity(), ImGuiInputTextFlags_EnterReturnsTrue))
+        if (wantRotation)
         {
-            tagComponent->GetTagRef() = tag;
+            dirty |= draw_vec3_control("rotation", rotation);
         }
-
-        ImGui::SameLine();
-        ImGui::PushItemWidth(-1);
-        if (ImGui::Button("Add Component"))
+        if (wantScale)
         {
-            ImGui::OpenPopup("AddComponentPopup");
+            dirty |= draw_vec3_control("scale", scale, 1.0f);
         }
-
-        if (ImGui::BeginPopup("AddComponentPopup"))
+        if (dirty)
         {
-            if (ImGui::MenuItem("Rigid Body"))
-            {
-                LOG_ERROR("TODO: implement add component");
-                ImGui::CloseCurrentPopup();
-            }
-            ImGui::EndPopup();
-        }
-
-        LightComponent* lightComponent = scene.GetComponent<LightComponent>(id);
-        DrawComponent("Light", lightComponent, [&](LightComponent& light) {
-            ImGui::Text("Light Component");
-            ImGui::DragFloat3("color:", &light.color.x);
-            ImGui::DragFloat("energy:", &light.energy);
-        });
-
-        TransformComponent* transformComponent = scene.GetComponent<TransformComponent>(id);
-        DrawComponent("Transform", transformComponent, [&](TransformComponent& transform) {
-            mat4 transformMatrix = transform.GetLocalMatrix();
-            vec3 translation;
-            vec3 rotation;
-            vec3 scale;
-            ImGuizmo::DecomposeMatrixToComponents(
-                glm::value_ptr(transformMatrix),
+            ImGuizmo::RecomposeMatrixFromComponents(
                 glm::value_ptr(translation),
                 glm::value_ptr(rotation),
-                glm::value_ptr(scale));
+                glm::value_ptr(scale),
+                glm::value_ptr(transformMatrix));
+            transform.SetLocalTransform(transformMatrix);
+        }
+    });
 
-            bool dirty = false;
-            bool wantTranslation = false, wantRotation = false, wantScale = false;
-            if (lightComponent)
-            {
-                switch (lightComponent->type)
-                {
-                    case LIGHT_TYPE_POINT:
-                        wantTranslation = true;
-                        break;
-                    case LIGHT_TYPE_OMNI:
-                        wantRotation = true;
-                        break;
-                    default:
-                        break;
-                }
+    RigidBodyPhysicsComponent* rigidBodyComponent = scene.GetComponent<RigidBodyPhysicsComponent>(id);
+    DrawComponent("RigidBody", rigidBodyComponent, [](RigidBodyPhysicsComponent& rigidbody) {
+        switch (rigidbody.shape)
+        {
+            case RigidBodyPhysicsComponent::BOX: {
+                const auto& half = rigidbody.param.box.halfExtent;
+                ImGui::Text("shape: box");
+                ImGui::Text("half size: %.2f, %.2f, %.2f", half.x, half.y, half.z);
+                break;
             }
-            else
-            {
-                wantTranslation = wantRotation = wantScale = true;
-            }
+            default:
+                break;
+        }
+    });
 
-            if (wantTranslation)
-            {
-                dirty |= draw_vec3_control("translation", translation);
-            }
-            if (wantRotation)
-            {
-                dirty |= draw_vec3_control("rotation", rotation);
-            }
-            if (wantScale)
-            {
-                dirty |= draw_vec3_control("scale", scale, 1.0f);
-            }
-            if (dirty)
-            {
-                ImGuizmo::RecomposeMatrixFromComponents(
-                    glm::value_ptr(translation),
-                    glm::value_ptr(rotation),
-                    glm::value_ptr(scale),
-                    glm::value_ptr(transformMatrix));
-                transform.SetLocalTransform(transformMatrix);
-            }
-        });
+    CameraComponent* cameraComponent = scene.GetComponent<CameraComponent>(id);
+    DrawComponent("Camera", cameraComponent, [](CameraComponent& camera) {
+        const float width = 50.0f;
+        float fovy = glm::degrees(camera.fovy);
+        draw_drag_float("fovy", &fovy, 1.0f, 20.0f, 90.0f, width);
+        draw_drag_float("near", &camera.zNear, 0.1f, 0.1f, 10.0f, width);
+        draw_drag_float("far", &camera.zFar, 10.0f, 10.0f, 5000.0f, width);
+        camera.fovy = glm::radians(fovy);
+    });
 
-        RigidBodyPhysicsComponent* rigidBodyComponent = scene.GetComponent<RigidBodyPhysicsComponent>(id);
-        DrawComponent("RigidBody", rigidBodyComponent, [](RigidBodyPhysicsComponent& rigidbody) {
-            switch (rigidbody.shape)
-            {
-                case RigidBodyPhysicsComponent::BOX: {
-                    const auto& half = rigidbody.param.box.halfExtent;
-                    ImGui::Text("shape: box");
-                    ImGui::Text("half size: %.2f, %.2f, %.2f", half.x, half.y, half.z);
-                    break;
-                }
-                default:
-                    break;
-            }
-        });
-
-        CameraComponent* cameraComponent = scene.GetComponent<CameraComponent>(id);
-        DrawComponent("Camera", cameraComponent, [](CameraComponent& camera) {
-            const float width = 50.0f;
-            float fovy = glm::degrees(camera.fovy);
-            draw_drag_float("fovy", &fovy, 1.0f, 20.0f, 90.0f, width);
-            draw_drag_float("near", &camera.zNear, 0.1f, 0.1f, 10.0f, width);
-            draw_drag_float("far", &camera.zFar, 10.0f, 10.0f, 5000.0f, width);
-            camera.fovy = glm::radians(fovy);
-        });
-
-        ObjectComponent* objectComponent = scene.GetComponent<ObjectComponent>(id);
-        DrawComponent("Object", objectComponent, [&](ObjectComponent& object) {
-            MeshComponent* mesh = scene.GetComponent<MeshComponent>(object.meshID);
-            TagComponent* meshName = scene.GetComponent<TagComponent>(object.meshID);
-            ImGui::Text("Mesh Component (%d)", object.meshID);
-            if (mesh)
-            {
-                const char* meshNameStr = meshName ? meshName->GetTag().c_str() : "untitled";
-                ImGui::Text("mesh %s (%zu submesh)", meshNameStr, mesh->mSubsets.size());
-                ImGui::Text("%zu triangles", mesh->mIndices.size() / 3);
-                ImGui::Text("v:%zu, n:%zu, u:%zu, b:%zu",
-                            mesh->mPositions.size(),
-                            mesh->mNormals.size(),
-                            mesh->mTexcoords_0.size(),
-                            mesh->mWeights_0.size());
-                // @TODO: armature
-            }
-        });
-    } while (0);
-
-    ImGui::End();
+    ObjectComponent* objectComponent = scene.GetComponent<ObjectComponent>(id);
+    DrawComponent("Object", objectComponent, [&](ObjectComponent& object) {
+        MeshComponent* mesh = scene.GetComponent<MeshComponent>(object.meshID);
+        TagComponent* meshName = scene.GetComponent<TagComponent>(object.meshID);
+        ImGui::Text("Mesh Component (%d)", object.meshID);
+        if (mesh)
+        {
+            const char* meshNameStr = meshName ? meshName->GetTag().c_str() : "untitled";
+            ImGui::Text("mesh %s (%zu submesh)", meshNameStr, mesh->mSubsets.size());
+            ImGui::Text("%zu triangles", mesh->mIndices.size() / 3);
+            ImGui::Text("v:%zu, n:%zu, u:%zu, b:%zu",
+                        mesh->mPositions.size(),
+                        mesh->mNormals.size(),
+                        mesh->mTexcoords_0.size(),
+                        mesh->mWeights_0.size());
+            // @TODO: armature
+        }
+    });
 }
-#endif

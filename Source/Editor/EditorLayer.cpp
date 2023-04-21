@@ -3,6 +3,7 @@
 #include "ConsolePanel.h"
 #include "DebugPanel.h"
 #include "HierarchyPanel.h"
+#include "PropertiyPanel.h"
 #include "Viewer.h"
 
 #include "Engine/Core/CommonDvars.h"
@@ -19,11 +20,15 @@
 EditorLayer::EditorLayer() : Layer("EditorLayer")
 {
     auto hierarchyPanel = std::make_shared<HierarchyPanel>();
+    auto propertyPanel = std::make_shared<PropertyPanel>();
+    hierarchyPanel->SetSelectedRef(&mSelected);
+    propertyPanel->SetSelectedRef(&mSelected);
+
     mPanels.emplace_back(std::make_shared<ConsolePanel>());
     mPanels.emplace_back(std::make_shared<DebugPanel>());
     mPanels.emplace_back(hierarchyPanel);
+    mPanels.emplace_back(propertyPanel);
     mPanels.emplace_back(std::make_shared<Viewer>());
-    hierarchyPanel->SetSelectedRef(&mSelected);
 }
 
 void EditorLayer::DockSpace()

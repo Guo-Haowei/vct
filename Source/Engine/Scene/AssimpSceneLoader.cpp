@@ -15,28 +15,27 @@ using std::string;
 using std::vector;
 namespace fs = std::filesystem;
 
-void SceneLoader::LoadGLTF(const char* fullpath, const mat4& transform, bool flipUVs)
+void SceneLoader::LoadGLTF(const char* path, bool flipUVs)
 {
     Assimp::Importer importer;
 
     unsigned int flag = aiProcess_CalcTangentSpace | aiProcess_Triangulate;
     flag |= flipUVs ? aiProcess_FlipUVs : 0;
-    const aiScene* aiscene = importer.ReadFile(fullpath, flag);
+    const aiScene* aiscene = importer.ReadFile(path, flag);
 
     // check for errors
     if (!aiscene || aiscene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !aiscene->mRootNode)  // if is Not Zero
     {
-        LOG_ERROR("[assimp] failed to load scene '{}'\n\tdetails: {}", fullpath, importer.GetErrorString());
+        LOG_ERROR("[assimp] failed to load scene '{}'\n\tdetails: {}", path, importer.GetErrorString());
     }
 
     const uint32_t numMeshes = aiscene->mNumMeshes;
     const uint32_t numMaterials = aiscene->mNumMaterials;
 
-    LOG_DEBUG("scene '{}' has {} meshes, {} materials", fullpath, numMeshes, numMaterials);
+    LOG_DEBUG("scene '{}' has {} meshes, {} materials", path, numMeshes, numMaterials);
 
-    mCurrentPath = fs::path(fullpath).parent_path().string() + "/";
-
-    size_t materialOffset = mScene.GetCount<MaterialComponent>();
+    fs::path fullpath = fs::path(path);
+    mCurrentPath = fullpath.parent_path().string() + "/";
 
     for (uint32_t i = 0; i < numMaterials; ++i)
     {
@@ -49,13 +48,14 @@ void SceneLoader::LoadGLTF(const char* fullpath, const mat4& transform, bool fli
     }
 
     ecs::Entity root = ProcessNode(aiscene->mRootNode, ecs::Entity::INVALID);
-    mScene.GetComponent<TagComponent>(root)->SetTag("Model");
+    mScene.GetComponent<TagComponent>(root)->SetTag(fullpath.filename().string());
 
     mScene.mRoot = root;
     // scene bounding box
     mScene.Update(0.0f);
     mScene.bound.MakeInvalid();
 
+    // @TODO: refactor
     const uint32_t numObjects = (uint32_t)mScene.GetCount<ObjectComponent>();
     for (uint32_t i = 0; i < numObjects; ++i)
     {
@@ -181,7 +181,7 @@ ecs::Entity SceneLoader::ProcessNode(const aiNode* node, ecs::Entity parent)
 
         for (uint32_t i = 0; i < node->mNumMeshes; ++i)
         {
-            ecs::Entity child = mScene.Entity_CreateObject("SubGeometry::" + key);
+            ecs::Entity child = mScene.Entity_CreateObject("SubGeometry_" + std::to_string(i + 1));
             ObjectComponent& objComponent = *mScene.GetComponent<ObjectComponent>(child);
             objComponent.meshID = mMeshes[node->mMeshes[i]];
             mScene.Component_Attach(child, entity);

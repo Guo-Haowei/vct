@@ -1,7 +1,6 @@
 #include "DynamicVariableBegin.h"
 
 DVAR_STRING(scene, "");
-DVAR_FLOAT(scene_scale, 1.0f);
 
 // camera
 DVAR_VEC3(cam_pos, -8.f, 2.f, 0.f);

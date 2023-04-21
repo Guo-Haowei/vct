@@ -1,8 +1,5 @@
 local windowScale = 1;
 
--- scene
-Dvar.SetFloat('scene_scale', 0.01);
-
 -- graphics
 Dvar.SetInt('r_voxelSize', 64);
 Dvar.SetInt('r_shadowRes', 1024 * 8);

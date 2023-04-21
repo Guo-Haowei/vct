@@ -3,8 +3,6 @@
 
 #include "Engine/Scene/Entity.h"
 
-class Scene;
-
 class HierarchyPanel : public Panel
 {
 public:
