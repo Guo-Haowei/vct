@@ -212,6 +212,8 @@ void FinalImageRT::Create(int width, int height)
     GLuint attachments[1] = { GL_COLOR_ATTACHMENT0 };
     glDrawBuffers(1, attachments);
 
+    // CreateDepthAttachment();
+
     CheckError();
     Unbind();
 }
@@ -221,6 +223,7 @@ GBuffer g_gbufferRT;
 SsaoRT g_ssaoRT;
 FinalImageRT g_finalImageRT;
 FinalImageRT g_fxaaRT;
+FinalImageRT g_viewerRT;
 
 uint32_t gFinalImage;
 
@@ -237,8 +240,9 @@ void R_CreateRT()
     g_ssaoRT.Create(w, h);
     g_finalImageRT.Create(w, h);
     g_fxaaRT.Create(w, h);
+    g_viewerRT.Create(w, h);
 
-    gFinalImage = g_finalImageRT.mColorAttachments[0].GetHandle();
+    gFinalImage = g_viewerRT.mColorAttachments[0].GetHandle();
 }
 
 void R_DestroyRT()

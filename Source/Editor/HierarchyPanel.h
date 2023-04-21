@@ -1,10 +1,10 @@
 #pragma once
 #include "Panel.h"
 
-class DebugPanel : public Panel
+class HierarchyPanel : public Panel
 {
 public:
-    DebugPanel() : Panel("Debug") {}
+    HierarchyPanel() : Panel("Hierarchy") {}
 
 protected:
     virtual void RenderInternal(Scene& scene) override;

@@ -7,7 +7,7 @@
 
 #include "imgui/imgui.h"
 
-void ConsolePanel::RenderInternal()
+void ConsolePanel::RenderInternal(Scene&)
 {
     ImGui::Separator();
 

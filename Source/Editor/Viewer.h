@@ -9,5 +9,5 @@ public:
     virtual void Update(float dt) override;
 
 protected:
-    virtual void RenderInternal() override;
+    virtual void RenderInternal(Scene& scene) override;
 };

@@ -267,6 +267,7 @@ public:                                                              \
     bool dirty = true;
     Light light;
     AABB bound;
+    ecs::Entity mSelected = ecs::Entity::INVALID;
 
 private:
     ecs::EntityGenerator mGenerator;

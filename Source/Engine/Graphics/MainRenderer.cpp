@@ -313,17 +313,19 @@ void MainRenderer::render()
             case DrawTexture::TEXTURE_VOXEL_ALBEDO:
             case DrawTexture::TEXTURE_VOXEL_NORMAL:
                 visualizeVoxels();
+                R_DrawEditor();
                 break;
             default: {
                 R_Deferred_VCT_Pass();
                 R_FXAA_Pass();
 
+                g_viewerRT.Bind();
                 renderFrameBufferTextures(frameW, frameH);
+                R_DrawEditor();
+                g_viewerRT.Unbind();
             }
             break;
         }
-
-        R_DrawEditor();
     }
 }
 

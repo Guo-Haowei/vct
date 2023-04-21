@@ -2,6 +2,8 @@
 
 #include "ConsolePanel.h"
 #include "DebugPanel.h"
+#include "HierarchyPanel.h"
+#include "PropertiyPanel.h"
 #include "Viewer.h"
 
 #include "Engine/Core/CommonDvars.h"
@@ -17,9 +19,17 @@
 
 EditorLayer::EditorLayer() : Layer("EditorLayer")
 {
-    mPanels.emplace_back(std::make_shared<ConsolePanel>());
-    mPanels.emplace_back(std::make_shared<DebugPanel>());
-    mPanels.emplace_back(std::make_shared<Viewer>());
+    AddPanel(std::make_shared<ConsolePanel>());
+    AddPanel(std::make_shared<DebugPanel>());
+    AddPanel(std::make_shared<HierarchyPanel>());
+    AddPanel(std::make_shared<PropertyPanel>());
+    AddPanel(std::make_shared<Viewer>());
+}
+
+void EditorLayer::AddPanel(std::shared_ptr<Panel> panel)
+{
+    mPanels.emplace_back(panel);
+    panel->SetSelectedRef(&mSelected);
 }
 
 void EditorLayer::DockSpace()
@@ -59,19 +69,13 @@ void EditorLayer::DockSpace()
     ImGui::PopStyleVar(2);
 
     // Submit the DockSpace
-    ImGuiIO& io = ImGui::GetIO();
     ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
-
-    const auto* node = ImGui::DockBuilderGetCentralNode(dockspace_id);
-    check(node);
-
-    pos = node->Pos;
-    size = node->Size;
 
     ImGui::End();
     return;
 #if 0
+    // ImGuiIO& io = ImGui::GetIO();
     if (ImGui::BeginMenuBar())
     {
         if (ImGui::BeginMenu("Options"))
@@ -131,8 +135,11 @@ void EditorLayer::Update(float dt)
 
 void EditorLayer::Render()
 {
+    Scene& scene = Com_GetScene();
     for (auto& it : mPanels)
     {
-        it->Render();
+        it->Render(scene);
     }
+
+    scene.mSelected = mSelected;
 }

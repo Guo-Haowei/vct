@@ -22,3 +22,6 @@
 [submodule "External/doctest"]
 	path = External/doctest
 	url = https://github.com/doctest/doctest.git
+[submodule "External/ImGuizmo"]
+	path = External/ImGuizmo
+	url = https://github.com/CedricGuillemet/ImGuizmo.git

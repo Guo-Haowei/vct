@@ -13,11 +13,11 @@ bool Panel::IsFocused() const
     return strcmp(mName.c_str(), focusedWindow->Name) == 0;
 }
 
-void Panel::Render()
+void Panel::Render(Scene& scene)
 {
     if (ImGui::Begin(mName.c_str()))
     {
-        RenderInternal();
+        RenderInternal(scene);
     }
     ImGui::End();
 }

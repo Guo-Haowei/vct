@@ -25,9 +25,6 @@ static bool Com_LoadScene()
     Scene& scene = g_scene;
     SceneLoader loader(scene);
 
-    const float worldScale = DVAR_GET_FLOAT(scene_scale);
-    const mat4 S = glm::scale(mat4(1), vec3(worldScale));
-    const mat4 trans = S;
     const char* scenePath = DVAR_GET_STRING(scene);
 
     if (!scenePath[0])
@@ -36,7 +33,7 @@ static bool Com_LoadScene()
         return false;
     }
 
-    loader.LoadGLTF(scenePath, trans);
+    loader.LoadGLTF(scenePath);
 
     Camera& camera = gCamera;
 
@@ -130,5 +127,6 @@ void SceneManager::FinalizeInternal()
 
 void SceneManager::Update(float dt)
 {
+    unused(dt);
     Com_UpdateWorld();
 }
