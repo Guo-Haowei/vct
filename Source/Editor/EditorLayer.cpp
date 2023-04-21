@@ -10,7 +10,6 @@
 #include "Engine/Core/Input.h"
 #include "Engine/Core/Log.h"
 #include "Engine/Graphics/r_cbuffers.h"
-#include "Engine/Math/Ray.h"
 #include "Engine/Framework/SceneManager.h"
 #include "Engine/Framework/WindowManager.h"
 
@@ -124,77 +123,6 @@ void EditorLayer::Update(float dt)
     {
         DockSpace();
     }
-
-#if 0
-    ImGuiIO& io = ImGui::GetIO();
-    Scene& scene = Com_GetScene();
-
-    // select object
-    if (!io.WantCaptureMouse && gWindowManager->IsMouseInScreen())
-    {
-        auto [mouseX, mouseY] = gWindowManager->GetMousePos();
-        auto [frameW, frameH] = gWindowManager->GetFrameSize();
-        if (Input::IsButtonPressed(EMouseButton::LEFT))
-        {
-            const Camera& camera = scene.camera;
-
-            const mat4& PV = camera.ProjView();
-            const mat4 invPV = glm::inverse(PV);
-            vec2 pos(mouseX / frameW, 1.0f - mouseY / frameH);
-            pos -= 0.5f;
-            pos *= 2.0f;
-
-            vec3 rayStart = camera.position;
-            vec3 direction = glm::normalize(vec3(invPV * vec4(pos.x, pos.y, 1.0f, 1.0f)));
-            vec3 rayEnd = rayStart + direction * camera.zFar;
-            Ray ray(rayStart, rayEnd);
-
-            // @TODO: fix selection
-            for (const auto& node : scene.geometryNodes)
-            {
-                for (const auto& geom : node.geometries)
-                {
-                    if (!geom.visible)
-                    {
-                        continue;
-                    }
-                    const AABB& box = geom.boundingBox;
-                    const auto& mesh = geom.mesh;
-                    if (ray.Intersects(box))
-                    {
-                        for (uint32_t idx = 0; idx < mesh->indices.size();)
-                        {
-                            const vec3& a = mesh->positions[mesh->indices[idx++]];
-                            const vec3& b = mesh->positions[mesh->indices[idx++]];
-                            const vec3& c = mesh->positions[mesh->indices[idx++]];
-                            if (ray.Intersects(a, b, c))
-                            {
-                                scene.selected = &geom;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else if (Input::IsButtonPressed(EMouseButton::RIGHT))
-        {
-            scene.selected = nullptr;
-        }
-    }
-
-    if (scene.selected && Input::IsKeyPressed(EKeyCode::DELETE))
-    {
-        if (scene.selected->visible)
-        {
-            LOG_WARN("material {} deleted", scene.selected->mesh->name);
-
-            scene.selected->visible = false;
-            scene.dirty = true;
-            scene.selected = nullptr;
-        }
-    }
-#endif
-
     for (auto& it : mPanels)
     {
         it->Update(dt);

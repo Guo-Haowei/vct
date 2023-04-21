@@ -15,6 +15,8 @@ target_link_libraries(${EXE_NAME} PUBLIC
     Engine
 )
 
+target_compile_options(${EXE_NAME} PRIVATE /W4)
+
 set_target_properties(${EXE_NAME}
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin

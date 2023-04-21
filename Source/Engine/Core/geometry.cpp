@@ -26,7 +26,7 @@ enum { A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7 };
 MeshComponent MakeBox(float size)
 {
     MeshComponent mesh;
-    mesh.positions = {
+    mesh.mPositions = {
         vec3(-size, +size, +size),  // A
         vec3(-size, -size, +size),  // B
         vec3(+size, -size, +size),  // C
@@ -37,7 +37,7 @@ MeshComponent MakeBox(float size)
         vec3(+size, +size, -size),  // H
     };
 
-    mesh.indices = {
+    mesh.mIndices = {
         A, B, D,  // ABD
         D, B, C,  // DBC
         E, H, F,  // EHF
@@ -52,7 +52,6 @@ MeshComponent MakeBox(float size)
         B, G, C,  // BGC
     };
 
-    mesh.flags = MeshComponent::None;
     return mesh;
 }
 
@@ -60,7 +59,7 @@ MeshComponent MakeBox(float size)
 MeshComponent MakeBoxWireFrame(float size)
 {
     MeshComponent mesh;
-    mesh.positions = {
+    mesh.mPositions = {
         vec3(-size, +size, +size),  // A
         vec3(-size, -size, +size),  // B
         vec3(+size, -size, +size),  // C
@@ -71,15 +70,15 @@ MeshComponent MakeBoxWireFrame(float size)
         vec3(+size, +size, -size),  // H
     };
 
-    mesh.indices = {
+    mesh.mIndices = {
         A, B, B, C, C, D, D, A,
         E, F, F, G, G, H, H, E,
         A, E, B, F, D, H, C, G
     };
 
-    mesh.flags = MeshComponent::None;
     return mesh;
 }
+
 // clang-format off
 void boxWithNormal(std::vector<vec3>& outPoints, std::vector<vec3>& outNomrals, std::vector<unsigned int>& outIndices, float size)
 {

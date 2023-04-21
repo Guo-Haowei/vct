@@ -1,7 +1,7 @@
 #pragma once
 #include "ManagerBase.h"
 
-#include "Core/scene.h"
+#include "Scene/Scene.h"
 
 class SceneManager : public ManagerBase
 {
@@ -18,5 +18,5 @@ protected:
 extern SceneManager* gSceneManager;
 
 // @TODO: refactor
-struct Scene;
+class Scene;
 Scene& Com_GetScene();

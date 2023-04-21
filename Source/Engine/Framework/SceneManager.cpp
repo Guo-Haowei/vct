@@ -9,7 +9,7 @@
 #include "imgui/imgui.h"
 #include "Graphics/r_cbuffers.h"
 #include "Graphics/r_sun_shadow.h"
-#include "scene/scene_loader.h"
+#include "Scene/AssimpSceneLoader.h"
 
 static Scene g_scene;
 
@@ -22,8 +22,8 @@ static bool Com_LoadScene()
     check(is_power_of_two(voxelTextureSize));
     check(voxelTextureSize <= 256);
 
-    SceneLoader loader;
     Scene& scene = g_scene;
+    SceneLoader loader(scene);
 
     const float worldScale = DVAR_GET_FLOAT(scene_scale);
     const mat4 S = glm::scale(mat4(1), vec3(worldScale));
@@ -36,9 +36,9 @@ static bool Com_LoadScene()
         return false;
     }
 
-    loader.loadGltf(scenePath, scene, trans);
+    loader.LoadGLTF(scenePath, trans);
 
-    Camera& camera = scene.camera;
+    Camera& camera = gCamera;
 
     const vec4 cascades = DVAR_GET_VEC4(cam_cascades);
 
@@ -52,8 +52,8 @@ static bool Com_LoadScene()
 
     scene.light.color = vec3(glm::clamp(DVAR_GET_FLOAT(light_power), 5.0f, 30.0f));
 
-    const vec3 center = scene.boundingBox.Center();
-    const vec3 size = scene.boundingBox.Size();
+    const vec3 center = scene.bound.Center();
+    const vec3 size = scene.bound.Size();
     const float worldSize = glm::max(size.x, glm::max(size.y, size.z));
     const float texelSize = 1.0f / static_cast<float>(voxelTextureSize);
     const float voxelSize = worldSize * texelSize;
@@ -81,7 +81,7 @@ static void Com_UpdateWorld()
     const float aspect = (float)frameW / frameH;
     check(aspect > 0.0f);
 
-    Camera& camera = scene.camera;
+    Camera& camera = gCamera;
     camera.SetAspect(aspect);
     camera.UpdatePV();
 

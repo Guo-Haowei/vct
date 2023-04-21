@@ -28,37 +28,37 @@ static std::shared_ptr<MeshData> CreateMeshData(const MeshComponent& mesh)
     MeshData* ret = new MeshData;
 
     MeshData& outMesh = *ret;
-    const bool hasNormals = !mesh.normals.empty();
-    const bool hasUVs = !mesh.uvs.empty();
-    const bool hasTangent = !mesh.tangents.empty();
-    const bool hasBitangent = !mesh.bitangents.empty();
+    const bool hasNormals = !mesh.mNormals.empty();
+    const bool hasUVs = !mesh.mTexcoords_0.empty();
+    const bool hasTangent = !mesh.mTangents.empty();
+    const bool hasBitangent = !mesh.mBitangents.empty();
 
     glGenVertexArrays(1, &outMesh.vao);
     glGenBuffers(2 + hasNormals + hasUVs + hasTangent + hasBitangent, &outMesh.ebo);
     glBindVertexArray(outMesh.vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outMesh.ebo);
     gl::BindToSlot(outMesh.vbos[0], 0, 3);
-    gl::NamedBufferStorage(outMesh.vbos[0], mesh.positions);
+    gl::NamedBufferStorage(outMesh.vbos[0], mesh.mPositions);
     if (hasNormals)
     {
         gl::BindToSlot(outMesh.vbos[1], 1, 3);
-        gl::NamedBufferStorage(outMesh.vbos[1], mesh.normals);
+        gl::NamedBufferStorage(outMesh.vbos[1], mesh.mNormals);
     }
     if (hasUVs)
     {
         gl::BindToSlot(outMesh.vbos[2], 2, 2);
-        gl::NamedBufferStorage(outMesh.vbos[2], mesh.uvs);
+        gl::NamedBufferStorage(outMesh.vbos[2], mesh.mTexcoords_0);
     }
     if (hasTangent)
     {
         gl::BindToSlot(outMesh.vbos[3], 3, 3);
-        gl::NamedBufferStorage(outMesh.vbos[3], mesh.tangents);
+        gl::NamedBufferStorage(outMesh.vbos[3], mesh.mTangents);
         gl::BindToSlot(outMesh.vbos[4], 4, 3);
-        gl::NamedBufferStorage(outMesh.vbos[4], mesh.bitangents);
+        gl::NamedBufferStorage(outMesh.vbos[4], mesh.mBitangents);
     }
 
-    gl::NamedBufferStorage(outMesh.ebo, mesh.indices);
-    outMesh.count = static_cast<uint32_t>(mesh.indices.size());
+    gl::NamedBufferStorage(outMesh.ebo, mesh.mIndices);
+    outMesh.count = static_cast<uint32_t>(mesh.mIndices.size());
 
     glBindVertexArray(0);
     return std::shared_ptr<MeshData>(ret);
@@ -98,55 +98,56 @@ void MainRenderer::createGpuResources()
     }
 
     // create mesh
-    for (const auto& mesh : scene.meshes)
+    for (const auto& mesh : scene.GetComponentArray<MeshComponent>())
     {
-        g_meshdata.emplace_back(CreateMeshData(*mesh.get()));
-        mesh->gpuResource = g_meshdata.back().get();
+        g_meshdata.emplace_back(CreateMeshData(mesh));
+        mesh.gpuResource = g_meshdata.back().get();
     }
 
     // create material
-    check(scene.materials.size() < array_length(g_constantCache.cache.AlbedoMaps));
+    check(scene.GetCount<MaterialComponent>() < array_length(g_constantCache.cache.AlbedoMaps));
 
-    for (int idx = 0; idx < scene.materials.size(); ++idx)
+    for (int idx = 0; idx < scene.GetCount<MaterialComponent>(); ++idx)
     {
-        const auto& mat = scene.materials.at(idx);
+        const auto& mat = scene.GetComponentArray<MaterialComponent>()[idx];
 
-        std::shared_ptr<MaterialData> matData(new MaterialData());
-        if (!mat->albedoTexture.empty())
-        {
-            matData->albedoColor = vec4(0);
-            matData->albedoMap.create2DImageFromFile(mat->albedoTexture.c_str());
-            g_constantCache.cache.AlbedoMaps[idx].data = gl::MakeTextureResident(matData->albedoMap.GetHandle());
-        }
-        else
-        {
-            matData->albedoColor = vec4(mat->albedo, 1.0f);
-        }
+        auto matData = std::make_shared<MaterialData>();
 
-        if (!mat->metallicRoughnessTexture.empty())
         {
-            matData->materialMap.create2DImageFromFile(mat->metallicRoughnessTexture.c_str());
-            g_constantCache.cache.PbrMaps[idx].data = gl::MakeTextureResident(matData->materialMap.GetHandle());
-        }
-        else
-        {
-            matData->metallic = mat->metallic;
-            matData->roughness = mat->roughness;
+            const std::string& textureMap = mat.mTextures[MaterialComponent::Base].name;
+            matData->albedoColor = mat.mBaseColor;
+            if (!textureMap.empty())
+            {
+                matData->albedoMap.Create2DImageFromFile(textureMap);
+                g_constantCache.cache.AlbedoMaps[idx].data = gl::MakeTextureResident(matData->albedoMap.GetHandle());
+            }
         }
 
-        if (!mat->normalTexture.empty())
         {
-            matData->normalMap.create2DImageFromFile(mat->normalTexture.c_str());
-            g_constantCache.cache.NormalMaps[idx].data = gl::MakeTextureResident(matData->normalMap.GetHandle());
-            //LOG_INFO("material has bump {}", mat->normalTexture.c_str());
+            const std::string& textureMap = mat.mTextures[MaterialComponent::MetallicRoughness].name;
+            matData->metallic = mat.mMetallic;
+            matData->roughness = mat.mRoughness;
+            if (!textureMap.empty())
+            {
+                matData->materialMap.Create2DImageFromFile(textureMap);
+                g_constantCache.cache.PbrMaps[idx].data = gl::MakeTextureResident(matData->materialMap.GetHandle());
+            }
+        }
+
+        {
+            const std::string& textureMap = mat.mTextures[MaterialComponent::Normal].name;
+            if (!textureMap.empty())
+            {
+                matData->normalMap.Create2DImageFromFile(textureMap);
+                g_constantCache.cache.NormalMaps[idx].data = gl::MakeTextureResident(matData->normalMap.GetHandle());
+                // LOG_INFO("material has bump {}", mat->normalTexture.c_str());
+            }
         }
 
         matData->textureMapIdx = idx;
 
-        matData->reflectPower = mat->reflectPower;
-
         g_materialdata.emplace_back(matData);
-        mat->gpuResource = g_materialdata.back().get();
+        mat.gpuResource = g_materialdata.back().get();
     }
 
     g_constantCache.cache.ShadowMap = gl::MakeTextureResident(g_shadowRT.GetDepthTexture().GetHandle());
@@ -216,27 +217,33 @@ void MainRenderer::renderToVoxelTexture()
     m_normalVoxel.bindImageTexture(IMAGE_VOXEL_NORMAL_SLOT);
     gProgramManager->GetShaderProgram(ProgramType::Voxel).Bind();
 
-    for (const GeometryNode& node : scene.geometryNodes)
+    const uint32_t numObjects = (uint32_t)scene.GetCount<ObjectComponent>();
+    for (uint32_t i = 0; i < numObjects; ++i)
     {
-        g_perBatchCache.cache.Model = node.transform;
-        g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * node.transform;
+        const ObjectComponent& obj = scene.GetComponentArray<ObjectComponent>()[i];
+        ecs::Entity entity = scene.GetEntity<ObjectComponent>(i);
+        check(scene.Contains<TransformComponent>(entity));
+        const TransformComponent& transform = *scene.GetComponent<TransformComponent>(entity);
+        check(scene.Contains<MeshComponent>(obj.meshID));
+        const MeshComponent& mesh = *scene.GetComponent<MeshComponent>(obj.meshID);
+
+        const mat4& M = transform.GetWorldMatrix();
+        g_perBatchCache.cache.Model = M;
+        g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
         g_perBatchCache.Update();
 
-        for (const Geometry& geom : node.geometries)
-        {
-            if (!geom.visible)
-            {
-                continue;
-            }
+        const MeshData* drawData = reinterpret_cast<MeshData*>(mesh.gpuResource);
+        glBindVertexArray(drawData->vao);
 
-            const MeshData* drawData = reinterpret_cast<const MeshData*>(geom.mesh->gpuResource);
-            const MaterialData* matData = reinterpret_cast<const MaterialData*>(geom.material->gpuResource);
+        for (const auto& subset : mesh.mSubsets)
+        {
+            const MaterialComponent& material = *scene.GetComponent<MaterialComponent>(subset.materialID);
+            const MaterialData* matData = reinterpret_cast<MaterialData*>(material.gpuResource);
 
             FillMaterialCB(matData, g_materialCache.cache);
             g_materialCache.Update();
 
-            glBindVertexArray(drawData->vao);
-            glDrawElements(GL_TRIANGLES, drawData->count, GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, subset.indexCount, GL_UNSIGNED_INT, (void*)(subset.indexOffset * sizeof(uint32_t)));
         }
     }
 

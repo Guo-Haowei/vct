@@ -92,21 +92,15 @@ void WindowManager::NewFrame()
     glfwPollEvents();
     glfwGetFramebufferSize(mWindow, &mFrameSize.x, &mFrameSize.y);
 
-    // mouse position
-    {
-        double x, y;
-        glfwGetCursorPos(mWindow, &x, &y);
-        mMousePos.x = static_cast<float>(x);
-        mMousePos.y = static_cast<float>(y);
-    }
+    glfwGetWindowPos(mWindow, &mWindowPos.x, &mWindowPos.y);
 
     // title
     char buffer[1024];
     snprintf(buffer, sizeof(buffer),
-             "%s | Size: %d x %d | Mouse: %d x %d | FPS: %.1f",
+             "%s | Pos: %d x %d | Size: %d x %d | FPS: %.1f",
              mApplication->GetInfo().title,
+             mWindowPos.x, mWindowPos.y,
              mFrameSize.x, mFrameSize.y,
-             int(mMousePos.x), int(mMousePos.y),
              ImGui::GetIO().Framerate);
     glfwSetWindowTitle(mWindow, buffer);
 
@@ -118,9 +112,9 @@ std::tuple<int, int> WindowManager::GetFrameSize()
     return std::tuple<int, int>(mFrameSize.x, mFrameSize.y);
 }
 
-std::tuple<float, float> WindowManager::GetMousePos()
+std::tuple<int, int> WindowManager::GetWindowPos()
 {
-    return std::tuple<float, float>(mMousePos.x, mMousePos.y);
+    return std::tuple<int, int>(mWindowPos.x, mWindowPos.y);
 }
 
 void WindowManager::Present()
@@ -133,21 +127,6 @@ void WindowManager::Present()
     glfwMakeContextCurrent(oldContext);
 
     glfwSwapBuffers(mWindow);
-}
-
-bool WindowManager::IsKeyDown(int code)
-{
-    return ImGui::IsKeyDown((ImGuiKey)code);
-}
-
-bool WindowManager::IsMouseInScreen()
-{
-    bool inside = true;
-    inside &= mMousePos.x >= 0;
-    inside &= mMousePos.y >= 0;
-    inside &= mMousePos.x <= mFrameSize.x;
-    inside &= mMousePos.y <= mFrameSize.y;
-    return inside;
 }
 
 void WindowManager::CursorPosCallback(GLFWwindow* window, double x, double y)

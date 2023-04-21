@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+
 #include "GLPrerequisites.h"
 
 struct Texture2DCreateInfo
@@ -26,9 +28,10 @@ struct Texture3DCreateInfo
 class GpuTexture
 {
 public:
+    void Create2DImageFromFile(const std::string& path);
+
     void create2DEmpty(const Texture2DCreateInfo& info);
     void create3DEmpty(const Texture3DCreateInfo& info);
-    void create2DImageFromFile(const char* path);
 
     void destroy();
     void bindImageTexture(int i, int mipLevel = 0);

@@ -5,6 +5,7 @@
 #include "Core/Check.h"
 #include "Core/DynamicVariable.h"
 #include "Core/CommonDvars.h"
+#include "Core/camera.h"
 #include "Framework/SceneManager.h"
 #include "Framework/ProgramManager.h"
 #include "Framework/WindowManager.h"
@@ -30,32 +31,49 @@ void R_Gbuffer_Pass()
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    Frustum frustum(scene.camera.ProjView());
-    for (const GeometryNode& node : scene.geometryNodes)
+    Frustum frustum(gCamera.ProjView());
+
+    const uint32_t numObjects = (uint32_t)scene.GetCount<ObjectComponent>();
+    for (uint32_t i = 0; i < numObjects; ++i)
     {
-        g_perBatchCache.cache.Model = node.transform;
-        g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * node.transform;
+        const ObjectComponent& obj = scene.GetComponentArray<ObjectComponent>()[i];
+        ecs::Entity entity = scene.GetEntity<ObjectComponent>(i);
+        check(scene.Contains<TransformComponent>(entity));
+        const TransformComponent& transform = *scene.GetComponent<TransformComponent>(entity);
+        check(scene.Contains<MeshComponent>(obj.meshID));
+        const MeshComponent& mesh = *scene.GetComponent<MeshComponent>(obj.meshID);
+
+        const mat4& M = transform.GetWorldMatrix();
+        AABB aabb = mesh.mLocalBound;
+        aabb.ApplyMatrix(M);
+        if (!frustum.Intersects(aabb))
+        {
+            continue;
+        }
+
+        g_perBatchCache.cache.Model = M;
+        g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
         g_perBatchCache.Update();
 
-        for (const Geometry& geom : node.geometries)
+        const MeshData* drawData = reinterpret_cast<MeshData*>(mesh.gpuResource);
+        glBindVertexArray(drawData->vao);
+
+        for (const auto& subset : mesh.mSubsets)
         {
-            if (!geom.visible)
-            {
-                continue;
-            }
-            if (!frustum.Intersects(geom.boundingBox))
+            aabb = subset.localBound;
+            aabb.ApplyMatrix(M);
+            if (!frustum.Intersects(aabb))
             {
                 continue;
             }
 
-            const MeshData* drawData = reinterpret_cast<MeshData*>(geom.mesh->gpuResource);
-            const MaterialData* matData = reinterpret_cast<MaterialData*>(geom.material->gpuResource);
+            const MaterialComponent& material = *scene.GetComponent<MaterialComponent>(subset.materialID);
+            const MaterialData* matData = reinterpret_cast<MaterialData*>(material.gpuResource);
 
             FillMaterialCB(matData, g_materialCache.cache);
             g_materialCache.Update();
 
-            glBindVertexArray(drawData->vao);
-            glDrawElements(GL_TRIANGLES, drawData->count, GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, subset.indexCount, GL_UNSIGNED_INT, (void*)(subset.indexOffset * sizeof(uint32_t)));
         }
     }
 

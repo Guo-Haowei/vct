@@ -8,8 +8,6 @@
 
 class WindowManager;
 
-using Point = glm::vec2;
-
 class Input
 {
     using KeyArray = std::array<bool, underlying(EKeyCode::COUNT)>;
@@ -27,8 +25,9 @@ public:
     static bool IsKeyPressed(EKeyCode key);
     static bool IsKeyReleased(EKeyCode key);
 
-    static const Point& Wheel();
-    static Point MouseMove();
+    static const vec2& GetCursor();
+    static const vec2& Wheel();
+    static vec2 MouseMove();
 
 private:
     Input();
@@ -45,10 +44,10 @@ private:
     ButtonArray mButtons;
     ButtonArray mPrevButtons;
 
-    Point mCursor{ 0, 0 };
-    Point mPrevCursor{ 0, 0 };
+    vec2 mCursor{ 0, 0 };
+    vec2 mPrevCursor{ 0, 0 };
 
-    Point mWheel{ 0, 0 };
+    vec2 mWheel{ 0, 0 };
 
     static Input gInput;
 

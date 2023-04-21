@@ -1,11 +1,15 @@
 #include "Viewer.h"
 
 #include "Engine/Core/Input.h"
+#include "Engine/Core/Log.h"
 #include "Engine/Framework/SceneManager.h"
+#include "Engine/Framework/WindowManager.h"
+#include "Engine/Math/Ray.h"
 
 #include "imgui/imgui_internal.h"
 
 // @TODO: refactor
+#include "Engine/Core/camera.h"
 extern uint32_t gFinalImage;
 
 static void ControlCamera(Camera& camera);
@@ -14,28 +18,63 @@ void Viewer::Update(float dt)
 {
     if (IsFocused())
     {
-        Scene& scene = Com_GetScene();
-        Camera& camera = scene.camera;
-        ControlCamera(camera);
+        ControlCamera(gCamera);
+    }
+}
+
+static void ray_cast(const vec2& point)
+{
+    Scene& scene = Com_GetScene();
+    const Camera& camera = gCamera;
+    const mat4& PV = camera.ProjView();
+    const mat4 invPV = glm::inverse(PV);
+
+    vec3 rayStart = camera.position;
+    vec3 direction = glm::normalize(vec3(invPV * vec4(point.x, point.y, 1.0f, 1.0f)));
+    vec3 rayEnd = rayStart + direction * camera.zFar;
+    Ray ray(rayStart, rayEnd);
+
+    const auto intersectionResult = scene.Intersects(ray);
+
+    if (intersectionResult.entity.IsValid())
+    {
+        LOG_INFO("{} SELECTED", intersectionResult.entity.GetID());
     }
 }
 
 void Viewer::RenderInternal()
 {
     constexpr float ratio = 1920.0f / 1080.0f;
-    ImVec2 size = ImGui::GetWindowSize();
-    if (size.y * ratio > size.x)
+    ImVec2 contentSize = ImGui::GetWindowSize();
+    if (contentSize.y * ratio > contentSize.x)
     {
-        size.y = size.x / ratio;
+        contentSize.y = contentSize.x / ratio;
     }
     else
     {
-        size.x = size.y * ratio;
+        contentSize.x = contentSize.y * ratio;
     }
 
-    ImGuiWindow* window = GImGui->CurrentWindow;
-    ImVec2 topLeft = GImGui->CurrentWindow->Pos;
-    ImVec2 bottomRight(topLeft.x + size.x, topLeft.y + size.y);
+    if (Input::IsButtonPressed(EMouseButton::LEFT))
+    {
+        ImVec2 pos = GImGui->NavWindow->ContentRegionRect.Min;
+        auto [windowX, windowY] = gWindowManager->GetWindowPos();
+        pos.x -= windowX;
+        pos.y -= windowY;
+        vec2 clicked = Input::GetCursor();
+        clicked.x = (clicked.x - pos.x) / contentSize.x;
+        clicked.y = (clicked.y - pos.y) / contentSize.y;
+
+        if (clicked.x >= 0.0f && clicked.x <= 1.0f && clicked.y >= 0.0f && clicked.y <= 1.0f)
+        {
+            clicked *= 2.0f;
+            clicked -= 1.0f;
+            ray_cast(clicked);
+        }
+    }
+
+    ImVec2 topLeft = GImGui->CurrentWindow->ContentRegionRect.Min;
+    ImVec2 bottomRight(topLeft.x + contentSize.x, topLeft.y + contentSize.y);
 
     ImGui::GetWindowDrawList()->AddImage(
         (ImTextureID)gFinalImage,

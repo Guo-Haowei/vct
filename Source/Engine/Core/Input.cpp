@@ -28,7 +28,7 @@ void Input::EndFrame()
     gInput.mPrevButtons = gInput.mButtons;
     gInput.mPrevCursor = gInput.mCursor;
 
-    gInput.mWheel = Point(0);
+    gInput.mWheel = vec2(0);
 }
 
 template<size_t N>
@@ -75,14 +75,19 @@ bool Input::IsKeyReleased(EKeyCode key)
     return InputChange(gInput.mPrevKeys, gInput.mKeys, underlying(key));
 }
 
-Point Input::MouseMove()
+vec2 Input::MouseMove()
 {
-    Point point;
+    vec2 point;
     point = gInput.mCursor - gInput.mPrevCursor;
     return point;
 }
 
-const Point& Input::Wheel()
+const vec2& Input::GetCursor()
+{
+    return gInput.mCursor;
+}
+
+const vec2& Input::Wheel()
 {
     return gInput.mWheel;
 }
