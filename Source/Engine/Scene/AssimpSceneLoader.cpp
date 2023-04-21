@@ -181,7 +181,9 @@ ecs::Entity SceneLoader::ProcessNode(const aiNode* node, ecs::Entity parent)
 
         for (uint32_t i = 0; i < node->mNumMeshes; ++i)
         {
-            ecs::Entity child = mScene.Entity_CreateObject("SubGeometry_" + std::to_string(i + 1));
+            ecs::Entity child = mScene.Entity_CreateObject("");
+            auto tagComponent = mScene.GetComponent<TagComponent>(child);
+            tagComponent->SetTag("SubGeometry_" + std::to_string(child.GetID()));
             ObjectComponent& objComponent = *mScene.GetComponent<ObjectComponent>(child);
             objComponent.meshID = mMeshes[node->mMeshes[i]];
             mScene.Component_Attach(child, entity);

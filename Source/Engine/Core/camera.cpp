@@ -13,6 +13,6 @@ vec3 Camera::direction() const
 void Camera::UpdatePV()
 {
     mView = glm::lookAt(position, position + direction(), vec3(0, 1, 0));
-    mProj = glm::perspectiveRH_NO(fovy, mAspect, zNear, zFar);
+    mProj = glm::perspective(fovy, mAspect, zNear, zFar);
     mProjView = mProj * mView;
 }

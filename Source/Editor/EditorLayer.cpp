@@ -19,16 +19,17 @@
 
 EditorLayer::EditorLayer() : Layer("EditorLayer")
 {
-    auto hierarchyPanel = std::make_shared<HierarchyPanel>();
-    auto propertyPanel = std::make_shared<PropertyPanel>();
-    hierarchyPanel->SetSelectedRef(&mSelected);
-    propertyPanel->SetSelectedRef(&mSelected);
+    AddPanel(std::make_shared<ConsolePanel>());
+    AddPanel(std::make_shared<DebugPanel>());
+    AddPanel(std::make_shared<HierarchyPanel>());
+    AddPanel(std::make_shared<PropertyPanel>());
+    AddPanel(std::make_shared<Viewer>());
+}
 
-    mPanels.emplace_back(std::make_shared<ConsolePanel>());
-    mPanels.emplace_back(std::make_shared<DebugPanel>());
-    mPanels.emplace_back(hierarchyPanel);
-    mPanels.emplace_back(propertyPanel);
-    mPanels.emplace_back(std::make_shared<Viewer>());
+void EditorLayer::AddPanel(std::shared_ptr<Panel> panel)
+{
+    mPanels.emplace_back(panel);
+    panel->SetSelectedRef(&mSelected);
 }
 
 void EditorLayer::DockSpace()

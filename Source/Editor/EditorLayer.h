@@ -14,8 +14,8 @@ public:
     virtual void Render() override;
 
 private:
-    void DbgWindow();
     void DockSpace();
+    void AddPanel(std::shared_ptr<Panel> panel);
 
     std::vector<std::shared_ptr<Panel>> mPanels;
     ecs::Entity mSelected;

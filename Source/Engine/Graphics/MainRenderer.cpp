@@ -312,18 +312,14 @@ void MainRenderer::render()
         {
             case DrawTexture::TEXTURE_VOXEL_ALBEDO:
             case DrawTexture::TEXTURE_VOXEL_NORMAL:
-                g_viewerRT.Bind();
-                glEnable(GL_DEPTH_TEST);
                 visualizeVoxels();
                 R_DrawEditor();
-                g_viewerRT.Unbind();
                 break;
             default: {
                 R_Deferred_VCT_Pass();
                 R_FXAA_Pass();
 
                 g_viewerRT.Bind();
-                glDisable(GL_DEPTH_TEST);
                 renderFrameBufferTextures(frameW, frameH);
                 R_DrawEditor();
                 g_viewerRT.Unbind();

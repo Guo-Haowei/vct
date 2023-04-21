@@ -14,30 +14,11 @@ extern uint32_t gFinalImage;
 
 static void ControlCamera(Camera& camera);
 
-void Viewer::Update(float dt)
+void Viewer::Update(float)
 {
     if (IsFocused())
     {
         ControlCamera(gCamera);
-    }
-}
-
-static void ray_cast(const vec2& point, Scene& scene)
-{
-    const Camera& camera = gCamera;
-    const mat4& PV = camera.ProjView();
-    const mat4 invPV = glm::inverse(PV);
-
-    vec3 rayStart = camera.position;
-    vec3 direction = glm::normalize(vec3(invPV * vec4(point.x, point.y, 1.0f, 1.0f)));
-    vec3 rayEnd = rayStart + direction * camera.zFar;
-    Ray ray(rayStart, rayEnd);
-
-    const auto intersectionResult = scene.Intersects(ray);
-
-    if (intersectionResult.entity.IsValid())
-    {
-        LOG_INFO("{} SELECTED", intersectionResult.entity.GetID());
     }
 }
 
@@ -68,8 +49,27 @@ void Viewer::RenderInternal(Scene& scene)
         {
             clicked *= 2.0f;
             clicked -= 1.0f;
-            ray_cast(clicked, scene);
+
+            const Camera& camera = gCamera;
+            const mat4& PV = camera.ProjView();
+            const mat4 invPV = glm::inverse(PV);
+
+            const vec3 rayStart = camera.position;
+            const vec3 direction = glm::normalize(vec3(invPV * vec4(clicked.x, -clicked.y, 1.0f, 1.0f)));
+            const vec3 rayEnd = rayStart + direction * camera.zFar;
+            Ray ray(rayStart, rayEnd);
+
+            const auto intersectionResult = scene.Intersects(ray);
+
+            if (intersectionResult.entity.IsValid())
+            {
+                SetSelected(intersectionResult.entity);
+            }
         }
+    }
+    else if (Input::IsButtonPressed(EMouseButton::RIGHT))
+    {
+        SetSelected(ecs::Entity::INVALID);
     }
 
     ImVec2 topLeft = GImGui->CurrentWindow->ContentRegionRect.Min;
