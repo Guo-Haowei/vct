@@ -3,7 +3,7 @@
 #include "Engine/Core/camera.h"
 
 #include "Engine/Core/CommonDvars.h"
-#include "Engine/Framework/SceneManager.h"
+#include "Engine/Scene/Scene.h"
 #include "Engine/Graphics/r_defines.h"
 
 static const char* DrawTextureToStr(int mode)
@@ -44,9 +44,8 @@ static const char* DrawTextureToStr(int mode)
     return str;
 }
 
-void DebugPanel::RenderInternal()
+void DebugPanel::RenderInternal(Scene& scene)
 {
-    Scene& scene = Com_GetScene();
     const Camera& camera = gCamera;
     bool dirty = false;
 

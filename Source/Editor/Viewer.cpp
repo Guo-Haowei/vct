@@ -22,9 +22,8 @@ void Viewer::Update(float dt)
     }
 }
 
-static void ray_cast(const vec2& point)
+static void ray_cast(const vec2& point, Scene& scene)
 {
-    Scene& scene = Com_GetScene();
     const Camera& camera = gCamera;
     const mat4& PV = camera.ProjView();
     const mat4 invPV = glm::inverse(PV);
@@ -42,7 +41,7 @@ static void ray_cast(const vec2& point)
     }
 }
 
-void Viewer::RenderInternal()
+void Viewer::RenderInternal(Scene& scene)
 {
     constexpr float ratio = 1920.0f / 1080.0f;
     ImVec2 contentSize = ImGui::GetWindowSize();
@@ -69,7 +68,7 @@ void Viewer::RenderInternal()
         {
             clicked *= 2.0f;
             clicked -= 1.0f;
-            ray_cast(clicked);
+            ray_cast(clicked, scene);
         }
     }
 

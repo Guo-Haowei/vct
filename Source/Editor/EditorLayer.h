@@ -1,8 +1,8 @@
 #pragma once
 #include "Panel.h"
 
-#include "imgui/imgui.h"
 #include "Engine/Framework/Application.h"
+#include "Engine/Scene/Scene.h"
 
 class EditorLayer : public Layer
 {
@@ -18,8 +18,5 @@ private:
     void DockSpace();
 
     std::vector<std::shared_ptr<Panel>> mPanels;
-
-    // @TODO: refactor
-    ImVec2 pos;
-    ImVec2 size;
+    ecs::Entity mSelected;
 };
