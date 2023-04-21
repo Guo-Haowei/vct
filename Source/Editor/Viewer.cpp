@@ -1,7 +1,10 @@
 #include "Viewer.h"
 
 #include "Engine/Core/Input.h"
+#include "Engine/Core/Log.h"
 #include "Engine/Framework/SceneManager.h"
+#include "Engine/Framework/WindowManager.h"
+#include "Engine/Math/Ray.h"
 
 #include "imgui/imgui_internal.h"
 
@@ -20,22 +23,108 @@ void Viewer::Update(float dt)
     }
 }
 
+static void ray_cast(const vec2& point)
+{
+    ImGuiIO& io = ImGui::GetIO();
+    Scene& scene = Com_GetScene();
+    const Camera& camera = scene.camera;
+    const mat4& PV = camera.ProjView();
+    const mat4 invPV = glm::inverse(PV);
+
+    vec3 rayStart = camera.position;
+    vec3 direction = glm::normalize(vec3(invPV * vec4(point.x, point.y, 1.0f, 1.0f)));
+    vec3 rayEnd = rayStart + direction * camera.zFar;
+    Ray ray(rayStart, rayEnd);
+
+    // WIP: Ray casting
+    for (const auto& node : scene.geometryNodes)
+    {
+        for (const auto& geom : node.geometries)
+        {
+            if (!geom.visible)
+            {
+                continue;
+            }
+            const AABB& box = geom.boundingBox;
+            const auto& mesh = geom.mesh;
+            if (ray.Intersects(box))
+            {
+                for (uint32_t idx = 0; idx < mesh->indices.size();)
+                {
+                    const vec3& a = mesh->positions[mesh->indices[idx++]];
+                    const vec3& b = mesh->positions[mesh->indices[idx++]];
+                    const vec3& c = mesh->positions[mesh->indices[idx++]];
+                    if (ray.Intersects(a, b, c))
+                    {
+                        scene.selected = &geom;
+                        LOG_INFO("SELECTED");
+                    }
+                }
+            }
+        }
+    }
+}
+
+#if 0
+
+    // select object
+    {
+        {
+        }
+        else if (Input::IsButtonPressed(EMouseButton::RIGHT))
+        {
+            scene.selected = nullptr;
+        }
+    }
+
+    if (scene.selected && Input::IsKeyPressed(EKeyCode::DELETE))
+    {
+        if (scene.selected->visible)
+        {
+            LOG_WARN("material {} deleted", scene.selected->mesh->name);
+
+            scene.selected->visible = false;
+            scene.dirty = true;
+            scene.selected = nullptr;
+        }
+    }
+#endif
+
 void Viewer::RenderInternal()
 {
     constexpr float ratio = 1920.0f / 1080.0f;
-    ImVec2 size = ImGui::GetWindowSize();
-    if (size.y * ratio > size.x)
+    ImVec2 contentSize = ImGui::GetWindowSize();
+    if (contentSize.y * ratio > contentSize.x)
     {
-        size.y = size.x / ratio;
+        contentSize.y = contentSize.x / ratio;
     }
     else
     {
-        size.x = size.y * ratio;
+        contentSize.x = contentSize.y * ratio;
+    }
+
+    if (Input::IsButtonPressed(EMouseButton::LEFT))
+    {
+        ImVec2 pos = GImGui->NavWindow->ContentRegionRect.Min;
+        auto [windowX, windowY] = gWindowManager->GetWindowPos();
+        pos.x -= windowX;
+        pos.y -= windowY;
+        vec2 clicked = Input::GetCursor();
+        clicked.x = (clicked.x - pos.x) / contentSize.x;
+        clicked.y = (clicked.y - pos.y) / contentSize.y;
+
+        if (clicked.x >= 0.0f && clicked.x <= 1.0f && clicked.y >= 0.0f && clicked.y <= 1.0f)
+        {
+            clicked *= 2.0f;
+            clicked -= 1.0f;
+            ray_cast(clicked);
+            LOG_INFO("Left button clicked {}, {}", clicked.x, clicked.y);
+        }
     }
 
     ImGuiWindow* window = GImGui->CurrentWindow;
-    ImVec2 topLeft = GImGui->CurrentWindow->Pos;
-    ImVec2 bottomRight(topLeft.x + size.x, topLeft.y + size.y);
+    ImVec2 topLeft = GImGui->CurrentWindow->ContentRegionRect.Min;
+    ImVec2 bottomRight(topLeft.x + contentSize.x, topLeft.y + contentSize.y);
 
     ImGui::GetWindowDrawList()->AddImage(
         (ImTextureID)gFinalImage,

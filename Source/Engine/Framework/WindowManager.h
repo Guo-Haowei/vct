@@ -14,10 +14,7 @@ public:
     GLFWwindow* GetRaw();
 
     std::tuple<int, int> GetFrameSize();
-    std::tuple<float, float> GetMousePos();
-    bool IsMouseInScreen();
-
-    bool IsKeyDown(int code);
+    std::tuple<int, int> GetWindowPos();
 
     void NewFrame();
     void Present();
@@ -36,11 +33,7 @@ private:
     struct
     {
         int x, y;
-    } mFrameSize;
-    struct
-    {
-        float x, y;
-    } mMousePos;
+    } mFrameSize, mWindowPos;
 };
 
 extern WindowManager* gWindowManager;

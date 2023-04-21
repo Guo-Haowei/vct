@@ -2,7 +2,7 @@
 
 #include "Core/Check.h"
 
-#define DEBUG_MANAGER_BASE(FMT, ...) LOG_DEBUG(__FUNCTION__ " " FMT, ##__VA_ARGS__)
+#define DEBUG_MANAGER_BASE(FMT, ...) LOG_DEBUG(__FUNCTION__ "() " FMT, ##__VA_ARGS__)
 
 bool ManagerBase::Initialize()
 {
@@ -10,7 +10,7 @@ bool ManagerBase::Initialize()
     mInitialized = InitializeInternal();
     if (!mInitialized)
     {
-        LOG_FATAL(__FUNCTION__ " Failed to initialize '{}'", mName);
+        LOG_FATAL(__FUNCTION__ "() Failed to initialize '{}'", mName);
         return false;
     }
 
