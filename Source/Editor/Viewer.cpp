@@ -35,41 +35,44 @@ void Viewer::RenderInternal(Scene& scene)
         contentSize.x = contentSize.y * ratio;
     }
 
-    if (Input::IsButtonPressed(EMouseButton::LEFT))
+    if (IsFocused())
     {
-        ImVec2 pos = GImGui->NavWindow->ContentRegionRect.Min;
-        auto [windowX, windowY] = gWindowManager->GetWindowPos();
-        pos.x -= windowX;
-        pos.y -= windowY;
-        vec2 clicked = Input::GetCursor();
-        clicked.x = (clicked.x - pos.x) / contentSize.x;
-        clicked.y = (clicked.y - pos.y) / contentSize.y;
-
-        if (clicked.x >= 0.0f && clicked.x <= 1.0f && clicked.y >= 0.0f && clicked.y <= 1.0f)
+        if (Input::IsButtonPressed(EMouseButton::LEFT))
         {
-            clicked *= 2.0f;
-            clicked -= 1.0f;
+            ImVec2 pos = GImGui->NavWindow->ContentRegionRect.Min;
+            auto [windowX, windowY] = gWindowManager->GetWindowPos();
+            pos.x -= windowX;
+            pos.y -= windowY;
+            vec2 clicked = Input::GetCursor();
+            clicked.x = (clicked.x - pos.x) / contentSize.x;
+            clicked.y = (clicked.y - pos.y) / contentSize.y;
 
-            const Camera& camera = gCamera;
-            const mat4& PV = camera.ProjView();
-            const mat4 invPV = glm::inverse(PV);
-
-            const vec3 rayStart = camera.position;
-            const vec3 direction = glm::normalize(vec3(invPV * vec4(clicked.x, -clicked.y, 1.0f, 1.0f)));
-            const vec3 rayEnd = rayStart + direction * camera.zFar;
-            Ray ray(rayStart, rayEnd);
-
-            const auto intersectionResult = scene.Intersects(ray);
-
-            if (intersectionResult.entity.IsValid())
+            if (clicked.x >= 0.0f && clicked.x <= 1.0f && clicked.y >= 0.0f && clicked.y <= 1.0f)
             {
-                SetSelected(intersectionResult.entity);
+                clicked *= 2.0f;
+                clicked -= 1.0f;
+
+                const Camera& camera = gCamera;
+                const mat4& PV = camera.ProjView();
+                const mat4 invPV = glm::inverse(PV);
+
+                const vec3 rayStart = camera.position;
+                const vec3 direction = glm::normalize(vec3(invPV * vec4(clicked.x, -clicked.y, 1.0f, 1.0f)));
+                const vec3 rayEnd = rayStart + direction * camera.zFar;
+                Ray ray(rayStart, rayEnd);
+
+                const auto intersectionResult = scene.Intersects(ray);
+
+                if (intersectionResult.entity.IsValid())
+                {
+                    SetSelected(intersectionResult.entity);
+                }
             }
         }
-    }
-    else if (Input::IsButtonPressed(EMouseButton::RIGHT))
-    {
-        SetSelected(ecs::Entity::INVALID);
+        else if (Input::IsButtonPressed(EMouseButton::RIGHT))
+        {
+            SetSelected(ecs::Entity::INVALID);
+        }
     }
 
     ImVec2 topLeft = GImGui->CurrentWindow->ContentRegionRect.Min;
