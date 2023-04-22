@@ -97,7 +97,7 @@ void Viewer::RenderInternal(Scene& scene)
     {
         TransformComponent* transform = scene.GetComponent<TransformComponent>(*mpSelected);
 
-        auto op = ImGuizmo::TRANSLATE;
+        auto op = ImGuizmo::ROTATE;
         if (transform)
         {
             mat4 local = transform->GetLocalMatrix();
