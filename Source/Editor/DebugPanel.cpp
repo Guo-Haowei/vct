@@ -95,5 +95,4 @@ void DebugPanel::RenderInternal(Scene& scene)
 #endif
 
     scene.light.direction = glm::normalize(DVAR_GET_VEC3(light_dir));
-    scene.dirty = dirty;
 }

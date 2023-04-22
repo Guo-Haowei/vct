@@ -1,20 +1,28 @@
 #include "UIManager.h"
 
 #include "imgui/imgui.h"
+#include "Core/Log.h"
+#include "Core/Utility.h"
 
 UIManager* gUIManager = new UIManager;
+
+static std::string gIniPath;
 
 bool UIManager::InitializeInternal()
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
+    fs::path path(ROOT_FOLDER);
+    path = path.parent_path() / "Config/imgui.ini";
+    gIniPath = path.string();
+    LOG_DEBUG("Set imgui ini file to {}", gIniPath);
+
     ImGuiIO& io = ImGui::GetIO();
-    // io.IniFilenameLoad;
-    // io.IniFilenameSave;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // Enable Docking
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;    // Enable Multi-Viewport / Platform Windows
+    io.IniFilename = gIniPath.c_str();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
     SetupStyle();
     return true;

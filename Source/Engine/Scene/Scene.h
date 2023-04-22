@@ -264,7 +264,6 @@ public:                                                              \
     }
 
     // @TODO: refactor
-    bool dirty = true;
     Light light;
     AABB bound;
     ecs::Entity mSelected = ecs::Entity::INVALID;
