@@ -24,6 +24,11 @@ message(STATUS "Configuring fmt...")
 add_subdirectory(External/fmt)
 set_target_properties(fmt PROPERTIES FOLDER External)
 
+################################################################################
+message(STATUS "Configuring Bullet3...")
+add_subdirectory(External/bullet3)
+set_target_properties(bullet PROPERTIES FOLDER External)
+
 include(cmake/build-lua.cmake)
 include(cmake/build-imgui.cmake)
 

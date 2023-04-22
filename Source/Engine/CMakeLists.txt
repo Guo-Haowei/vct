@@ -47,11 +47,11 @@ source_group("Scene"        FILES ${SRC_SCENE})
 
 target_include_directories(${LIB_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/External/assimp/include
+    ${PROJECT_SOURCE_DIR}/External/bullet
     ${PROJECT_SOURCE_DIR}/External/fmt/include
     ${PROJECT_SOURCE_DIR}/External/glfw/include
     ${PROJECT_SOURCE_DIR}/External/glad/include
     ${PROJECT_SOURCE_DIR}/External/glm
-    ${PROJECT_SOURCE_DIR}/External/bullet
     ${PROJECT_SOURCE_DIR}/External/imgui
     ${PROJECT_SOURCE_DIR}/External
     ${PROJECT_SOURCE_DIR}/Source/Engine
@@ -63,7 +63,7 @@ target_compile_definitions(${LIB_NAME} PUBLIC
     -DROOT_FOLDER="${PROJECT_SOURCE_DIR}/"
 )
 
-target_link_libraries(${LIB_NAME} PUBLIC imgui glfw glad lua fmt)
+target_link_libraries(${LIB_NAME} PUBLIC imgui glfw glad lua fmt bullet)
 
 target_compile_options(${LIB_NAME} PRIVATE /W4)
 
