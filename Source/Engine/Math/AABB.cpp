@@ -1,46 +1,6 @@
 #include "AABB.h"
 #include "Core/Check.h"
 
-#ifdef min
-#undef min
-#endif
-#ifdef max
-#undef max
-#endif
-
-void AABB::MakeInvalid()
-{
-    mMin = vec3(std::numeric_limits<float>::infinity());
-    mMax = vec3(-std::numeric_limits<float>::infinity());
-}
-
-AABB::AABB(const vec3& min, const vec3& max)
-    : mMin(min), mMax(max)
-{
-    check(IsValid());
-}
-
-void AABB::MakeValid()
-{
-    const vec3 size = mMax - mMin;
-    constexpr float delta = 0.0001f;
-    if (size.x == 0.0f)
-    {
-        mMin.x -= delta;
-        mMax.x += delta;
-    }
-    if (size.y == 0.0f)
-    {
-        mMin.y -= delta;
-        mMax.y += delta;
-    }
-    if (size.z == 0.0f)
-    {
-        mMin.z -= delta;
-        mMax.z += delta;
-    }
-}
-
 #if 0
  *        E__________________ H
  *       /|                 /|
@@ -74,24 +34,6 @@ vec3 AABB::Corner(int index) const
     // clang-format on
     check(0);
     return vec3(0);
-}
-
-void AABB::Expand(const vec3& point)
-{
-    mMin = glm::min(mMin, point);
-    mMax = glm::max(mMax, point);
-}
-
-void AABB::Union(const AABB& o)
-{
-    mMin = glm::min(mMin, o.mMin);
-    mMax = glm::max(mMax, o.mMax);
-}
-
-void AABB::Intersection(const AABB& o)
-{
-    mMin = glm::max(mMin, o.mMin);
-    mMax = glm::min(mMax, o.mMax);
 }
 
 void AABB::ApplyMatrix(const mat4& mat4)

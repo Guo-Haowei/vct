@@ -1,5 +1,7 @@
 #include "Viewer.h"
 
+#include "Gizmo.h"
+
 #include "Engine/Core/Input.h"
 #include "Engine/Core/Log.h"
 #include "Engine/Framework/SceneManager.h"
@@ -7,25 +9,35 @@
 #include "Engine/Math/Ray.h"
 
 #include "imgui/imgui_internal.h"
+#include "ImGuizmo/ImGuizmo.h"
 
 // @TODO: refactor
 #include "Engine/Core/camera.h"
 extern uint32_t gFinalImage;
 
-static void ControlCamera(Camera& camera);
+static void camera_control(Camera& camera);
 
 void Viewer::Update(float)
 {
     if (IsFocused())
     {
-        ControlCamera(gCamera);
+        camera_control(gCamera);
     }
 }
 
 void Viewer::RenderInternal(Scene& scene)
 {
+    ImGuiWindow* window = ImGui::FindWindowByName(mName.c_str());
+    check(window);
+    const ImRect& contentRegionRect = window->ContentRegionRect;
+    vec2 canvasMinToScreen;
+    canvasMinToScreen.x = contentRegionRect.Min.x;
+    canvasMinToScreen.y = contentRegionRect.Min.y;
+
     constexpr float ratio = 1920.0f / 1080.0f;
-    ImVec2 contentSize = ImGui::GetWindowSize();
+    vec2 contentSize;
+    contentSize.x = ImGui::GetWindowSize().x;
+    contentSize.y = ImGui::GetWindowSize().y;
     if (contentSize.y * ratio > contentSize.x)
     {
         contentSize.y = contentSize.x / ratio;
@@ -37,15 +49,13 @@ void Viewer::RenderInternal(Scene& scene)
 
     if (IsFocused())
     {
-        if (Input::IsButtonPressed(EMouseButton::LEFT))
+        if (Input::IsButtonPressed(EMouseButton::MIDDLE))
         {
-            ImVec2 pos = GImGui->NavWindow->ContentRegionRect.Min;
+
             auto [windowX, windowY] = gWindowManager->GetWindowPos();
-            pos.x -= windowX;
-            pos.y -= windowY;
             vec2 clicked = Input::GetCursor();
-            clicked.x = (clicked.x - pos.x) / contentSize.x;
-            clicked.y = (clicked.y - pos.y) / contentSize.y;
+            clicked.x = (clicked.x + windowX - canvasMinToScreen.x) / contentSize.x;
+            clicked.y = (clicked.y + windowY - canvasMinToScreen.y) / contentSize.y;
 
             if (clicked.x >= 0.0f && clicked.x <= 1.0f && clicked.y >= 0.0f && clicked.y <= 1.0f)
             {
@@ -82,9 +92,23 @@ void Viewer::RenderInternal(Scene& scene)
         (ImTextureID)gFinalImage,
         topLeft, bottomRight,
         ImVec2(0, 1), ImVec2(1, 0));
+
+    if (mpSelected->IsValid())
+    {
+        TransformComponent* transform = scene.GetComponent<TransformComponent>(*mpSelected);
+
+        auto op = ImGuizmo::TRANSLATE;
+        if (transform)
+        {
+            mat4 local = transform->GetLocalMatrix();
+            Box2 rect(canvasMinToScreen, canvasMinToScreen + contentSize);
+            gizmo_control(op, gCamera.View(), gCamera.Proj(), rect, local);
+            transform->SetLocalTransform(local);
+        }
+    }
 }
 
-static void ControlCamera(Camera& camera)
+static void camera_control(Camera& camera)
 {
     constexpr float VIEW_SPEED = 2.0f;
     float CAMERA_SPEED = 0.15f;

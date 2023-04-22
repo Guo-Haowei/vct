@@ -127,6 +127,6 @@ void SceneManager::FinalizeInternal()
 
 void SceneManager::Update(float dt)
 {
-    unused(dt);
     Com_UpdateWorld();
+    Com_GetScene().Update(dt);
 }

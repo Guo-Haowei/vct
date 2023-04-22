@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Math/GeoMath.h"
+#include "Math/Box.h"
 #include "EditorLayer.h"
 
-// namespace ImGuizmo
-// {
-// enum OPERATION;
-// }
+namespace ImGuizmo
+{
+enum OPERATION;
+}
 
-// void Gizmo(ImGuizmo::OPERATION op, const glm::mat4& view, const glm::mat4& proj, const Viewport& viewport, mat4& out);
+void gizmo_control(ImGuizmo::OPERATION op, const glm::mat4& view, const glm::mat4& proj, const Box2& rect, mat4& out);
