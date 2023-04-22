@@ -2,7 +2,7 @@ local windowScale = 1;
 
 -- graphics
 Dvar.SetInt('r_voxelSize', 64);
-Dvar.SetInt('r_shadowRes', 1024 * 8);
+Dvar.SetInt('r_shadowRes', 1024 * 4);
 
 -- camera
 Dvar.SetVec3('cam_pos', -5.0, 5.0, 0.0);

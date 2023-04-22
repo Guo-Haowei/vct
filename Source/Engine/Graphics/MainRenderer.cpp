@@ -290,7 +290,7 @@ void MainRenderer::render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     R_ShadowPass();
 
-    if (scene.dirty || DVAR_GET_BOOL(r_forceVXGI))
+    // if (scene.dirty || DVAR_GET_BOOL(r_forceVXGI))
     {
         m_albedoVoxel.clear();
         m_normalVoxel.clear();

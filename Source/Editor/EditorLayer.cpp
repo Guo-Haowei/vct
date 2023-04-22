@@ -117,16 +117,7 @@ void EditorLayer::DockSpace()
 
 void EditorLayer::Update(float dt)
 {
-    static bool hideUI = false;
-    if (Input::IsKeyPressed(EKeyCode::ESCAPE))
-    {
-        hideUI = !hideUI;
-    }
-
-    if (!hideUI)
-    {
-        DockSpace();
-    }
+    DockSpace();
     for (auto& it : mPanels)
     {
         it->Update(dt);

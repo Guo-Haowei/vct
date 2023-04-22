@@ -115,6 +115,8 @@ int Application::Run(int argc, const char** argv)
 
         Input::BeginFrame();
 
+        gSceneManager->Update(dt);
+
         ImGui::NewFrame();
         for (auto& layer : mLayers)
         {
@@ -127,15 +129,11 @@ int Application::Run(int argc, const char** argv)
         }
         ImGui::Render();
 
-        gSceneManager->Update(dt);
-
         renderer.render();
 
         gWindowManager->Present();
 
-        Com_GetScene().dirty = false;
-
-        Input::EndFrame();
+        ImGui::EndFrame();
     }
 
     renderer.destroyGpuResources();
