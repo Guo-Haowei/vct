@@ -71,13 +71,13 @@ target_compile_options(${LIB_NAME} PRIVATE /W4)
 if(MSVC)
     set(LIB_ASSIMP_DEBUG_DIR ${PROJECT_SOURCE_DIR}/External/assimp/build/lib/Debug)
     target_link_libraries(${LIB_NAME} PUBLIC debug
-        ${LIB_ASSIMP_DEBUG_DIR}/assimp-vc142-mtd.lib
+        ${LIB_ASSIMP_DEBUG_DIR}/assimp-vc143-mtd.lib
         ${LIB_ASSIMP_DEBUG_DIR}/IrrXMLd.lib
         ${LIB_ASSIMP_DEBUG_DIR}/zlibstaticd.lib)
 
     set(LIB_ASSIMP_RELEASE_DIR ${PROJECT_SOURCE_DIR}/External/assimp/build/lib/Release)
     target_link_libraries(${LIB_NAME} PUBLIC optimized
-        ${LIB_ASSIMP_RELEASE_DIR}/assimp-vc142-mt.lib
+        ${LIB_ASSIMP_RELEASE_DIR}/assimp-vc143-mt.lib
         ${LIB_ASSIMP_RELEASE_DIR}/IrrXML.lib
         ${LIB_ASSIMP_RELEASE_DIR}/zlibstatic.lib)
 endif()
