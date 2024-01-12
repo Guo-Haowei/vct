@@ -1,19 +1,15 @@
 set(EXE_NAME Editor)
 
-file(GLOB SRC_EDITOR
-    "*.h"
-    "*.cpp"
+file(GLOB_RECURSE SRC
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
 )
 
-add_executable(${EXE_NAME}
-    ${SRC_EDITOR}
-)
+add_executable(${EXE_NAME} ${SRC})
 
-source_group("Editor" FILES ${SRC_EDITOR})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SRC})
 
-target_link_libraries(${EXE_NAME} PUBLIC
-    Engine
-)
+target_link_libraries(${EXE_NAME} PUBLIC Engine)
 
 target_compile_options(${EXE_NAME} PRIVATE /W4)
 

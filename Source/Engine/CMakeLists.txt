@@ -1,49 +1,13 @@
-file(GLOB SRC_CONTAINER
-    "Container/*.h"
-)
-
-file(GLOB SRC_CORE
-    "Core/*.h"
-    "Core/*.cpp"
-)
-
-file(GLOB SRC_FRAMEWORK
-    "Framework/*.h"
-    "Framework/*.cpp"
-)
-
-file(GLOB SRC_GRAPHICS
-    "Graphics/*.h"
-    "Graphics/*.cpp"
-)
-
-file(GLOB SRC_MATH
-    "Math/*.h"
-    "Math/*.cpp"
-)
-
-file(GLOB SRC_SCENE
-    "Scene/*.h"
-    "Scene/*.cpp"
-)
-
 set(LIB_NAME Engine)
 
-add_library(${LIB_NAME} STATIC
-    ${SRC_CONTAINER}
-    ${SRC_CORE}
-    ${SRC_FRAMEWORK}
-    ${SRC_GRAPHICS}
-    ${SRC_MATH}
-    ${SRC_SCENE}
+file(GLOB_RECURSE SRC
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
 )
 
-source_group("Container"    FILES ${SRC_CONTAINER})
-source_group("Core"         FILES ${SRC_CORE})
-source_group("Framework"    FILES ${SRC_FRAMEWORK})
-source_group("Graphics"     FILES ${SRC_GRAPHICS})
-source_group("Math"         FILES ${SRC_MATH})
-source_group("Scene"        FILES ${SRC_SCENE})
+add_library(${LIB_NAME} STATIC ${SRC})
+
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SRC})
 
 target_include_directories(${LIB_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/External/assimp/include
