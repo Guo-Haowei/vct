@@ -1,5 +1,6 @@
 #pragma once
 #include <cassert>
+#include <initializer_list>
 #include "iterator.h"
 
 template<typename T>

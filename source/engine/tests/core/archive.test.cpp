@@ -1,8 +1,5 @@
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include <doctest/doctest.h>
-
-#include "Core/Archive.h"
-#include "Scene/SceneComponents.h"
+#include <engine/core/Archive.h>
+#include <engine/scene/SceneComponents.h>
 
 TEST_CASE("Archive")
 {

@@ -3,17 +3,19 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceRoot}/External/assimp/include",
-                "${workspaceRoot}/External/bullet3/",
-                "${workspaceRoot}/External/doctest",
-                "${workspaceRoot}/External/fmt/include",
-                "${workspaceRoot}/External/glad/include",
-                "${workspaceRoot}/External/glfw/include",
-                "${workspaceRoot}/External/glm/",
-                "${workspaceRoot}/External/imgui/",
-                "${workspaceRoot}/External/",
-                "${workspaceRoot}/Source/Engine",
-                "${workspaceRoot}/Source"
+                "${workspaceRoot}/thirdparty/assimp/include",
+                "${workspaceRoot}/thirdparty/bullet3/",
+                "${workspaceRoot}/thirdparty/doctest",
+                "${workspaceRoot}/thirdparty/fmt/include",
+                "${workspaceRoot}/thirdparty/glad/include",
+                "${workspaceRoot}/thirdparty/glfw/include",
+                "${workspaceRoot}/thirdparty/glm/",
+                "${workspaceRoot}/thirdparty/imgui/",
+                "${workspaceRoot}/thirdparty/",
+                "${workspaceRoot}/source/engine/src"
+            ],
+            "forcedInclude": [
+                "${workspaceFolder}/source/engine/tests/pch.h"
             ],
             "defines": [
                 "DATA_DIR=\"\"",

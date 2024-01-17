@@ -46,3 +46,5 @@ if(MSVC)
         ${LIB_ASSIMP_RELEASE_DIR}/IrrXML.lib
         ${LIB_ASSIMP_RELEASE_DIR}/zlibstatic.lib)
 endif()
+
+add_subdirectory(tests)
