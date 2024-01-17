@@ -1,3 +1,8 @@
+#ifdef PRECOMPILED_HEADER_INCLUDED
+#error "this file should only be included once"
+#endif
+#define PRECOMPILED_HEADER_INCLUDED
+
 #include <array>
 #include <atomic>
 #include <cassert>

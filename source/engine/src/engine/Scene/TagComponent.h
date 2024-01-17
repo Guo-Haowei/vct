@@ -1,5 +1,5 @@
 #pragma once
-#include <universal/containers/fixed_string.h"
+#include <universal/containers/fixed_string.h>
 
 class Archive;
 
