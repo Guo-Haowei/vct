@@ -1,6 +1,4 @@
 #pragma once
-#include <string>
-
 #include "GLPrerequisites.h"
 
 struct Texture2DCreateInfo

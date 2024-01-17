@@ -1,6 +1,4 @@
 #pragma once
-#include <memory>
-
 #include "GpuTexture.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"

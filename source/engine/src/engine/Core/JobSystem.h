@@ -1,7 +1,4 @@
 #pragma once
-#include <atomic>
-#include <functional>
-
 #include "Core/Defines.h"
 
 namespace jobsystem

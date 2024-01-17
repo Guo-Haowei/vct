@@ -15,7 +15,8 @@
                 "${workspaceRoot}/source/engine/src"
             ],
             "forcedInclude": [
-                "${workspaceFolder}/source/engine/tests/pch.h"
+                "${workspaceFolder}/source/engine/src/engine/pch.h",
+                "${workspaceFolder}/source/engine/tests/pch.h",
             ],
             "defines": [
                 "DATA_DIR=\"\"",

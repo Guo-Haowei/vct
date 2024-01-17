@@ -32,6 +32,8 @@ target_link_libraries(${LIB_NAME} PUBLIC imgui glfw glad lua fmt bullet)
 
 target_compile_options(${LIB_NAME} PRIVATE /W4)
 
+target_precompile_headers(${LIB_NAME} PRIVATE src/engine/pch.h)
+
 # @TODO: move to plugin
 if(MSVC)
     set(LIB_ASSIMP_DEBUG_DIR ${PROJECT_SOURCE_DIR}/thirdparty/assimp/build/lib/Debug)

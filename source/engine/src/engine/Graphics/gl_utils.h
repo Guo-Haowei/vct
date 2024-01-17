@@ -1,8 +1,4 @@
 #pragma once
-
-#include <string>
-#include <vector>
-
 #include "GpuTexture.h"
 #include "Core/Log.h"
 #include "Math/GeoMath.h"

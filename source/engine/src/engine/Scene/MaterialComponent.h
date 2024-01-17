@@ -1,5 +1,4 @@
 #pragma once
-#include <string>
 #include "Math/GeoMath.h"
 
 class Archive;

@@ -5,10 +5,9 @@
 #include <string>
 #include <thread>
 
-#include "Platform.h"
 #include "Core/Check.h"
-#include "Container/fixed_stack.h"
-#include "Container/ring_buffer.h"
+#include "utils/fixed_stack.h"
+#include "utils/ring_buffer.h"
 
 #define WIN_CALL(x) x
 

@@ -1,8 +1,4 @@
 #pragma once
-#include <memory>
-#include <type_traits>
-#include <string>
-#include <vector>
 
 #define DISABLE_COPY(CLASS)       \
     CLASS(const CLASS&) = delete; \

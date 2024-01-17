@@ -1,6 +1,4 @@
 #pragma once
-#include <array>
-
 #include "InputCode.h"
 
 #include "Core/Types.h"

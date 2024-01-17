@@ -1,7 +1,4 @@
 #pragma once
-#include <cstdint>
-#include <string>
-
 struct ProgramCreateInfo
 {
     std::string vs;

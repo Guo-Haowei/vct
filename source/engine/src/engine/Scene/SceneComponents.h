@@ -1,7 +1,4 @@
 #pragma once
-#include <string>
-#include <vector>
-
 #include "Entity.h"
 
 // #include "Core/Image.h"

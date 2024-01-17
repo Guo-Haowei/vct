@@ -1,5 +1,4 @@
 #pragma once
-#include <atomic>
 #include "Entity.h"
 
 namespace ecs

@@ -1,6 +1,4 @@
 #pragma once
-#include <cstdint>
-
 #include "SceneComponents.h"
 
 #include "Core/Types.h"
