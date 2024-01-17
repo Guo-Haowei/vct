@@ -1,4 +1,4 @@
-set(LUA_SOURCE_DIR ${PROJECT_SOURCE_DIR}/External/lua/)
+set(LUA_SOURCE_DIR ${PROJECT_SOURCE_DIR}/thirdparty/lua/)
 
 file(GLOB LUA_HEAD
     "${LUA_SOURCE_DIR}/*.h"
@@ -49,4 +49,4 @@ add_library(lua STATIC
 source_group("" FILES ${LUA_HEAD})
 source_group("" FILES ${LUA_SOURCE})
 
-set_target_properties(lua PROPERTIES FOLDER External)
+set_target_properties(lua PROPERTIES FOLDER thirdparty)

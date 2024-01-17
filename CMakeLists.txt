@@ -12,22 +12,25 @@ message("Configuring glfw...")
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-add_subdirectory(External/glfw)
+set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
+add_subdirectory(thirdparty/glfw)
+set_target_properties(glfw PROPERTIES FOLDER thirdparty)
+set_target_properties(update_mappings PROPERTIES FOLDER thirdparty)
 
 ################################################################################
 message("Configuring glad...")
-add_subdirectory(External/glad)
-set_target_properties(glad PROPERTIES FOLDER External)
+add_subdirectory(thirdparty/glad)
+set_target_properties(glad PROPERTIES FOLDER thirdparty)
 
 ################################################################################
 message(STATUS "Configuring fmt...")
-add_subdirectory(External/fmt)
-set_target_properties(fmt PROPERTIES FOLDER External)
+add_subdirectory(thirdparty/fmt)
+set_target_properties(fmt PROPERTIES FOLDER thirdparty)
 
 ################################################################################
 message(STATUS "Configuring Bullet3...")
-add_subdirectory(External/bullet3)
-set_target_properties(bullet PROPERTIES FOLDER External)
+add_subdirectory(thirdparty/bullet3)
+set_target_properties(bullet PROPERTIES FOLDER thirdparty)
 
 include(cmake/build-lua.cmake)
 include(cmake/build-imgui.cmake)
