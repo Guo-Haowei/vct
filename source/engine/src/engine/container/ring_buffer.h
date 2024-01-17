@@ -16,61 +16,61 @@ public:
 public:
     ring_buffer_iterator(size_t index, pointer ptr)
     {
-        mIndex = index + N;  // add N to make sure when --, index doesn't go under 0
-        mPtr = ptr;
+        m_index = index + N;  // add N to make sure when --, index doesn't go under 0
+        m_ptr = ptr;
     }
 
     this_type operator++(int)
     {
         this_type tmp = *this;
-        ++mIndex;
+        ++m_index;
         return tmp;
     }
 
     this_type& operator++()
     {
-        ++mIndex;
+        ++m_index;
         return *this;
     }
 
     this_type operator--(int)
     {
         this_type tmp = *this;
-        --mIndex;
+        --m_index;
         return tmp;
     }
 
     this_type& operator--()
     {
-        --mIndex;
+        --m_index;
         return *this;
     }
 
     reference operator*() const
     {
-        return mPtr[mIndex % N];
+        return m_ptr[m_index % N];
     }
 
     pointer operator->() const
     {
-        return &mPtr[mIndex % N];
+        return &m_ptr[m_index % N];
     }
 
     bool operator==(const this_type& rhs) const
     {
-        assert(mPtr == rhs.mPtr);
-        return mIndex == rhs.mIndex;
+        assert(m_ptr == rhs.m_ptr);
+        return m_index == rhs.m_index;
     }
 
     bool operator!=(const this_type& rhs) const
     {
-        assert(mPtr == rhs.mPtr);
-        return mIndex != rhs.mIndex;
+        assert(m_ptr == rhs.m_ptr);
+        return m_index != rhs.m_index;
     }
 
 private:
-    size_t mIndex;
-    pointer mPtr;
+    size_t m_index;
+    pointer m_ptr;
 };
 
 template<typename T, size_t N>
@@ -86,10 +86,10 @@ public:
     using reverse_const_iterator = reverse_iterator_type<const_iterator>;
 
 public:
-    iterator begin() { return iterator(mHead, mData); }
-    iterator end() { return iterator(mHead + mSize, mData); }
-    const_iterator begin() const { return const_iterator(mHead, mData); }
-    const_iterator end() const { return const_iterator(mHead + mSize, mData); }
+    iterator begin() { return iterator(m_head, m_data); }
+    iterator end() { return iterator(m_head + m_size, m_data); }
+    const_iterator begin() const { return const_iterator(m_head, m_data); }
+    const_iterator end() const { return const_iterator(m_head + m_size, m_data); }
 
     DEFAULT_ITERATOR_FUNCTIONS();
 
@@ -101,46 +101,46 @@ public:
 
     void clear()
     {
-        mHead = 0;
-        mSize = 0;
+        m_head = 0;
+        m_size = 0;
     }
 
     void push_back(const T& value)
     {
-        if (mSize < N)
+        if (m_size < N)
         {
-            ++mSize;
-            mData[index(mSize - 1)] = value;
+            ++m_size;
+            m_data[index(m_size - 1)] = value;
         }
         else
         {
-            mData[index(0)] = value;
-            mHead = (mHead + 1) % N;
+            m_data[index(0)] = value;
+            m_head = (m_head + 1) % N;
         }
     }
 
     void pop_front()
     {
         assert(!empty());
-        mHead = (mHead + 1) % N;
-        --mSize;
+        m_head = (m_head + 1) % N;
+        --m_size;
     }
 
     T& front()
     {
         assert(!empty());
-        return mData[index(0)];
+        return m_data[index(0)];
     }
 
     T& back()
     {
         assert(!empty());
-        return mData[index(mSize - 1)];
+        return m_data[index(m_size - 1)];
     }
 
-    inline T& at(size_t idx) { return mData[index(idx)]; }
+    inline T& at(size_t idx) { return m_data[index(idx)]; }
 
-    inline const T& at(size_t idx) const { return mData[index(idx)]; }
+    inline const T& at(size_t idx) const { return m_data[index(idx)]; }
 
     inline T& operator[](size_t idx) { return at(idx); }
 
@@ -149,10 +149,10 @@ public:
 private:
     inline size_t index(size_t idx) const
     {
-        assert(idx < mSize);
-        return (mHead + idx) % N;
+        assert(idx < m_size);
+        return (m_head + idx) % N;
     }
 
 private:
-    size_t mHead;
+    size_t m_head;
 };

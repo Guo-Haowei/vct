@@ -28,9 +28,9 @@ public:
 
 public:
     iterator begin() { return iterator(data()); }
-    iterator end() { return iterator(data() + mSize); }
+    iterator end() { return iterator(data() + m_size); }
     const_iterator begin() const { return const_iterator(data()); }
-    const_iterator end() const { return const_iterator(data() + mSize); }
+    const_iterator end() const { return const_iterator(data() + m_size); }
 
     DEFAULT_ITERATOR_FUNCTIONS();
 
@@ -56,39 +56,39 @@ public:
 
     void clear()
     {
-        mSize = 0;
+        m_size = 0;
     }
 
     void resize(size_t newSize)
     {
-        mSize = newSize;
+        m_size = newSize;
     }
 
     size_t capacity() const { return N; }
 
-    bool empty() const { return mSize == 0; }
+    bool empty() const { return m_size == 0; }
 
-    size_t size() const { return mSize; }
+    size_t size() const { return m_size; }
 
-    T* data() { return mData; }
-    const T* data() const { return mData; }
+    T* data() { return m_data; }
+    const T* data() const { return m_data; }
 
     T& at(size_t index)
     {
-        assert(index < mSize);
-        return mData[index];
+        assert(index < m_size);
+        return m_data[index];
     }
 
     const T& at(size_t index) const
     {
-        assert(index < mSize);
-        return mData[index];
+        assert(index < m_size);
+        return m_data[index];
     }
 
     void push_back(const T& element)
     {
         assert(size() < N);
-        mData[mSize++] = element;
+        m_data[m_size++] = element;
     }
 
     void pop_back()
@@ -97,6 +97,6 @@ public:
     }
 
 protected:
-    T mData[N];
-    size_t mSize;
+    T m_data[N];
+    size_t m_size;
 };

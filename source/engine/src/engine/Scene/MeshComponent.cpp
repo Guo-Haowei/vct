@@ -1,6 +1,6 @@
 #include "MeshComponent.h"
 
-#include "Core/Archive.h"
+#include "engine/Archive.h"
 #include "Core/Check.h"
 
 static uint32_t GetStride(MeshComponent::VertexAttribute::NAME name)
