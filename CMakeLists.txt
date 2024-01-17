@@ -35,4 +35,21 @@ set_target_properties(bullet PROPERTIES FOLDER thirdparty)
 include(cmake/build-lua.cmake)
 include(cmake/build-imgui.cmake)
 
+# gtest
+enable_testing()
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+add_subdirectory(thirdparty/googletest)
+set_target_properties(gtest PROPERTIES FOLDER thirdparty)
+set_target_properties(gtest_main PROPERTIES FOLDER thirdparty)
+
+function(target_set_warning_level TARGET)
+    if(MSVC)
+        target_compile_options(${TARGET} PRIVATE /W4 /WX)
+    else()
+        message(FATAL_ERROR "platform not supported")
+    endif()
+endfunction()
+
 add_subdirectory(source)

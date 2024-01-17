@@ -51,19 +51,19 @@ public:
 
     void clear()
     {
-        mData[0] = 0;
-        mSize = 1;
+        m_data[0] = 0;
+        m_size = 1;
     }
 
-    const char* c_str() const { return mData; }
+    const char* c_str() const { return m_data; }
 
     bool empty() const { return length() == 0; }
 
-    size_t length() const { return mSize - 1; };
+    size_t length() const { return m_size - 1; };
 
     bool equal(size_t n, const char* str) const
     {
-        return length() == n && strncmp(mData, str, n) == 0;
+        return length() == n && strncmp(m_data, str, n) == 0;
     }
 
     bool equal(const char* str) const
@@ -73,7 +73,7 @@ public:
 
     bool iequal(size_t n, const char* str) const
     {
-        return length() == n && _strnicmp(mData, str, n) == 0;
+        return length() == n && _strnicmp(m_data, str, n) == 0;
     }
 
     bool iequal(const char* str) const
@@ -112,18 +112,18 @@ public:
     void push_back(const char& element)
     {
         assert(length() < N);
-        mData[length()] = element;
-        mData[length() + 1] = 0;
-        ++mSize;
+        m_data[length()] = element;
+        m_data[length() + 1] = 0;
+        ++m_size;
     }
 
 public:
     this_type& append(const char* buffer, size_t len)
     {
         assert(length() + len < N);
-        memcpy(mData + length(), buffer, len);
-        mSize += len;
-        mData[length()] = 0;
+        memcpy(m_data + length(), buffer, len);
+        m_size += len;
+        m_data[length()] = 0;
         return *this;
     }
 
@@ -147,8 +147,8 @@ protected:
     void set_from_length_and_buffer(size_t len, const char* str)
     {
         assert(len < N);
-        mSize = min_val(N - 1, len) + 1;
-        memcpy(mData, str, length());
-        mData[length()] = 0;
+        m_size = min_val(N - 1, len) + 1;
+        memcpy(m_data, str, length());
+        m_data[length()] = 0;
     }
 };

@@ -20,56 +20,56 @@ public:
     using pointer = element_type*;
 
 public:
-    explicit this_type(pointer ptr) : mPtr(ptr) {}
+    explicit this_type(pointer ptr) : m_ptr(ptr) {}
 
     this_type operator++(int)
     {
         this_type tmp = *this;
-        ++mPtr;
+        ++m_ptr;
         return tmp;
     }
 
     this_type& operator++()
     {
-        ++mPtr;
+        ++m_ptr;
         return *this;
     }
 
     this_type operator--(int)
     {
         this_type tmp = *this;
-        --mPtr;
+        --m_ptr;
         return tmp;
     }
 
     this_type& operator--()
     {
-        --mPtr;
+        --m_ptr;
         return *this;
     }
 
     reference operator*() const
     {
-        return *mPtr;
+        return *m_ptr;
     }
 
     pointer operator->() const
     {
-        return mPtr;
+        return m_ptr;
     }
 
     bool operator==(const this_type& rhs) const
     {
-        return mPtr == rhs.mPtr;
+        return m_ptr == rhs.m_ptr;
     }
 
     bool operator!=(const this_type& rhs) const
     {
-        return mPtr != rhs.mPtr;
+        return m_ptr != rhs.m_ptr;
     }
 
 private:
-    pointer mPtr;
+    pointer m_ptr;
 };
 
 template<typename base_iterator_type>
@@ -81,41 +81,41 @@ class reverse_iterator_type
     using pointer = element_type*;
 
 public:
-    explicit this_type(const base_iterator_type& iterator) : mInternal(iterator) {}
+    explicit this_type(const base_iterator_type& iterator) : m_internal(iterator) {}
 
     this_type operator++(int)
     {
         this_type tmp = *this;
-        --mInternal;
+        --m_internal;
         return tmp;
     }
 
     this_type& operator++()
     {
-        --mInternal;
+        --m_internal;
         return *this;
     }
 
     reference operator*() const
     {
-        return mInternal.operator*();
+        return m_internal.operator*();
     }
 
     pointer operator->() const
     {
-        return mInternal.operator->();
+        return m_internal.operator->();
     }
 
     bool operator==(const this_type& rhs) const
     {
-        return mInternal == rhs.mInternal;
+        return m_internal == rhs.m_internal;
     }
 
     bool operator!=(const this_type& rhs) const
     {
-        return mInternal != rhs.mInternal;
+        return m_internal != rhs.m_internal;
     }
 
 private:
-    base_iterator_type mInternal;
+    base_iterator_type m_internal;
 };

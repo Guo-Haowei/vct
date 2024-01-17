@@ -1,7 +1,7 @@
 #pragma once
 #include "SceneComponents.h"
 
-#include "Core/Archive.h"
+#include "engine/Archive.h"
 #include "Core/Check.h"
 
 void HierarchyComponent::Serialize(Archive& archive)

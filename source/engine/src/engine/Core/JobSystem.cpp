@@ -6,8 +6,8 @@
 #include <thread>
 
 #include "Core/Check.h"
-#include <universal/containers/fixed_stack.h>
-#include <universal/containers/ring_buffer.h>
+#include <engine/container/fixed_stack.h>
+#include <engine/container/ring_buffer.h>
 
 #define WIN_CALL(x) x
 

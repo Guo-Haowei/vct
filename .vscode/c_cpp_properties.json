@@ -5,7 +5,7 @@
             "includePath": [
                 "${workspaceRoot}/thirdparty/assimp/include",
                 "${workspaceRoot}/thirdparty/bullet3/",
-                "${workspaceRoot}/thirdparty/doctest",
+                "${workspaceRoot}/thirdparty/googletest/googletest/include",
                 "${workspaceRoot}/thirdparty/fmt/include",
                 "${workspaceRoot}/thirdparty/glad/include",
                 "${workspaceRoot}/thirdparty/glfw/include",
