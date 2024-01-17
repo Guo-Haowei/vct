@@ -4,7 +4,7 @@
 #include <set>
 
 #include "Core/CommonDvars.h"
-#include "shaders/cbuffer.glsl"
+#include "cbuffer.glsl"
 #include "Core/Check.h"
 #include "Core/DynamicVariable.h"
 #include "Core/Log.h"

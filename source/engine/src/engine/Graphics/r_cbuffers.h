@@ -3,7 +3,7 @@
 #include "r_defines.h"
 
 // inline include
-#include "shaders/cbuffer.glsl"
+#include "cbuffer.glsl"
 
 extern gl::ConstantBuffer<PerFrameCB> g_perFrameCache;
 extern gl::ConstantBuffer<PerBatchCB> g_perBatchCache;

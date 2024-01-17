@@ -1,13 +1,13 @@
-set(LIB_NAME Engine)
+set(LIB_NAME engine)
 
 file(GLOB_RECURSE SRC
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
 add_library(${LIB_NAME} STATIC ${SRC})
 
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SRC})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src/engine FILES ${SRC})
 
 target_include_directories(${LIB_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/thirdparty/assimp/include
@@ -18,8 +18,9 @@ target_include_directories(${LIB_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/thirdparty/glm
     ${PROJECT_SOURCE_DIR}/thirdparty/imgui
     ${PROJECT_SOURCE_DIR}/thirdparty
-    ${PROJECT_SOURCE_DIR}/Source/Engine
-    ${PROJECT_SOURCE_DIR}/Source/
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/engine
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../shaders
 )
 
 target_compile_definitions(${LIB_NAME} PUBLIC
