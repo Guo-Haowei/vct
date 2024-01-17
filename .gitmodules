@@ -1,27 +1,27 @@
-[submodule "External/glfw"]
+[submodule "thirdparty/glfw"]
 	path = thirdparty/glfw
 	url = https://github.com/glfw/glfw.git
-[submodule "External/glad"]
+[submodule "thirdparty/glad"]
 	path = thirdparty/glad
 	url = https://github.com/Guo-Haowei/glad.git
-[submodule "External/assimp"]
+[submodule "thirdparty/assimp"]
 	path = thirdparty/assimp
 	url = https://github.com/assimp/assimp.git
-[submodule "External/glm"]
+[submodule "thirdparty/glm"]
 	path = thirdparty/glm
 	url = https://github.com/g-truc/glm.git
-[submodule "External/lua"]
+[submodule "thirdparty/lua"]
 	path = thirdparty/lua
 	url = https://github.com/lua/lua.git
-[submodule "External/imgui"]
+[submodule "thirdparty/imgui"]
 	path = thirdparty/imgui
 	url = https://github.com/ocornut/imgui.git
-[submodule "External/fmt"]
+[submodule "thirdparty/fmt"]
 	path = thirdparty/fmt
 	url = https://github.com/fmtlib/fmt.git
-[submodule "External/doctest"]
+[submodule "thirdparty/doctest"]
 	path = thirdparty/doctest
 	url = https://github.com/doctest/doctest.git
-[submodule "External/ImGuizmo"]
+[submodule "thirdparty/ImGuizmo"]
 	path = thirdparty/ImGuizmo
 	url = https://github.com/CedricGuillemet/ImGuizmo.git

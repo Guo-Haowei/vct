@@ -35,5 +35,4 @@ set_target_properties(bullet PROPERTIES FOLDER thirdparty)
 include(cmake/build-lua.cmake)
 include(cmake/build-imgui.cmake)
 
-add_subdirectory(Source)
-add_subdirectory(Test)
+add_subdirectory(source)
