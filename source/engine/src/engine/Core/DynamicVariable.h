@@ -1,6 +1,7 @@
 #pragma once
-#include "utils/fixed_string.h"
 #include "Math/GeoMath.h"
+
+#include <universal/containers/fixed_string.h>
 
 enum class EDvarType
 {

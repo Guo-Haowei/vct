@@ -12,11 +12,12 @@
                 "${workspaceRoot}/thirdparty/glm/",
                 "${workspaceRoot}/thirdparty/imgui/",
                 "${workspaceRoot}/thirdparty/",
-                "${workspaceRoot}/source/engine/src"
+                "${workspaceRoot}/source/engine/src",
+                "${workspaceRoot}/source/universal/src"
             ],
             "forcedInclude": [
-                "${workspaceFolder}/source/engine/src/engine/pch.h",
-                "${workspaceFolder}/source/engine/tests/pch.h"
+                "${workspaceRoot}/source/engine/src/engine/pch.h",
+                "${workspaceRoot}/source/engine/tests/pch.h"
             ],
             "defines": [
                 "DATA_DIR=\"\"",
