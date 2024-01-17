@@ -15,6 +15,7 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 add_subdirectory(thirdparty/glfw)
 set_target_properties(glfw PROPERTIES FOLDER thirdparty)
+set_target_properties(update_mappings PROPERTIES FOLDER thirdparty)
 
 ################################################################################
 message("Configuring glad...")
