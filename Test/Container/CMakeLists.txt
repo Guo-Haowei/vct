@@ -6,7 +6,7 @@ add_executable(${TESTNAME}
 
 target_include_directories(${TESTNAME} PRIVATE
     ${PROJECT_SOURCE_DIR}/Source/Engine
-    ${PROJECT_SOURCE_DIR}/External/doctest
+    ${PROJECT_SOURCE_DIR}/thirdparty/doctest
 )
 
 set_target_properties(${TESTNAME} PROPERTIES FOLDER Test)

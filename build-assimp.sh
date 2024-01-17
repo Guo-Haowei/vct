@@ -1,5 +1,5 @@
 #!/bin/bash
-cd External/assimp || exit 1
+cd thirdparty/assimp || exit 1
 if [ ! -d build ]; then
     mkdir build || exit 1
 fi
