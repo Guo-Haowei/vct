@@ -1,10 +1,11 @@
 #include "Log.h"
 
-#include "Types.h"
-
-#include <cstdarg>
 #include <fmt/chrono.h>
 #include <fmt/color.h>
+
+#include <cstdarg>
+
+#include "Types.h"
 
 #define LOG_TO_SCREEN IN_USE
 
@@ -12,15 +13,12 @@
 #include "Framework/LogManager.h"
 #endif
 
-namespace base
-{
+namespace base {
 
-void log_impl(ELogLevel level, const std::string& message)
-{
+void log_impl(ELogLevel level, const std::string& message) {
     fmt::color color = fmt::color::silver;
     bool bold = true;
-    switch (level)
-    {
+    switch (level) {
         case ELogLevel::Fatal:
         case ELogLevel::Error:
             color = fmt::color::red;
@@ -44,42 +42,30 @@ void log_impl(ELogLevel level, const std::string& message)
 #endif
 
     auto style = fg(color);
-    if (bold)
-    {
+    if (bold) {
         style |= fmt::emphasis::bold;
     }
     fmt::print(style, "{}", message);
 
 #if USING(LOG_TO_SCREEN)
     LogManager* pLogManager = LogManager::GetSingletonPtr();
-    if (pLogManager)
-    {
+    if (pLogManager) {
         pLogManager->PushLog(static_cast<uint32_t>(color), message);
     }
 #endif
 
-    if (level == ELogLevel::Fatal)
-    {
-        if (IsDebuggerPresent())
-        {
+    if (level == ELogLevel::Fatal) {
+        if (IsDebuggerPresent()) {
             __debugbreak();
-        }
-        else
-        {
+        } else {
             exit(1);
         }
     }
 }
 
-void log(ELogLevel level, const std::string& message)
-{
+void log(ELogLevel level, const std::string& message) {
     constexpr const char* sTags[] = {
-        "[FATAL]- ",
-        "[ERROR]- ",
-        "[WARN] - ",
-        "[INFO] - ",
-        "[DEBUG]- ",
-        "[OK]   - ",
+        "[FATAL]- ", "[ERROR]- ", "[WARN] - ", "[INFO] - ", "[DEBUG]- ", "[OK]   - ",
     };
 
     static_assert(array_length(sTags) == underlying(ELogLevel::Count));

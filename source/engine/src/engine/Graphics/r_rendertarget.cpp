@@ -1,27 +1,19 @@
 #include "r_rendertarget.h"
 
-#include "Core/CommonDvars.h"
-#include "Framework/WindowManager.h"
-#include "r_cbuffers.h"
 #include "Core/Check.h"
+#include "Core/CommonDvars.h"
 #include "Core/DynamicVariable.h"
 #include "Core/Log.h"
+#include "Framework/WindowManager.h"
+#include "r_cbuffers.h"
 
-void RenderTarget::Bind()
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, mHandle);
-}
+void RenderTarget::Bind() { glBindFramebuffer(GL_FRAMEBUFFER, mHandle); }
 
-void RenderTarget::Unbind()
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
+void RenderTarget::Unbind() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
-void RenderTarget::Destroy()
-{
+void RenderTarget::Destroy() {
     mDepthAttachment.destroy();
-    for (int i = 0; i < mColorAttachmentCount; ++i)
-    {
+    for (int i = 0; i < mColorAttachmentCount; ++i) {
         mColorAttachments[i].destroy();
     }
 
@@ -29,8 +21,7 @@ void RenderTarget::Destroy()
     mHandle = 0;
 }
 
-void RenderTarget::CreateDepthAttachment()
-{
+void RenderTarget::CreateDepthAttachment() {
     Texture2DCreateInfo info{};
     info.width = mWidth;
     info.height = mHeight;
@@ -50,8 +41,7 @@ void RenderTarget::CreateDepthAttachment()
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, mDepthAttachment.GetHandle(), 0);
 }
 
-void RenderTarget::Create(int width, int height)
-{
+void RenderTarget::Create(int width, int height) {
     mWidth = width;
     mHeight = height;
     glGenFramebuffers(1, &mHandle);
@@ -59,8 +49,7 @@ void RenderTarget::Create(int width, int height)
 
 static std::vector<RenderTarget*> g_rts;
 
-void DepthRenderTarget::Create(int width, int height)
-{
+void DepthRenderTarget::Create(int width, int height) {
     RenderTarget::Create(width, height);
 
     Bind();
@@ -74,26 +63,16 @@ void DepthRenderTarget::Create(int width, int height)
     g_rts.push_back(this);
 }
 
-void RenderTarget::CheckError()
-{
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    {
+void RenderTarget::CheckError() {
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         LOG_ERROR("Frame buffer not completed");
     }
 }
 
 // TODO: expose
-enum
-{
-    POSISION = 0,
-    NORMAL = 1,
-    ALBEDO = 2,
-    FINALIMAGE = 0,
-    SSAO = 0
-};
+enum { POSISION = 0, NORMAL = 1, ALBEDO = 2, FINALIMAGE = 0, SSAO = 0 };
 
-void GBuffer::Create(int width, int height)
-{
+void GBuffer::Create(int width, int height) {
     RenderTarget::Create(width, height);
 
     mColorAttachmentCount = 3;
@@ -110,32 +89,20 @@ void GBuffer::Create(int width, int height)
 
     // position
     mColorAttachments[POSISION].create2DEmpty(info);
-    glFramebufferTexture2D(
-        GL_FRAMEBUFFER,
-        GL_COLOR_ATTACHMENT0 + POSISION,
-        GL_TEXTURE_2D,
-        mColorAttachments[POSISION].GetHandle(),
-        0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + POSISION, GL_TEXTURE_2D,
+                           mColorAttachments[POSISION].GetHandle(), 0);
 
     // normal
     mColorAttachments[NORMAL].create2DEmpty(info);
-    glFramebufferTexture2D(
-        GL_FRAMEBUFFER,
-        GL_COLOR_ATTACHMENT0 + NORMAL,
-        GL_TEXTURE_2D,
-        mColorAttachments[NORMAL].GetHandle(),
-        0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + NORMAL, GL_TEXTURE_2D,
+                           mColorAttachments[NORMAL].GetHandle(), 0);
 
     // albedo
     info.internalFormat = GL_RGBA;
     info.dataType = GL_UNSIGNED_BYTE;
     mColorAttachments[ALBEDO].create2DEmpty(info);
-    glFramebufferTexture2D(
-        GL_FRAMEBUFFER,
-        GL_COLOR_ATTACHMENT0 + ALBEDO,
-        GL_TEXTURE_2D,
-        mColorAttachments[ALBEDO].GetHandle(),
-        0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ALBEDO, GL_TEXTURE_2D,
+                           mColorAttachments[ALBEDO].GetHandle(), 0);
 
     GLuint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
     glDrawBuffers(3, attachments);
@@ -147,8 +114,7 @@ void GBuffer::Create(int width, int height)
     Unbind();
 }
 
-void SsaoRT::Create(int width, int height)
-{
+void SsaoRT::Create(int width, int height) {
     RenderTarget::Create(width, height);
 
     mColorAttachmentCount = 1;
@@ -170,12 +136,8 @@ void SsaoRT::Create(int width, int height)
     // position
     const int slot = SSAO;
     mColorAttachments[slot].create2DEmpty(info);
-    glFramebufferTexture2D(
-        GL_FRAMEBUFFER,
-        GL_COLOR_ATTACHMENT0 + slot,
-        GL_TEXTURE_2D,
-        mColorAttachments[slot].GetHandle(),
-        0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + slot, GL_TEXTURE_2D,
+                           mColorAttachments[slot].GetHandle(), 0);
 
     GLuint attachments[1] = { GL_COLOR_ATTACHMENT0 };
     glDrawBuffers(1, attachments);
@@ -184,8 +146,7 @@ void SsaoRT::Create(int width, int height)
     Unbind();
 }
 
-void FinalImageRT::Create(int width, int height)
-{
+void FinalImageRT::Create(int width, int height) {
     RenderTarget::Create(width, height);
 
     mColorAttachmentCount = 1;
@@ -202,12 +163,8 @@ void FinalImageRT::Create(int width, int height)
     // position
     const int slot = FINALIMAGE;
     mColorAttachments[slot].create2DEmpty(info);
-    glFramebufferTexture2D(
-        GL_FRAMEBUFFER,
-        GL_COLOR_ATTACHMENT0 + slot,
-        GL_TEXTURE_2D,
-        mColorAttachments[slot].GetHandle(),
-        0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + slot, GL_TEXTURE_2D,
+                           mColorAttachments[slot].GetHandle(), 0);
 
     GLuint attachments[1] = { GL_COLOR_ATTACHMENT0 };
     glDrawBuffers(1, attachments);
@@ -227,8 +184,7 @@ FinalImageRT g_viewerRT;
 
 uint32_t gFinalImage;
 
-void R_CreateRT()
-{
+void R_CreateRT() {
     auto [w, h] = gWindowManager->GetFrameSize();
 
     const int res = DVAR_GET_INT(r_shadowRes);
@@ -245,10 +201,8 @@ void R_CreateRT()
     gFinalImage = g_viewerRT.mColorAttachments[0].GetHandle();
 }
 
-void R_DestroyRT()
-{
-    for (auto& rt : g_rts)
-    {
+void R_DestroyRT() {
+    for (auto& rt : g_rts) {
         rt->Destroy();
     }
 }

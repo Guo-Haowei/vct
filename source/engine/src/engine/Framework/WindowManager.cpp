@@ -1,26 +1,22 @@
 #include "WindowManager.h"
 
 #include "Application.h"
-#include "Core/CommonDvars.h"
 #include "Core/Check.h"
+#include "Core/CommonDvars.h"
 #include "Core/Input.h"
 #include "Core/Log.h"
-
+#include "GLFW/glfw3.h"
 #include "imgui/backends/imgui_impl_glfw.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
-#include "GLFW/glfw3.h"
 
 WindowManager* gWindowManager = new WindowManager();
 
-bool WindowManager::InitializeInternal()
-{
+bool WindowManager::InitializeInternal() {
     const auto& info = mApplication->GetInfo();
 
     check(!mInitialized);
 
-    glfwSetErrorCallback([](int code, const char* desc) {
-        LOG_FATAL("[glfw] error({}): {}", code, desc);
-    });
+    glfwSetErrorCallback([](int code, const char* desc) { LOG_FATAL("[glfw] error({}): {}", code, desc); });
 
     glfwInit();
 
@@ -29,8 +25,7 @@ bool WindowManager::InitializeInternal()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-    if (DVAR_GET_BOOL(r_debug))
-    {
+    if (DVAR_GET_BOOL(r_debug)) {
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
     }
 
@@ -69,26 +64,20 @@ bool WindowManager::InitializeInternal()
     return true;
 }
 
-void WindowManager::FinalizeInternal()
-{
+void WindowManager::FinalizeInternal() {
     ImGui_ImplGlfw_Shutdown();
     glfwDestroyWindow(mWindow);
     glfwTerminate();
 }
 
-bool WindowManager::ShouldClose()
-{
-    return glfwWindowShouldClose(mWindow);
-}
+bool WindowManager::ShouldClose() { return glfwWindowShouldClose(mWindow); }
 
-GLFWwindow* WindowManager::GetRaw()
-{
+GLFWwindow* WindowManager::GetRaw() {
     check(mInitialized && mWindow);
     return mWindow;
 }
 
-void WindowManager::NewFrame()
-{
+void WindowManager::NewFrame() {
     glfwPollEvents();
     glfwGetFramebufferSize(mWindow, &mFrameSize.x, &mFrameSize.y);
 
@@ -96,29 +85,18 @@ void WindowManager::NewFrame()
 
     // title
     char buffer[1024];
-    snprintf(buffer, sizeof(buffer),
-             "%s | Pos: %d x %d | Size: %d x %d | FPS: %.1f",
-             mApplication->GetInfo().title,
-             mWindowPos.x, mWindowPos.y,
-             mFrameSize.x, mFrameSize.y,
-             ImGui::GetIO().Framerate);
+    snprintf(buffer, sizeof(buffer), "%s | Pos: %d x %d | Size: %d x %d | FPS: %.1f", mApplication->GetInfo().title,
+             mWindowPos.x, mWindowPos.y, mFrameSize.x, mFrameSize.y, ImGui::GetIO().Framerate);
     glfwSetWindowTitle(mWindow, buffer);
 
     ImGui_ImplGlfw_NewFrame();
 }
 
-std::tuple<int, int> WindowManager::GetFrameSize()
-{
-    return std::tuple<int, int>(mFrameSize.x, mFrameSize.y);
-}
+std::tuple<int, int> WindowManager::GetFrameSize() { return std::tuple<int, int>(mFrameSize.x, mFrameSize.y); }
 
-std::tuple<int, int> WindowManager::GetWindowPos()
-{
-    return std::tuple<int, int>(mWindowPos.x, mWindowPos.y);
-}
+std::tuple<int, int> WindowManager::GetWindowPos() { return std::tuple<int, int>(mWindowPos.x, mWindowPos.y); }
 
-void WindowManager::Present()
-{
+void WindowManager::Present() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     GLFWwindow* oldContext = glfwGetCurrentContext();
@@ -129,57 +107,43 @@ void WindowManager::Present()
     glfwSwapBuffers(mWindow);
 }
 
-void WindowManager::CursorPosCallback(GLFWwindow* window, double x, double y)
-{
+void WindowManager::CursorPosCallback(GLFWwindow* window, double x, double y) {
     ImGui_ImplGlfw_CursorPosCallback(window, x, y);
     // if (!ImGui::GetIO().WantCaptureMouse)
-    {
-        Input::gInput.SetCursor(static_cast<float>(x), static_cast<float>(y));
-    }
+    { Input::gInput.SetCursor(static_cast<float>(x), static_cast<float>(y)); }
 }
 
-void WindowManager::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
-{
+void WindowManager::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
 
     // if (!ImGui::GetIO().WantCaptureMouse)
     {
-        if (action == GLFW_PRESS)
-        {
+        if (action == GLFW_PRESS) {
             Input::gInput.SetButton(button, true);
-        }
-        else if (action == GLFW_RELEASE)
-        {
+        } else if (action == GLFW_RELEASE) {
             Input::gInput.SetButton(button, false);
         }
     }
 }
 
-void WindowManager::KeyCallback(GLFWwindow* window, int keycode, int scancode, int action, int mods)
-{
+void WindowManager::KeyCallback(GLFWwindow* window, int keycode, int scancode, int action, int mods) {
     ImGui_ImplGlfw_KeyCallback(window, keycode, scancode, action, mods);
 
     // if (!ImGui::GetIO().WantCaptureKeyboard)
     {
-        if (action == GLFW_PRESS)
-        {
+        if (action == GLFW_PRESS) {
             Input::gInput.SetKey(keycode, true);
-        }
-        else if (action == GLFW_RELEASE)
-        {
+        } else if (action == GLFW_RELEASE) {
             Input::gInput.SetKey(keycode, false);
         }
     }
 }
 
-void WindowManager::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
-{
+void WindowManager::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
     ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
 
     // if (!ImGui::GetIO().WantCaptureMouse)
-    {
-        Input::gInput.SetWheel(static_cast<float>(xoffset), static_cast<float>(yoffset));
-    }
+    { Input::gInput.SetWheel(static_cast<float>(xoffset), static_cast<float>(yoffset)); }
 }
 
 #include "imgui/backends/imgui_impl_glfw.cpp"

@@ -1,8 +1,7 @@
 #pragma once
 #include "Math/GeoMath.h"
 
-class Camera
-{
+class Camera {
 public:
     vec3 direction() const;
 

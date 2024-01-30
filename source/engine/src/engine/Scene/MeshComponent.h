@@ -4,17 +4,13 @@
 
 class Archive;
 
-struct MeshComponent
-{
-    enum : uint32_t
-    {
+struct MeshComponent {
+    enum : uint32_t {
         None = 0,
     };
 
-    struct VertexAttribute
-    {
-        enum NAME
-        {
+    struct VertexAttribute {
+        enum NAME {
             POSITION = 0,
             NORMAL,
             TEXCOORD_0,
@@ -33,8 +29,7 @@ struct MeshComponent
         bool IsValid() const { return sizeInByte != 0; }
     };
 
-    struct MeshSubset
-    {
+    struct MeshSubset {
         ecs::Entity materialID;
         uint32_t indexOffset = 0;
         uint32_t indexCount = 0;
@@ -43,8 +38,7 @@ struct MeshComponent
         void Serialize(Archive& archive);
     };
 
-    struct GPUBuffers
-    {
+    struct GPUBuffers {
         virtual ~GPUBuffers() = default;
     };
 

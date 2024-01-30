@@ -2,27 +2,16 @@
 
 #include "engine/Archive.h"
 
-namespace ecs
-{
+namespace ecs {
 
-EntityGenerator::EntityGenerator()
-    : mNext(Entity::INVALID_ID + 1)
-{
-}
+EntityGenerator::EntityGenerator() : mNext(Entity::INVALID_ID + 1) {}
 
-Entity EntityGenerator::Create()
-{
-    return Entity(mNext.fetch_add(1));
-}
+Entity EntityGenerator::Create() { return Entity(mNext.fetch_add(1)); }
 
-void EntityGenerator::Serialize(Archive& archive)
-{
-    if (archive.IsWriteMode())
-    {
+void EntityGenerator::Serialize(Archive& archive) {
+    if (archive.IsWriteMode()) {
         archive << mNext.load();
-    }
-    else
-    {
+    } else {
         uint32_t value;
         archive >> value;
         mNext.store(value);

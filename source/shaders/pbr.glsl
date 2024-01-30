@@ -1,8 +1,7 @@
 //------------------------------------------------------------------------------
 // PBR utilities
 //------------------------------------------------------------------------------
-float distributionGGX(float NdotH, float roughness)
-{
+float distributionGGX(float NdotH, float roughness) {
     float a = roughness * roughness;
     float a2 = a * a;
     float NdotH2 = NdotH * NdotH;
@@ -14,8 +13,7 @@ float distributionGGX(float NdotH, float roughness)
     return nom / denom;
 }
 
-float geometrySchlickGGX(float NdotV, float roughness)
-{
+float geometrySchlickGGX(float NdotV, float roughness) {
     float r = roughness + 1.0;
     float k = (r * r) / 8.0;
 
@@ -25,13 +23,8 @@ float geometrySchlickGGX(float NdotV, float roughness)
     return nom / denom;
 }
 
-float geometrySmith(float NdotV, float NdotL, float roughness)
-{
-    return geometrySchlickGGX(NdotV, roughness) *
-           geometrySchlickGGX(NdotL, roughness);
+float geometrySmith(float NdotV, float NdotL, float roughness) {
+    return geometrySchlickGGX(NdotV, roughness) * geometrySchlickGGX(NdotL, roughness);
 }
 
-vec3 fresnelSchlick(float cosTheta, const in vec3 F0)
-{
-    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
-}
+vec3 fresnelSchlick(float cosTheta, const in vec3 F0) { return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0); }

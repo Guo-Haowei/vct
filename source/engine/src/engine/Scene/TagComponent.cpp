@@ -1,14 +1,11 @@
 #include "TagComponent.h"
+
 #include "engine/Archive.h"
 
-void TagComponent::Serialize(Archive& archive)
-{
-    if (archive.IsWriteMode())
-    {
+void TagComponent::Serialize(Archive& archive) {
+    if (archive.IsWriteMode()) {
         archive << mTag;
-    }
-    else
-    {
+    } else {
         archive >> mTag;
     }
 }

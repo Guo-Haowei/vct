@@ -1,18 +1,15 @@
 #include "core/collections/fixed_stack.h"
 
-namespace vct
-{
+namespace vct {
 
-TEST(FixedStack, constructor)
-{
+TEST(FixedStack, constructor) {
     FixedStack<int, 7> stack;
     EXPECT_TRUE(stack.empty());
     EXPECT_EQ(stack.size(), 0);
     EXPECT_EQ(stack.capacity(), 7);
 }
 
-TEST(FixedStack, constructor_initializer_list)
-{
+TEST(FixedStack, constructor_initializer_list) {
     FixedStack<int, 6> stack{ 1, 2, 3 };
     EXPECT_FALSE(stack.empty());
     EXPECT_EQ(stack.size(), 3);
@@ -21,17 +18,13 @@ TEST(FixedStack, constructor_initializer_list)
     EXPECT_EQ(stack[2], 3);
 }
 
-TEST(FixedStack, constructor_initializer_list_over_flow)
-{
-    auto func = []() {
-        [[maybe_unused]] FixedStack<int, 2> stack{ 1, 2, 3 };
-    };
+TEST(FixedStack, constructor_initializer_list_over_flow) {
+    auto func = []() { [[maybe_unused]] FixedStack<int, 2> stack{ 1, 2, 3 }; };
 
     EXPECT_DEATH({ func(); }, "index out of range");
 }
 
-TEST(FixedStack, emtpy)
-{
+TEST(FixedStack, emtpy) {
     {
         FixedStack<int, 4> stack;
         EXPECT_TRUE(stack.empty());
@@ -46,8 +39,7 @@ TEST(FixedStack, emtpy)
     }
 }
 
-TEST(FixedStack, size)
-{
+TEST(FixedStack, size) {
     FixedStack<char, 4> stack;
     EXPECT_EQ(stack.size(), 0);
     stack.push_back('a');
@@ -67,8 +59,7 @@ TEST(FixedStack, size)
     EXPECT_EQ(stack.size(), 0);
 }
 
-TEST(FixedStack, capacity)
-{
+TEST(FixedStack, capacity) {
     {
         FixedStack<int, 1> stack;
         static_assert(stack.capacity() == 1);
@@ -79,8 +70,7 @@ TEST(FixedStack, capacity)
     }
 }
 
-TEST(FixedStack, push_back)
-{
+TEST(FixedStack, push_back) {
     FixedStack<int, 5> stack{ 1, 2, 3 };
     stack.push_back(10);
     EXPECT_EQ(stack[3], 10);
@@ -90,8 +80,7 @@ TEST(FixedStack, push_back)
     EXPECT_DEATH({ stack.push_back(12); }, "index out of range");
 }
 
-TEST(FixedStack, pop_back)
-{
+TEST(FixedStack, pop_back) {
     FixedStack<int, 5> stack{ 1, 2, 3 };
     EXPECT_EQ(stack.back(), 3);
     stack.pop_back();
@@ -103,8 +92,7 @@ TEST(FixedStack, pop_back)
     EXPECT_DEATH({ stack.pop_back(); }, "index out of range");
 }
 
-TEST(FixedStack, front_and_back)
-{
+TEST(FixedStack, front_and_back) {
     FixedStack<int, 5> stack;
     EXPECT_DEATH({ stack.front(); }, "index out of range");
     EXPECT_DEATH({ stack.back(); }, "index out of range");
@@ -116,45 +104,37 @@ TEST(FixedStack, front_and_back)
     EXPECT_EQ(stack.back(), 20);
 }
 
-TEST(FixedStack, iterator)
-{
+TEST(FixedStack, iterator) {
     FixedStack<int, 5> stack{ 0, 1, 2, 3, 4 };
     int i = 0;
-    for (auto& it : stack)
-    {
+    for (auto& it : stack) {
         EXPECT_EQ(it, i);
         ++i;
     }
 }
 
-TEST(FixedStack, const_iterator)
-{
+TEST(FixedStack, const_iterator) {
     FixedStack<int, 5> stack{ 0, 1, 2, 3, 4 };
     int i = 0;
-    for (const auto& it : stack)
-    {
+    for (const auto& it : stack) {
         EXPECT_EQ(it, i);
         ++i;
     }
 }
 
-TEST(FixedStack, reverse_iterator)
-{
+TEST(FixedStack, reverse_iterator) {
     FixedStack<int, 5> stack{ 0, 1, 2, 3, 4 };
     int i = 4;
-    for (auto it = stack.rbegin(); it != stack.rend(); ++it)
-    {
+    for (auto it = stack.rbegin(); it != stack.rend(); ++it) {
         EXPECT_EQ(*it, i);
         --i;
     }
 }
 
-TEST(FixedStack, reverse_const_iterator)
-{
+TEST(FixedStack, reverse_const_iterator) {
     FixedStack<int, 5> stack{ 0, 1, 2, 3, 4 };
     int i = 4;
-    for (auto it = stack.crbegin(); it != stack.crend(); ++it)
-    {
+    for (auto it = stack.crbegin(); it != stack.crend(); ++it) {
         EXPECT_EQ(*it, i);
         --i;
     }

@@ -7,8 +7,7 @@ struct aiMaterial;
 struct aiScene;
 struct aiAnimation;
 
-class SceneLoader
-{
+class SceneLoader {
 public:
     SceneLoader(Scene& scene) : mScene(scene) {}
 

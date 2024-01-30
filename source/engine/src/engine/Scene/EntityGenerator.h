@@ -1,11 +1,9 @@
 #pragma once
 #include "Entity.h"
 
-namespace ecs
-{
+namespace ecs {
 
-class EntityGenerator
-{
+class EntityGenerator {
     EntityGenerator(const EntityGenerator&) = delete;
     EntityGenerator& operator=(const EntityGenerator&) = delete;
 

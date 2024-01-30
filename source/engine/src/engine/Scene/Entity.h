@@ -2,11 +2,9 @@
 
 class Archive;
 
-namespace ecs
-{
+namespace ecs {
 
-class Entity
-{
+class Entity {
 public:
     static constexpr size_t INVALID_INDEX = ~0llu;
     static constexpr uint32_t INVALID_ID = 0;
@@ -17,25 +15,13 @@ public:
 
     ~Entity() = default;
 
-    bool operator==(const Entity& rhs) const
-    {
-        return mID == rhs.mID;
-    }
+    bool operator==(const Entity& rhs) const { return mID == rhs.mID; }
 
-    bool operator!=(const Entity& rhs) const
-    {
-        return mID != rhs.mID;
-    }
+    bool operator!=(const Entity& rhs) const { return mID != rhs.mID; }
 
-    bool IsValid() const
-    {
-        return mID != INVALID_ID;
-    }
+    bool IsValid() const { return mID != INVALID_ID; }
 
-    void MakeInvalid()
-    {
-        mID = INVALID_ID;
-    }
+    void MakeInvalid() { mID = INVALID_ID; }
 
     constexpr uint32_t GetID() const { return mID; }
 
@@ -51,32 +37,23 @@ private:
 
 }  // namespace ecs
 
-namespace std
-{
+namespace std {
 
 template<>
-struct hash<ecs::Entity>
-{
-    std::size_t operator()(const ecs::Entity& entity) const
-    {
-        return std::hash<uint32_t>{}(entity.GetID());
-    }
+struct hash<ecs::Entity> {
+    std::size_t operator()(const ecs::Entity& entity) const { return std::hash<uint32_t>{}(entity.GetID()); }
 };
 
 template<>
-struct less<ecs::Entity>
-{
-    constexpr bool operator()(const ecs::Entity& lhs, const ecs::Entity& rhs) const
-    {
+struct less<ecs::Entity> {
+    constexpr bool operator()(const ecs::Entity& lhs, const ecs::Entity& rhs) const {
         return lhs.GetID() < rhs.GetID();
     }
 };
 
 template<>
-struct equal_to<ecs::Entity>
-{
-    constexpr bool operator()(const ecs::Entity& lhs, const ecs::Entity& rhs) const
-    {
+struct equal_to<ecs::Entity> {
+    constexpr bool operator()(const ecs::Entity& lhs, const ecs::Entity& rhs) const {
         return lhs.GetID() == rhs.GetID();
     }
 };

@@ -2,15 +2,11 @@
 
 class Archive;
 
-class TagComponent
-{
+class TagComponent {
 public:
     TagComponent() = default;
 
-    TagComponent(const char* tag)
-    {
-        mTag = tag;
-    }
+    TagComponent(const char* tag) { mTag = tag; }
 
     // bool operator==(const std::string& tag) const { return mTag == tag; }
 

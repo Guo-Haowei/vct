@@ -1,15 +1,14 @@
 #include "UIManager.h"
 
-#include "imgui/imgui.h"
 #include "Core/Log.h"
 #include "Core/Utility.h"
+#include "imgui/imgui.h"
 
 UIManager* gUIManager = new UIManager;
 
 static std::string gIniPath;
 
-bool UIManager::InitializeInternal()
-{
+bool UIManager::InitializeInternal() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
@@ -28,13 +27,9 @@ bool UIManager::InitializeInternal()
     return true;
 }
 
-void UIManager::FinalizeInternal()
-{
-    ImGui::DestroyContext();
-}
+void UIManager::FinalizeInternal() { ImGui::DestroyContext(); }
 
-void UIManager::SetupStyle()
-{
+void UIManager::SetupStyle() {
     ImGui::StyleColorsDark();
 
     auto& style = ImGui::GetStyle();
@@ -70,8 +65,7 @@ void UIManager::SetupStyle()
     colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.15f, 0.1505f, 0.151f, 1.0f);
 
     ImGuiIO& io = ImGui::GetIO();
-    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-    {
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
         style.WindowRounding = 0.0f;
         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }

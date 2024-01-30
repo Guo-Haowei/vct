@@ -3,23 +3,22 @@
 #include <random>
 
 #include "Core/Check.h"
-#include "Core/DynamicVariable.h"
 #include "Core/CommonDvars.h"
+#include "Core/DynamicVariable.h"
 #include "Core/camera.h"
-#include "Framework/SceneManager.h"
 #include "Framework/ProgramManager.h"
+#include "Framework/SceneManager.h"
 #include "Framework/WindowManager.h"
+#include "Math/Frustum.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"
 #include "r_rendertarget.h"
-#include "Math/Frustum.h"
 
 static GLuint g_noiseTexture;
 
 extern void FillMaterialCB(const MaterialData* mat, MaterialCB& cb);
 
-void R_Gbuffer_Pass()
-{
+void R_Gbuffer_Pass() {
     Scene& scene = Com_GetScene();
     const auto& program = gProgramManager->GetShaderProgram(ProgramType::GBUFFER);
 
@@ -34,8 +33,7 @@ void R_Gbuffer_Pass()
     Frustum frustum(gCamera.ProjView());
 
     const uint32_t numObjects = (uint32_t)scene.GetCount<ObjectComponent>();
-    for (uint32_t i = 0; i < numObjects; ++i)
-    {
+    for (uint32_t i = 0; i < numObjects; ++i) {
         const ObjectComponent& obj = scene.GetComponentArray<ObjectComponent>()[i];
         ecs::Entity entity = scene.GetEntity<ObjectComponent>(i);
         check(scene.Contains<TransformComponent>(entity));
@@ -46,8 +44,7 @@ void R_Gbuffer_Pass()
         const mat4& M = transform.GetWorldMatrix();
         AABB aabb = mesh.mLocalBound;
         aabb.ApplyMatrix(M);
-        if (!frustum.Intersects(aabb))
-        {
+        if (!frustum.Intersects(aabb)) {
             continue;
         }
 
@@ -58,12 +55,10 @@ void R_Gbuffer_Pass()
         const MeshData* drawData = reinterpret_cast<MeshData*>(mesh.gpuResource);
         glBindVertexArray(drawData->vao);
 
-        for (const auto& subset : mesh.mSubsets)
-        {
+        for (const auto& subset : mesh.mSubsets) {
             aabb = subset.localBound;
             aabb.ApplyMatrix(M);
-            if (!frustum.Intersects(aabb))
-            {
+            if (!frustum.Intersects(aabb)) {
                 continue;
             }
 
@@ -73,7 +68,8 @@ void R_Gbuffer_Pass()
             FillMaterialCB(matData, g_materialCache.cache);
             g_materialCache.Update();
 
-            glDrawElements(GL_TRIANGLES, subset.indexCount, GL_UNSIGNED_INT, (void*)(subset.indexOffset * sizeof(uint32_t)));
+            glDrawElements(GL_TRIANGLES, subset.indexCount, GL_UNSIGNED_INT,
+                           (void*)(subset.indexOffset * sizeof(uint32_t)));
         }
     }
 
@@ -81,8 +77,7 @@ void R_Gbuffer_Pass()
     g_gbufferRT.Unbind();
 }
 
-void R_SSAO_Pass()
-{
+void R_SSAO_Pass() {
     const auto& shader = gProgramManager->GetShaderProgram(ProgramType::SSAO);
 
     g_ssaoRT.Bind();
@@ -98,8 +93,7 @@ void R_SSAO_Pass()
     g_ssaoRT.Unbind();
 }
 
-void R_Deferred_VCT_Pass()
-{
+void R_Deferred_VCT_Pass() {
     const auto& program = gProgramManager->GetShaderProgram(ProgramType::VCT_DEFERRED);
     g_finalImageRT.Bind();
 
@@ -114,8 +108,7 @@ void R_Deferred_VCT_Pass()
     g_finalImageRT.Unbind();
 }
 
-void R_FXAA_Pass()
-{
+void R_FXAA_Pass() {
     const auto& program = gProgramManager->GetShaderProgram(ProgramType::FXAA);
 
     g_fxaaRT.Bind();
@@ -128,22 +121,18 @@ void R_FXAA_Pass()
     g_fxaaRT.Unbind();
 }
 
-static float lerp(float a, float b, float f)
-{
-    return a + f * (b - a);
-}
+static float lerp(float a, float b, float f) { return a + f * (b - a); }
 
-static void CreateSSAOResource()
-{
+static void CreateSSAOResource() {
     // generate sample kernel
     std::uniform_real_distribution<float> randomFloats(0.0f, 1.0f);  // generates random floats between 0.0 and 1.0
     std::default_random_engine generator;
     std::vector<glm::vec4> ssaoKernel;
     const int kernelSize = DVAR_GET_INT(r_ssaoKernelSize);
-    for (int i = 0; i < kernelSize; ++i)
-    {
+    for (int i = 0; i < kernelSize; ++i) {
         // [-1, 1], [-1, 1], [0, 1]
-        glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, randomFloats(generator));
+        glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0,
+                         randomFloats(generator));
         sample = glm::normalize(sample);
         sample *= randomFloats(generator);
         float scale = float(i) / kernelSize;
@@ -160,8 +149,7 @@ static void CreateSSAOResource()
     const int noiseSize = DVAR_GET_INT(r_ssaoNoiseSize);
 
     std::vector<glm::vec3> ssaoNoise;
-    for (int i = 0; i < noiseSize * noiseSize; ++i)
-    {
+    for (int i = 0; i < noiseSize * noiseSize; ++i) {
         glm::vec3 noise(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, 0.0f);
         noise = glm::normalize(noise);
         ssaoNoise.emplace_back(noise);
@@ -179,12 +167,6 @@ static void CreateSSAOResource()
     g_noiseTexture = noiseTexture;
 }
 
-void R_Create_Pass_Resources()
-{
-    CreateSSAOResource();
-}
+void R_Create_Pass_Resources() { CreateSSAOResource(); }
 
-void R_Destroy_Pass_Resources()
-{
-    glDeleteTextures(1, &g_noiseTexture);
-}
+void R_Destroy_Pass_Resources() { glDeleteTextures(1, &g_noiseTexture); }

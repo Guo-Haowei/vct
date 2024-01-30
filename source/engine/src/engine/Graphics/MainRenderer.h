@@ -4,11 +4,9 @@
 #include "r_cbuffers.h"
 #include "r_rendertarget.h"
 
-namespace vct
-{
+namespace vct {
 
-class MainRenderer
-{
+class MainRenderer {
 public:
     void createGpuResources();
     void render();

@@ -1,20 +1,17 @@
 #include "HierarchyPanel.h"
 
 #include <map>
-#include <unordered_set>
 #include <memory>
+#include <unordered_set>
 #include <vector>
-
-#include "imgui/imgui_internal.h"
 
 #include "Engine/Core/Check.h"
 #include "Engine/Scene/Scene.h"
+#include "imgui/imgui_internal.h"
 
-class HierarchyCreator
-{
+class HierarchyCreator {
 public:
-    struct HierarchyNode
-    {
+    struct HierarchyNode {
         HierarchyNode* parent = nullptr;
         ecs::Entity entity;
 
@@ -23,8 +20,7 @@ public:
 
     HierarchyCreator(HierarchyPanel& panel) : mPanel(panel) {}
 
-    void Draw(const Scene& scene)
-    {
+    void Draw(const Scene& scene) {
         Build(scene);
         check(mRoot);
         DrawNode(scene, mRoot, ImGuiTreeNodeFlags_DefaultOpen);
@@ -39,8 +35,7 @@ private:
     HierarchyPanel& mPanel;
 };
 
-void HierarchyCreator::DrawNode(const Scene& scene, HierarchyNode* pHier, ImGuiTreeNodeFlags flags)
-{
+void HierarchyCreator::DrawNode(const Scene& scene, HierarchyNode* pHier, ImGuiTreeNodeFlags flags) {
     check(pHier);
     ecs::Entity id = pHier->entity;
     const TagComponent* tagComponent = scene.GetComponent<TagComponent>(id);
@@ -54,32 +49,26 @@ void HierarchyCreator::DrawNode(const Scene& scene, HierarchyNode* pHier, ImGuiT
     flags |= mPanel.GetSelected() == id ? ImGuiTreeNodeFlags_Selected : 0;
     bool expanded = ImGui::TreeNodeEx(nodeTag.c_str(), flags);
     ImGui::SameLine();
-    if (ImGui::Selectable(tag.c_str()))
-    {
+    if (ImGui::Selectable(tag.c_str())) {
         mPanel.SetSelected(id);
     }
-    if (expanded)
-    {
+    if (expanded) {
         float indentWidth = 8.f;
         ImGui::Indent(indentWidth);
-        for (auto& child : pHier->children)
-        {
+        for (auto& child : pHier->children) {
             DrawNode(scene, child);
         }
         ImGui::Unindent(indentWidth);
     }
 }
 
-void HierarchyCreator::Build(const Scene& scene)
-{
+void HierarchyCreator::Build(const Scene& scene) {
     const size_t hierarchyComponentCount = scene.GetCount<HierarchyComponent>();
 
-    for (int i = 0; i < hierarchyComponentCount; ++i)
-    {
+    for (int i = 0; i < hierarchyComponentCount; ++i) {
         auto FindOrCreate = [this](ecs::Entity id) {
             auto it = m_nodes.find(id);
-            if (it == m_nodes.end())
-            {
+            if (it == m_nodes.end()) {
                 m_nodes[id] = std::make_shared<HierarchyNode>();
                 return m_nodes[id].get();
             }
@@ -98,10 +87,8 @@ void HierarchyCreator::Build(const Scene& scene)
     }
 
     int nodesWithNoParent = 0;
-    for (auto& it : m_nodes)
-    {
-        if (!it.second->parent)
-        {
+    for (auto& it : m_nodes) {
+        if (!it.second->parent) {
             ++nodesWithNoParent;
             mRoot = it.second.get();
         }
@@ -109,8 +96,7 @@ void HierarchyCreator::Build(const Scene& scene)
     check(nodesWithNoParent == 1);
 }
 
-void HierarchyPanel::RenderInternal(Scene& scene)
-{
+void HierarchyPanel::RenderInternal(Scene& scene) {
     HierarchyCreator creator(*this);
     creator.Draw(scene);
 }

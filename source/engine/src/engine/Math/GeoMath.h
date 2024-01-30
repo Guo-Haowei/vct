@@ -27,24 +27,18 @@ using glm::mat4;
 
 using glm::quat;
 template<typename T>
-T Square(const T& a)
-{
+T Square(const T& a) {
     return a * a;
 }
 
 template<typename T>
-inline T Lerp(const T& a, const T& b, const T& f)
-{
+inline T Lerp(const T& a, const T& b, const T& f) {
     return a + f * (b - a);
 }
 
-static inline float SaturateF(float x)
-{
-    return glm::min(1.0f, glm::max(0.0f, x));
-}
+static inline float SaturateF(float x) { return glm::min(1.0f, glm::max(0.0f, x)); }
 
-static inline void Decompose(const mat4& matrix, vec3& scale, vec4& rotation, vec3& translation)
-{
+static inline void Decompose(const mat4& matrix, vec3& scale, vec4& rotation, vec3& translation) {
     vec3 _skew;
     vec4 _perspective;
     quat quaternion;
@@ -55,8 +49,7 @@ static inline void Decompose(const mat4& matrix, vec3& scale, vec4& rotation, ve
     rotation.w = quaternion.w;
 }
 
-static inline constexpr uint32_t NextPowerOfTwo(uint32_t x)
-{
+static inline constexpr uint32_t NextPowerOfTwo(uint32_t x) {
     --x;
     x |= x >> 1;
     x |= x >> 2;

@@ -5,8 +5,7 @@
     CLASS& operator=(const CLASS&) = delete
 
 template<typename T>
-constexpr std::underlying_type_t<T> underlying(T value)
-{
+constexpr std::underlying_type_t<T> underlying(T value) {
     static_assert(std::is_enum_v<T>);
     return static_cast<std::underlying_type_t<T>>(value);
 }
@@ -15,8 +14,7 @@ using String = std::string;
 using StringVector = std::vector<String>;
 
 template<typename FUNC>
-class ScopeDrop
-{
+class ScopeDrop {
 public:
     ScopeDrop(FUNC func) : mFunc(func) {}
     ~ScopeDrop() { mFunc(); }
@@ -26,8 +24,7 @@ private:
 };
 
 template<typename FUNC>
-ScopeDrop<FUNC> MakeScopeDrop(FUNC func)
-{
+ScopeDrop<FUNC> MakeScopeDrop(FUNC func) {
     return ScopeDrop<FUNC>(func);
 }
 

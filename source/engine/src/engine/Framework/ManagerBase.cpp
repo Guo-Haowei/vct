@@ -4,12 +4,10 @@
 
 #define DEBUG_MANAGER_BASE(FMT, ...) LOG_DEBUG(__FUNCTION__ "() " FMT, ##__VA_ARGS__)
 
-bool ManagerBase::Initialize()
-{
+bool ManagerBase::Initialize() {
     DEBUG_MANAGER_BASE("Initializing '{}'...", mName);
     mInitialized = InitializeInternal();
-    if (!mInitialized)
-    {
+    if (!mInitialized) {
         LOG_FATAL(__FUNCTION__ "() Failed to initialize '{}'", mName);
         return false;
     }
@@ -18,13 +16,10 @@ bool ManagerBase::Initialize()
     return true;
 }
 
-void ManagerBase::Finalize()
-{
+void ManagerBase::Finalize() {
     DEBUG_MANAGER_BASE("Finalizing '{}'...", mName);
     FinalizeInternal();
     DEBUG_MANAGER_BASE("Manager '{}' finalized", mName);
 }
 
-void ManagerBase::Update(float)
-{
-}
+void ManagerBase::Update(float) {}

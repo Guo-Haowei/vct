@@ -1,14 +1,12 @@
 #pragma once
-struct ProgramCreateInfo
-{
+struct ProgramCreateInfo {
     std::string vs;
     std::string ps;
     std::string gs;
     std::string cs;
 };
 
-class Program
-{
+class Program {
 public:
     void Bind() const;
     void Unbind() const;

@@ -1,7 +1,6 @@
 #include "geometry.h"
 
-namespace geometry
-{
+namespace geometry {
 
 /**
  *        E__________________ H
@@ -23,8 +22,7 @@ namespace geometry
 enum { A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7 };
 // clang-format on
 
-MeshComponent MakeBox(float size)
-{
+MeshComponent MakeBox(float size) {
     MeshComponent mesh;
     mesh.mPositions = {
         vec3(-size, +size, +size),  // A
@@ -56,8 +54,7 @@ MeshComponent MakeBox(float size)
 }
 
 // load scene
-MeshComponent MakeBoxWireFrame(float size)
-{
+MeshComponent MakeBoxWireFrame(float size) {
     MeshComponent mesh;
     mesh.mPositions = {
         vec3(-size, +size, +size),  // A
@@ -70,11 +67,7 @@ MeshComponent MakeBoxWireFrame(float size)
         vec3(+size, +size, -size),  // H
     };
 
-    mesh.mIndices = {
-        A, B, B, C, C, D, D, A,
-        E, F, F, G, G, H, H, E,
-        A, E, B, F, D, H, C, G
-    };
+    mesh.mIndices = { A, B, B, C, C, D, D, A, E, F, F, G, G, H, H, E, A, E, B, F, D, H, C, G };
 
     return mesh;
 }

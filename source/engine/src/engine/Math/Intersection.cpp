@@ -1,9 +1,9 @@
 #include "Intersection.h"
+
 #include "AABB.h"
 #include "Ray.h"
 
-bool TestIntersection::RayAABB(const AABB& aabb, Ray& ray)
-{
+bool TestIntersection::RayAABB(const AABB& aabb, Ray& ray) {
     const vec3 direction = ray.mEnd - ray.mStart;
 
     vec3 invD = vec3(1) / direction;
@@ -17,8 +17,7 @@ bool TestIntersection::RayAABB(const AABB& aabb, Ray& ray)
     float tmax = glm::min(FLT_MAX, glm::min(tbigger.x, glm::min(tbigger.y, tbigger.z)));
 
     // check bounding box
-    if (tmin >= tmax || tmin <= 0.0f || tmin >= ray.mDist)
-    {
+    if (tmin >= tmax || tmin <= 0.0f || tmin >= ray.mDist) {
         return false;
     }
 
@@ -26,8 +25,7 @@ bool TestIntersection::RayAABB(const AABB& aabb, Ray& ray)
     return true;
 }
 
-bool TestIntersection::RayTriangle(const vec3& A, const vec3& B, const vec3& C, Ray& ray)
-{
+bool TestIntersection::RayTriangle(const vec3& A, const vec3& B, const vec3& C, Ray& ray) {
     // P = A + u(B - A) + v(C - A) => O - A = -tD + u(B - A) + v(C - A)
     // -tD + uAB + vAC = AO
     const vec3 direction = ray.mEnd - ray.mStart;
@@ -35,8 +33,7 @@ bool TestIntersection::RayTriangle(const vec3& A, const vec3& B, const vec3& C, 
     const vec3 AC = C - A;
     const vec3 P = glm::cross(direction, AC);
     const float det = glm::dot(AB, P);
-    if (det < glm::epsilon<float>())
-    {
+    if (det < glm::epsilon<float>()) {
         return false;
     }
 
@@ -47,14 +44,12 @@ bool TestIntersection::RayTriangle(const vec3& A, const vec3& B, const vec3& C, 
     const float u = glm::dot(AO, P) * invDet;
     const float v = glm::dot(direction, Q) * invDet;
 
-    if (u < 0.0 || v < 0.0 || u + v > 1.0)
-    {
+    if (u < 0.0 || v < 0.0 || u + v > 1.0) {
         return false;
     }
 
     const float t = dot(AC, Q) * invDet;
-    if (t < glm::epsilon<float>() || t >= ray.mDist)
-    {
+    if (t < glm::epsilon<float>() || t >= ray.mDist) {
         return false;
     }
 

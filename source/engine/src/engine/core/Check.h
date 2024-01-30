@@ -4,8 +4,7 @@
 #if USING(ENABLE_CHECK)
 #define check(expr) (void)((!!(expr)) || (::base::check_impl(__FILE__, __LINE__, #expr), 0))
 #define checkfmt(expr, FMT, ...)                                                             \
-    do                                                                                       \
-    {                                                                                        \
+    do {                                                                                     \
         if ((expr)) break;                                                                   \
         std::string message = fmt::format("{}, {}", #expr, fmt::format(FMT, ##__VA_ARGS__)); \
         ::base::check_impl(__FILE__, __LINE__, message);                                     \
@@ -21,8 +20,7 @@
 #define unreachable(...) (void)0
 #endif
 
-namespace base
-{
+namespace base {
 
 void check_impl(const char* file, int ln, const std::string& expr);
 

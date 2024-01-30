@@ -7,11 +7,9 @@ class WindowManager;
 
 using CommandLine = std::list<std::string>;
 
-class Application
-{
+class Application {
 public:
-    struct InitInfo
-    {
+    struct InitInfo {
         const char* title;
         uint32_t width;
         uint32_t height;

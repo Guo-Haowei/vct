@@ -21,8 +21,7 @@
 #define LOG_OK(fmt, ...)    (void)0
 #endif
 
-enum class ELogLevel
-{
+enum class ELogLevel {
     Fatal = 0,
     Error,
     Warn,
@@ -32,8 +31,7 @@ enum class ELogLevel
     Count,
 };
 
-namespace base
-{
+namespace base {
 
 void log(ELogLevel level, const std::string& message);
 void log_impl(ELogLevel level, const std::string& message);

@@ -1,8 +1,7 @@
 #pragma once
 #include "Math/GeoMath.h"
 
-enum class EDvarType
-{
+enum class EDvarType {
     Invalid,
     Integer,
     Float,
@@ -12,15 +11,13 @@ enum class EDvarType
     Vec4,
 };
 
-enum class EDvarError
-{
+enum class EDvarError {
     Ok,
     NotExisted,
     TypeMismatch,
 };
 
-class DynamicVariable
-{
+class DynamicVariable {
 public:
     void RegisterInt(const char* key, int value);
     void RegisterFloat(const char* key, float value);
@@ -49,12 +46,10 @@ public:
 private:
     EDvarType mType;
 
-    union
-    {
+    union {
         int mIntegerValue;
         float mFloatValue;
-        struct
-        {
+        struct {
             float x, y, z, w;
         } mVecValue;
     };
@@ -64,8 +59,7 @@ private:
     friend class DynamicVariableManager;
 };
 
-class DynamicVariableManager
-{
+class DynamicVariableManager {
 public:
     static DynamicVariable* Find(const char* name);
     static void Register(const char* key, DynamicVariable* dvar);

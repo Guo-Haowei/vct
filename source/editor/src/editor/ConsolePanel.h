@@ -1,9 +1,8 @@
 #pragma once
-#include "Panel.h"
 #include "Engine/Framework/LogManager.h"
+#include "Panel.h"
 
-class ConsolePanel : public Panel
-{
+class ConsolePanel : public Panel {
 public:
     ConsolePanel() : Panel("Console") {}
 

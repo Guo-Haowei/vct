@@ -17,12 +17,12 @@ AlignConsecutiveMacros: true
 AlignOperands: true
 AlignTrailingComments: true
 BreakBeforeBinaryOperators: None
-ColumnLimit: 0
+ColumnLimit: 120
 Cpp11BracedListStyle: false
 # DeriveLineEnding: false
 # IndentCaseLabels: true
 KeepEmptyLinesAtTheStartOfBlocks: true
-SortIncludes: false
+SortIncludes: true
 SpaceAfterTemplateKeyword: false
 # SpaceBeforeCpp11BracedList: false
 # SpacesInParentheses: true
@@ -32,14 +32,14 @@ AlignConsecutiveDeclarations: false
 
 # brace
 BraceWrapping:
-  AfterClass            : true
-  AfterControlStatement : true
-  AfterEnum             : true
-  AfterFunction         : true
-  AfterNamespace        : true
-  AfterStruct           : true
-  AfterUnion            : true
-  BeforeElse            : true
+  AfterClass            : false
+  AfterControlStatement : false
+  AfterEnum             : false
+  AfterFunction         : false
+  AfterNamespace        : false
+  AfterStruct           : false
+  AfterUnion            : false
+  BeforeElse            : false
 BreakBeforeBraces: Custom
 
 AlignAfterOpenBracket: true

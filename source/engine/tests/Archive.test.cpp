@@ -1,8 +1,7 @@
 #include <engine/Archive.h>
 #include <engine/scene/SceneComponents.h>
 
-class ArchiveTest : public testing::Test
-{
+class ArchiveTest : public testing::Test {
 public:
     static constexpr const char* FILE_NAME = "archive.bin";
     static constexpr const char* TEST_STRING = "add3to2";
@@ -10,8 +9,7 @@ public:
     static constexpr double TEST_DOUBLE = 3.1415926;
 };
 
-TEST_F(ArchiveTest, Serialize)
-{
+TEST_F(ArchiveTest, Serialize) {
     Archive writer;
 
     EXPECT_TRUE(writer.OpenWrite(FILE_NAME));
@@ -24,8 +22,7 @@ TEST_F(ArchiveTest, Serialize)
     writer.Close();
 }
 
-TEST_F(ArchiveTest, Deserialize)
-{
+TEST_F(ArchiveTest, Deserialize) {
     Archive reader;
     EXPECT_TRUE(reader.OpenRead(FILE_NAME));
     EXPECT_TRUE(!reader.IsWriteMode());

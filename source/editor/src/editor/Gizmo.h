@@ -1,10 +1,9 @@
 #pragma once
 
-#include "Math/Box.h"
 #include "EditorLayer.h"
+#include "Math/Box.h"
 
-namespace ImGuizmo
-{
+namespace ImGuizmo {
 enum OPERATION;
 }
 

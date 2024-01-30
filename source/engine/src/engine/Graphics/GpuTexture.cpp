@@ -11,24 +11,16 @@
 
 using std::string;
 
-void GpuTexture::bind() const
-{
-    glBindTexture(m_type, mHandle);
-}
+void GpuTexture::bind() const { glBindTexture(m_type, mHandle); }
 
-void GpuTexture::unbind() const
-{
-    glBindTexture(m_type, 0);
-}
+void GpuTexture::unbind() const { glBindTexture(m_type, 0); }
 
-void GpuTexture::genMipMap()
-{
+void GpuTexture::genMipMap() {
     // make sure texture is bond first
     glGenerateMipmap(m_type);
 }
 
-void GpuTexture::create2DEmpty(const Texture2DCreateInfo& info)
-{
+void GpuTexture::create2DEmpty(const Texture2DCreateInfo& info) {
     m_type = GL_TEXTURE_2D;
     m_format = info.internalFormat;
 
@@ -37,20 +29,15 @@ void GpuTexture::create2DEmpty(const Texture2DCreateInfo& info)
     bind();
     glTexImage2D(m_type, 0, info.internalFormat, info.width, info.height, 0, info.format, info.dataType, 0);
 
-    if (info.wrapS)
-        glTexParameteri(m_type, GL_TEXTURE_WRAP_S, info.wrapS);
-    if (info.wrapT)
-        glTexParameteri(m_type, GL_TEXTURE_WRAP_T, info.wrapT);
-    if (info.minFilter)
-        glTexParameteri(m_type, GL_TEXTURE_MIN_FILTER, info.minFilter);
-    if (info.magFilter)
-        glTexParameteri(m_type, GL_TEXTURE_MAG_FILTER, info.magFilter);
+    if (info.wrapS) glTexParameteri(m_type, GL_TEXTURE_WRAP_S, info.wrapS);
+    if (info.wrapT) glTexParameteri(m_type, GL_TEXTURE_WRAP_T, info.wrapT);
+    if (info.minFilter) glTexParameteri(m_type, GL_TEXTURE_MIN_FILTER, info.minFilter);
+    if (info.magFilter) glTexParameteri(m_type, GL_TEXTURE_MAG_FILTER, info.magFilter);
 
     unbind();
 }
 
-void GpuTexture::create3DEmpty(const Texture3DCreateInfo& info)
-{
+void GpuTexture::create3DEmpty(const Texture3DCreateInfo& info) {
     m_type = GL_TEXTURE_3D;
     m_format = info.format;
 
@@ -65,14 +52,12 @@ void GpuTexture::create3DEmpty(const Texture3DCreateInfo& info)
     glTexStorage3D(m_type, info.mipLevel, m_format, info.size, info.size, info.size);
 }
 
-void GpuTexture::Create2DImageFromFile(const std::string& path)
-{
+void GpuTexture::Create2DImageFromFile(const std::string& path) {
     m_type = GL_TEXTURE_2D;
     int width, height, channel;
     unsigned char* image = stbi_load(path.c_str(), &width, &height, &channel, 4);
 
-    if (!image)
-    {
+    if (!image) {
         LOG_ERROR("stb: failed to load image '{}'", path);
     }
 
@@ -98,22 +83,18 @@ void GpuTexture::Create2DImageFromFile(const std::string& path)
     glBindTexture(m_type, 0);
 }
 
-void GpuTexture::destroy()
-{
-    if (mHandle != 0)
-    {
+void GpuTexture::destroy() {
+    if (mHandle != 0) {
         glDeleteTextures(1, &mHandle);
     }
     mHandle = 0;
 }
 
-void GpuTexture::bindImageTexture(int i, int mipLevel)
-{
+void GpuTexture::bindImageTexture(int i, int mipLevel) {
     glBindImageTexture(i, mHandle, mipLevel, GL_TRUE, 0, GL_READ_WRITE, m_format);
 }
 
-void GpuTexture::clear()
-{
+void GpuTexture::clear() {
     float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
     /// Hard code format for now
     glClearTexImage(mHandle, 0, GL_RGBA, GL_FLOAT, clearColor);

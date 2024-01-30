@@ -5,8 +5,7 @@
 
 struct GLFWwindow;
 
-class WindowManager : public ManagerBase
-{
+class WindowManager : public ManagerBase {
 public:
     WindowManager() : ManagerBase("WindowManager") {}
 
@@ -30,8 +29,7 @@ private:
     static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
     GLFWwindow* mWindow = nullptr;
-    struct
-    {
+    struct {
         int x, y;
     } mFrameSize, mWindowPos;
 };

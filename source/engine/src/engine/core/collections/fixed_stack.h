@@ -1,16 +1,14 @@
 #pragma once
 #include <initializer_list>
 
-#include "prerequisites.h"
 #include "linear_iterator.h"
+#include "prerequisites.h"
 #include "reverse_iterator.h"
 
-namespace vct
-{
+namespace vct {
 
 template<typename T, size_t N>
-class FixedStack
-{
+class FixedStack {
     using iter = LinearIterator<T>;
     using const_iter = LinearIterator<const T>;
     using reverse_iter = ReverseIterator<T, iter>;
@@ -33,10 +31,8 @@ public:
 public:
     FixedStack() = default;
 
-    FixedStack(std::initializer_list<T> list)
-    {
-        for (auto& element : list)
-        {
+    FixedStack(std::initializer_list<T> list) {
+        for (auto& element : list) {
             push_back(element);
         }
     }
@@ -59,23 +55,18 @@ public:
     auto back() -> T& { return (*this)[m_size - 1]; }
     auto back() const -> const T& { return (*this)[m_size - 1]; }
 
-    void push_back(const T& v)
-    {
+    void push_back(const T& v) {
         check_out_of_range_if_debug(m_size, N);
         m_data[m_size++] = v;
     }
 
-    void pop_back()
-    {
+    void pop_back() {
         check_out_of_range_if_debug(0, m_size);
         --m_size;
     }
 
     // @TODO: emplace back
-    void emplace_back(const T& v)
-    {
-        push_back(v);
-    }
+    void emplace_back(const T& v) { push_back(v); }
 
 protected:
     size_t m_size = 0;

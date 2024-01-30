@@ -2,12 +2,10 @@
 
 #include "Core/Check.h"
 
-bool Archive::OpenRead(const std::string& path)
-{
+bool Archive::OpenRead(const std::string& path) {
     mFile = fopen(path.c_str(), "rb");
 
-    if (mFile == NULL)
-    {
+    if (mFile == NULL) {
         return false;
     }
 
@@ -15,12 +13,10 @@ bool Archive::OpenRead(const std::string& path)
     return true;
 }
 
-bool Archive::OpenWrite(const std::string& path)
-{
+bool Archive::OpenWrite(const std::string& path) {
     mFile = fopen(path.c_str(), "wb");  // r for read, b for binary
 
-    if (mFile == NULL)
-    {
+    if (mFile == NULL) {
         return false;
     }
 
@@ -28,20 +24,16 @@ bool Archive::OpenWrite(const std::string& path)
     return true;
 }
 
-void Archive::Close()
-{
-    switch (mMode)
-    {
+void Archive::Close() {
+    switch (mMode) {
         case EMode::Write:
-            if (mFile)
-            {
+            if (mFile) {
                 fclose(mFile);
                 mFile = nullptr;
             }
             break;
         case EMode::Read:
-            if (mFile)
-            {
+            if (mFile) {
                 fclose(mFile);
                 mFile = nullptr;
             }
@@ -53,18 +45,15 @@ void Archive::Close()
     mMode = EMode::None;
 }
 
-bool Archive::IsWriteMode() const
-{
+bool Archive::IsWriteMode() const {
     check(mFile && mMode != EMode::None);
     return mMode == EMode::Write;
 }
 
-bool Archive::Write(const void* data, size_t bytes)
-{
+bool Archive::Write(const void* data, size_t bytes) {
     check(mMode == EMode::Write && mFile);
     size_t written = fwrite(data, 1, bytes, mFile);
-    if (written == bytes)
-    {
+    if (written == bytes) {
         return true;
     }
 
@@ -72,12 +61,10 @@ bool Archive::Write(const void* data, size_t bytes)
     return false;
 }
 
-bool Archive::Read(void* data, size_t bytes)
-{
+bool Archive::Read(void* data, size_t bytes) {
     check(mMode == EMode::Read && mFile);
     size_t read = fread(data, 1, bytes, mFile);
-    if (read == bytes)
-    {
+    if (read == bytes) {
         return true;
     }
 

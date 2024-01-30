@@ -2,11 +2,11 @@
 
 #include <thread>
 
-#include "engine/Archive.h"
 #include "Core/Check.h"
 #include "Core/CommonDvars.h"
-#include "Core/Timer.h"
 #include "Core/JobSystem.h"
+#include "Core/Timer.h"
+#include "engine/Archive.h"
 // #include "Math/Primitives.h"
 
 using jobsystem::Context;
@@ -18,8 +18,7 @@ using jobsystem::Context;
 #undef max
 #endif
 
-void Scene::Update(float dt)
-{
+void Scene::Update(float dt) {
     mDeltaTime = dt;
 
     Context ctx;
@@ -41,56 +40,44 @@ void Scene::Update(float dt)
     RunLightUpdateSystem();
 }
 
-void Scene::Merge(Scene& other)
-{
+void Scene::Merge(Scene& other) {
     unused(other);
     checkmsg("FIX");
 }
 
-ecs::Entity Scene::Entity_CreateName(const std::string& name)
-{
+ecs::Entity Scene::Entity_CreateName(const std::string& name) {
     ecs::Entity entity = mGenerator.Create();
     Create<TagComponent>(entity).SetTag(name);
     return entity;
 }
 
-ecs::Entity Scene::Entity_CreateTransform(const std::string& name)
-{
+ecs::Entity Scene::Entity_CreateTransform(const std::string& name) {
     ecs::Entity entity = Entity_CreateName(name);
     Create<TransformComponent>(entity);
     return entity;
 }
 
-ecs::Entity Scene::Entity_CreateObject(const std::string& name)
-{
+ecs::Entity Scene::Entity_CreateObject(const std::string& name) {
     ecs::Entity entity = Entity_CreateName(name);
     Create<ObjectComponent>(entity);
     Create<TransformComponent>(entity);
     return entity;
 }
 
-ecs::Entity Scene::Entity_CreateMesh(const std::string& name)
-{
+ecs::Entity Scene::Entity_CreateMesh(const std::string& name) {
     ecs::Entity entity = Entity_CreateName(name);
     Create<MeshComponent>(entity);
     return entity;
 }
 
-ecs::Entity Scene::Entity_CreateMaterial(const std::string& name)
-{
+ecs::Entity Scene::Entity_CreateMaterial(const std::string& name) {
     ecs::Entity entity = Entity_CreateName(name);
     Create<MaterialComponent>(entity);
     return entity;
 }
 
-ecs::Entity Scene::Entity_CreateCamera(
-    const std::string& name,
-    float width,
-    float height,
-    float near_plane,
-    float far_plane,
-    float fovy)
-{
+ecs::Entity Scene::Entity_CreateCamera(const std::string& name, float width, float height, float near_plane,
+                                       float far_plane, float fovy) {
     ecs::Entity entity = Entity_CreateName(name);
     CameraComponent& cameraComponent = Create<CameraComponent>(entity);
     cameraComponent.width = width;
@@ -102,12 +89,8 @@ ecs::Entity Scene::Entity_CreateCamera(
     return entity;
 }
 
-ecs::Entity Scene::Entity_CreatePointLight(
-    const std::string& name,
-    const vec3& position,
-    const vec3& color,
-    const float energy)
-{
+ecs::Entity Scene::Entity_CreatePointLight(const std::string& name, const vec3& position, const vec3& color,
+                                           const float energy) {
     ecs::Entity entity = Entity_CreateName(name);
     (void)name;
     (void)position;
@@ -123,11 +106,7 @@ ecs::Entity Scene::Entity_CreatePointLight(
     return entity;
 }
 
-ecs::Entity Scene::Entity_CreateOmniLight(
-    const std::string& name,
-    const vec3& color,
-    const float energy)
-{
+ecs::Entity Scene::Entity_CreateOmniLight(const std::string& name, const vec3& color, const float energy) {
     ecs::Entity entity = Entity_CreateName(name);
     (void)color;
     (void)energy;
@@ -140,21 +119,13 @@ ecs::Entity Scene::Entity_CreateOmniLight(
     return entity;
 }
 
-ecs::Entity Scene::Entity_CreateSphere(
-    const std::string& name,
-    float radius,
-    const mat4& transform)
-{
+ecs::Entity Scene::Entity_CreateSphere(const std::string& name, float radius, const mat4& transform) {
     ecs::Entity matID = Entity_CreateMaterial(name + ":mat");
     return Entity_CreateSphere(name, matID, radius, transform);
 }
 
-ecs::Entity Scene::Entity_CreateSphere(
-    const std::string& name,
-    ecs::Entity materialID,
-    float radius,
-    const mat4& transform)
-{
+ecs::Entity Scene::Entity_CreateSphere(const std::string& name, ecs::Entity materialID, float radius,
+                                       const mat4& transform) {
     (void)name;
     (void)materialID;
     (void)radius;
@@ -180,21 +151,13 @@ ecs::Entity Scene::Entity_CreateSphere(
     return entity;
 }
 
-ecs::Entity Scene::Entity_CreateCube(
-    const std::string& name,
-    const vec3& scale,
-    const mat4& transform)
-{
+ecs::Entity Scene::Entity_CreateCube(const std::string& name, const vec3& scale, const mat4& transform) {
     ecs::Entity matID = Entity_CreateMaterial(name + ":mat");
     return Entity_CreateCube(name, matID, scale, transform);
 }
 
-ecs::Entity Scene::Entity_CreateCube(
-    const std::string& name,
-    ecs::Entity materialID,
-    const vec3& scale,
-    const mat4& transform)
-{
+ecs::Entity Scene::Entity_CreateCube(const std::string& name, ecs::Entity materialID, const vec3& scale,
+                                     const mat4& transform) {
     (void)name;
     (void)materialID;
     (void)scale;
@@ -220,14 +183,12 @@ ecs::Entity Scene::Entity_CreateCube(
     return entity;
 }
 
-void Scene::Component_Attach(ecs::Entity child, ecs::Entity parent)
-{
+void Scene::Component_Attach(ecs::Entity child, ecs::Entity parent) {
     check(child != parent);
     check(parent.IsValid());
 
     // if child already has a parent, detach it
-    if (mHierarchyComponents.Contains(child))
-    {
+    if (mHierarchyComponents.Contains(child)) {
         checkmsg("Unlikely to happen at this point");
         Component_Detach(child);
     }
@@ -236,14 +197,12 @@ void Scene::Component_Attach(ecs::Entity child, ecs::Entity parent)
     hier.mParent = parent;
 }
 
-void Scene::Component_Detach(ecs::Entity entity)
-{
+void Scene::Component_Detach(ecs::Entity entity) {
     unused(entity);
     checkmsg("TODO");
 }
 
-void Scene::Component_DetachChildren(ecs::Entity parent)
-{
+void Scene::Component_DetachChildren(ecs::Entity parent) {
     unused(parent);
     checkmsg("TODO");
 }
@@ -251,19 +210,15 @@ void Scene::Component_DetachChildren(ecs::Entity parent)
 // static constexpr uint32_t SMALL_SUBTASK_GROUPSIZE = 64;
 static constexpr uint32_t SMALL_SUBTASK_GROUPSIZE = 16;
 
-void Scene::RunAnimationUpdateSystem(Context& ctx)
-{
+void Scene::RunAnimationUpdateSystem(Context& ctx) {
     JS_PARALLEL_FOR(ctx, i, GetCount<AnimationComponent>(), 1, {
         AnimationComponent& animation = mAnimationComponents[i];
-        if (!animation.IsPlaying())
-        {
+        if (!animation.IsPlaying()) {
             continue;
         }
 
-        for (const AnimationComponent::Channel& channel : animation.channels)
-        {
-            if (channel.path == AnimationComponent::Channel::Path::UNKNOWN)
-            {
+        for (const AnimationComponent::Channel& channel : animation.channels) {
+            if (channel.path == AnimationComponent::Channel::Path::UNKNOWN) {
                 continue;
             }
             check(channel.samplerIndex < (int)animation.samplers.size());
@@ -276,31 +231,25 @@ void Scene::RunAnimationUpdateSystem(Context& ctx)
             float timeLeft = std::numeric_limits<float>::min();
             float timeRight = std::numeric_limits<float>::max();
 
-            for (int k = 0; k < (int)sampler.keyframeTimes.size(); ++k)
-            {
+            for (int k = 0; k < (int)sampler.keyframeTimes.size(); ++k) {
                 const float time = sampler.keyframeTimes[k];
-                if (time < timeFirst)
-                {
+                if (time < timeFirst) {
                     timeFirst = time;
                 }
-                if (time > timeLast)
-                {
+                if (time > timeLast) {
                     timeLast = time;
                 }
-                if (time <= animation.timer && time > timeLeft)
-                {
+                if (time <= animation.timer && time > timeLeft) {
                     timeLeft = time;
                     keyLeft = k;
                 }
-                if (time >= animation.timer && time < timeRight)
-                {
+                if (time >= animation.timer && time < timeRight) {
                     timeRight = time;
                     keyRight = k;
                 }
             }
 
-            if (animation.timer < timeFirst)
-            {
+            if (animation.timer < timeFirst) {
                 continue;
             }
 
@@ -308,16 +257,14 @@ void Scene::RunAnimationUpdateSystem(Context& ctx)
             const float right = sampler.keyframeTimes[keyRight];
 
             float t = 0;
-            if (keyLeft != keyRight)
-            {
+            if (keyLeft != keyRight) {
                 t = (animation.timer - left) / (right - left);
             }
             t = SaturateF(t);
 
             TransformComponent* targetTransform = mTransformComponents.GetComponent(channel.targetID);
             check(targetTransform);
-            switch (channel.path)
-            {
+            switch (channel.path) {
                 case AnimationComponent::Channel::SCALE: {
                     check(sampler.keyframeData.size() == sampler.keyframeTimes.size() * 3);
                     const vec3* data = (const vec3*)sampler.keyframeData.data();
@@ -349,51 +296,40 @@ void Scene::RunAnimationUpdateSystem(Context& ctx)
             targetTransform->SetDirty();
         }
 
-        if (animation.IsLooped() && animation.timer > animation.end)
-        {
+        if (animation.IsLooped() && animation.timer > animation.end) {
             animation.timer = animation.start;
         }
 
-        if (animation.IsPlaying())
-        {
+        if (animation.IsPlaying()) {
             animation.timer += mDeltaTime * animation.speed;
         }
     });
 }
 
-void Scene::RunTransformUpdateSystem(Context& ctx)
-{
-    JS_PARALLEL_FOR(ctx, i, GetCount<TransformComponent>(), SMALL_SUBTASK_GROUPSIZE, {
-        mTransformComponents[i].UpdateTransform();
-    });
+void Scene::RunTransformUpdateSystem(Context& ctx) {
+    JS_PARALLEL_FOR(ctx, i, GetCount<TransformComponent>(), SMALL_SUBTASK_GROUPSIZE,
+                    { mTransformComponents[i].UpdateTransform(); });
 }
 
-void Scene::RunHierarchyUpdateSystem(Context& ctx)
-{
+void Scene::RunHierarchyUpdateSystem(Context& ctx) {
     JS_PARALLEL_FOR(ctx, i, GetCount<HierarchyComponent>(), SMALL_SUBTASK_GROUPSIZE, {
         ecs::Entity child = mHierarchyComponents.GetEntity(i);
         TransformComponent* childTrans = mTransformComponents.GetComponent(child);
-        if (childTrans)
-        {
+        if (childTrans) {
             const HierarchyComponent* hier = &mHierarchyComponents[i];
             ecs::Entity parent = hier->mParent;
             mat4 W = childTrans->GetLocalMatrix();
 
-            while (parent.IsValid())
-            {
+            while (parent.IsValid()) {
                 TransformComponent* parentTrans = mTransformComponents.GetComponent(parent);
-                if (parentTrans)
-                {
+                if (parentTrans) {
                     W = parentTrans->GetLocalMatrix() * W;
                 }
 
-                if ((hier = mHierarchyComponents.GetComponent(parent)) != nullptr)
-                {
+                if ((hier = mHierarchyComponents.GetComponent(parent)) != nullptr) {
                     parent = hier->mParent;
                     check(parent.IsValid());
-                }
-                else
-                {
+                } else {
                     parent = ecs::Entity::INVALID;
                 }
             }
@@ -404,8 +340,7 @@ void Scene::RunHierarchyUpdateSystem(Context& ctx)
     });
 }
 
-void Scene::RunArmatureUpdateSystem(Context& ctx)
-{
+void Scene::RunArmatureUpdateSystem(Context& ctx) {
     JS_PARALLEL_FOR(ctx, i, GetCount<ArmatureComponent>(), 1, {
         ecs::Entity id = mArmatureComponents.GetEntity(i);
         ArmatureComponent& armature = mArmatureComponents[i];
@@ -419,20 +354,18 @@ void Scene::RunArmatureUpdateSystem(Context& ctx)
         //	remain unchanged.
         //
         //	This is useful for an other thing too:
-        //	If a whole transform tree is transformed by some parent (even gltf import does that to convert from RH to LH space)
-        //	then the inverseBindMatrices are not reflected in that because they are not contained in the hierarchy system.
-        //	But this will correct them too.
+        //	If a whole transform tree is transformed by some parent (even gltf import does that to convert from RH
+        // to LH space) 	then the inverseBindMatrices are not reflected in that because they are not contained in
+        // the hierarchy system. 	But this will correct them too.
 
         const mat4 R = glm::inverse(transform->GetWorldMatrix());
         const size_t numBones = armature.boneCollection.size();
-        if (armature.boneTransforms.size() != numBones)
-        {
+        if (armature.boneTransforms.size() != numBones) {
             armature.boneTransforms.resize(numBones);
         }
 
         int idx = 0;
-        for (ecs::Entity boneID : armature.boneCollection)
-        {
+        for (ecs::Entity boneID : armature.boneCollection) {
             const TransformComponent* boneTransform = mTransformComponents.GetComponent(boneID);
             check(boneTransform);
 
@@ -447,27 +380,19 @@ void Scene::RunArmatureUpdateSystem(Context& ctx)
     });
 }
 
-void Scene::RunObjectUpdateSystem()
-{
-    unreachable();
-}
+void Scene::RunObjectUpdateSystem() { unreachable(); }
 
-void Scene::RunCameraUpdateSystem()
-{
-    for (int i = 0; i < GetCount<CameraComponent>(); ++i)
-    {
+void Scene::RunCameraUpdateSystem() {
+    for (int i = 0; i < GetCount<CameraComponent>(); ++i) {
         ecs::Entity cam = GetEntity<CameraComponent>(i);
         CameraComponent& cameraComponent = mCameraComponents[i];
         cameraComponent.UpdateCamera();
     }
 }
 
-void Scene::RunLightUpdateSystem()
-{
-}
+void Scene::RunLightUpdateSystem() {}
 
-void Scene::Serialize(Archive& archive)
-{
+void Scene::Serialize(Archive& archive) {
     mGenerator.Serialize(archive);
     mRoot.Serialize(archive);
 
@@ -484,20 +409,17 @@ void Scene::Serialize(Archive& archive)
     mRigidBodyPhysicsComponents.Serialize(archive);
 }
 
-Scene::RayIntersectionResult Scene::Intersects(Ray& ray)
-{
+Scene::RayIntersectionResult Scene::Intersects(Ray& ray) {
     RayIntersectionResult result;
 
-    for (int objIdx = 0; objIdx < GetCount<ObjectComponent>(); ++objIdx)
-    {
+    for (int objIdx = 0; objIdx < GetCount<ObjectComponent>(); ++objIdx) {
         ecs::Entity entity = GetEntity<ObjectComponent>(objIdx);
         ObjectComponent& object = GetComponentArray<ObjectComponent>()[objIdx];
         MeshComponent* mesh = GetComponent<MeshComponent>(object.meshID);
         TransformComponent* transform = GetComponent<TransformComponent>(entity);
         check(mesh && transform);
 
-        if (!transform || !mesh)
-        {
+        if (!transform || !mesh) {
             continue;
         }
 
@@ -505,21 +427,18 @@ Scene::RayIntersectionResult Scene::Intersects(Ray& ray)
         Ray inversedRay = ray.Inverse(inversedModel);
         Ray inversedRayAABB = inversedRay;  // make a copy, we don't want dist to be modified by AABB
         // Perform aabb test
-        if (!inversedRayAABB.Intersects(mesh->mLocalBound))
-        {
+        if (!inversedRayAABB.Intersects(mesh->mLocalBound)) {
             continue;
         }
 
         // @TODO: test submesh intersection
 
         // Test every single triange
-        for (size_t i = 0; i < mesh->mIndices.size(); i += 3)
-        {
+        for (size_t i = 0; i < mesh->mIndices.size(); i += 3) {
             const vec3& A = mesh->mPositions[mesh->mIndices[i]];
             const vec3& B = mesh->mPositions[mesh->mIndices[i + 1]];
             const vec3& C = mesh->mPositions[mesh->mIndices[i + 2]];
-            if (inversedRay.Intersects(A, B, C))
-            {
+            if (inversedRay.Intersects(A, B, C)) {
                 ray.CopyDist(inversedRay);
                 result.entity = entity;
                 break;

@@ -1,13 +1,9 @@
 #pragma once
 #include "GLPrerequisites.h"
 
-class GpuResource
-{
+class GpuResource {
 public:
-    enum
-    {
-        NULL_HANDLE = 0u
-    };
+    enum { NULL_HANDLE = 0u };
     inline GLuint getHandle() const { return m_handle; }
 
 protected:

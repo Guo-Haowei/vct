@@ -2,13 +2,9 @@
 
 #include "GpuTexture.h"
 
-class RenderTarget
-{
+class RenderTarget {
 public:
-    enum
-    {
-        MAX_COLOR_ATTACHMENT = 4
-    };
+    enum { MAX_COLOR_ATTACHMENT = 4 };
 
     virtual void Create(int width, int height);
     void Bind();
@@ -33,26 +29,22 @@ protected:
     int mHeight = 0;
 };
 
-class DepthRenderTarget : public RenderTarget
-{
+class DepthRenderTarget : public RenderTarget {
 public:
     virtual void Create(int width, int height) override;
 };
 
-class GBuffer : public RenderTarget
-{
+class GBuffer : public RenderTarget {
 public:
     virtual void Create(int width, int height) override;
 };
 
-class SsaoRT : public RenderTarget
-{
+class SsaoRT : public RenderTarget {
 public:
     virtual void Create(int width, int height) override;
 };
 
-class FinalImageRT : public RenderTarget
-{
+class FinalImageRT : public RenderTarget {
 public:
     virtual void Create(int width, int height) override;
 };

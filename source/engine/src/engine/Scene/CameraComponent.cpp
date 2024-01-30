@@ -2,27 +2,20 @@
 
 #include "engine/Archive.h"
 
-mat4 CameraComponent::CalculateViewMatrix() const
-{
-    return glm::lookAt(eye, center, glm::normalize(vec3(0, 1, 0)));
-}
+mat4 CameraComponent::CalculateViewMatrix() const { return glm::lookAt(eye, center, glm::normalize(vec3(0, 1, 0))); }
 
-void CameraComponent::UpdateCamera()
-{
+void CameraComponent::UpdateCamera() {
     const float aspect = width / height;
     projMatrix = glm::perspective(fovy, aspect, zNear, zFar);
 
-    if (IsDirty())
-    {
+    if (IsDirty()) {
         viewMatrix = CalculateViewMatrix();
         SetDirty(false);
     }
 }
 
-void CameraComponent::Serialize(Archive& archive)
-{
-    if (archive.IsWriteMode())
-    {
+void CameraComponent::Serialize(Archive& archive) {
+    if (archive.IsWriteMode()) {
         archive << flags;
         archive << zNear;
         archive << zFar;
@@ -32,9 +25,7 @@ void CameraComponent::Serialize(Archive& archive)
 
         archive << center;
         archive << eye;
-    }
-    else
-    {
+    } else {
         archive >> flags;
         archive >> zNear;
         archive >> zFar;

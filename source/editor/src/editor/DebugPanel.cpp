@@ -1,16 +1,13 @@
 #include "DebugPanel.h"
 
-#include "Engine/Core/camera.h"
-
 #include "Engine/Core/CommonDvars.h"
-#include "Engine/Scene/Scene.h"
+#include "Engine/Core/camera.h"
 #include "Engine/Graphics/r_defines.h"
+#include "Engine/Scene/Scene.h"
 
-static const char* DrawTextureToStr(int mode)
-{
+static const char* DrawTextureToStr(int mode) {
     const char* str = "scene";
-    switch (mode)
-    {
+    switch (mode) {
         case TEXTURE_VOXEL_ALBEDO:
             str = "voxel color";
             break;
@@ -44,8 +41,7 @@ static const char* DrawTextureToStr(int mode)
     return str;
 }
 
-void DebugPanel::RenderInternal(Scene& scene)
-{
+void DebugPanel::RenderInternal(Scene& scene) {
     const Camera& camera = gCamera;
     bool dirty = false;
 
@@ -74,7 +70,8 @@ void DebugPanel::RenderInternal(Scene& scene)
     ImGui::Separator();
 
     ImGui::Text("Display Texture");
-    ImGui::SliderInt("Display Texture", (int*)(DVAR_GET_POINTER(r_debugTexture)), DrawTexture::TEXTURE_FINAL_IMAGE, DrawTexture::TEXTURE_MAX);
+    ImGui::SliderInt("Display Texture", (int*)(DVAR_GET_POINTER(r_debugTexture)), DrawTexture::TEXTURE_FINAL_IMAGE,
+                     DrawTexture::TEXTURE_MAX);
     ImGui::Text("%s", DrawTextureToStr(DVAR_GET_INT(r_debugTexture)));
 
     ImGui::Separator();

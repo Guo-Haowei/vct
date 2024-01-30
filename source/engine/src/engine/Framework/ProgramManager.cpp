@@ -11,15 +11,12 @@
 
 ProgramManager *gProgramManager = new ProgramManager();
 
-static std::string process_shader(const std::string &source)
-{
+static std::string process_shader(const std::string &source) {
     std::string result;
     std::stringstream ss(source);
-    for (std::string line; std::getline(ss, line);)
-    {
+    for (std::string line; std::getline(ss, line);) {
         constexpr const char pattern[] = "#include";
-        if (line.find(pattern) == 0)
-        {
+        if (line.find(pattern) == 0) {
             const char *lineStr = line.c_str();
             const char *quote1 = strchr(lineStr, '"');
             const char *quote2 = strrchr(lineStr, '"');
@@ -27,14 +24,11 @@ static std::string process_shader(const std::string &source)
             std::string includedFile(quote1 + 1, quote2);
 
             std::string extra = read_file_to_buffer(fs::path(SHADER_FOLDER) / includedFile);
-            if (extra.empty())
-            {
+            if (extra.empty()) {
                 LOG_ERROR("[filesystem] failed to read shader '{}'", includedFile);
             }
             result.append(extra.data());
-        }
-        else
-        {
+        } else {
             result.append(line);
         }
 
@@ -44,11 +38,9 @@ static std::string process_shader(const std::string &source)
     return result;
 }
 
-static GLuint create_shader(const std::string &file, GLenum type)
-{
+static GLuint create_shader(const std::string &file, GLenum type) {
     std::string source = read_file_to_buffer(fs::path(SHADER_FOLDER) / file);
-    if (source.empty())
-    {
+    if (source.empty()) {
         LOG_ERROR("[filesystem] failed to read shader '{}'", file);
         return 0;
     }
@@ -70,15 +62,13 @@ static GLuint create_shader(const std::string &file, GLenum type)
     GLint status = GL_FALSE, length = 0;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
-    if (length > 0)
-    {
+    if (length > 0) {
         std::vector<char> buffer(length + 1);
         glGetShaderInfoLog(shader, length, nullptr, buffer.data());
         LOG_ERROR("[glsl] failed to compile shader '{}'\ndetails:\n{}", file, buffer.data());
     }
 
-    if (status == GL_FALSE)
-    {
+    if (status == GL_FALSE) {
         glDeleteShader(shader);
         return 0;
     }
@@ -86,13 +76,11 @@ static GLuint create_shader(const std::string &file, GLenum type)
     return shader;
 }
 
-Program ProgramManager::Create(const ProgramCreateInfo &info)
-{
+Program ProgramManager::Create(const ProgramCreateInfo &info) {
     GLuint programID = glCreateProgram();
     std::vector<GLuint> shaders;
     auto createShader = [&](const std::string &path, GLenum type) {
-        if (!path.empty())
-        {
+        if (!path.empty()) {
             GLuint shader = create_shader(path, type);
             glAttachShader(programID, shader);
             shaders.push_back(shader);
@@ -100,21 +88,17 @@ Program ProgramManager::Create(const ProgramCreateInfo &info)
     };
 
     on_scope_exit([&]() {
-        for (GLuint id : shaders)
-        {
+        for (GLuint id : shaders) {
             glDeleteShader(id);
         }
     });
 
-    if (!info.cs.empty())
-    {
+    if (!info.cs.empty()) {
         check(info.vs.empty());
         check(info.ps.empty());
         check(info.gs.empty());
         createShader(info.cs, GL_COMPUTE_SHADER);
-    }
-    else if (!info.vs.empty())
-    {
+    } else if (!info.vs.empty()) {
         check(info.cs.empty());
         createShader(info.vs, GL_VERTEX_SHADER);
         createShader(info.ps, GL_FRAGMENT_SHADER);
@@ -127,15 +111,13 @@ Program ProgramManager::Create(const ProgramCreateInfo &info)
     GLint status = GL_FALSE, length = 0;
     glGetProgramiv(programID, GL_LINK_STATUS, &status);
     glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &length);
-    if (length > 0)
-    {
+    if (length > 0) {
         std::vector<char> buffer(length + 1);
         glGetProgramInfoLog(programID, length, nullptr, buffer.data());
         LOG_ERROR("[glsl] failed to link program\ndetails:\n{}", buffer.data());
     }
 
-    if (status == GL_FALSE)
-    {
+    if (status == GL_FALSE) {
         glDeleteProgram(programID);
         programID = 0;
     }
@@ -147,8 +129,7 @@ Program ProgramManager::Create(const ProgramCreateInfo &info)
 
 static std::vector<Program> g_shaderCache;
 
-bool ProgramManager::InitializeInternal()
-{
+bool ProgramManager::InitializeInternal() {
     g_shaderCache.resize(static_cast<int>(ProgramType::COUNT));
     {
         ProgramCreateInfo info;
@@ -220,16 +201,13 @@ bool ProgramManager::InitializeInternal()
     return true;
 }
 
-void ProgramManager::FinalizeInternal()
-{
-    for (auto it : g_shaderCache)
-    {
+void ProgramManager::FinalizeInternal() {
+    for (auto it : g_shaderCache) {
         glDeleteProgram(it.mHandle);
     }
 }
 
-const Program &ProgramManager::GetShaderProgram(ProgramType type)
-{
+const Program &ProgramManager::GetShaderProgram(ProgramType type) {
     checkrange(type, 0, g_shaderCache.size());
     return g_shaderCache[underlying(type)];
 }

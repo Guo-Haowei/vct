@@ -3,11 +3,9 @@
 
 class Archive;
 
-class TransformComponent
-{
+class TransformComponent {
 public:
-    enum
-    {
+    enum {
         NONE = 0,
         DIRTY = 1 << 0,
     };

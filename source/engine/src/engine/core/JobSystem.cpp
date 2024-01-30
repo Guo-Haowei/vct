@@ -1,31 +1,29 @@
 #include "JobSystem.h"
 
+#include <engine/core/collections/fixed_stack.h>
+#include <engine/core/collections/ring_buffer.h>
+
 #include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
 
 #include "Core/Check.h"
-#include <engine/core/collections/fixed_stack.h>
-#include <engine/core/collections/ring_buffer.h>
 
 #define WIN_CALL(x) x
 
-namespace jobsystem
-{
+namespace jobsystem {
 
 static constexpr uint32_t MAIN_THREAD_ID = 0;
 static constexpr uint32_t INVALID_WORKER_ID = MAIN_THREAD_ID;
 
-struct Worker
-{
+struct Worker {
     uint32_t id = INVALID_WORKER_ID;
     std::wstring name;
     std::shared_ptr<std::thread> thread;
 };
 
-struct Job
-{
+struct Job {
     Context* ctx;
     std::function<void(JobArgs)> task;
     uint32_t groupID;
@@ -35,16 +33,13 @@ struct Job
 
 // @TODO: refactor
 template<size_t N>
-struct ThreadSafeRingBuffer
-{
+struct ThreadSafeRingBuffer {
     vct::RingBuffer<Job, N> mRingBuffer;
     std::mutex mLock;
 
-    bool PopFront(Job& out_value)
-    {
+    bool PopFront(Job& out_value) {
         std::lock_guard<std::mutex> lock(mLock);
-        if (mRingBuffer.empty())
-        {
+        if (mRingBuffer.empty()) {
             return false;
         }
 
@@ -53,11 +48,9 @@ struct ThreadSafeRingBuffer
         return true;
     }
 
-    bool PushBack(const Job& value)
-    {
+    bool PushBack(const Job& value) {
         std::lock_guard<std::mutex> lock(mLock);
-        if (mRingBuffer.size() == mRingBuffer.capacity())
-        {
+        if (mRingBuffer.size() == mRingBuffer.capacity()) {
             return false;
         }
 
@@ -66,8 +59,7 @@ struct ThreadSafeRingBuffer
     }
 };
 
-static struct
-{
+static struct {
     uint32_t numWorker;
     vct::FixedStack<Worker, 32> workers;
 
@@ -82,31 +74,26 @@ static thread_local uint32_t sThreadID;
 
 static bool work();
 
-bool initialize()
-{
+bool initialize() {
     uint32_t numWorkers = std::thread::hardware_concurrency() - 1;
     check(numWorkers > 0);
     sJSGlob.numWorker = numWorkers;
 
     sThreadID = MAIN_THREAD_ID;
 
-    for (uint32_t threadID = 1; threadID <= numWorkers; ++threadID)
-    {
+    for (uint32_t threadID = 1; threadID <= numWorkers; ++threadID) {
         Worker worker;
         worker.id = threadID;
         worker.name = L"JS worker" + std::to_wstring(threadID);
         worker.thread = std::make_shared<std::thread>([&] {
             sThreadID = threadID;
 
-            while (true)
-            {
-                if (sJSGlob.quit.load())
-                {
+            while (true) {
+                if (sJSGlob.quit.load()) {
                     break;
                 }
 
-                if (!work())
-                {
+                if (!work()) {
                     std::unique_lock<std::mutex> lock(sJSGlob.wakeMutex);
                     sJSGlob.wakeCondition.wait(lock);
                 }
@@ -131,27 +118,22 @@ bool initialize()
     return true;
 }
 
-void finalize()
-{
+void finalize() {
     sJSGlob.quit.store(true);
     sJSGlob.wakeCondition.notify_all();
-    for (auto& worker : sJSGlob.workers)
-    {
+    for (auto& worker : sJSGlob.workers) {
         worker.thread->join();
     }
     sJSGlob.workers.clear();
 }
 
-static bool work()
-{
+static bool work() {
     Job job;
-    if (!sJSGlob.jobQueue.PopFront(job))
-    {
+    if (!sJSGlob.jobQueue.PopFront(job)) {
         return false;
     }
 
-    for (uint32_t i = job.groupJobOffset; i < job.groupJobEnd; ++i)
-    {
+    for (uint32_t i = job.groupJobOffset; i < job.groupJobEnd; ++i) {
         JobArgs args;
         args.groupID = job.groupID;
         args.jobIndex = i;
@@ -163,30 +145,19 @@ static bool work()
     return true;
 }
 
-static bool is_main_thread()
-{
-    return sThreadID == MAIN_THREAD_ID;
-}
+static bool is_main_thread() { return sThreadID == MAIN_THREAD_ID; }
 
-static bool is_worker_thread()
-{
-    return sThreadID > MAIN_THREAD_ID && sThreadID < static_cast<uint32_t>(sJSGlob.workers.size());
-}
-
-void Context::Dispatch(uint32_t jobCount, uint32_t groupSize, const std::function<void(JobArgs)>& task)
-{
+void Context::Dispatch(uint32_t jobCount, uint32_t groupSize, const std::function<void(JobArgs)>& task) {
     check(is_main_thread());
 
-    if (jobCount == 0 || groupSize == 0)
-    {
+    if (jobCount == 0 || groupSize == 0) {
         return;
     }
 
     const uint32_t groupCount = (jobCount + groupSize - 1) / groupSize;  // make sure round up
     mTaskCount.fetch_add(groupCount);
 
-    for (uint32_t groupID = 0; groupID < groupCount; ++groupID)
-    {
+    for (uint32_t groupID = 0; groupID < groupCount; ++groupID) {
         Job job;
         job.ctx = this;
         job.task = task;
@@ -194,8 +165,7 @@ void Context::Dispatch(uint32_t jobCount, uint32_t groupSize, const std::functio
         job.groupJobOffset = groupID * groupSize;
         job.groupJobEnd = min(job.groupJobOffset + groupSize, jobCount);
 
-        while (!sJSGlob.jobQueue.PushBack(job))
-        {
+        while (!sJSGlob.jobQueue.PushBack(job)) {
             // if job queue is full, notify all and let main thread do the work as well
             sJSGlob.wakeCondition.notify_all();
             work();
@@ -205,14 +175,12 @@ void Context::Dispatch(uint32_t jobCount, uint32_t groupSize, const std::functio
     sJSGlob.wakeCondition.notify_all();
 }
 
-void Context::Wait()
-{
+void Context::Wait() {
     // Wake any threads that might be sleeping:
     sJSGlob.wakeCondition.notify_all();
 
     // Waiting will also put the current thread to good use by working on an other job if it can:
-    while (IsBusy())
-    {
+    while (IsBusy()) {
         work();
     }
 }

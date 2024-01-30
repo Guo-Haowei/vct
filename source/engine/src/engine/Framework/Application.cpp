@@ -1,15 +1,15 @@
 #include "Application.h"
 
+#include "Core/CommonDvars.h"
+#include "Core/Input.h"
+#include "Core/JobSystem.h"
+#include "Core/Log.h"
 #include "GraphicsManager.h"
 #include "LogManager.h"
 #include "ProgramManager.h"
 #include "SceneManager.h"
 #include "UIManager.h"
 #include "WindowManager.h"
-#include "Core/CommonDvars.h"
-#include "Core/Input.h"
-#include "Core/Log.h"
-#include "Core/JobSystem.h"
 
 // @TODO: refactor
 #include "Core/lua_script.h"
@@ -19,33 +19,24 @@
 #define DEFINE_DVAR
 #include "Core/CommonDvars.h"
 
-class JobSystemManager : public ManagerBase
-{
+class JobSystemManager : public ManagerBase {
 public:
     JobSystemManager() : ManagerBase("JobSystemManager") {}
 
 protected:
-    virtual bool InitializeInternal() override
-    {
-        return jobsystem::initialize();
-    }
+    virtual bool InitializeInternal() override { return jobsystem::initialize(); }
 
-    virtual void FinalizeInternal() override
-    {
-        jobsystem::finalize();
-    }
+    virtual void FinalizeInternal() override { jobsystem::finalize(); }
 };
 
 static JobSystemManager gJobSystemManager;
 
-void Application::RegisterManager(ManagerBase* manager)
-{
+void Application::RegisterManager(ManagerBase* manager) {
     mManagers.emplace_back(manager);
     manager->mApplication = this;
 }
 
-bool Application::RegisterManagers()
-{
+bool Application::RegisterManagers() {
     RegisterManager(LogManager::GetSingletonPtr());
     RegisterManager(&gJobSystemManager);
     RegisterManager(gUIManager);
@@ -56,12 +47,9 @@ bool Application::RegisterManagers()
     return true;
 }
 
-bool Application::InitializeManagers()
-{
-    for (auto manager : mManagers)
-    {
-        if (!manager->Initialize())
-        {
+bool Application::InitializeManagers() {
+    for (auto manager : mManagers) {
+        if (!manager->Initialize()) {
             return false;
         }
     }
@@ -69,23 +57,16 @@ bool Application::InitializeManagers()
     return true;
 }
 
-void Application::FinalizeManagers()
-{
-    for (auto it = mManagers.rbegin(); it != mManagers.rend(); ++it)
-    {
+void Application::FinalizeManagers() {
+    for (auto it = mManagers.rbegin(); it != mManagers.rend(); ++it) {
         (*it)->Finalize();
     }
 }
 
-void Application::AddLayer(std::shared_ptr<Layer> layer)
-{
-    mLayers.emplace_back(layer);
-}
+void Application::AddLayer(std::shared_ptr<Layer> layer) { mLayers.emplace_back(layer); }
 
-int Application::Run(int argc, const char** argv)
-{
-    for (int i = 1; i < argc; ++i)
-    {
+int Application::Run(int argc, const char** argv) {
+    for (int i = 1; i < argc; ++i) {
         mCommandLine.emplace_back(std::string(argv[i]));
     }
 
@@ -94,23 +75,20 @@ int Application::Run(int argc, const char** argv)
     ok = ok && RegisterManagers();
     ok = ok && InitializeManagers();
 
-    if (!ok)
-    {
+    if (!ok) {
         return -1;
     }
 
     vct::MainRenderer renderer;
     renderer.createGpuResources();
 
-    for (auto& layer : mLayers)
-    {
+    for (auto& layer : mLayers) {
         layer->Attach();
         LOG_OK("[Runtime] layer '{}' attached!", layer->GetName());
     }
 
     float dt = 0.0f;
-    while (!gWindowManager->ShouldClose())
-    {
+    while (!gWindowManager->ShouldClose()) {
         gWindowManager->NewFrame();
 
         Input::BeginFrame();
@@ -118,13 +96,11 @@ int Application::Run(int argc, const char** argv)
         gSceneManager->Update(dt);
 
         ImGui::NewFrame();
-        for (auto& layer : mLayers)
-        {
+        for (auto& layer : mLayers) {
             layer->Update(dt);
         }
 
-        for (auto& layer : mLayers)
-        {
+        for (auto& layer : mLayers) {
             layer->Render();
         }
         ImGui::Render();
@@ -143,23 +119,17 @@ int Application::Run(int argc, const char** argv)
     return 0;
 }
 
-static void register_common_dvars()
-{
+static void register_common_dvars() {
 #define REGISTER_DVAR
 #include "Core/CommonDvars.h"
 }
 
-class CommandHelper
-{
+class CommandHelper {
 public:
-    CommandHelper(const CommandLine& cmdLine) : mCommandLine(cmdLine)
-    {
-    }
+    CommandHelper(const CommandLine& cmdLine) : mCommandLine(cmdLine) {}
 
-    bool TryConsume(std::string& str)
-    {
-        if (mCommandLine.empty())
-        {
+    bool TryConsume(std::string& str) {
+        if (mCommandLine.empty()) {
             str.clear();
             return false;
         }
@@ -169,10 +139,8 @@ public:
         return true;
     }
 
-    bool Consume(std::string& str)
-    {
-        if (mCommandLine.empty())
-        {
+    bool Consume(std::string& str) {
+        if (mCommandLine.empty()) {
             LOG_ERROR("Unexpected EOF");
             str.clear();
             return false;
@@ -185,38 +153,29 @@ private:
     CommandLine mCommandLine;
 };
 
-bool Application::ProcessCmdLine()
-{
+bool Application::ProcessCmdLine() {
     register_common_dvars();
 
     CommandHelper cmdHelper(mCommandLine);
 
     std::string arg;
-    while (cmdHelper.TryConsume(arg))
-    {
-        if (arg == "+set")
-        {
+    while (cmdHelper.TryConsume(arg)) {
+        if (arg == "+set") {
             cmdHelper.Consume(arg);
             DynamicVariable* dvar = DynamicVariableManager::Find(arg.c_str());
-            if (dvar == nullptr)
-            {
+            if (dvar == nullptr) {
                 LOG_ERROR("[dvar] Dvar '{}' not found", arg);
                 return false;
             }
             cmdHelper.Consume(arg);
             dvar->SetFromSourceString(arg.c_str());
-        }
-        else if (arg == "+exec")
-        {
+        } else if (arg == "+exec") {
             cmdHelper.Consume(arg);
-            if (!Com_ExecLua(arg.c_str()))
-            {
+            if (!Com_ExecLua(arg.c_str())) {
                 LOG_ERROR("[lua] failed to execute script '{}'", arg);
                 return false;
             }
-        }
-        else
-        {
+        } else {
             LOG_ERROR("Unknown command '{}'", arg);
             return false;
         }

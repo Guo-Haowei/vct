@@ -2,23 +2,20 @@
 
 #include "ConsolePanel.h"
 #include "DebugPanel.h"
-#include "HierarchyPanel.h"
-#include "PropertiyPanel.h"
-#include "Viewer.h"
-
-#include "Engine/Core/CommonDvars.h"
 #include "Engine/Core/Check.h"
+#include "Engine/Core/CommonDvars.h"
 #include "Engine/Core/DynamicVariable.h"
 #include "Engine/Core/Input.h"
 #include "Engine/Core/Log.h"
-#include "Engine/Graphics/r_cbuffers.h"
 #include "Engine/Framework/SceneManager.h"
 #include "Engine/Framework/WindowManager.h"
-
+#include "Engine/Graphics/r_cbuffers.h"
+#include "HierarchyPanel.h"
+#include "PropertiyPanel.h"
+#include "Viewer.h"
 #include "imgui/imgui_internal.h"
 
-EditorLayer::EditorLayer() : Layer("EditorLayer")
-{
+EditorLayer::EditorLayer() : Layer("EditorLayer") {
     AddPanel(std::make_shared<ConsolePanel>());
     AddPanel(std::make_shared<DebugPanel>());
     AddPanel(std::make_shared<HierarchyPanel>());
@@ -26,14 +23,12 @@ EditorLayer::EditorLayer() : Layer("EditorLayer")
     AddPanel(std::make_shared<Viewer>());
 }
 
-void EditorLayer::AddPanel(std::shared_ptr<Panel> panel)
-{
+void EditorLayer::AddPanel(std::shared_ptr<Panel> panel) {
     mPanels.emplace_back(panel);
     panel->SetSelectedRef(&mSelected);
 }
 
-void EditorLayer::DockSpace()
-{
+void EditorLayer::DockSpace() {
     ImGui::GetMainViewport();
 
     static bool opt_padding = false;
@@ -48,21 +43,19 @@ void EditorLayer::DockSpace()
     ImGui::SetNextWindowViewport(viewport->ID);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-    window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+    window_flags |=
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
     window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
-    if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
-    {
+    if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode) {
         window_flags |= ImGuiWindowFlags_NoBackground;
     }
 
-    if (!opt_padding)
-    {
+    if (!opt_padding) {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
     }
     ImGui::Begin("DockSpace Demo", nullptr, window_flags);
-    if (!opt_padding)
-    {
+    if (!opt_padding) {
         ImGui::PopStyleVar();
     }
 
@@ -115,20 +108,16 @@ void EditorLayer::DockSpace()
 #endif
 }
 
-void EditorLayer::Update(float dt)
-{
+void EditorLayer::Update(float dt) {
     DockSpace();
-    for (auto& it : mPanels)
-    {
+    for (auto& it : mPanels) {
         it->Update(dt);
     }
 }
 
-void EditorLayer::Render()
-{
+void EditorLayer::Render() {
     Scene& scene = Com_GetScene();
-    for (auto& it : mPanels)
-    {
+    for (auto& it : mPanels) {
         it->Render(scene);
     }
 
