@@ -29,5 +29,5 @@ def format_folder(folder_name):
                 # print(file_path)
                 subprocess.run(['clang-format', '-i', file_path])
 
-for dir in ['Source', 'Test']:
+for dir in ['source']:
     format_folder(os.path.join(project_dir, dir))

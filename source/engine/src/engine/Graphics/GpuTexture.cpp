@@ -117,5 +117,5 @@ void GpuTexture::clear()
     float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
     /// Hard code format for now
     glClearTexImage(mHandle, 0, GL_RGBA, GL_FLOAT, clearColor);
-    //glClearTexImage(m_handle, 0, m_format, GL_FLOAT, clearColor);
+    // glClearTexImage(m_handle, 0, m_format, GL_FLOAT, clearColor);
 }

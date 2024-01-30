@@ -234,7 +234,7 @@ void Scene::Component_DetachChildren(ecs::Entity parent)
     checkmsg("TODO");
 }
 
-//static constexpr uint32_t SMALL_SUBTASK_GROUPSIZE = 64;
+// static constexpr uint32_t SMALL_SUBTASK_GROUPSIZE = 64;
 static constexpr uint32_t SMALL_SUBTASK_GROUPSIZE = 16;
 
 void Scene::RunAnimationUpdateSystem(Context& ctx)

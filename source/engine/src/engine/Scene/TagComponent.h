@@ -15,7 +15,7 @@ public:
         mTag = tag;
     }
 
-    //bool operator==(const std::string& tag) const { return mTag == tag; }
+    // bool operator==(const std::string& tag) const { return mTag == tag; }
 
     void Serialize(Archive& archive);
 

@@ -103,7 +103,7 @@ static int LuaDvarFunc_SetVec4(lua_State* L)
 
 #define LUA_DVAR_LIB(func)        \
     {                             \
-#func, LuaDvarFunc_##func \
+        #func, LuaDvarFunc_##func \
     }
 
 static const luaL_Reg s_funcs[] = {
