@@ -1,8 +1,6 @@
 #pragma once
 #include "Math/GeoMath.h"
 
-#include <engine/container/fixed_string.h>
-
 enum class EDvarType
 {
     Invalid,
@@ -60,8 +58,8 @@ private:
             float x, y, z, w;
         } mVecValue;
     };
-    fixed_string<128> mStringValue;
-    fixed_string<128> mDebugName;
+    std::string mStringValue;
+    std::string mDebugName;
 
     friend class DynamicVariableManager;
 };

@@ -282,8 +282,6 @@ void MainRenderer::renderFrameBufferTextures(int width, int height)
 
 void MainRenderer::render()
 {
-    Scene& scene = Com_GetScene();
-
     g_perFrameCache.Update();
 
     // clear window

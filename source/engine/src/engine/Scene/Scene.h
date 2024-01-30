@@ -23,7 +23,7 @@ class Scene
     DISABLE_COPY(Scene);
 
 public:
-    static constexpr char* EXTENSION = ".scene";
+    static constexpr const char* EXTENSION = ".scene";
 
     Scene() {}
     Scene(uint32_t revision) : mRevision(revision) {}
@@ -134,7 +134,7 @@ public:                                                              \
     template<typename T>
     size_t GetIndex(const ecs::Entity&) const
     {
-        return Entity::INVALID_INDEX;
+        return ecs::Entity::INVALID_INDEX;
     }
     template<typename T>
     size_t GetCount() const

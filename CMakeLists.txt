@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
 project(VCT)
 set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 
 message("***********************************************************************")
 message(STATUS "CMAKE_CXX_COMPILER_ID   : ${CMAKE_CXX_COMPILER_ID}")

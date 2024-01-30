@@ -4,6 +4,7 @@
 
 void LightComponent::Serialize(Archive& archive)
 {
+    (void)archive;
     // if (archive.IsWriteMode())
     // {
     //     archive << type;

@@ -156,7 +156,7 @@ void PropertyPanel::RenderInternal(Scene& scene)
         return;
     }
 
-    TagComponent::TagString tag = tagComponent->GetTag();
+    std::string tag = tagComponent->GetTag();
     if (ImGui::InputText("##Tag", tag.data(), tag.capacity(), ImGuiInputTextFlags_EnterReturnsTrue))
     {
         tagComponent->GetTagRef() = tag;

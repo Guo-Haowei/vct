@@ -1,13 +1,10 @@
 #pragma once
-#include <engine/container/fixed_string.h>
 
 class Archive;
 
 class TagComponent
 {
 public:
-    using TagString = fixed_string<256>;
-
     TagComponent() = default;
 
     TagComponent(const char* tag)
@@ -22,9 +19,9 @@ public:
     void SetTag(const char* tag) { mTag = tag; }
     void SetTag(const std::string& tag) { mTag = tag; }
 
-    const TagString& GetTag() const { return mTag; }
-    TagString& GetTagRef() { return mTag; }
+    const std::string& GetTag() const { return mTag; }
+    std::string& GetTagRef() { return mTag; }
 
 private:
-    TagString mTag;
+    std::string mTag;
 };

@@ -1,7 +1,6 @@
 #include "core/collections/ring_buffer.h"
 
-// @TODO: rewrite tests
-namespace vct::collection
+namespace vct
 {
 
 TEST(RingBuffer, constructor)
@@ -227,4 +226,4 @@ TEST(RingBuffer, reverse_const_iterator)
     }
 }
 
-}  // namespace vct::collection
+}  // namespace vct

@@ -1,14 +1,14 @@
 #pragma once
 #include "ManagerBase.h"
 #include "Core/Singleton.h"
-#include <engine/container/ring_buffer.h>
+#include <engine/core/collections/ring_buffer.h>
 
 class LogManager : public Singleton<LogManager>, public ManagerBase
 {
 public:
     static constexpr int BUFFER_SIZE = 400;
     using Item = std::pair<uint32_t, std::string>;
-    using Buffer = ring_buffer<Item, BUFFER_SIZE>;
+    using Buffer = vct::RingBuffer<Item, BUFFER_SIZE>;
 
 public:
     LogManager() : ManagerBase("LogManager") {}
