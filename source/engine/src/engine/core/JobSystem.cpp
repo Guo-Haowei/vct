@@ -6,8 +6,8 @@
 #include <thread>
 
 #include "Core/Check.h"
-#include <engine/container/fixed_stack.h>
-#include <engine/container/ring_buffer.h>
+#include <engine/core/collections/fixed_stack.h>
+#include <engine/core/collections/ring_buffer.h>
 
 #define WIN_CALL(x) x
 
@@ -37,7 +37,7 @@ struct Job
 template<size_t N>
 struct ThreadSafeRingBuffer
 {
-    ring_buffer<Job, N> mRingBuffer;
+    vct::RingBuffer<Job, N> mRingBuffer;
     std::mutex mLock;
 
     bool PopFront(Job& out_value)
@@ -69,7 +69,7 @@ struct ThreadSafeRingBuffer
 static struct
 {
     uint32_t numWorker;
-    fixed_stack<Worker, 32> workers;
+    vct::FixedStack<Worker, 32> workers;
 
     std::condition_variable wakeCondition;
     std::mutex wakeMutex;

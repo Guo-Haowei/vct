@@ -109,6 +109,10 @@ ecs::Entity Scene::Entity_CreatePointLight(
     const float energy)
 {
     ecs::Entity entity = Entity_CreateName(name);
+    (void)name;
+    (void)position;
+    (void)color;
+    (void)energy;
     // TransformComponent& transComponent = Create<TransformComponent>(entity);
     // transComponent.SetPosition(position);
     // LightComponent& lightComponent = Create<LightComponent>(entity);
@@ -125,6 +129,8 @@ ecs::Entity Scene::Entity_CreateOmniLight(
     const float energy)
 {
     ecs::Entity entity = Entity_CreateName(name);
+    (void)color;
+    (void)energy;
     // Create<TransformComponent>(entity);
     // LightComponent& lightComponent = Create<LightComponent>(entity);
     // lightComponent.type = LIGHT_TYPE_OMNI;
@@ -149,6 +155,10 @@ ecs::Entity Scene::Entity_CreateSphere(
     float radius,
     const mat4& transform)
 {
+    (void)name;
+    (void)materialID;
+    (void)radius;
+    (void)transform;
     ecs::Entity entity = Entity_CreateObject(name);
     // TransformComponent& trans = *GetComponent<TransformComponent>(entity);
     // ObjectComponent& obj = *GetComponent<ObjectComponent>(entity);
@@ -185,6 +195,10 @@ ecs::Entity Scene::Entity_CreateCube(
     const vec3& scale,
     const mat4& transform)
 {
+    (void)name;
+    (void)materialID;
+    (void)scale;
+    (void)transform;
     ecs::Entity entity = Entity_CreateObject(name);
     // TransformComponent& trans = *GetComponent<TransformComponent>(entity);
     // ObjectComponent& obj = *GetComponent<ObjectComponent>(entity);
@@ -234,7 +248,7 @@ void Scene::Component_DetachChildren(ecs::Entity parent)
     checkmsg("TODO");
 }
 
-//static constexpr uint32_t SMALL_SUBTASK_GROUPSIZE = 64;
+// static constexpr uint32_t SMALL_SUBTASK_GROUPSIZE = 64;
 static constexpr uint32_t SMALL_SUBTASK_GROUPSIZE = 16;
 
 void Scene::RunAnimationUpdateSystem(Context& ctx)

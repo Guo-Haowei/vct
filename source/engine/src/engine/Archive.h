@@ -1,5 +1,4 @@
 #pragma once
-#include <engine/container/fixed_string.h>
 
 class Archive
 {
@@ -53,27 +52,6 @@ public:
         Read(stringLength);
         value.resize(stringLength);
         Read(value.data(), stringLength);
-        return *this;
-    }
-
-    template<size_t N>
-    inline Archive& operator<<(const fixed_string<N>& value)
-    {
-        size_t length = value.length();
-        Write(length);
-        Write(value.data(), length);
-        return *this;
-    }
-
-    template<size_t N>
-    inline Archive& operator>>(fixed_string<N>& value)
-    {
-        size_t length = 0;
-        Read(length);
-        assert(length + 1 < value.capacity());
-        char buffer[N] = { 0 };
-        Read(buffer, length);
-        value = fixed_string<N>(length, buffer);
         return *this;
     }
 
