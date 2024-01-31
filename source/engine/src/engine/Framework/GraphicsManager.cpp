@@ -1,8 +1,6 @@
 #include "GraphicsManager.h"
 
 #include "Core/CommonDvars.h"
-#include "Core/Log.h"
-
 #include "Graphics/GLPrerequisites.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
 
@@ -10,28 +8,24 @@ GraphicsManager *gGraphicsManager = new GraphicsManager;
 
 static void APIENTRY gl_debug_callback(GLenum, GLenum, unsigned int, GLenum, GLsizei, const char *, const void *);
 
-bool GraphicsManager::InitializeInternal()
-{
-    if (gladLoadGL() == 0)
-    {
+bool GraphicsManager::InitializeInternal() {
+    if (gladLoadGL() == 0) {
         LOG_FATAL("[glad] failed to load gl functions");
         return false;
     }
 
-    LOG_DEBUG("[opengl] renderer: {}", (const char *)glGetString(GL_RENDERER));
-    LOG_DEBUG("[opengl] version: {}", (const char *)glGetString(GL_VERSION));
+    LOG_VERBOSE("[opengl] renderer: {}", (const char *)glGetString(GL_RENDERER));
+    LOG_VERBOSE("[opengl] version: {}", (const char *)glGetString(GL_VERSION));
 
-    if (DVAR_GET_BOOL(r_debug))
-    {
+    if (DVAR_GET_BOOL(r_debug)) {
         int flags;
         glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
-        if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
-        {
+        if (flags & GL_CONTEXT_FLAG_DEBUG_BIT) {
             glEnable(GL_DEBUG_OUTPUT);
             glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
             glDebugMessageCallback(gl_debug_callback, nullptr);
             glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-            LOG_DEBUG("[opengl] debug callback enabled");
+            LOG_VERBOSE("[opengl] debug callback enabled");
         }
     }
 
@@ -40,32 +34,20 @@ bool GraphicsManager::InitializeInternal()
     return true;
 }
 
-void GraphicsManager::FinalizeInternal()
-{
-    ImGui_ImplOpenGL3_Shutdown();
-}
+void GraphicsManager::FinalizeInternal() { ImGui_ImplOpenGL3_Shutdown(); }
 
-static void APIENTRY gl_debug_callback(
-    GLenum source,
-    GLenum type,
-    unsigned int id,
-    GLenum severity,
-    GLsizei length,
-    const char *message,
-    const void *userParam)
-{
+static void APIENTRY gl_debug_callback(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length,
+                                       const char *message, const void *userParam) {
     unused(length);
     unused(userParam);
 
-    switch (id)
-    {
+    switch (id) {
         case 131185:
             return;
     }
 
     const char *sourceStr = "GL_DEBUG_SOURCE_OTHER";
-    switch (source)
-    {
+    switch (source) {
         case GL_DEBUG_SOURCE_API:
             sourceStr = "GL_DEBUG_SOURCE_API";
             break;
@@ -86,8 +68,7 @@ static void APIENTRY gl_debug_callback(
     }
 
     const char *typeStr = "GL_DEBUG_TYPE_OTHER";
-    switch (type)
-    {
+    switch (type) {
         case GL_DEBUG_TYPE_ERROR:
             typeStr = "GL_DEBUG_TYPE_ERROR";
             break;
@@ -116,18 +97,17 @@ static void APIENTRY gl_debug_callback(
             break;
     }
 
-    ELogLevel level = ELogLevel::Debug;
-    switch (severity)
-    {
-        case GL_DEBUG_SEVERITY_HIGH:
-            level = ELogLevel::Error;
-            break;
-        case GL_DEBUG_SEVERITY_MEDIUM:
-            level = ELogLevel::Warn;
-            break;
-        default:
-            break;
-    }
+    // ELogLevel level = ELogLevel::Debug;
+    // switch (severity) {
+    //     case GL_DEBUG_SEVERITY_HIGH:
+    //         level = ELogLevel::Error;
+    //         break;
+    //     case GL_DEBUG_SEVERITY_MEDIUM:
+    //         level = ELogLevel::Warn;
+    //         break;
+    //     default:
+    //         break;
+    // }
 
-    base::log(level, fmt::format("[opengl] {}\n\t| id: {} | source: {} | type: {}", message, id, sourceStr, typeStr));
+    LOG_ERROR(std::format("[opengl] {}\n\t| id: {} | source: {} | type: {}", message, id, sourceStr, typeStr));
 }

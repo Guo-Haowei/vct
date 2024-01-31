@@ -8,8 +8,7 @@
 // no filter
 float Shadow(sampler2D shadowMap, const in vec4 position_light, float NdotL
              //, int level
-)
-{
+) {
     vec3 coords = position_light.xyz / position_light.w;
     coords = 0.5 * coords + 0.5;
 
@@ -24,10 +23,8 @@ float Shadow(sampler2D shadowMap, const in vec4 position_light, float NdotL
     float bias = max(0.005 * (1.0 - NdotL), 0.0005);
 
     const int SAMPLE_STEP = 1;
-    for (int x = -SAMPLE_STEP; x <= SAMPLE_STEP; ++x)
-    {
-        for (int y = -SAMPLE_STEP; y <= SAMPLE_STEP; ++y)
-        {
+    for (int x = -SAMPLE_STEP; x <= SAMPLE_STEP; ++x) {
+        for (int y = -SAMPLE_STEP; y <= SAMPLE_STEP; ++y) {
             vec2 offset = vec2(x, y) * texelSize;
             float closest_depth = texture(shadowMap, coords.xy + offset).r;
 

@@ -82,8 +82,7 @@ layout(std140, binding = 2) uniform MaterialCB
 #ifdef __cplusplus
 using sampler2D = uint64_t;
 using sampler3D = uint64_t;
-typedef struct
-{
+typedef struct {
     uint64_t data;
     uint64_t padding;
 } Sampler2DArray;

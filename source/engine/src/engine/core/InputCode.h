@@ -4,8 +4,7 @@
 #undef DELETE
 #endif
 
-enum class EMouseButton : uint8_t
-{
+enum class EMouseButton : uint8_t {
     LEFT = 0,
     RIGHT = 1,
     MIDDLE = 2,
@@ -13,8 +12,7 @@ enum class EMouseButton : uint8_t
     COUNT,
 };
 
-enum class EKeyCode : uint16_t
-{
+enum class EKeyCode : uint16_t {
     SPACE = 32,
     APOSTROPHE = 39,
     COMMA = 44,

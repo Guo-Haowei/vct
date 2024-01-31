@@ -7,8 +7,7 @@
 
 class Archive;
 
-class HierarchyComponent
-{
+class HierarchyComponent {
 public:
     ecs::Entity GetParent() const { return mParent; }
 
@@ -20,10 +19,8 @@ private:
     friend class Scene;
 };
 
-struct ObjectComponent
-{
-    enum FLAGS
-    {
+struct ObjectComponent {
+    enum FLAGS {
         NONE = 0,
         RENDERABLE = 1 << 0,
         CAST_SHADOW = 1 << 1,
@@ -38,10 +35,8 @@ struct ObjectComponent
     void Serialize(Archive& archive);
 };
 
-struct ArmatureComponent
-{
-    enum FLAGS
-    {
+struct ArmatureComponent {
+    enum FLAGS {
         NONE = 0,
     };
     uint32_t flags = NONE;
@@ -55,10 +50,8 @@ struct ArmatureComponent
     void Serialize(Archive& archive);
 };
 
-struct AnimationComponent
-{
-    enum : uint32_t
-    {
+struct AnimationComponent {
+    enum : uint32_t {
         NONE = 0,
         PLAYING = 1 << 0,
         LOOPED = 1 << 1,
@@ -76,13 +69,11 @@ struct AnimationComponent
     float amount = 1;  // blend amount
     float speed = 1;
 
-    struct Channel
-    {
+    struct Channel {
         ecs::Entity targetID;
         int samplerIndex = -1;
 
-        enum Path
-        {
+        enum Path {
             TRANSLATION,
             ROTATION,
             SCALE,
@@ -90,8 +81,7 @@ struct AnimationComponent
             UNKNOWN,
         } path = Path::UNKNOWN;
 
-        enum PathDataType
-        {
+        enum PathDataType {
             Event,
             Float,
             Float2,
@@ -102,8 +92,7 @@ struct AnimationComponent
             Count,
         };
     };
-    struct Sampler
-    {
+    struct Sampler {
         std::vector<float> keyframeTimes;
         std::vector<float> keyframeData;
     };
@@ -114,25 +103,20 @@ struct AnimationComponent
     void Serialize(Archive& archive);
 };
 
-struct RigidBodyPhysicsComponent
-{
-    enum CollisionShape
-    {
+struct RigidBodyPhysicsComponent {
+    enum CollisionShape {
         UNKNOWN,
         SPHERE,
         BOX,
     } shape;
 
-    struct BoxParam
-    {
+    struct BoxParam {
         vec3 halfExtent;
     };
-    struct SphereParam
-    {
+    struct SphereParam {
         float radius;
     };
-    union
-    {
+    union {
         BoxParam box;
         SphereParam sphere;
     } param;
@@ -142,8 +126,8 @@ struct RigidBodyPhysicsComponent
 };
 
 #include "CameraComponent.h"
+#include "LightComponent.h"
 #include "MaterialComponent.h"
 #include "MeshComponent.h"
-#include "LightComponent.h"
 #include "TagComponent.h"
 #include "TransformComponent.h"

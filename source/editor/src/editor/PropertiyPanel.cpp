@@ -1,20 +1,22 @@
 #include "PropertiyPanel.h"
 
 #include "Engine/Scene/Scene.h"
-#include "imgui/imgui_internal.h"
 #include "ImGuizmo/ImGuizmo.h"
+#include "imgui/imgui_internal.h"
 
 static constexpr float DEFAULT_COLUMN_WIDTH = 100.0f;
 
-static bool draw_vec3_control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = DEFAULT_COLUMN_WIDTH);
-static bool draw_drag_float(const char* tag, float* p, float speed, float min, float max, float columnWidth = DEFAULT_COLUMN_WIDTH);
+static bool draw_vec3_control(const std::string& label, glm::vec3& values, float resetValue = 0.0f,
+                              float columnWidth = DEFAULT_COLUMN_WIDTH);
+static bool draw_drag_float(const char* tag, float* p, float speed, float min, float max,
+                            float columnWidth = DEFAULT_COLUMN_WIDTH);
 
 template<typename T, typename UIFunction>
-static void DrawComponent(const std::string& name, T* component, UIFunction uiFunction)
-{
-    const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
-    if (component)
-    {
+static void DrawComponent(const std::string& name, T* component, UIFunction uiFunction) {
+    const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed |
+                                             ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap |
+                                             ImGuiTreeNodeFlags_FramePadding;
+    if (component) {
         ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
@@ -23,37 +25,31 @@ static void DrawComponent(const std::string& name, T* component, UIFunction uiFu
         bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, name.c_str());
         ImGui::PopStyleVar();
         ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
-        if (ImGui::Button("-", ImVec2{ lineHeight, lineHeight }))
-        {
+        if (ImGui::Button("-", ImVec2{ lineHeight, lineHeight })) {
             ImGui::OpenPopup("ComponentSettings");
         }
 
         bool removeComponent = false;
-        if (ImGui::BeginPopup("ComponentSettings"))
-        {
-            if (ImGui::MenuItem("Remove component"))
-            {
+        if (ImGui::BeginPopup("ComponentSettings")) {
+            if (ImGui::MenuItem("Remove component")) {
                 removeComponent = true;
             }
 
             ImGui::EndPopup();
         }
 
-        if (open)
-        {
+        if (open) {
             uiFunction(*component);
             ImGui::TreePop();
         }
 
-        if (removeComponent)
-        {
+        if (removeComponent) {
             LOG_ERROR("TODO: implement remove component");
         }
     }
 }
 
-static bool draw_vec3_control(const std::string& label, glm::vec3& values, float resetValue, float columnWidth)
-{
+static bool draw_vec3_control(const std::string& label, glm::vec3& values, float resetValue, float columnWidth) {
     bool dirty = false;
 
     ImGuiIO& io = ImGui::GetIO();
@@ -74,8 +70,7 @@ static bool draw_vec3_control(const std::string& label, glm::vec3& values, float
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
     ImGui::PushFont(boldFont);
 
-    if (ImGui::Button("X"))
-    {
+    if (ImGui::Button("X")) {
         values.x = resetValue;
         dirty = true;
     }
@@ -91,8 +86,7 @@ static bool draw_vec3_control(const std::string& label, glm::vec3& values, float
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
     ImGui::PushFont(boldFont);
-    if (ImGui::Button("Y"))
-    {
+    if (ImGui::Button("Y")) {
         values.y = resetValue;
         dirty = true;
     }
@@ -108,8 +102,7 @@ static bool draw_vec3_control(const std::string& label, glm::vec3& values, float
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
     ImGui::PushFont(boldFont);
-    if (ImGui::Button("Z"))
-    {
+    if (ImGui::Button("Z")) {
         values.z = resetValue;
         dirty = true;
     }
@@ -128,51 +121,43 @@ static bool draw_vec3_control(const std::string& label, glm::vec3& values, float
     return dirty;
 }
 
-static bool draw_drag_float(const char* tag, float* p, float speed, float min, float max, float columnWidth)
-{
+static bool draw_drag_float(const char* tag, float* p, float speed, float min, float max, float columnWidth) {
     ImGui::Columns(2);
     ImGui::SetColumnWidth(0, columnWidth);
     ImGui::Text(tag);
     ImGui::NextColumn();
-    auto dragFloatTag = fmt::format("##{}", tag);
+    auto dragFloatTag = std::format("##{}", tag);
     bool dirty = ImGui::DragFloat(dragFloatTag.c_str(), p, speed, min, max);
     ImGui::Columns(1);
     return dirty;
 }
 
-void PropertyPanel::RenderInternal(Scene& scene)
-{
+void PropertyPanel::RenderInternal(Scene& scene) {
     ecs::Entity id = *mpSelected;
 
-    if (!id.IsValid())
-    {
+    if (!id.IsValid()) {
         return;
     }
 
     TagComponent* tagComponent = scene.GetComponent<TagComponent>(id);
-    if (!tagComponent)
-    {
+    if (!tagComponent) {
         LOG_WARN("Entity {} does not have name", id.GetID());
         return;
     }
 
     std::string tag = tagComponent->GetTag();
-    if (ImGui::InputText("##Tag", tag.data(), tag.capacity(), ImGuiInputTextFlags_EnterReturnsTrue))
-    {
+    if (ImGui::InputText("##Tag", tag.data(), tag.capacity(), ImGuiInputTextFlags_EnterReturnsTrue)) {
         tagComponent->GetTagRef() = tag;
     }
 
     ImGui::SameLine();
     ImGui::PushItemWidth(-1);
-    if (ImGui::Button("Add Component"))
-    {
+    if (ImGui::Button("Add Component")) {
         ImGui::OpenPopup("AddComponentPopup");
     }
 
-    if (ImGui::BeginPopup("AddComponentPopup"))
-    {
-        if (ImGui::MenuItem("Rigid Body"))
-        {
+    if (ImGui::BeginPopup("AddComponentPopup")) {
+        if (ImGui::MenuItem("Rigid Body")) {
             LOG_ERROR("TODO: implement add component");
             ImGui::CloseCurrentPopup();
         }
@@ -194,11 +179,8 @@ void PropertyPanel::RenderInternal(Scene& scene)
         vec3 translation;
         vec3 rotation;
         vec3 scale;
-        ImGuizmo::DecomposeMatrixToComponents(
-            glm::value_ptr(transformMatrix),
-            glm::value_ptr(translation),
-            glm::value_ptr(rotation),
-            glm::value_ptr(scale));
+        ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transformMatrix), glm::value_ptr(translation),
+                                              glm::value_ptr(rotation), glm::value_ptr(scale));
 
         bool dirty = false;
         bool wantTranslation = false, wantRotation = false, wantScale = false;
@@ -217,37 +199,27 @@ void PropertyPanel::RenderInternal(Scene& scene)
         //     }
         // }
         // else
-        {
-            wantTranslation = wantRotation = wantScale = true;
-        }
+        { wantTranslation = wantRotation = wantScale = true; }
 
-        if (wantTranslation)
-        {
+        if (wantTranslation) {
             dirty |= draw_vec3_control("translation", translation);
         }
-        if (wantRotation)
-        {
+        if (wantRotation) {
             dirty |= draw_vec3_control("rotation", rotation);
         }
-        if (wantScale)
-        {
+        if (wantScale) {
             dirty |= draw_vec3_control("scale", scale, 1.0f);
         }
-        if (dirty)
-        {
-            ImGuizmo::RecomposeMatrixFromComponents(
-                glm::value_ptr(translation),
-                glm::value_ptr(rotation),
-                glm::value_ptr(scale),
-                glm::value_ptr(transformMatrix));
+        if (dirty) {
+            ImGuizmo::RecomposeMatrixFromComponents(glm::value_ptr(translation), glm::value_ptr(rotation),
+                                                    glm::value_ptr(scale), glm::value_ptr(transformMatrix));
             transform.SetLocalTransform(transformMatrix);
         }
     });
 
     RigidBodyPhysicsComponent* rigidBodyComponent = scene.GetComponent<RigidBodyPhysicsComponent>(id);
     DrawComponent("RigidBody", rigidBodyComponent, [](RigidBodyPhysicsComponent& rigidbody) {
-        switch (rigidbody.shape)
-        {
+        switch (rigidbody.shape) {
             case RigidBodyPhysicsComponent::BOX: {
                 const auto& half = rigidbody.param.box.halfExtent;
                 ImGui::Text("shape: box");
@@ -274,16 +246,12 @@ void PropertyPanel::RenderInternal(Scene& scene)
         MeshComponent* mesh = scene.GetComponent<MeshComponent>(object.meshID);
         TagComponent* meshName = scene.GetComponent<TagComponent>(object.meshID);
         ImGui::Text("Mesh Component (%d)", object.meshID);
-        if (mesh)
-        {
+        if (mesh) {
             const char* meshNameStr = meshName ? meshName->GetTag().c_str() : "untitled";
             ImGui::Text("mesh %s (%zu submesh)", meshNameStr, mesh->mSubsets.size());
             ImGui::Text("%zu triangles", mesh->mIndices.size() / 3);
-            ImGui::Text("v:%zu, n:%zu, u:%zu, b:%zu",
-                        mesh->mPositions.size(),
-                        mesh->mNormals.size(),
-                        mesh->mTexcoords_0.size(),
-                        mesh->mWeights_0.size());
+            ImGui::Text("v:%zu, n:%zu, u:%zu, b:%zu", mesh->mPositions.size(), mesh->mNormals.size(),
+                        mesh->mTexcoords_0.size(), mesh->mWeights_0.size());
             // @TODO: armature
         }
     });

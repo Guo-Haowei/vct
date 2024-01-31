@@ -1,16 +1,13 @@
 #include "r_editor.h"
 
-#include "GpuTexture.h"
-
-#include "Core/Check.h"
 #include "Core/geometry.h"
 #include "Framework/ProgramManager.h"
 #include "Framework/SceneManager.h"
+#include "GpuTexture.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"
 
-struct VertexPoint3D
-{
+struct VertexPoint3D {
     vec3 position;
     vec3 color;
 };
@@ -19,14 +16,12 @@ static MeshData g_boxWireFrame;
 static MeshData g_gridWireFrame;
 static MeshData g_imageBuffer;
 
-struct TextureVertex
-{
+struct TextureVertex {
     vec2 pos;
     vec2 uv;
 };
 
-static void CreateImageBuffer()
-{
+static void CreateImageBuffer() {
     MeshData& mesh = g_imageBuffer;
     glGenVertexArrays(1, &mesh.vao);
     glGenBuffers(1, mesh.vbos);
@@ -39,13 +34,11 @@ static void CreateImageBuffer()
     glBindVertexArray(0);
 }
 
-static void CreateBoxWireFrameData()
-{
+static void CreateBoxWireFrameData() {
     std::vector<VertexPoint3D> vertices;
     const MeshComponent box = geometry::MakeBoxWireFrame();
     vertices.reserve(box.mPositions.size());
-    for (const vec3& pos : box.mPositions)
-    {
+    for (const vec3& pos : box.mPositions) {
         vertices.emplace_back(VertexPoint3D{ pos, vec3(1) });
     }
 
@@ -70,20 +63,17 @@ static void CreateBoxWireFrameData()
     g_boxWireFrame.count = uint32_t(box.mIndices.size());
 }
 
-void R_CreateEditorResource()
-{
+void R_CreateEditorResource() {
     CreateBoxWireFrameData();
     CreateImageBuffer();
 }
 
-void R_DestroyEditorResource()
-{
+void R_DestroyEditorResource() {
     glDeleteVertexArrays(1, &g_boxWireFrame.vao);
     glDeleteBuffers(2, &g_boxWireFrame.ebo);
 }
 
-static inline void FillTextureIconBuffer(std::vector<TextureVertex>& iconBuffer, const vec2& offset, float aspect)
-{
+static inline void FillTextureIconBuffer(std::vector<TextureVertex>& iconBuffer, const vec2& offset, float aspect) {
     constexpr TextureVertex kVertices[] = {
         { vec2(-1, +1), vec2(0, 0) },  // top-left
         { vec2(-1, -1), vec2(0, 1) },  // bottom-left
@@ -95,8 +85,7 @@ static inline void FillTextureIconBuffer(std::vector<TextureVertex>& iconBuffer,
     constexpr float kScale = 0.07f;
     const vec2 scale(kScale, aspect * kScale);
 
-    for (size_t idx = 0; idx < array_length(indices); ++idx)
-    {
+    for (size_t idx = 0; idx < vct::array_length(indices); ++idx) {
         TextureVertex vertex = kVertices[indices[idx]];
         vertex.pos *= scale;
         vertex.pos += offset;
@@ -105,18 +94,16 @@ static inline void FillTextureIconBuffer(std::vector<TextureVertex>& iconBuffer,
 }
 
 // draw grid, bounding box, ui
-void R_DrawEditor()
-{
+void R_DrawEditor() {
     const Scene& scene = Com_GetScene();
     auto selected = scene.mSelected;
-    if (selected.IsValid())
-    {
+    if (selected.IsValid()) {
         auto transformComponent = scene.GetComponent<TransformComponent>(selected);
-        check(transformComponent);
+        DEV_ASSERT(transformComponent);
         auto objComponent = scene.GetComponent<ObjectComponent>(selected);
-        check(objComponent);
+        DEV_ASSERT(objComponent);
         auto meshComponent = scene.GetComponent<MeshComponent>(objComponent->meshID);
-        check(meshComponent);
+        DEV_ASSERT(meshComponent);
         AABB aabb = meshComponent->mLocalBound;
         aabb.ApplyMatrix(transformComponent->GetWorldMatrix());
 
@@ -148,7 +135,8 @@ void R_DrawEditor()
     //     std::vector<TextureVertex> iconBuffer;
 
     //     FillTextureIconBuffer(iconBuffer, lightPos2d, camera.GetAspect());
-    //     glNamedBufferData(g_imageBuffer.vbos[0], sizeof(TextureVertex) * iconBuffer.size(), iconBuffer.data(), GL_STREAM_DRAW);
+    //     glNamedBufferData(g_imageBuffer.vbos[0], sizeof(TextureVertex) * iconBuffer.size(), iconBuffer.data(),
+    //     GL_STREAM_DRAW);
 
     //     gProgramManager->GetShaderProgram(ProgramType::IMAGE2D).Bind();
     //     glBindVertexArray(g_imageBuffer.vao);

@@ -1,26 +1,22 @@
 #include "cbuffer.glsl"
 
-layout( location = 0 ) in vec2 pass_uv;
-layout( location = 0 ) out vec4 out_color;
+layout(location = 0) in vec2 pass_uv;
+layout(location = 0) out vec4 out_color;
 
 #include "common.glsl"
 
 // http://blog.simonrodriguez.fr/articles/2016/07/implementing_fxaa.html
-float rgb2luma( vec3 rgb )
-{
-    return sqrt( dot( rgb, vec3( 0.299, 0.587, 0.114 ) ) );
-}
+float rgb2luma(vec3 rgb) { return sqrt(dot(rgb, vec3(0.299, 0.587, 0.114))); }
 
 #define EDGE_THRESHOLD_MIN 0.0312
 #define EDGE_THRESHOLD_MAX 0.125
 #define ITERATIONS         12
 #define SUBPIXEL_QUALITY   0.75
 
-void main()
-{
-    const vec2 uv          = pass_uv;
-    const vec3 colorCenter = texture( FinalImage, uv ).rgb;
-    out_color              = vec4( colorCenter, 1.0 );
+void main() {
+    const vec2 uv = pass_uv;
+    const vec3 colorCenter = texture(FinalImage, uv).rgb;
+    out_color = vec4(colorCenter, 1.0);
     return;
 #if 0
     if ( EnableFXAA == 0 )

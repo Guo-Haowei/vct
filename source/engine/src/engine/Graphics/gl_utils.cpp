@@ -4,15 +4,12 @@
 #include <set>
 
 #include "Core/CommonDvars.h"
-#include "cbuffer.glsl"
-#include "Core/Check.h"
 #include "Core/DynamicVariable.h"
-#include "Core/Log.h"
+#include "cbuffer.glsl"
 
 static MeshData g_quad;
 
-void R_CreateQuad()
-{
+void R_CreateQuad() {
     // clang-format off
     float points[] = { -1.0f, +1.0f, -1.0f, -1.0f, +1.0f, +1.0f, +1.0f, +1.0f, -1.0f, -1.0f, +1.0f, -1.0f, };
     // clang-format on
@@ -26,15 +23,13 @@ void R_CreateQuad()
     glEnableVertexAttribArray(0);
 }
 
-void R_DrawQuad()
-{
-    check(g_quad.vao);
+void R_DrawQuad() {
+    DEV_ASSERT(g_quad.vao);
     glBindVertexArray(g_quad.vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void FillMaterialCB(const MaterialData *mat, MaterialCB &cb)
-{
+void FillMaterialCB(const MaterialData *mat, MaterialCB &cb) {
     cb.AlbedoColor = mat->albedoColor;
     cb.Metallic = mat->metallic;
     cb.Roughness = mat->roughness;
@@ -45,27 +40,24 @@ void FillMaterialCB(const MaterialData *mat, MaterialCB &cb)
     cb.ReflectPower = mat->reflectPower;
 }
 
-namespace gl
-{
+namespace gl {
 
 //------------------------------------------------------------------------------
 // Constant Buffer
 //------------------------------------------------------------------------------
-GLuint CreateAndBindConstantBuffer(int slot, size_t sizeInByte)
-{
+GLuint CreateAndBindConstantBuffer(int slot, size_t sizeInByte) {
     GLuint handle = 0;
     glGenBuffers(1, &handle);
     glBindBuffer(GL_UNIFORM_BUFFER, handle);
     glBufferData(GL_UNIFORM_BUFFER, sizeInByte, nullptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glBindBufferBase(GL_UNIFORM_BUFFER, slot, handle);
-    LOG_DEBUG("[opengl] created buffer of size {} (slot {})", sizeInByte, slot);
+    LOG_VERBOSE("[opengl] created buffer of size {} (slot {})", sizeInByte, slot);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     return handle;
 }
 
-void UpdateConstantBuffer(GLuint handle, const void *ptr, size_t sizeInByte)
-{
+void UpdateConstantBuffer(GLuint handle, const void *ptr, size_t sizeInByte) {
     // glMapBuffer( mHandle, 0 );
     glBindBuffer(GL_UNIFORM_BUFFER, handle);
     glBufferData(GL_UNIFORM_BUFFER, sizeInByte, ptr, GL_DYNAMIC_DRAW);

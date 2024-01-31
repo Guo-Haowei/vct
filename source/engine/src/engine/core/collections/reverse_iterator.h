@@ -1,25 +1,21 @@
 #pragma once
 
-namespace vct
-{
+namespace vct {
 
 template<typename T, typename Base>
-class ReverseIterator
-{
+class ReverseIterator {
     using ThisType = ReverseIterator<T, Base>;
 
 public:
     explicit ReverseIterator(Base base) : m_base_iterator(--base) {}
 
-    ThisType operator++(int)
-    {
+    ThisType operator++(int) {
         ThisType tmp = *this;
         --m_base_iterator;
         return tmp;
     }
 
-    ThisType& operator++()
-    {
+    ThisType& operator++() {
         --m_base_iterator;
         return *this;
     }

@@ -1,5 +1,6 @@
 #include "AABB.h"
-#include "Core/Check.h"
+
+using namespace vct;
 
 #if 0
  *        E__________________ H
@@ -17,8 +18,7 @@
  *
  * A, B, B, C, C, D, D, A, E, F, F, G, G, H, H, E, A, E, B, F, D, H, C, G
 #endif
-vec3 AABB::Corner(int index) const
-{
+vec3 AABB::Corner(int index) const {
     // clang-format off
     switch (index)
     {
@@ -32,27 +32,19 @@ vec3 AABB::Corner(int index) const
         case 7: return vec3(mMax.x, mMax.y, mMin.z); // H
     }
     // clang-format on
-    check(0);
+    DEV_ASSERT(0);
     return vec3(0);
 }
 
-void AABB::ApplyMatrix(const mat4& mat4)
-{
-    vec4 points[] = {
-        vec4(mMin.x, mMin.y, mMin.z, 1.0f),
-        vec4(mMin.x, mMin.y, mMax.z, 1.0f),
-        vec4(mMin.x, mMax.y, mMin.z, 1.0f),
-        vec4(mMin.x, mMax.y, mMax.z, 1.0f),
-        vec4(mMax.x, mMin.y, mMin.z, 1.0f),
-        vec4(mMax.x, mMin.y, mMax.z, 1.0f),
-        vec4(mMax.x, mMax.y, mMin.z, 1.0f),
-        vec4(mMax.x, mMax.y, mMax.z, 1.0f)
-    };
+void AABB::ApplyMatrix(const mat4& mat4) {
+    vec4 points[] = { vec4(mMin.x, mMin.y, mMin.z, 1.0f), vec4(mMin.x, mMin.y, mMax.z, 1.0f),
+                      vec4(mMin.x, mMax.y, mMin.z, 1.0f), vec4(mMin.x, mMax.y, mMax.z, 1.0f),
+                      vec4(mMax.x, mMin.y, mMin.z, 1.0f), vec4(mMax.x, mMin.y, mMax.z, 1.0f),
+                      vec4(mMax.x, mMax.y, mMin.z, 1.0f), vec4(mMax.x, mMax.y, mMax.z, 1.0f) };
     static_assert(array_length(points) == 8);
 
     AABB newBox;
-    for (size_t i = 0; i < array_length(points); ++i)
-    {
+    for (size_t i = 0; i < array_length(points); ++i) {
         newBox.Expand(vec3(mat4 * points[i]));
     }
 
@@ -60,8 +52,7 @@ void AABB::ApplyMatrix(const mat4& mat4)
     mMax = newBox.mMax;
 }
 
-void AABB::FromCenterSize(const vec3& center, const vec3& size)
-{
+void AABB::FromCenterSize(const vec3& center, const vec3& size) {
     vec3 half = 0.5f * size;
     mMin = center - half;
     mMax = center + half;

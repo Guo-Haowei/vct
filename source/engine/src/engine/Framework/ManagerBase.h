@@ -3,8 +3,7 @@
 
 class Application;
 
-class ManagerBase
-{
+class ManagerBase {
     DISABLE_COPY(ManagerBase);
 
 public:

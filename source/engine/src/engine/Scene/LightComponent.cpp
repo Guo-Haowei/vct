@@ -1,9 +1,8 @@
 #include "LightComponent.h"
 
-#include "engine/Archive.h"
+#include "Archive.h"
 
-void LightComponent::Serialize(Archive& archive)
-{
+void LightComponent::Serialize(Archive& archive) {
     (void)archive;
     // if (archive.IsWriteMode())
     // {

@@ -1,13 +1,11 @@
 #pragma once
-#include "InputCode.h"
-
 #include "Core/Types.h"
+#include "InputCode.h"
 #include "Math/GeoMath.h"
 
 class WindowManager;
 
-class Input
-{
+class Input {
     using KeyArray = std::array<bool, underlying(EKeyCode::COUNT)>;
     using ButtonArray = std::array<bool, underlying(EMouseButton::COUNT)>;
 

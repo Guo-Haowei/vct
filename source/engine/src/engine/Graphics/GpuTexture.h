@@ -1,8 +1,7 @@
 #pragma once
 #include "GLPrerequisites.h"
 
-struct Texture2DCreateInfo
-{
+struct Texture2DCreateInfo {
     GLenum wrapS = 0;
     GLenum wrapT = 0;
     GLenum minFilter = 0;
@@ -14,8 +13,7 @@ struct Texture2DCreateInfo
     int height;
 };
 
-struct Texture3DCreateInfo
-{
+struct Texture3DCreateInfo {
     GLenum wrapS, wrapT, wrapR;
     GLenum minFilter, magFilter;
     GLenum format;
@@ -23,8 +21,7 @@ struct Texture3DCreateInfo
     int mipLevel;
 };
 
-class GpuTexture
-{
+class GpuTexture {
 public:
     void Create2DImageFromFile(const std::string& path);
 

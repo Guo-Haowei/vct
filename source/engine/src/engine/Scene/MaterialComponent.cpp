@@ -1,17 +1,13 @@
 #include "MaterialComponent.h"
 
-#include "engine/Archive.h"
+#include "Archive.h"
 
-void MaterialComponent::Serialize(Archive& archive)
-{
-    if (archive.IsWriteMode())
-    {
+void MaterialComponent::Serialize(Archive& archive) {
+    if (archive.IsWriteMode()) {
         archive << mMetallic;
         archive << mRoughness;
         archive << mBaseColor;
-    }
-    else
-    {
+    } else {
         archive >> mMetallic;
         archive >> mRoughness;
         archive >> mBaseColor;

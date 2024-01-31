@@ -6,8 +6,7 @@
 
 class Scene;
 
-class Panel
-{
+class Panel {
 public:
     Panel(const std::string& name) : mName(name) {}
 

@@ -1,10 +1,8 @@
 #pragma once
 #include "ManagerBase.h"
-
 #include "Scene/Scene.h"
 
-class SceneManager : public ManagerBase
-{
+class SceneManager : public ManagerBase {
 public:
     SceneManager() : ManagerBase("SceneManager") {}
 

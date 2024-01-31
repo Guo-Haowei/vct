@@ -1,19 +1,16 @@
 #include "r_sun_shadow.h"
 
 #include "Core/CommonDvars.h"
-#include "Framework/SceneManager.h"
+#include "Core/DynamicVariable.h"
 #include "Framework/ProgramManager.h"
+#include "Framework/SceneManager.h"
 #include "Framework/WindowManager.h"
+#include "Math/Frustum.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"
 #include "r_rendertarget.h"
-#include "Core/Check.h"
-#include "Core/DynamicVariable.h"
-#include "Core/Log.h"
-#include "Math/Frustum.h"
 
-static mat4 R_HackLightSpaceMatrix(const vec3& lightDir)
-{
+static mat4 R_HackLightSpaceMatrix(const vec3& lightDir) {
     const Scene& scene = Com_GetScene();
     const vec3 center = scene.bound.Center();
     const vec3 extents = scene.bound.Size();
@@ -23,15 +20,13 @@ static mat4 R_HackLightSpaceMatrix(const vec3& lightDir)
     return P * V;
 }
 
-void R_LightSpaceMatrix(const Camera& camera, const vec3& lightDir, mat4 lightPVs[NUM_CASCADES])
-{
+void R_LightSpaceMatrix(const Camera& camera, const vec3& lightDir, mat4 lightPVs[NUM_CASCADES]) {
     unused(camera);
     lightPVs[0] = lightPVs[1] = lightPVs[2] = R_HackLightSpaceMatrix(lightDir);
     return;
 }
 
-void R_ShadowPass()
-{
+void R_ShadowPass() {
     const Scene& scene = Com_GetScene();
     g_shadowRT.Bind();
 
@@ -46,26 +41,23 @@ void R_ShadowPass()
     // render scene 3 times
 
     const uint32_t numObjects = (uint32_t)scene.GetCount<ObjectComponent>();
-    for (int idx = 0; idx < NUM_CASCADES; ++idx)
-    {
+    for (int idx = 0; idx < NUM_CASCADES; ++idx) {
         glViewport(idx * res, 0, res, res);
         const mat4& PV = g_perFrameCache.cache.LightPVs[idx];
         const Frustum frustum(PV);
 
-        for (uint32_t i = 0; i < numObjects; ++i)
-        {
+        for (uint32_t i = 0; i < numObjects; ++i) {
             const ObjectComponent& obj = scene.GetComponentArray<ObjectComponent>()[i];
             ecs::Entity entity = scene.GetEntity<ObjectComponent>(i);
-            check(scene.Contains<TransformComponent>(entity));
+            DEV_ASSERT(scene.Contains<TransformComponent>(entity));
             const TransformComponent& transform = *scene.GetComponent<TransformComponent>(entity);
-            check(scene.Contains<MeshComponent>(obj.meshID));
+            DEV_ASSERT(scene.Contains<MeshComponent>(obj.meshID));
             const MeshComponent& mesh = *scene.GetComponent<MeshComponent>(obj.meshID);
 
             const mat4& M = transform.GetWorldMatrix();
             AABB aabb = mesh.mLocalBound;
             aabb.ApplyMatrix(M);
-            if (!frustum.Intersects(aabb))
-            {
+            if (!frustum.Intersects(aabb)) {
                 continue;
             }
 

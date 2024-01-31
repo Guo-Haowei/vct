@@ -1,30 +1,26 @@
 #pragma once
 #include "MainRenderer.h"
 
+#include "Core/CommonDvars.h"
+#include "Core/DynamicVariable.h"
+#include "Core/geometry.h"
+#include "Framework/ProgramManager.h"
+#include "Framework/SceneManager.h"
+#include "Framework/WindowManager.h"
 #include "r_defines.h"
 #include "r_editor.h"
 #include "r_passes.h"
 #include "r_rendertarget.h"
 #include "r_sun_shadow.h"
 
-#include "Core/Check.h"
-#include "Core/CommonDvars.h"
-#include "Core/DynamicVariable.h"
-#include "Core/geometry.h"
-#include "Framework/SceneManager.h"
-#include "Framework/ProgramManager.h"
-#include "Framework/WindowManager.h"
-
 static std::vector<std::shared_ptr<MeshData>> g_meshdata;
 static std::vector<std::shared_ptr<MaterialData>> g_materialdata;
 
 extern void FillMaterialCB(const MaterialData* mat, MaterialCB& cb);
 
-namespace vct
-{
+namespace vct {
 
-static std::shared_ptr<MeshData> CreateMeshData(const MeshComponent& mesh)
-{
+static std::shared_ptr<MeshData> CreateMeshData(const MeshComponent& mesh) {
     MeshData* ret = new MeshData;
 
     MeshData& outMesh = *ret;
@@ -39,18 +35,15 @@ static std::shared_ptr<MeshData> CreateMeshData(const MeshComponent& mesh)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outMesh.ebo);
     gl::BindToSlot(outMesh.vbos[0], 0, 3);
     gl::NamedBufferStorage(outMesh.vbos[0], mesh.mPositions);
-    if (hasNormals)
-    {
+    if (hasNormals) {
         gl::BindToSlot(outMesh.vbos[1], 1, 3);
         gl::NamedBufferStorage(outMesh.vbos[1], mesh.mNormals);
     }
-    if (hasUVs)
-    {
+    if (hasUVs) {
         gl::BindToSlot(outMesh.vbos[2], 2, 2);
         gl::NamedBufferStorage(outMesh.vbos[2], mesh.mTexcoords_0);
     }
-    if (hasTangent)
-    {
+    if (hasTangent) {
         gl::BindToSlot(outMesh.vbos[3], 3, 3);
         gl::NamedBufferStorage(outMesh.vbos[3], mesh.mTangents);
         gl::BindToSlot(outMesh.vbos[4], 4, 3);
@@ -64,8 +57,7 @@ static std::shared_ptr<MeshData> CreateMeshData(const MeshComponent& mesh)
     return std::shared_ptr<MeshData>(ret);
 }
 
-void MainRenderer::createGpuResources()
-{
+void MainRenderer::createGpuResources() {
     R_Create_Pass_Resources();
 
     R_Alloc_Cbuffers();
@@ -98,17 +90,15 @@ void MainRenderer::createGpuResources()
     }
 
     // create mesh
-    for (const auto& mesh : scene.GetComponentArray<MeshComponent>())
-    {
+    for (const auto& mesh : scene.GetComponentArray<MeshComponent>()) {
         g_meshdata.emplace_back(CreateMeshData(mesh));
         mesh.gpuResource = g_meshdata.back().get();
     }
 
     // create material
-    check(scene.GetCount<MaterialComponent>() < array_length(g_constantCache.cache.AlbedoMaps));
+    DEV_ASSERT(scene.GetCount<MaterialComponent>() < array_length(g_constantCache.cache.AlbedoMaps));
 
-    for (int idx = 0; idx < scene.GetCount<MaterialComponent>(); ++idx)
-    {
+    for (int idx = 0; idx < scene.GetCount<MaterialComponent>(); ++idx) {
         const auto& mat = scene.GetComponentArray<MaterialComponent>()[idx];
 
         auto matData = std::make_shared<MaterialData>();
@@ -116,8 +106,7 @@ void MainRenderer::createGpuResources()
         {
             const std::string& textureMap = mat.mTextures[MaterialComponent::Base].name;
             matData->albedoColor = mat.mBaseColor;
-            if (!textureMap.empty())
-            {
+            if (!textureMap.empty()) {
                 matData->albedoMap.Create2DImageFromFile(textureMap);
                 g_constantCache.cache.AlbedoMaps[idx].data = gl::MakeTextureResident(matData->albedoMap.GetHandle());
             }
@@ -127,8 +116,7 @@ void MainRenderer::createGpuResources()
             const std::string& textureMap = mat.mTextures[MaterialComponent::MetallicRoughness].name;
             matData->metallic = mat.mMetallic;
             matData->roughness = mat.mRoughness;
-            if (!textureMap.empty())
-            {
+            if (!textureMap.empty()) {
                 matData->materialMap.Create2DImageFromFile(textureMap);
                 g_constantCache.cache.PbrMaps[idx].data = gl::MakeTextureResident(matData->materialMap.GetHandle());
             }
@@ -136,11 +124,10 @@ void MainRenderer::createGpuResources()
 
         {
             const std::string& textureMap = mat.mTextures[MaterialComponent::Normal].name;
-            if (!textureMap.empty())
-            {
+            if (!textureMap.empty()) {
                 matData->normalMap.Create2DImageFromFile(textureMap);
                 g_constantCache.cache.NormalMaps[idx].data = gl::MakeTextureResident(matData->normalMap.GetHandle());
-                // LOG_INFO("material has bump {}", mat->normalTexture.c_str());
+                // LOG("material has bump {}", mat->normalTexture.c_str());
             }
         }
 
@@ -152,8 +139,10 @@ void MainRenderer::createGpuResources()
 
     g_constantCache.cache.ShadowMap = gl::MakeTextureResident(g_shadowRT.GetDepthTexture().GetHandle());
     g_constantCache.cache.GbufferDepthMap = gl::MakeTextureResident(g_gbufferRT.GetDepthTexture().GetHandle());
-    g_constantCache.cache.GbufferPositionMetallicMap = gl::MakeTextureResident(g_gbufferRT.GetColorAttachment(0).GetHandle());
-    g_constantCache.cache.GbufferNormalRoughnessMap = gl::MakeTextureResident(g_gbufferRT.GetColorAttachment(1).GetHandle());
+    g_constantCache.cache.GbufferPositionMetallicMap =
+        gl::MakeTextureResident(g_gbufferRT.GetColorAttachment(0).GetHandle());
+    g_constantCache.cache.GbufferNormalRoughnessMap =
+        gl::MakeTextureResident(g_gbufferRT.GetColorAttachment(1).GetHandle());
     g_constantCache.cache.GbufferAlbedoMap = gl::MakeTextureResident(g_gbufferRT.GetColorAttachment(2).GetHandle());
     g_constantCache.cache.VoxelAlbedoMap = gl::MakeTextureResident(m_albedoVoxel.GetHandle());
     g_constantCache.cache.VoxelNormalMap = gl::MakeTextureResident(m_normalVoxel.GetHandle());
@@ -164,8 +153,7 @@ void MainRenderer::createGpuResources()
     g_constantCache.Update();
 }
 
-void MainRenderer::visualizeVoxels()
-{
+void MainRenderer::visualizeVoxels() {
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
@@ -180,8 +168,7 @@ void MainRenderer::visualizeVoxels()
     program.Unbind();
 }
 
-struct MaterialCache
-{
+struct MaterialCache {
     vec4 albedo_color;  // if it doesn't have albedo color, then it's alpha is 0.0f
     float metallic = 0.0f;
     float roughness = 0.0f;
@@ -189,8 +176,7 @@ struct MaterialCache
     float has_normal_texture = 0.0f;
     float reflect = 0.0f;
 
-    MaterialCache& operator=(const MaterialData& mat)
-    {
+    MaterialCache& operator=(const MaterialData& mat) {
         albedo_color = mat.albedoColor;
         roughness = mat.roughness;
         metallic = mat.metallic;
@@ -202,8 +188,7 @@ struct MaterialCache
     }
 };
 
-void MainRenderer::renderToVoxelTexture()
-{
+void MainRenderer::renderToVoxelTexture() {
     const Scene& scene = Com_GetScene();
     const int voxelSize = DVAR_GET_INT(r_voxelSize);
 
@@ -218,13 +203,12 @@ void MainRenderer::renderToVoxelTexture()
     gProgramManager->GetShaderProgram(ProgramType::Voxel).Bind();
 
     const uint32_t numObjects = (uint32_t)scene.GetCount<ObjectComponent>();
-    for (uint32_t i = 0; i < numObjects; ++i)
-    {
+    for (uint32_t i = 0; i < numObjects; ++i) {
         const ObjectComponent& obj = scene.GetComponentArray<ObjectComponent>()[i];
         ecs::Entity entity = scene.GetEntity<ObjectComponent>(i);
-        check(scene.Contains<TransformComponent>(entity));
+        DEV_ASSERT(scene.Contains<TransformComponent>(entity));
         const TransformComponent& transform = *scene.GetComponent<TransformComponent>(entity);
-        check(scene.Contains<MeshComponent>(obj.meshID));
+        DEV_ASSERT(scene.Contains<MeshComponent>(obj.meshID));
         const MeshComponent& mesh = *scene.GetComponent<MeshComponent>(obj.meshID);
 
         const mat4& M = transform.GetWorldMatrix();
@@ -235,15 +219,15 @@ void MainRenderer::renderToVoxelTexture()
         const MeshData* drawData = reinterpret_cast<MeshData*>(mesh.gpuResource);
         glBindVertexArray(drawData->vao);
 
-        for (const auto& subset : mesh.mSubsets)
-        {
+        for (const auto& subset : mesh.mSubsets) {
             const MaterialComponent& material = *scene.GetComponent<MaterialComponent>(subset.materialID);
             const MaterialData* matData = reinterpret_cast<MaterialData*>(material.gpuResource);
 
             FillMaterialCB(matData, g_materialCache.cache);
             g_materialCache.Update();
 
-            glDrawElements(GL_TRIANGLES, subset.indexCount, GL_UNSIGNED_INT, (void*)(subset.indexOffset * sizeof(uint32_t)));
+            glDrawElements(GL_TRIANGLES, subset.indexCount, GL_UNSIGNED_INT,
+                           (void*)(subset.indexOffset * sizeof(uint32_t)));
         }
     }
 
@@ -254,9 +238,7 @@ void MainRenderer::renderToVoxelTexture()
 
     constexpr GLuint workGroupX = 512;
     constexpr GLuint workGroupY = 512;
-    const GLuint workGroupZ =
-        (voxelSize * voxelSize * voxelSize) /
-        (workGroupX * workGroupY);
+    const GLuint workGroupZ = (voxelSize * voxelSize * voxelSize) / (workGroupX * workGroupY);
 
     glDispatchCompute(workGroupX, workGroupY, workGroupZ);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
@@ -267,8 +249,7 @@ void MainRenderer::renderToVoxelTexture()
     m_normalVoxel.genMipMap();
 }
 
-void MainRenderer::renderFrameBufferTextures(int width, int height)
-{
+void MainRenderer::renderFrameBufferTextures(int width, int height) {
     const auto& program = gProgramManager->GetShaderProgram(ProgramType::DebugTexture);
 
     program.Bind();
@@ -280,8 +261,7 @@ void MainRenderer::renderFrameBufferTextures(int width, int height)
     program.Unbind();
 }
 
-void MainRenderer::render()
-{
+void MainRenderer::render() {
     g_perFrameCache.Update();
 
     // clear window
@@ -296,8 +276,7 @@ void MainRenderer::render()
     }
 
     auto [frameW, frameH] = gWindowManager->GetFrameSize();
-    if (frameW * frameH > 0)
-    {
+    if (frameW * frameH > 0) {
         // skip rendering if minimized
         glViewport(0, 0, frameW, frameH);
 
@@ -306,8 +285,7 @@ void MainRenderer::render()
 
         const int mode = DVAR_GET_INT(r_debugTexture);
 
-        switch (mode)
-        {
+        switch (mode) {
             case DrawTexture::TEXTURE_VOXEL_ALBEDO:
             case DrawTexture::TEXTURE_VOXEL_NORMAL:
                 visualizeVoxels();
@@ -321,14 +299,12 @@ void MainRenderer::render()
                 renderFrameBufferTextures(frameW, frameH);
                 R_DrawEditor();
                 g_viewerRT.Unbind();
-            }
-            break;
+            } break;
         }
     }
 }
 
-void MainRenderer::destroyGpuResources()
-{
+void MainRenderer::destroyGpuResources() {
     R_DestroyRT();
 
     R_DestroyEditorResource();

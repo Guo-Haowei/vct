@@ -2,21 +2,17 @@
 
 #include "imgui/imgui_internal.h"
 
-bool Panel::IsFocused() const
-{
+bool Panel::IsFocused() const {
     ImGuiContext& g = *GImGui;
     ImGuiWindow* focusedWindow = g.NavWindow;
-    if (!focusedWindow)
-    {
+    if (!focusedWindow) {
         return false;
     }
     return strcmp(mName.c_str(), focusedWindow->Name) == 0;
 }
 
-void Panel::Render(Scene& scene)
-{
-    if (ImGui::Begin(mName.c_str()))
-    {
+void Panel::Render(Scene& scene) {
+    if (ImGui::Begin(mName.c_str())) {
         RenderInternal(scene);
     }
     ImGui::End();

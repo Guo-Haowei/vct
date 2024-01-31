@@ -4,59 +4,39 @@
 
 #include "reverse_iterator.h"
 
-namespace vct
-{
+namespace vct {
 
 template<typename T, size_t N>
-class RingBufferIterator
-{
-    using this_type = RingBufferIterator<T, N>;
+class RingBufferIterator {
+    using self_type = RingBufferIterator<T, N>;
 
 public:
-    RingBufferIterator(size_t index, T* ptr) : m_index(index), m_ptr(ptr)
-    {
-    }
+    RingBufferIterator(size_t index, T* ptr) : m_index(index), m_ptr(ptr) {}
 
-    this_type operator++(int)
-    {
-        return this_type(m_index++, m_ptr);
-    }
+    self_type operator++(int) { return self_type(m_index++, m_ptr); }
 
-    this_type& operator++()
-    {
+    self_type& operator++() {
         ++m_index;
         return *this;
     }
 
-    this_type operator--(int)
-    {
-        return this_type(m_index--, m_ptr);
-    }
+    self_type operator--(int) { return self_type(m_index--, m_ptr); }
 
-    this_type& operator--()
-    {
+    self_type& operator--() {
         --m_index;
         return *this;
     }
 
-    T& operator*() const
-    {
-        return m_ptr[(m_index + N) % N];
-    }
+    T& operator*() const { return m_ptr[(m_index + N) % N]; }
 
-    T* operator->() const
-    {
-        return &m_ptr[(m_index + N) % N];
-    }
+    T* operator->() const { return &m_ptr[(m_index + N) % N]; }
 
-    bool operator==(const this_type& rhs) const
-    {
+    bool operator==(const self_type& rhs) const {
         assert(m_ptr == rhs.m_ptr);
         return m_index == rhs.m_index;
     }
 
-    bool operator!=(const this_type& rhs) const
-    {
+    bool operator!=(const self_type& rhs) const {
         assert(m_ptr == rhs.m_ptr);
         return m_index != rhs.m_index;
     }
@@ -67,8 +47,7 @@ private:
 };
 
 template<typename T, size_t N>
-class RingBuffer
-{
+class RingBuffer {
     using iter = RingBufferIterator<T, N>;
     using const_iter = RingBufferIterator<const T, N>;
     using reverse_iter = ReverseIterator<T, iter>;
@@ -91,10 +70,8 @@ public:
 public:
     RingBuffer() = default;
 
-    RingBuffer(std::initializer_list<T> list)
-    {
-        for (auto& element : list)
-        {
+    RingBuffer(std::initializer_list<T> list) {
+        for (auto& element : list) {
             push_back(element);
         }
     }
@@ -113,30 +90,24 @@ public:
     auto back() -> T& { return (*this)[m_size - 1]; }
     auto back() const -> const T& { return (*this)[m_size - 1]; }
 
-    void push_back(const T& value)
-    {
-        if (m_size < N)
-        {
+    void push_back(const T& value) {
+        if (m_size < N) {
             ++m_size;
             m_data[index(m_size - 1)] = value;
-        }
-        else
-        {
+        } else {
             m_data[index(0)] = value;
             m_head = (m_head + 1) % N;
         }
     }
 
-    void pop_front()
-    {
+    void pop_front() {
         assert(!empty());
         m_head = (m_head + 1) % N;
         --m_size;
     }
 
 private:
-    size_t index(size_t idx) const
-    {
+    size_t index(size_t idx) const {
         // @TODO: bound check
         assert(idx < m_size);
         return (m_head + idx) % N;

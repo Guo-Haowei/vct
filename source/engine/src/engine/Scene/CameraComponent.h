@@ -3,14 +3,12 @@
 
 class Archive;
 
-struct CameraComponent
-{
+struct CameraComponent {
     static constexpr float DEFAULT_ZNEAR = 0.1f;
     static constexpr float DEFAULT_ZFAR = 100.0f;
     static constexpr float DEFAULT_FOVY = glm::radians(50.0f);
 
-    enum
-    {
+    enum {
         None = 0,
         Dirty = 1,
     };

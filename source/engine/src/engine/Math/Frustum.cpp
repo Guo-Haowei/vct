@@ -1,9 +1,9 @@
 #include "Frustum.h"
+
 #include "AABB.h"
 
 // https://stackoverflow.com/questions/12836967/extracting-view-frustum-planes-hartmann-gribbs-method
-Frustum::Frustum(const mat4& PV)
-{
+Frustum::Frustum(const mat4& PV) {
     mLeft.mNormal.x = PV[0][3] + PV[0][0];
     mLeft.mNormal.y = PV[1][3] + PV[1][0];
     mLeft.mNormal.z = PV[2][3] + PV[2][0];
@@ -35,20 +35,17 @@ Frustum::Frustum(const mat4& PV)
     mFar.mDist = PV[3][3] - PV[3][2];
 }
 
-bool Frustum::Intersects(const AABB& box) const
-{
+bool Frustum::Intersects(const AABB& box) const {
     const vec3& boxMin = box.GetMin();
     const vec3& boxMax = box.GetMax();
-    for (int i = 0; i < 6; ++i)
-    {
+    for (int i = 0; i < 6; ++i) {
         const Plane3& plane = this->operator[](i);
         vec3 p;
         p.x = plane.mNormal.x > static_cast<float>(0) ? boxMax.x : boxMin.x;
         p.y = plane.mNormal.y > static_cast<float>(0) ? boxMax.y : boxMin.y;
         p.z = plane.mNormal.z > static_cast<float>(0) ? boxMax.z : boxMin.z;
 
-        if (plane.Distance(p) < static_cast<float>(0))
-        {
+        if (plane.Distance(p) < static_cast<float>(0)) {
             return false;
         }
     }

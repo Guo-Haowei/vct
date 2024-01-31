@@ -1,9 +1,8 @@
 #pragma once
-#include "Intersection.h"
 #include "Box.h"
+#include "Intersection.h"
 
-class AABB : public Box3
-{
+class AABB : public Box3 {
 public:
     using Box3::Box;
 

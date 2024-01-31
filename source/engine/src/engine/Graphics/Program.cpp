@@ -2,15 +2,9 @@
 
 #include "GLPrerequisites.h"
 
-#include "Core/Check.h"
-
-void Program::Bind() const
-{
-    check(mHandle);
+void Program::Bind() const {
+    DEV_ASSERT(mHandle);
     glUseProgram(mHandle);
 }
 
-void Program::Unbind() const
-{
-    glUseProgram(0);
-}
+void Program::Unbind() const { glUseProgram(0); }

@@ -4,18 +4,15 @@
 class Archive;
 struct Image;
 
-struct MaterialComponent
-{
-    enum ETextureSlot
-    {
+struct MaterialComponent {
+    enum ETextureSlot {
         Base,
         Normal,
         MetallicRoughness,
         Count,
     };
 
-    struct TextureMap
-    {
+    struct TextureMap {
         std::string name;
         const Image* image = nullptr;
         // mutable GPUTexture texture;

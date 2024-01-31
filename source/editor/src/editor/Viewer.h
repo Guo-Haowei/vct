@@ -1,8 +1,7 @@
 #pragma once
 #include "Panel.h"
 
-class Viewer : public Panel
-{
+class Viewer : public Panel {
 public:
     Viewer() : Panel("Viewer") {}
 

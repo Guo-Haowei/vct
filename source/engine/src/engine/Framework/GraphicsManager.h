@@ -1,8 +1,7 @@
 #pragma once
 #include "ManagerBase.h"
 
-class GraphicsManager : public ManagerBase
-{
+class GraphicsManager : public ManagerBase {
 public:
     GraphicsManager() : ManagerBase("GraphicsManager") {}
 

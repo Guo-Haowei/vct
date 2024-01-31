@@ -1,41 +1,28 @@
 #pragma once
 #include "SceneComponents.h"
 
-#include "engine/Archive.h"
-#include "Core/Check.h"
+#include "Archive.h"
 
-void HierarchyComponent::Serialize(Archive& archive)
-{
-    mParent.Serialize(archive);
-}
+void HierarchyComponent::Serialize(Archive& archive) { mParent.Serialize(archive); }
 
-void ObjectComponent::Serialize(Archive& archive)
-{
-    meshID.Serialize(archive);
-}
+void ObjectComponent::Serialize(Archive& archive) { meshID.Serialize(archive); }
 
-void AnimationComponent::Serialize(Archive& archive)
-{
+void AnimationComponent::Serialize(Archive& archive) {
     unused(archive);
-    checkmsg("NOT IMPLMENTED");
+    CRASH_NOW_MSG("NOT IMPLMENTED");
 }
 
-void ArmatureComponent::Serialize(Archive& archive)
-{
+void ArmatureComponent::Serialize(Archive& archive) {
     unused(archive);
-    checkmsg("NOT IMPLMENTED");
+    CRASH_NOW_MSG("NOT IMPLMENTED");
 }
 
-void RigidBodyPhysicsComponent::Serialize(Archive& archive)
-{
-    if (archive.IsWriteMode())
-    {
+void RigidBodyPhysicsComponent::Serialize(Archive& archive) {
+    if (archive.IsWriteMode()) {
         archive << shape;
         archive << param;
         archive << mass;
-    }
-    else
-    {
+    } else {
         archive >> shape;
         archive >> param;
         archive >> mass;

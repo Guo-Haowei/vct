@@ -6,14 +6,11 @@ extern "C" {
 #include <lua/lualib.h>
 }
 
-#include "Core/Check.h"
 #include "Core/DynamicVariable.h"
-#include "Core/Log.h"
 
 #define FIND_DVAR_OR_RETURN(variable, name)                         \
     DynamicVariable* variable = DynamicVariableManager::Find(name); \
-    if (!variable)                                                  \
-    {                                                               \
+    if (!variable) {                                                \
         LOG_ERROR("dvar '{}' not found!", name);                    \
         return 0;                                                   \
     }
@@ -21,8 +18,7 @@ extern "C" {
 #define SET_DVAR(expr)                     \
     {                                      \
         EDvarError err = (expr);           \
-        if (err != EDvarError::Ok)         \
-        {                                  \
+        if (err != EDvarError::Ok) {       \
             LOG_ERROR("{} failed", #expr); \
         }                                  \
     }
@@ -30,8 +26,7 @@ extern "C" {
 extern "C" {
 
 // usage: Dvar.SetInt(string, integer)
-static int LuaDvarFunc_SetInt(lua_State* L)
-{
+static int LuaDvarFunc_SetInt(lua_State* L) {
     const char* name = luaL_checkstring(L, 1);
     lua_Integer value = luaL_checkinteger(L, 2);
 
@@ -41,8 +36,7 @@ static int LuaDvarFunc_SetInt(lua_State* L)
 }
 
 // usage: Dvar.SetFloat(string, float)
-static int LuaDvarFunc_SetFloat(lua_State* L)
-{
+static int LuaDvarFunc_SetFloat(lua_State* L) {
     const char* name = luaL_checkstring(L, 1);
     const lua_Number value = luaL_checknumber(L, 2);
 
@@ -52,8 +46,7 @@ static int LuaDvarFunc_SetFloat(lua_State* L)
 }
 
 // usage: Dvar.SetString(string, string)
-static int LuaDvarFunc_SetString(lua_State* L)
-{
+static int LuaDvarFunc_SetString(lua_State* L) {
     const char* name = luaL_checkstring(L, 1);
     const char* value = luaL_checkstring(L, 2);
 
@@ -63,8 +56,7 @@ static int LuaDvarFunc_SetString(lua_State* L)
 }
 
 // usage: Dvar.SetVec2(string, number, number)
-static int LuaDvarFunc_SetVec2(lua_State* L)
-{
+static int LuaDvarFunc_SetVec2(lua_State* L) {
     const char* name = luaL_checkstring(L, 1);
     const lua_Number x = luaL_checknumber(L, 2);
     const lua_Number y = luaL_checknumber(L, 3);
@@ -75,8 +67,7 @@ static int LuaDvarFunc_SetVec2(lua_State* L)
 }
 
 // usage: Dvar.SetVec3(string, number, number, number)
-static int LuaDvarFunc_SetVec3(lua_State* L)
-{
+static int LuaDvarFunc_SetVec3(lua_State* L) {
     const char* name = luaL_checkstring(L, 1);
     const lua_Number x = luaL_checknumber(L, 2);
     const lua_Number y = luaL_checknumber(L, 3);
@@ -88,8 +79,7 @@ static int LuaDvarFunc_SetVec3(lua_State* L)
 }
 
 // usage: Dvar.SetVec4(string, number, number, number, number)
-static int LuaDvarFunc_SetVec4(lua_State* L)
-{
+static int LuaDvarFunc_SetVec4(lua_State* L) {
     const char* name = luaL_checkstring(L, 1);
     const lua_Number x = luaL_checknumber(L, 2);
     const lua_Number y = luaL_checknumber(L, 3);
@@ -101,35 +91,22 @@ static int LuaDvarFunc_SetVec4(lua_State* L)
     return 0;
 }
 
-#define LUA_DVAR_LIB(func)        \
-    {                             \
-        #func, LuaDvarFunc_##func \
-    }
+#define LUA_DVAR_LIB(func) \
+    { #func, LuaDvarFunc_##func }
 
-static const luaL_Reg s_funcs[] = {
-    LUA_DVAR_LIB(SetInt),
-    LUA_DVAR_LIB(SetFloat),
-    LUA_DVAR_LIB(SetVec2),
-    LUA_DVAR_LIB(SetVec3),
-    LUA_DVAR_LIB(SetVec4),
-    LUA_DVAR_LIB(SetString),
-    { nullptr, nullptr }
-};
+static const luaL_Reg s_funcs[] = { LUA_DVAR_LIB(SetInt), LUA_DVAR_LIB(SetFloat), LUA_DVAR_LIB(SetVec2), LUA_DVAR_LIB(SetVec3), LUA_DVAR_LIB(SetVec4), LUA_DVAR_LIB(SetString), { nullptr, nullptr } };
 
-static int luaopen_EngineLib(lua_State* L)
-{
+static int luaopen_EngineLib(lua_State* L) {
     luaL_newlib(L, s_funcs);
     return 1;
 }
 }
 
-bool Com_ExecLua(const char* path)
-{
-    LOG_INFO("[lua] executing {}", path);
+bool Com_ExecLua(const char* path) {
+    LOG("[lua] executing {}", path);
     lua_State* L = luaL_newstate();
-    check(L);
-    if (L == nullptr)
-    {
+    DEV_ASSERT(L);
+    if (L == nullptr) {
         return false;
     }
 
@@ -138,8 +115,7 @@ bool Com_ExecLua(const char* path)
     luaL_requiref(L, "Dvar", luaopen_EngineLib, 1);
 
     int code = luaL_dofile(L, path);
-    switch (code)
-    {
+    switch (code) {
         case LUA_OK:
             break;
         default:

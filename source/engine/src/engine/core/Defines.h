@@ -54,21 +54,9 @@ inline constexpr size_t GB = 1024 * MB;
 inline constexpr int OPENGL_VERSION_MAJOR = 4;
 inline constexpr int OPENGL_VERSION_MINOR = 6;
 
-template<typename T, int N>
-inline constexpr int array_length(T (&)[N])
-{
-    return N;
-}
+inline constexpr unsigned int log_two(unsigned int x) { return x == 1 ? 0 : 1 + log_two(x >> 1); }
 
-inline constexpr unsigned int log_two(unsigned int x)
-{
-    return x == 1 ? 0 : 1 + log_two(x >> 1);
-}
-
-inline constexpr bool is_power_of_two(unsigned int x)
-{
-    return (x & (x - 1)) == 0;
-}
+inline constexpr bool is_power_of_two(unsigned int x) { return (x & (x - 1)) == 0; }
 
 template<typename T>
 void unused(T&){};

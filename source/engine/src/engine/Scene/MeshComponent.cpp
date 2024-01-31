@@ -1,12 +1,9 @@
 #include "MeshComponent.h"
 
-#include "engine/Archive.h"
-#include "Core/Check.h"
+#include "Archive.h"
 
-static uint32_t GetStride(MeshComponent::VertexAttribute::NAME name)
-{
-    switch (name)
-    {
+static uint32_t GetStride(MeshComponent::VertexAttribute::NAME name) {
+    switch (name) {
         case MeshComponent::VertexAttribute::POSITION:
         case MeshComponent::VertexAttribute::NORMAL:
         case MeshComponent::VertexAttribute::TANGENT:
@@ -20,28 +17,24 @@ static uint32_t GetStride(MeshComponent::VertexAttribute::NAME name)
         case MeshComponent::VertexAttribute::WEIGHTS_0:
             return sizeof(vec4);
         default:
-            unreachable();
+            CRASH_NOW();
             return 0;
     }
 }
 
 template<typename T>
-void VertexAttribHelper(MeshComponent::VertexAttribute& attrib, const std::vector<T>& buffer, size_t& outOffset)
-{
+void VertexAttribHelper(MeshComponent::VertexAttribute& attrib, const std::vector<T>& buffer, size_t& outOffset) {
     attrib.offsetInByte = static_cast<uint32_t>(outOffset);
     attrib.sizeInByte = (uint32_t)(ALIGN(sizeof(T) * buffer.size(), 16));
     attrib.stride = GetStride(attrib.name);
     outOffset += attrib.sizeInByte;
 }
 
-void MeshComponent::CreateBounds()
-{
+void MeshComponent::CreateBounds() {
     mLocalBound.MakeInvalid();
-    for (MeshSubset& subset : mSubsets)
-    {
+    for (MeshSubset& subset : mSubsets) {
         subset.localBound.MakeInvalid();
-        for (uint32_t i = 0; i < subset.indexCount; ++i)
-        {
+        for (uint32_t i = 0; i < subset.indexCount; ++i) {
             const vec3& point = mPositions[mIndices[i + subset.indexOffset]];
             subset.localBound.Expand(point);
         }
@@ -50,16 +43,14 @@ void MeshComponent::CreateBounds()
     }
 }
 
-void MeshComponent::CreateRenderData()
-{
-    check(mTexcoords_0.size());
-    check(mNormals.size());
+void MeshComponent::CreateRenderData() {
+    DEV_ASSERT(mTexcoords_0.size());
+    DEV_ASSERT(mNormals.size());
     // AABB
     CreateBounds();
 
     // Attributes
-    for (int i = 0; i < VertexAttribute::COUNT; ++i)
-    {
+    for (int i = 0; i < VertexAttribute::COUNT; ++i) {
         mAttributes[i].name = static_cast<VertexAttribute::NAME>(i);
     }
 
@@ -75,14 +66,12 @@ void MeshComponent::CreateRenderData()
     return;
 }
 
-std::vector<char> MeshComponent::GenerateCombinedBuffer() const
-{
+std::vector<char> MeshComponent::GenerateCombinedBuffer() const {
     std::vector<char> result;
     result.resize(mVertexBufferSize);
 
     auto SafeCopy = [&](const VertexAttribute& attrib, const void* data) {
-        if (attrib.sizeInByte == 0)
-        {
+        if (attrib.sizeInByte == 0) {
             return;
         }
 
@@ -100,25 +89,20 @@ std::vector<char> MeshComponent::GenerateCombinedBuffer() const
     return result;
 }
 
-void MeshComponent::MeshSubset::Serialize(Archive& archive)
-{
+void MeshComponent::MeshSubset::Serialize(Archive& archive) {
     materialID.Serialize(archive);
-    if (archive.IsWriteMode())
-    {
+    if (archive.IsWriteMode()) {
         archive << indexOffset;
         archive << indexCount;
         archive.Write(&localBound, sizeof(AABB));
-    }
-    else
-    {
+    } else {
         archive >> indexOffset;
         archive >> indexCount;
         archive.Read(&localBound, sizeof(AABB));
     }
 }
 
-void MeshComponent::Serialize(Archive& archive)
-{
+void MeshComponent::Serialize(Archive& archive) {
 #define SERIALIZE_MESH(OP)   \
     archive OP mIndices;     \
     archive OP mPositions;   \
@@ -133,26 +117,21 @@ void MeshComponent::Serialize(Archive& archive)
 #define SERIALIZE()   SERIALIZE_MESH(<<)
 #define DESERIALIZE() SERIALIZE_MESH(>>)
 
-    if (archive.IsWriteMode())
-    {
+    if (archive.IsWriteMode()) {
         SERIALIZE();
 
         size_t size = mSubsets.size();
         archive << size;
-        for (auto& subset : mSubsets)
-        {
+        for (auto& subset : mSubsets) {
             subset.Serialize(archive);
         }
-    }
-    else
-    {
+    } else {
         DESERIALIZE();
 
         size_t size = 0;
         archive >> size;
         mSubsets.resize(size);
-        for (size_t i = 0; i < size; ++i)
-        {
+        for (size_t i = 0; i < size; ++i) {
             mSubsets[i].Serialize(archive);
         }
     }

@@ -1,8 +1,7 @@
 #pragma once
 #include "ManagerBase.h"
 
-class UIManager : public ManagerBase
-{
+class UIManager : public ManagerBase {
 public:
     UIManager() : ManagerBase("UIManager") {}
 

@@ -3,21 +3,15 @@
 constexpr uint64_t MILLISECOND = 1000000;
 constexpr uint64_t SECOND = MILLISECOND * 1000;
 
-struct NanoSecond
-{
-    NanoSecond(const uint64_t value)
-        : mValue(value)
-    {
-    }
+struct NanoSecond {
+    NanoSecond(const uint64_t value) : mValue(value) {}
 
-    double ToMilliSecond() const
-    {
+    double ToMilliSecond() const {
         constexpr double factor = 1.0 / MILLISECOND;
         return factor * mValue;
     }
 
-    double ToSecond() const
-    {
+    double ToSecond() const {
         constexpr double factor = 1.0 / SECOND;
         return factor * mValue;
     }
@@ -25,8 +19,7 @@ struct NanoSecond
     uint64_t mValue;
 };
 
-class Timer
-{
+class Timer {
     using Clock = std::chrono::high_resolution_clock;
     using TimePoint = std::chrono::time_point<Clock>;
 
@@ -42,8 +35,7 @@ protected:
     TimePoint mStartPoint{};
 };
 
-class ScopedTimer : public Timer
-{
+class ScopedTimer : public Timer {
 public:
     ScopedTimer(const std::string& message);
     ~ScopedTimer();

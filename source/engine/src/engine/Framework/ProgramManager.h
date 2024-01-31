@@ -1,9 +1,8 @@
 #pragma once
-#include "ManagerBase.h"
 #include "Graphics/Program.h"
+#include "ManagerBase.h"
 
-enum class ProgramType
-{
+enum class ProgramType {
     IMAGE2D,
     LINE3D,
     SHADOW,
@@ -18,8 +17,7 @@ enum class ProgramType
     COUNT,
 };
 
-class ProgramManager : public ManagerBase
-{
+class ProgramManager : public ManagerBase {
 public:
     ProgramManager() : ManagerBase("ProgramManager") {}
 
