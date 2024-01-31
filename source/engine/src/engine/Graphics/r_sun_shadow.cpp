@@ -14,7 +14,7 @@ static mat4 R_HackLightSpaceMatrix(const vec3& lightDir) {
     const Scene& scene = Com_GetScene();
     const vec3 center = scene.bound.Center();
     const vec3 extents = scene.bound.Size();
-    const float size = 0.5f * glm::max(extents.x, glm::max(extents.y, extents.z));
+    const float size = 0.5f * max_val(extents.x, max_val(extents.y, extents.z));
     const mat4 V = glm::lookAt(center + glm::normalize(lightDir) * size, center, vec3(0, 1, 0));
     const mat4 P = glm::ortho(-size, size, -size, size, 0.0f, 2.0f * size);
     return P * V;

@@ -1,5 +1,5 @@
 #pragma once
-#include "GeoMath.h"
+#include "core/math/geomath.h"
 
 class AABB;
 

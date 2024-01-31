@@ -1,5 +1,5 @@
 #pragma once
-#include "GeoMath.h"
+#include "core/math/geomath.h"
 
 template<size_t N>
 class Box {
@@ -36,18 +36,18 @@ public:
     }
 
     void Expand(const Vec& point) {
-        mMin = glm::min(mMin, point);
-        mMax = glm::max(mMax, point);
+        mMin = min_val(mMin, point);
+        mMax = max_val(mMax, point);
     }
 
     void Union(const Self& o) {
-        mMin = glm::min(mMin, o.mMin);
-        mMax = glm::max(mMax, o.mMax);
+        mMin = min_val(mMin, o.mMin);
+        mMax = max_val(mMax, o.mMax);
     }
 
     void Intersection(const Self& o) {
-        mMin = glm::max(mMin, o.mMin);
-        mMax = glm::min(mMax, o.mMax);
+        mMin = max_val(mMin, o.mMin);
+        mMax = min_val(mMax, o.mMax);
     }
 
     Vec Center() const { return 0.5f * (mMin + mMax); }

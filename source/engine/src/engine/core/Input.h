@@ -1,7 +1,7 @@
 #pragma once
 #include "Core/Types.h"
 #include "InputCode.h"
-#include "Math/GeoMath.h"
+#include "core/math/geomath.h"
 
 class WindowManager;
 

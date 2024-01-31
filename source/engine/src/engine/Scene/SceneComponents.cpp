@@ -3,6 +3,8 @@
 
 #include "Archive.h"
 
+using namespace vct;
+
 void HierarchyComponent::Serialize(Archive& archive) { mParent.Serialize(archive); }
 
 void ObjectComponent::Serialize(Archive& archive) { meshID.Serialize(archive); }

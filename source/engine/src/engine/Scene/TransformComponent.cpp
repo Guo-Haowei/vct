@@ -2,6 +2,8 @@
 
 #include "Archive.h"
 
+using namespace vct;
+
 mat4 TransformComponent::GetLocalMatrix() const {
     mat4 rotationMatrix = glm::toMat4(quat(mRotation.w, mRotation.x, mRotation.y, mRotation.z));
     mat4 translationMatrix = glm::translate(mTranslation);

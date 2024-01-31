@@ -45,7 +45,7 @@ static bool Com_LoadScene() {
 
     const vec3 center = scene.bound.Center();
     const vec3 size = scene.bound.Size();
-    const float worldSize = glm::max(size.x, glm::max(size.y, size.z));
+    const float worldSize = max_val(size.x, max_val(size.y, size.z));
     const float texelSize = 1.0f / static_cast<float>(voxelTextureSize);
     const float voxelSize = worldSize * texelSize;
 
