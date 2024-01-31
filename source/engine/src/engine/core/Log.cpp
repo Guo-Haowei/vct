@@ -65,10 +65,15 @@ void log_impl(ELogLevel level, const std::string& message) {
 
 void log(ELogLevel level, const std::string& message) {
     constexpr const char* sTags[] = {
-        "[FATAL]- ", "[ERROR]- ", "[WARN] - ", "[INFO] - ", "[DEBUG]- ", "[OK]   - ",
+        "[FATAL]- ",
+        "[ERROR]- ",
+        "[WARN] - ",
+        "[INFO] - ",
+        "[DEBUG]- ",
+        "[OK]   - ",
     };
 
-    static_assert(array_length(sTags) == underlying(ELogLevel::Count));
+    static_assert(vct::array_length(sTags) == underlying(ELogLevel::Count));
 
     const char* tag = sTags[underlying(level)];
 

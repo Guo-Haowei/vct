@@ -23,7 +23,8 @@
 
 #define PUSH_WARNING(CODE)   \
     __pragma(warning(push)); \
-    __pragma(warning(disable : CODE))
+    __pragma(warning(disable \
+                     : CODE))
 #define POP_WARNING() __pragma(warning(pop))
 
 #if defined(_WIN32)
@@ -52,11 +53,6 @@ inline constexpr size_t GB = 1024 * MB;
 
 inline constexpr int OPENGL_VERSION_MAJOR = 4;
 inline constexpr int OPENGL_VERSION_MINOR = 6;
-
-template<typename T, int N>
-inline constexpr int array_length(T (&)[N]) {
-    return N;
-}
 
 inline constexpr unsigned int log_two(unsigned int x) { return x == 1 ? 0 : 1 + log_two(x >> 1); }
 

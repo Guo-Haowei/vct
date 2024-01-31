@@ -1,8 +1,8 @@
 #pragma once
 #include "SceneComponents.h"
 
+#include "Archive.h"
 #include "Core/Check.h"
-#include "engine/Archive.h"
 
 void HierarchyComponent::Serialize(Archive& archive) { mParent.Serialize(archive); }
 

@@ -56,7 +56,7 @@ static GLuint create_shader(const std::string &file, GLenum type) {
     const char *sources[] = { extras, fullsource.c_str() };
 
     GLuint shader = glCreateShader(type);
-    glShaderSource(shader, array_length(sources), sources, nullptr);
+    glShaderSource(shader, vct::array_length(sources), sources, nullptr);
     glCompileShader(shader);
 
     GLint status = GL_FALSE, length = 0;

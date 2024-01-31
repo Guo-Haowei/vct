@@ -1,8 +1,7 @@
 #pragma once
-#include <engine/core/collections/ring_buffer.h>
-
 #include "Core/Singleton.h"
 #include "ManagerBase.h"
+#include "core/collections/ring_buffer.h"
 
 class LogManager : public Singleton<LogManager>, public ManagerBase {
 public:

@@ -96,9 +96,7 @@ static int LuaDvarFunc_SetVec4(lua_State* L) {
 #define LUA_DVAR_LIB(func) \
     { #func, LuaDvarFunc_##func }
 
-static const luaL_Reg s_funcs[] = { LUA_DVAR_LIB(SetInt),  LUA_DVAR_LIB(SetFloat), LUA_DVAR_LIB(SetVec2),
-                                    LUA_DVAR_LIB(SetVec3), LUA_DVAR_LIB(SetVec4),  LUA_DVAR_LIB(SetString),
-                                    { nullptr, nullptr } };
+static const luaL_Reg s_funcs[] = { LUA_DVAR_LIB(SetInt), LUA_DVAR_LIB(SetFloat), LUA_DVAR_LIB(SetVec2), LUA_DVAR_LIB(SetVec3), LUA_DVAR_LIB(SetVec4), LUA_DVAR_LIB(SetString), { nullptr, nullptr } };
 
 static int luaopen_EngineLib(lua_State* L) {
     luaL_newlib(L, s_funcs);

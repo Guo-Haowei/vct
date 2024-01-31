@@ -1,8 +1,8 @@
-#include "core/collections/ring_buffer.h"
+#include "engine/core/collections/ring_buffer.h"
 
 namespace vct {
 
-TEST(RingBuffer, constructor) {
+TEST(ring_buffer, constructor) {
     RingBuffer<int, 4> rb;
     EXPECT_TRUE(rb.empty());
     rb.push_back(2);
@@ -11,7 +11,7 @@ TEST(RingBuffer, constructor) {
     EXPECT_TRUE(rb.empty());
 }
 
-TEST(RingBuffer, constructor_initializer_list) {
+TEST(ring_buffer, constructor_initializer_list) {
     RingBuffer<int, 6> rb{ 1, 2, 3 };
     EXPECT_FALSE(rb.empty());
     EXPECT_EQ(rb.size(), 3);
@@ -20,7 +20,7 @@ TEST(RingBuffer, constructor_initializer_list) {
     EXPECT_EQ(rb[2], 3);
 }
 
-TEST(RingBuffer, emtpy) {
+TEST(ring_buffer, emtpy) {
     {
         RingBuffer<int, 4> rb;
         EXPECT_TRUE(rb.empty());
@@ -35,7 +35,7 @@ TEST(RingBuffer, emtpy) {
     }
 }
 
-TEST(RingBuffer, size) {
+TEST(ring_buffer, size) {
     RingBuffer<char, 4> rb;
     EXPECT_EQ(rb.size(), 0);
     rb.push_back('a');
@@ -57,7 +57,7 @@ TEST(RingBuffer, size) {
     EXPECT_EQ(rb.size(), 0);
 }
 
-TEST(RingBuffer, capacity) {
+TEST(ring_buffer, capacity) {
     {
         RingBuffer<int, 1> rb;
         static_assert(rb.capacity() == 1);
@@ -68,7 +68,7 @@ TEST(RingBuffer, capacity) {
     }
 }
 
-TEST(RingBuffer, push_back) {
+TEST(ring_buffer, push_back) {
     RingBuffer<int, 3> rb;
     rb.push_back(5);
     EXPECT_EQ(rb.front(), 5);
@@ -84,7 +84,7 @@ TEST(RingBuffer, push_back) {
     EXPECT_EQ(rb.back(), 8);
 }
 
-TEST(RingBuffer, pop_front) {
+TEST(ring_buffer, pop_front) {
     RingBuffer<int, 3> rb;
     rb.push_back(5);
     rb.push_back(6);
@@ -101,7 +101,7 @@ TEST(RingBuffer, pop_front) {
     EXPECT_TRUE(rb.empty());
 }
 
-TEST(RingBuffer, ring_buffer_of_size_1) {
+TEST(ring_buffer, ring_buffer_of_size_1) {
     RingBuffer<int, 1> rb;
     EXPECT_EQ(rb.size(), 0);
     EXPECT_EQ(rb.capacity(), 1);
@@ -120,7 +120,7 @@ TEST(RingBuffer, ring_buffer_of_size_1) {
     EXPECT_EQ(rb.back(), 2);
 }
 
-TEST(RingBuffer, ring_buffer_of_size_3) {
+TEST(ring_buffer, ring_buffer_of_size_3) {
     RingBuffer<int, 3> rb;
     EXPECT_EQ(rb.size(), 0);
     EXPECT_EQ(rb.capacity(), 3);
@@ -137,7 +137,7 @@ TEST(RingBuffer, ring_buffer_of_size_3) {
     EXPECT_EQ(rb.back(), 3);
 }
 
-TEST(RingBuffer, ring_buffer_of_size_4) {
+TEST(ring_buffer, ring_buffer_of_size_4) {
     constexpr int capacity = 4;
     RingBuffer<int, capacity> rb;
     EXPECT_EQ(rb.size(), 0);
@@ -168,7 +168,7 @@ TEST(RingBuffer, ring_buffer_of_size_4) {
     EXPECT_EQ(rb[3], 20);
 }
 
-TEST(RingBuffer, iterator) {
+TEST(ring_buffer, iterator) {
     RingBuffer<int, 5> stack{ 0, 1, 2, 3, 4 };  // 2, 3, 4
     int i = 0;
     for (auto& it : stack) {
@@ -177,7 +177,7 @@ TEST(RingBuffer, iterator) {
     }
 }
 
-TEST(RingBuffer, const_iterator) {
+TEST(ring_buffer, const_iterator) {
     RingBuffer<int, 4> stack{ 0, 1, 2, 3, 4 };  // 1, 2, 3, 4
     int i = 1;
     for (const auto& it : stack) {
@@ -186,7 +186,7 @@ TEST(RingBuffer, const_iterator) {
     }
 }
 
-TEST(RingBuffer, reverse_iterator) {
+TEST(ring_buffer, reverse_iterator) {
     RingBuffer<int, 7> stack{ 0, 1, 2, 3, 4 };  // 1, 2, 3, 4
     int i = 4;
     for (auto it = stack.rbegin(); it != stack.rend(); ++it) {
@@ -195,7 +195,7 @@ TEST(RingBuffer, reverse_iterator) {
     }
 }
 
-TEST(RingBuffer, reverse_const_iterator) {
+TEST(ring_buffer, reverse_const_iterator) {
     RingBuffer<int, 5> stack{ 0, 1, 2, 3, 4 };  // 2, 3, 4
     int i = 4;
     for (auto it = stack.crbegin(); it != stack.crend(); ++it) {

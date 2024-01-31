@@ -78,7 +78,7 @@ static void Com_UpdateWorld() {
     mat4 lightPVs[NUM_CASCADES];
     R_LightSpaceMatrix(camera, scene.light.direction, lightPVs);
 
-    for (size_t idx = 0; idx < array_length(lightPVs); ++idx) {
+    for (size_t idx = 0; idx < vct::array_length(lightPVs); ++idx) {
         g_perFrameCache.cache.LightPVs[idx] = lightPVs[idx];
     }
 

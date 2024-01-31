@@ -1,14 +1,8 @@
 #include "JobSystem.h"
 
-#include <engine/core/collections/fixed_stack.h>
-#include <engine/core/collections/ring_buffer.h>
-
-#include <memory>
-#include <mutex>
-#include <string>
-#include <thread>
-
 #include "Core/Check.h"
+#include "core/collections/fixed_stack.h"
+#include "core/collections/ring_buffer.h"
 
 #define WIN_CALL(x) x
 

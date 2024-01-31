@@ -1,7 +1,7 @@
 #include "MeshComponent.h"
 
+#include "Archive.h"
 #include "Core/Check.h"
-#include "engine/Archive.h"
 
 static uint32_t GetStride(MeshComponent::VertexAttribute::NAME name) {
     switch (name) {

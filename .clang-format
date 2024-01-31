@@ -17,7 +17,7 @@ AlignConsecutiveMacros: true
 AlignOperands: true
 AlignTrailingComments: true
 BreakBeforeBinaryOperators: None
-ColumnLimit: 120
+ColumnLimit: 0
 Cpp11BracedListStyle: false
 # DeriveLineEnding: false
 # IndentCaseLabels: true

@@ -2,6 +2,8 @@
 
 #include "Core/Check.h"
 
+using namespace vct;
+
 #if 0
  *        E__________________ H
  *       /|                 /|

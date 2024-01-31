@@ -1,6 +1,6 @@
 #include "CameraComponent.h"
 
-#include "engine/Archive.h"
+#include "Archive.h"
 
 mat4 CameraComponent::CalculateViewMatrix() const { return glm::lookAt(eye, center, glm::normalize(vec3(0, 1, 0))); }
 

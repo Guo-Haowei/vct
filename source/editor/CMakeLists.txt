@@ -9,6 +9,10 @@ add_executable(${TARGET_NAME} ${SRC})
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src/editor FILES ${SRC})
 
+target_include_directories(${TARGET_NAME} PRIVATE
+    ${PROJECT_SOURCE_DIR}/source/engine/src
+)
+
 target_link_libraries(${TARGET_NAME} PRIVATE engine)
 
 target_compile_options(${TARGET_NAME} PRIVATE /W4)

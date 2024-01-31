@@ -70,7 +70,11 @@ void RenderTarget::CheckError() {
 }
 
 // TODO: expose
-enum { POSISION = 0, NORMAL = 1, ALBEDO = 2, FINALIMAGE = 0, SSAO = 0 };
+enum { POSISION = 0,
+       NORMAL = 1,
+       ALBEDO = 2,
+       FINALIMAGE = 0,
+       SSAO = 0 };
 
 void GBuffer::Create(int width, int height) {
     RenderTarget::Create(width, height);
