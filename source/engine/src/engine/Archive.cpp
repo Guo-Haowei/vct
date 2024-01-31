@@ -1,7 +1,5 @@
 #include "Archive.h"
 
-#include "Core/Check.h"
-
 bool Archive::OpenRead(const std::string& path) {
     mFile = fopen(path.c_str(), "rb");
 
@@ -46,12 +44,12 @@ void Archive::Close() {
 }
 
 bool Archive::IsWriteMode() const {
-    check(mFile && mMode != EMode::None);
+    DEV_ASSERT(mFile && mMode != EMode::None);
     return mMode == EMode::Write;
 }
 
 bool Archive::Write(const void* data, size_t bytes) {
-    check(mMode == EMode::Write && mFile);
+    DEV_ASSERT(mMode == EMode::Write && mFile);
     size_t written = fwrite(data, 1, bytes, mFile);
     if (written == bytes) {
         return true;
@@ -62,7 +60,7 @@ bool Archive::Write(const void* data, size_t bytes) {
 }
 
 bool Archive::Read(void* data, size_t bytes) {
-    check(mMode == EMode::Read && mFile);
+    DEV_ASSERT(mMode == EMode::Read && mFile);
     size_t read = fread(data, 1, bytes, mFile);
     if (read == bytes) {
         return true;

@@ -7,10 +7,8 @@
 #include <assimp/Importer.hpp>
 #include <filesystem>
 
-#include "Core/Check.h"
 #include "Core/CommonDvars.h"
 #include "Core/DynamicVariable.h"
-#include "Core/Log.h"
 
 using std::string;
 using std::vector;
@@ -32,7 +30,7 @@ void SceneLoader::LoadGLTF(const char* path, bool flipUVs) {
     const uint32_t numMeshes = aiscene->mNumMeshes;
     const uint32_t numMaterials = aiscene->mNumMaterials;
 
-    LOG_DEBUG("scene '{}' has {} meshes, {} materials", path, numMeshes, numMaterials);
+    LOG_VERBOSE("scene '{}' has {} meshes, {} materials", path, numMeshes, numMaterials);
 
     fs::path fullpath = fs::path(path);
     mCurrentPath = fullpath.parent_path().string() + "/";
@@ -58,9 +56,9 @@ void SceneLoader::LoadGLTF(const char* path, bool flipUVs) {
     for (uint32_t i = 0; i < numObjects; ++i) {
         const ObjectComponent& obj = mScene.GetComponentArray<ObjectComponent>()[i];
         ecs::Entity entity = mScene.GetEntity<ObjectComponent>(i);
-        check(mScene.Contains<TransformComponent>(entity));
+        DEV_ASSERT(mScene.Contains<TransformComponent>(entity));
         const TransformComponent& transform = *mScene.GetComponent<TransformComponent>(entity);
-        check(mScene.Contains<MeshComponent>(obj.meshID));
+        DEV_ASSERT(mScene.Contains<MeshComponent>(obj.meshID));
         const MeshComponent& mesh = *mScene.GetComponent<MeshComponent>(obj.meshID);
 
         mat4 M = transform.GetWorldMatrix();
@@ -73,7 +71,7 @@ void SceneLoader::LoadGLTF(const char* path, bool flipUVs) {
 void SceneLoader::ProcessMaterial(aiMaterial& material) {
     auto materialID = mScene.Entity_CreateMaterial(std::string("Material::") + material.GetName().C_Str());
     MaterialComponent* materialComponent = mScene.GetComponent<MaterialComponent>(materialID);
-    check(materialComponent);
+    DEV_ASSERT(materialComponent);
 
     auto getMaterialPath = [&](aiTextureType type, unsigned int index) -> std::string {
         aiString path;
@@ -102,7 +100,7 @@ void SceneLoader::ProcessMaterial(aiMaterial& material) {
 }
 
 void SceneLoader::ProcessMesh(const aiMesh& mesh) {
-    check(mesh.mNumVertices);
+    DEV_ASSERT(mesh.mNumVertices);
     const std::string meshName(mesh.mName.C_Str());
     const bool hasUV = mesh.mTextureCoords[0];
     if (!hasUV) {
@@ -137,7 +135,7 @@ void SceneLoader::ProcessMesh(const aiMesh& mesh) {
         meshComponent.mIndices.emplace_back(face.mIndices[2]);
     }
 
-    check(mMaterials.size());
+    DEV_ASSERT(mMaterials.size());
     MeshComponent::MeshSubset subset;
     subset.indexCount = (uint32_t)meshComponent.mIndices.size();
     subset.indexOffset = 0;
@@ -172,7 +170,7 @@ ecs::Entity SceneLoader::ProcessNode(const aiNode* node, ecs::Entity parent) {
         }
     }
 
-    check(mScene.Contains<TransformComponent>(entity));
+    DEV_ASSERT(mScene.Contains<TransformComponent>(entity));
 
     const aiMatrix4x4& local = node->mTransformation;                       // row major matrix
     mat4 localTransformColumnMajor(local.a1, local.b1, local.c1, local.d1,  // x0 y0 z0 w0

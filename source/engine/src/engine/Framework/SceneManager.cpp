@@ -1,8 +1,6 @@
 #include "SceneManager.h"
 
-#include "Core/Check.h"
 #include "Core/CommonDvars.h"
-#include "Core/Log.h"
 #include "Framework/WindowManager.h"
 #include "Graphics/r_cbuffers.h"
 #include "Graphics/r_sun_shadow.h"
@@ -16,8 +14,8 @@ SceneManager* gSceneManager = new SceneManager;
 static bool Com_LoadScene() {
     // validate dvars
     const int voxelTextureSize = DVAR_GET_INT(r_voxelSize);
-    check(is_power_of_two(voxelTextureSize));
-    check(voxelTextureSize <= 256);
+    DEV_ASSERT(is_power_of_two(voxelTextureSize));
+    DEV_ASSERT(voxelTextureSize <= 256);
 
     Scene& scene = g_scene;
     SceneLoader loader(scene);
@@ -56,7 +54,7 @@ static bool Com_LoadScene() {
     g_perFrameCache.cache.TexelSize = texelSize;
     g_perFrameCache.cache.VoxelSize = voxelSize;
 
-    LOG_OK("Scene '{}' loaded", scenePath);
+    LOG("Scene '{}' loaded", scenePath);
     return true;
 }
 
@@ -68,7 +66,7 @@ static void Com_UpdateWorld() {
     // update camera
     auto [frameW, frameH] = gWindowManager->GetFrameSize();
     const float aspect = (float)frameW / frameH;
-    check(aspect > 0.0f);
+    DEV_ASSERT(aspect > 0.0f);
 
     Camera& camera = gCamera;
     camera.SetAspect(aspect);

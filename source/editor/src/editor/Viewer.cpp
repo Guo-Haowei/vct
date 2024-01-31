@@ -1,7 +1,6 @@
 #include "Viewer.h"
 
 #include "Engine/Core/Input.h"
-#include "Engine/Core/Log.h"
 #include "Engine/Framework/SceneManager.h"
 #include "Engine/Framework/WindowManager.h"
 #include "Engine/Math/Ray.h"
@@ -23,7 +22,7 @@ void Viewer::Update(float) {
 
 void Viewer::RenderInternal(Scene& scene) {
     ImGuiWindow* window = ImGui::FindWindowByName(mName.c_str());
-    check(window);
+    DEV_ASSERT(window);
     const ImRect& contentRegionRect = window->ContentRegionRect;
     vec2 canvasMinToScreen;
     canvasMinToScreen.x = contentRegionRect.Min.x;

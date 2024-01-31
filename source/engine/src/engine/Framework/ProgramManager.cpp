@@ -3,7 +3,6 @@
 #include <sstream>
 #include <vector>
 
-#include "Core/Check.h"
 #include "Core/Utility.h"
 #include "Graphics/GLPrerequisites.h"
 
@@ -20,7 +19,7 @@ static std::string process_shader(const std::string &source) {
             const char *lineStr = line.c_str();
             const char *quote1 = strchr(lineStr, '"');
             const char *quote2 = strrchr(lineStr, '"');
-            check(quote1 && quote2 && (quote1 != quote2));
+            DEV_ASSERT(quote1 && quote2 && (quote1 != quote2));
             std::string includedFile(quote1 + 1, quote2);
 
             std::string extra = read_file_to_buffer(fs::path(SHADER_FOLDER) / includedFile);
@@ -94,18 +93,18 @@ Program ProgramManager::Create(const ProgramCreateInfo &info) {
     });
 
     if (!info.cs.empty()) {
-        check(info.vs.empty());
-        check(info.ps.empty());
-        check(info.gs.empty());
+        DEV_ASSERT(info.vs.empty());
+        DEV_ASSERT(info.ps.empty());
+        DEV_ASSERT(info.gs.empty());
         createShader(info.cs, GL_COMPUTE_SHADER);
     } else if (!info.vs.empty()) {
-        check(info.cs.empty());
+        DEV_ASSERT(info.cs.empty());
         createShader(info.vs, GL_VERTEX_SHADER);
         createShader(info.ps, GL_FRAGMENT_SHADER);
         createShader(info.gs, GL_GEOMETRY_SHADER);
     }
 
-    check(!shaders.empty());
+    DEV_ASSERT(!shaders.empty());
 
     glLinkProgram(programID);
     GLint status = GL_FALSE, length = 0;
@@ -208,6 +207,6 @@ void ProgramManager::FinalizeInternal() {
 }
 
 const Program &ProgramManager::GetShaderProgram(ProgramType type) {
-    checkrange(type, 0, g_shaderCache.size());
+    DEV_ASSERT_INDEX(type, g_shaderCache.size());
     return g_shaderCache[underlying(type)];
 }

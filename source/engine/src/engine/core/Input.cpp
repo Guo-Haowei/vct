@@ -1,13 +1,11 @@
 #include "Input.h"
 
-#include "Core/Check.h"
-
 Input Input::gInput;
 
 Input::Input() {
 #if USING(ENABLE_CHECK)
     static int sCounter = 0;
-    checkfmt(++sCounter == 1, "Input::Input() should be called only once");
+    DEV_ASSERT(++sCounter == 1);
 #endif
 
     mKeys.fill(false);
@@ -30,13 +28,13 @@ void Input::EndFrame() {
 
 template<size_t N>
 static inline bool InputIsDown(const std::array<bool, N>& arr, int index) {
-    checkrange(index, 0, N);
+    DEV_ASSERT_INDEX(index, N);
     return arr[index];
 }
 
 template<size_t N>
 static inline bool InputChange(const std::array<bool, N>& current, const std::array<bool, N>& prev, int index) {
-    checkrange(index, 0, N);
+    DEV_ASSERT_INDEX(index, N);
     return current[index] == true && prev[index] == false;
 }
 
@@ -67,12 +65,12 @@ const vec2& Input::GetCursor() { return gInput.mCursor; }
 const vec2& Input::Wheel() { return gInput.mWheel; }
 
 void Input::SetButton(int button, bool pressed) {
-    checkrange(button, 0, EMouseButton::COUNT);
+    DEV_ASSERT_INDEX(button, EMouseButton::COUNT);
     mButtons[button] = pressed;
 }
 
 void Input::SetKey(int key, bool pressed) {
-    checkrange(key, 0, EKeyCode::COUNT);
+    DEV_ASSERT_INDEX(key, EKeyCode::COUNT);
     mKeys[key] = pressed;
 }
 

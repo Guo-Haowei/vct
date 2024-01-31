@@ -1,10 +1,9 @@
 #include "Program.h"
 
-#include "Core/Check.h"
 #include "GLPrerequisites.h"
 
 void Program::Bind() const {
-    check(mHandle);
+    DEV_ASSERT(mHandle);
     glUseProgram(mHandle);
 }
 

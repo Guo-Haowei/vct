@@ -1,6 +1,5 @@
 #pragma once
 #include "Archive.h"
-#include "Core/Check.h"
 #include "EntityGenerator.h"
 
 namespace ecs {
@@ -58,7 +57,7 @@ public:
 
         for (size_t i = 0; i < other.GetCount(); ++i) {
             Entity entity = other.mEntityArray[i];
-            check(!Contains(entity));
+            DEV_ASSERT(!Contains(entity));
             mEntityArray.push_back(entity);
             mLookup[entity] = mComponentArray.size();
             mComponentArray.push_back(std::move(other.mComponentArray[i]));
@@ -72,8 +71,8 @@ public:
     // virtual void Serialize(wi::Archive& archive, EntitySerializer& seri) = 0;
     // virtual void Component_Serialize(Entity entity, wi::Archive& archive, EntitySerializer& seri) = 0;
     virtual void Remove(const Entity& entity) override {
-        unused(entity);
-        check(0);
+        vct::unused(entity);
+        DEV_ASSERT(0);
     }
 
     // virtual void Remove_KeepSorted(Entity entity) = 0;
@@ -86,7 +85,7 @@ public:
     }
 
     inline T& GetComponent(size_t idx) {
-        check(idx < mComponentArray.size());
+        DEV_ASSERT(idx < mComponentArray.size());
         return mComponentArray[idx];
     }
 
@@ -120,17 +119,17 @@ public:
     inline virtual size_t GetCount() const override { return mComponentArray.size(); }
 
     inline virtual Entity GetEntity(size_t index) const override {
-        check(index < mEntityArray.size());
+        DEV_ASSERT(index < mEntityArray.size());
         return mEntityArray[index];
     }
 
     T& Create(const Entity& entity) {
-        check(entity.IsValid());
+        DEV_ASSERT(entity.IsValid());
 
         const size_t componentCount = mComponentArray.size();
-        check(mLookup.find(entity) == mLookup.end());
-        check(mEntityArray.size() == componentCount);
-        check(mLookup.size() == componentCount);
+        DEV_ASSERT(mLookup.find(entity) == mLookup.end());
+        DEV_ASSERT(mEntityArray.size() == componentCount);
+        DEV_ASSERT(mLookup.size() == componentCount);
 
         mLookup[entity] = componentCount;
         mComponentArray.emplace_back();
@@ -188,7 +187,7 @@ public:
 
     template<typename T>
     inline ComponentManager<T>& Register(const std::string& name, uint64_t version = 0) {
-        check(mEntries.find(name) == mEntries.end());
+        DEV_ASSERT(mEntries.find(name) == mEntries.end());
         mEntries[name].mManager = std::make_unique<ComponentManager<T>>();
         mEntries[name].mVersion = version;
         return static_cast<ComponentManager<T>&>(*(mEntries[name].mManager));

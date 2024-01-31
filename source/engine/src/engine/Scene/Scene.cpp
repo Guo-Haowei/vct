@@ -3,7 +3,6 @@
 #include <thread>
 
 #include "Archive.h"
-#include "Core/Check.h"
 #include "Core/CommonDvars.h"
 #include "Core/JobSystem.h"
 #include "Core/Timer.h"
@@ -42,7 +41,7 @@ void Scene::Update(float dt) {
 
 void Scene::Merge(Scene& other) {
     unused(other);
-    checkmsg("FIX");
+    CRASH_NOW_MSG("FIX");
 }
 
 ecs::Entity Scene::Entity_CreateName(const std::string& name) {
@@ -184,12 +183,12 @@ ecs::Entity Scene::Entity_CreateCube(const std::string& name, ecs::Entity materi
 }
 
 void Scene::Component_Attach(ecs::Entity child, ecs::Entity parent) {
-    check(child != parent);
-    check(parent.IsValid());
+    DEV_ASSERT(child != parent);
+    DEV_ASSERT(parent.IsValid());
 
     // if child already has a parent, detach it
     if (mHierarchyComponents.Contains(child)) {
-        checkmsg("Unlikely to happen at this point");
+        CRASH_NOW_MSG("Unlikely to happen at this point");
         Component_Detach(child);
     }
 
@@ -199,12 +198,12 @@ void Scene::Component_Attach(ecs::Entity child, ecs::Entity parent) {
 
 void Scene::Component_Detach(ecs::Entity entity) {
     unused(entity);
-    checkmsg("TODO");
+    CRASH_NOW_MSG("TODO");
 }
 
 void Scene::Component_DetachChildren(ecs::Entity parent) {
     unused(parent);
-    checkmsg("TODO");
+    CRASH_NOW_MSG("TODO");
 }
 
 // static constexpr uint32_t SMALL_SUBTASK_GROUPSIZE = 64;
@@ -221,7 +220,7 @@ void Scene::RunAnimationUpdateSystem(Context& ctx) {
             if (channel.path == AnimationComponent::Channel::Path::UNKNOWN) {
                 continue;
             }
-            check(channel.samplerIndex < (int)animation.samplers.size());
+            DEV_ASSERT(channel.samplerIndex < (int)animation.samplers.size());
             const AnimationComponent::Sampler& sampler = animation.samplers[channel.samplerIndex];
 
             int keyLeft = 0;
@@ -263,10 +262,10 @@ void Scene::RunAnimationUpdateSystem(Context& ctx) {
             t = SaturateF(t);
 
             TransformComponent* targetTransform = mTransformComponents.GetComponent(channel.targetID);
-            check(targetTransform);
+            DEV_ASSERT(targetTransform);
             switch (channel.path) {
                 case AnimationComponent::Channel::SCALE: {
-                    check(sampler.keyframeData.size() == sampler.keyframeTimes.size() * 3);
+                    DEV_ASSERT(sampler.keyframeData.size() == sampler.keyframeTimes.size() * 3);
                     const vec3* data = (const vec3*)sampler.keyframeData.data();
                     const vec3& vLeft = data[keyLeft];
                     const vec3& vRight = data[keyRight];
@@ -274,7 +273,7 @@ void Scene::RunAnimationUpdateSystem(Context& ctx) {
                     break;
                 }
                 case AnimationComponent::Channel::TRANSLATION: {
-                    check(sampler.keyframeData.size() == sampler.keyframeTimes.size() * 3);
+                    DEV_ASSERT(sampler.keyframeData.size() == sampler.keyframeTimes.size() * 3);
                     const vec3* data = (const vec3*)sampler.keyframeData.data();
                     const vec3& vLeft = data[keyLeft];
                     const vec3& vRight = data[keyRight];
@@ -282,7 +281,7 @@ void Scene::RunAnimationUpdateSystem(Context& ctx) {
                     break;
                 }
                 case AnimationComponent::Channel::ROTATION: {
-                    check(sampler.keyframeData.size() == sampler.keyframeTimes.size() * 4);
+                    DEV_ASSERT(sampler.keyframeData.size() == sampler.keyframeTimes.size() * 4);
                     const vec4* data = (const vec4*)sampler.keyframeData.data();
                     const vec4& vLeft = data[keyLeft];
                     const vec4& vRight = data[keyRight];
@@ -290,7 +289,7 @@ void Scene::RunAnimationUpdateSystem(Context& ctx) {
                     break;
                 }
                 default:
-                    unreachable();
+                    CRASH_NOW();
                     break;
             }
             targetTransform->SetDirty();
@@ -328,7 +327,7 @@ void Scene::RunHierarchyUpdateSystem(Context& ctx) {
 
                 if ((hier = mHierarchyComponents.GetComponent(parent)) != nullptr) {
                     parent = hier->mParent;
-                    check(parent.IsValid());
+                    DEV_ASSERT(parent.IsValid());
                 } else {
                     parent = ecs::Entity::INVALID;
                 }
@@ -345,7 +344,7 @@ void Scene::RunArmatureUpdateSystem(Context& ctx) {
         ecs::Entity id = mArmatureComponents.GetEntity(i);
         ArmatureComponent& armature = mArmatureComponents[i];
         TransformComponent* transform = mTransformComponents.GetComponent(id);
-        check(transform);
+        DEV_ASSERT(transform);
 
         // The transform world matrices are in world space, but skinning needs them in armature-local space,
         //	so that the skin is reusable for instanced meshes.
@@ -367,7 +366,7 @@ void Scene::RunArmatureUpdateSystem(Context& ctx) {
         int idx = 0;
         for (ecs::Entity boneID : armature.boneCollection) {
             const TransformComponent* boneTransform = mTransformComponents.GetComponent(boneID);
-            check(boneTransform);
+            DEV_ASSERT(boneTransform);
 
             const mat4& B = armature.inverseBindMatrices[idx];
             const mat4& W = boneTransform->GetWorldMatrix();
@@ -380,7 +379,7 @@ void Scene::RunArmatureUpdateSystem(Context& ctx) {
     });
 }
 
-void Scene::RunObjectUpdateSystem() { unreachable(); }
+void Scene::RunObjectUpdateSystem() { CRASH_NOW(); }
 
 void Scene::RunCameraUpdateSystem() {
     for (int i = 0; i < GetCount<CameraComponent>(); ++i) {
@@ -417,7 +416,7 @@ Scene::RayIntersectionResult Scene::Intersects(Ray& ray) {
         ObjectComponent& object = GetComponentArray<ObjectComponent>()[objIdx];
         MeshComponent* mesh = GetComponent<MeshComponent>(object.meshID);
         TransformComponent* transform = GetComponent<TransformComponent>(entity);
-        check(mesh && transform);
+        DEV_ASSERT(mesh && transform);
 
         if (!transform || !mesh) {
             continue;

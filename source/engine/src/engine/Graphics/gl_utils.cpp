@@ -3,10 +3,8 @@
 #include <filesystem>
 #include <set>
 
-#include "Core/Check.h"
 #include "Core/CommonDvars.h"
 #include "Core/DynamicVariable.h"
-#include "Core/Log.h"
 #include "cbuffer.glsl"
 
 static MeshData g_quad;
@@ -26,7 +24,7 @@ void R_CreateQuad() {
 }
 
 void R_DrawQuad() {
-    check(g_quad.vao);
+    DEV_ASSERT(g_quad.vao);
     glBindVertexArray(g_quad.vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
@@ -54,7 +52,7 @@ GLuint CreateAndBindConstantBuffer(int slot, size_t sizeInByte) {
     glBufferData(GL_UNIFORM_BUFFER, sizeInByte, nullptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glBindBufferBase(GL_UNIFORM_BUFFER, slot, handle);
-    LOG_DEBUG("[opengl] created buffer of size {} (slot {})", sizeInByte, slot);
+    LOG_VERBOSE("[opengl] created buffer of size {} (slot {})", sizeInByte, slot);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     return handle;
 }

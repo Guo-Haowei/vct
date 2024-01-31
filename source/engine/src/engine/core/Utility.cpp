@@ -2,8 +2,6 @@
 
 #include <fstream>
 
-#include "Log.h"
-
 std::string read_file_to_buffer(const char* path) {
     if (!fs::exists(fs::path(path))) {
         LOG_ERROR("File {} does not exist", path);

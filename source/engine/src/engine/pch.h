@@ -26,4 +26,5 @@
 #include <vector>
 
 #include "core/error/error_macros.h"
+#include "core/io/print.h"
 #include "core/typedefs.h"

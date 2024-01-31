@@ -6,9 +6,7 @@ extern "C" {
 #include <lua/lualib.h>
 }
 
-#include "Core/Check.h"
 #include "Core/DynamicVariable.h"
-#include "Core/Log.h"
 
 #define FIND_DVAR_OR_RETURN(variable, name)                         \
     DynamicVariable* variable = DynamicVariableManager::Find(name); \
@@ -105,9 +103,9 @@ static int luaopen_EngineLib(lua_State* L) {
 }
 
 bool Com_ExecLua(const char* path) {
-    LOG_INFO("[lua] executing {}", path);
+    LOG("[lua] executing {}", path);
     lua_State* L = luaL_newstate();
-    check(L);
+    DEV_ASSERT(L);
     if (L == nullptr) {
         return false;
     }

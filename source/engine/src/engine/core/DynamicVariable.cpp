@@ -3,8 +3,6 @@
 #include <string>
 #include <unordered_map>
 
-#include "Core/Check.h"
-
 static std::unordered_map<std::string, DynamicVariable*> sDVARMap;
 
 void DynamicVariable::RegisterInt(const char* key, int value) {
@@ -44,32 +42,32 @@ void DynamicVariable::RegisterVec4(const char* key, float x, float y, float z, f
 }
 
 int DynamicVariable::AsInt() const {
-    check(mType == EDvarType::Integer);
+    DEV_ASSERT(mType == EDvarType::Integer);
     return mIntegerValue;
 }
 
 float DynamicVariable::AsFloat() const {
-    check(mType == EDvarType::Float);
+    DEV_ASSERT(mType == EDvarType::Float);
     return mFloatValue;
 }
 
 const char* DynamicVariable::AsString() const {
-    check(mType == EDvarType::String);
+    DEV_ASSERT(mType == EDvarType::String);
     return mStringValue.c_str();
 }
 
 vec2 DynamicVariable::AsVec2() const {
-    check(mType == EDvarType::Vec2);
+    DEV_ASSERT(mType == EDvarType::Vec2);
     return vec2(mVecValue.x, mVecValue.y);
 }
 
 vec3 DynamicVariable::AsVec3() const {
-    check(mType == EDvarType::Vec3);
+    DEV_ASSERT(mType == EDvarType::Vec3);
     return vec3(mVecValue.x, mVecValue.y, mVecValue.z);
 }
 
 vec4 DynamicVariable::AsVec4() const {
-    check(mType == EDvarType::Vec4);
+    DEV_ASSERT(mType == EDvarType::Vec4);
     return vec4(mVecValue.x, mVecValue.y, mVecValue.z, mVecValue.w);
 }
 
@@ -82,7 +80,7 @@ void* DynamicVariable::AsPointer() {
         case EDvarType::Vec4:
             return &mIntegerValue;
         default:
-            unreachable();
+            CRASH_NOW();
             return nullptr;
     }
 }
@@ -151,15 +149,15 @@ EDvarError DynamicVariable::SetFromSourceString(const char* str) {
     switch (mType) {
         case EDvarType::Integer:
             mIntegerValue = atoi(str);
-            LOG_DEBUG("change dvar '{}'(int) to {}", mDebugName.c_str(), mIntegerValue);
+            LOG_VERBOSE("change dvar '{}'(int) to {}", mDebugName.c_str(), mIntegerValue);
             break;
         case EDvarType::Float:
             mFloatValue = float(atof(str));
-            LOG_DEBUG("change dvar '{}'(float) to {}", mDebugName.c_str(), mFloatValue);
+            LOG_VERBOSE("change dvar '{}'(float) to {}", mDebugName.c_str(), mFloatValue);
             break;
         case EDvarType::String:
             mStringValue = str;
-            LOG_DEBUG("change dvar '{}'(string) to \"{}\"", mDebugName.c_str(), mStringValue.c_str());
+            LOG_VERBOSE("change dvar '{}'(string) to \"{}\"", mDebugName.c_str(), mStringValue.c_str());
             break;
         default:
             LOG_FATAL("Unknown dvar type {}", static_cast<int>(mType));
@@ -189,24 +187,24 @@ void DynamicVariableManager::Register(const char* key, DynamicVariable* dvar) {
     sDVARMap.insert(std::make_pair(keyStr, dvar));
     switch (dvar->mType) {
         case EDvarType::Integer:
-            LOG_DEBUG("register dvar '{}'(int) {}", key, dvar->mIntegerValue);
+            LOG_VERBOSE("register dvar '{}'(int) {}", key, dvar->mIntegerValue);
             break;
         case EDvarType::Float:
-            LOG_DEBUG("register dvar '{}'(float) {}", key, dvar->mFloatValue);
+            LOG_VERBOSE("register dvar '{}'(float) {}", key, dvar->mFloatValue);
             break;
         case EDvarType::String:
-            LOG_DEBUG("register dvar '{}'(string) \"{}\"", key, dvar->mStringValue.c_str());
+            LOG_VERBOSE("register dvar '{}'(string) \"{}\"", key, dvar->mStringValue.c_str());
             break;
         case EDvarType::Vec2:
-            LOG_DEBUG("register dvar '{}'(vec2) {} {}", key, dvar->mVecValue.x, dvar->mVecValue.y);
+            LOG_VERBOSE("register dvar '{}'(vec2) {} {}", key, dvar->mVecValue.x, dvar->mVecValue.y);
             break;
         case EDvarType::Vec3:
-            LOG_DEBUG("register dvar '{}'(vec3) {} {} {}", key, dvar->mVecValue.x, dvar->mVecValue.y,
-                      dvar->mVecValue.z);
+            LOG_VERBOSE("register dvar '{}'(vec3) {} {} {}", key, dvar->mVecValue.x, dvar->mVecValue.y,
+                        dvar->mVecValue.z);
             break;
         case EDvarType::Vec4:
-            LOG_DEBUG("register dvar '{}'(vec4) {} {} {} {}", key, dvar->mVecValue.x, dvar->mVecValue.y,
-                      dvar->mVecValue.z, dvar->mVecValue.w);
+            LOG_VERBOSE("register dvar '{}'(vec4) {} {} {} {}", key, dvar->mVecValue.x, dvar->mVecValue.y,
+                        dvar->mVecValue.z, dvar->mVecValue.w);
             break;
         default:
             LOG_FATAL("Unknown dvar type {}", static_cast<int>(dvar->mType));

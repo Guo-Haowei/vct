@@ -1,15 +1,15 @@
 #pragma once
 
-#define LOG(fmt, ...)           ::vct::log_impl(::vct::LOG_LEVEL_NORMAL, fmt, ##__VA_ARGS__)
-#define LOG_VERBOSE(fmt, ...)   ::vct::log_impl(::vct::LOG_LEVEL_VERBOSE, fmt, ##__VA_ARGS__)
-#define LOG_WARN(fmt, ...)      ::vct::log_impl(::vct::LOG_LEVEL_WARN, fmt, ##__VA_ARGS__)
-#define LOG_ERROR(fmt, ...)     ::vct::log_impl(::vct::LOG_LEVEL_ERROR, fmt, ##__VA_ARGS__)
-#define LOG_FATAL(fmt, ...)     ::vct::log_impl(::vct::LOG_LEVEL_FATAL, fmt, ##__VA_ARGS__)
-#define PRINT(fmt, ...)         ::vct::print_impl(::vct::LOG_LEVEL_NORMAL, fmt, ##__VA_ARGS__)
-#define PRINT_VERBOSE(fmt, ...) ::vct::print_impl(::vct::LOG_LEVEL_VERBOSE, fmt, ##__VA_ARGS__)
-#define PRINT_WARN(fmt, ...)    ::vct::print_impl(::vct::LOG_LEVEL_WARN, fmt, ##__VA_ARGS__)
-#define PRINT_ERROR(fmt, ...)   ::vct::print_impl(::vct::LOG_LEVEL_ERROR, fmt, ##__VA_ARGS__)
-#define PRINT_FATAL(fmt, ...)   ::vct::print_impl(::vct::LOG_LEVEL_FATAL, fmt, ##__VA_ARGS__)
+#define LOG(FMT, ...)           ::vct::log_impl(::vct::LOG_LEVEL_NORMAL, FMT, ##__VA_ARGS__)
+#define LOG_VERBOSE(FMT, ...)   ::vct::log_impl(::vct::LOG_LEVEL_VERBOSE, FMT, ##__VA_ARGS__)
+#define LOG_WARN(FMT, ...)      ::vct::log_impl(::vct::LOG_LEVEL_WARN, FMT, ##__VA_ARGS__)
+#define LOG_ERROR(FMT, ...)     ::vct::log_impl(::vct::LOG_LEVEL_ERROR, FMT, ##__VA_ARGS__)
+#define LOG_FATAL(FMT, ...)     ::vct::log_impl(::vct::LOG_LEVEL_FATAL, FMT, ##__VA_ARGS__)
+#define PRINT(FMT, ...)         ::vct::print_impl(::vct::LOG_LEVEL_NORMAL, FMT, ##__VA_ARGS__)
+#define PRINT_VERBOSE(FMT, ...) ::vct::print_impl(::vct::LOG_LEVEL_VERBOSE, FMT, ##__VA_ARGS__)
+#define PRINT_WARN(FMT, ...)    ::vct::print_impl(::vct::LOG_LEVEL_WARN, FMT, ##__VA_ARGS__)
+#define PRINT_ERROR(FMT, ...)   ::vct::print_impl(::vct::LOG_LEVEL_ERROR, FMT, ##__VA_ARGS__)
+#define PRINT_FATAL(FMT, ...)   ::vct::print_impl(::vct::LOG_LEVEL_FATAL, FMT, ##__VA_ARGS__)
 
 namespace vct {
 

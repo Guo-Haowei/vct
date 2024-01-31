@@ -1,6 +1,5 @@
 #include "JobSystem.h"
 
-#include "Core/Check.h"
 #include "core/collections/fixed_stack.h"
 #include "core/collections/ring_buffer.h"
 
@@ -70,7 +69,7 @@ static bool work();
 
 bool initialize() {
     uint32_t numWorkers = std::thread::hardware_concurrency() - 1;
-    check(numWorkers > 0);
+    DEV_ASSERT(numWorkers > 0);
     sJSGlob.numWorker = numWorkers;
 
     sThreadID = MAIN_THREAD_ID;
@@ -99,7 +98,7 @@ bool initialize() {
 
         DWORD_PTR affinityMask = 1ull << threadID;
         DWORD_PTR affinityResult = SetThreadAffinityMask(handle, affinityMask);
-        check(affinityResult > 0);
+        DEV_ASSERT(affinityResult > 0);
 
         HRESULT hr = S_OK;
         WIN_CALL(hr = SetThreadDescription(handle, worker.name.c_str()));
@@ -107,7 +106,7 @@ bool initialize() {
         sJSGlob.workers.push_back(worker);
     }
 
-    LOG_INFO("JobSystem has {} workers", numWorkers);
+    LOG("JobSystem has {} workers", numWorkers);
     sJSGlob.initialized = true;
     return true;
 }
@@ -142,7 +141,7 @@ static bool work() {
 static bool is_main_thread() { return sThreadID == MAIN_THREAD_ID; }
 
 void Context::Dispatch(uint32_t jobCount, uint32_t groupSize, const std::function<void(JobArgs)>& task) {
-    check(is_main_thread());
+    DEV_ASSERT(is_main_thread());
 
     if (jobCount == 0 || groupSize == 0) {
         return;

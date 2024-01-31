@@ -68,8 +68,20 @@ void report_error_index_impl(std::string_view function, std::string_view file, i
 #define ERR_FAIL_INDEX_V(INDEX, BOUND, RET)          ERR_FAIL_INDEX_V_MSG_INTERNAL(INDEX, BOUND, RET, "")
 #define ERR_FAIL_INDEX_V_MSG(INDEX, BOUND, RET, MSG) ERR_FAIL_INDEX_V_MSG_INTERNAL(INDEX, BOUND, RET, MSG)
 
-// @TODO: refactor
 // @TODO: use same crash handler
+// @TODO: flush
+#define CRASH_NOW()                                                                                 \
+    do {                                                                                            \
+        vct::report_error_impl(__FUNCTION__, __FILE__, __LINE__, "FATAL: Method/function failed."); \
+        GENERATE_TRAP();                                                                            \
+    } while (0)
+
+#define CRASH_NOW_MSG(MSG)                                                                               \
+    do {                                                                                                 \
+        vct::report_error_impl(__FUNCTION__, __FILE__, __LINE__, "FATAL: Method/function failed.", MSG); \
+        GENERATE_TRAP();                                                                                 \
+    } while (0)
+
 #define CRASH_COND(EXPR)                                                                                          \
     if (EXPR) [[unlikely]] {                                                                                      \
         vct::report_error_impl(__FUNCTION__, __FILE__, __LINE__, "FATAL: Condition \"" _STR(EXPR) "\" is true."); \
@@ -98,11 +110,5 @@ void report_error_index_impl(std::string_view function, std::string_view file, i
         GENERATE_TRAP();                                                                                             \
     } else                                                                                                           \
         ((void)0)
-
-#define PANIC(msg)                                                     \
-    do {                                                               \
-        vct::report_error_impl(__FUNCTION__, __FILE__, __LINE__, msg); \
-        GENERATE_TRAP();                                               \
-    } while (0)
 
 }  // namespace vct

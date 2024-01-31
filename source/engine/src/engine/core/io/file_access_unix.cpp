@@ -44,7 +44,7 @@ void FileAccessUnix::close() {
 bool FileAccessUnix::is_open() const { return m_file_handle != nullptr; }
 
 size_t FileAccessUnix::get_length() const {
-    PANIC("TODO");
+    CRASH_NOW_MSG("TODO");
     return 0;
 }
 

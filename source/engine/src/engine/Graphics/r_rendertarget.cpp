@@ -1,9 +1,7 @@
 #include "r_rendertarget.h"
 
-#include "Core/Check.h"
 #include "Core/CommonDvars.h"
 #include "Core/DynamicVariable.h"
-#include "Core/Log.h"
 #include "Framework/WindowManager.h"
 #include "r_cbuffers.h"
 
@@ -192,7 +190,7 @@ void R_CreateRT() {
     auto [w, h] = gWindowManager->GetFrameSize();
 
     const int res = DVAR_GET_INT(r_shadowRes);
-    check(is_power_of_two(res));
+    DEV_ASSERT(is_power_of_two(res));
 
     // g_shadowRT.Create( NUM_CASCADES * res, res );
     g_shadowRT.Create(res, res);

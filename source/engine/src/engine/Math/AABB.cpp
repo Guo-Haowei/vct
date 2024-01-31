@@ -1,7 +1,5 @@
 #include "AABB.h"
 
-#include "Core/Check.h"
-
 using namespace vct;
 
 #if 0
@@ -34,7 +32,7 @@ vec3 AABB::Corner(int index) const {
         case 7: return vec3(mMax.x, mMax.y, mMin.z); // H
     }
     // clang-format on
-    check(0);
+    DEV_ASSERT(0);
     return vec3(0);
 }
 

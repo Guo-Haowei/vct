@@ -1,9 +1,7 @@
 #include "r_sun_shadow.h"
 
-#include "Core/Check.h"
 #include "Core/CommonDvars.h"
 #include "Core/DynamicVariable.h"
-#include "Core/Log.h"
 #include "Framework/ProgramManager.h"
 #include "Framework/SceneManager.h"
 #include "Framework/WindowManager.h"
@@ -51,9 +49,9 @@ void R_ShadowPass() {
         for (uint32_t i = 0; i < numObjects; ++i) {
             const ObjectComponent& obj = scene.GetComponentArray<ObjectComponent>()[i];
             ecs::Entity entity = scene.GetEntity<ObjectComponent>(i);
-            check(scene.Contains<TransformComponent>(entity));
+            DEV_ASSERT(scene.Contains<TransformComponent>(entity));
             const TransformComponent& transform = *scene.GetComponent<TransformComponent>(entity);
-            check(scene.Contains<MeshComponent>(obj.meshID));
+            DEV_ASSERT(scene.Contains<MeshComponent>(obj.meshID));
             const MeshComponent& mesh = *scene.GetComponent<MeshComponent>(obj.meshID);
 
             const mat4& M = transform.GetWorldMatrix();

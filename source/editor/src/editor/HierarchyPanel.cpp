@@ -5,7 +5,6 @@
 #include <unordered_set>
 #include <vector>
 
-#include "Engine/Core/Check.h"
 #include "Engine/Scene/Scene.h"
 #include "imgui/imgui_internal.h"
 
@@ -22,7 +21,7 @@ public:
 
     void Draw(const Scene& scene) {
         Build(scene);
-        check(mRoot);
+        DEV_ASSERT(mRoot);
         DrawNode(scene, mRoot, ImGuiTreeNodeFlags_DefaultOpen);
     }
 
@@ -36,13 +35,13 @@ private:
 };
 
 void HierarchyCreator::DrawNode(const Scene& scene, HierarchyNode* pHier, ImGuiTreeNodeFlags flags) {
-    check(pHier);
+    DEV_ASSERT(pHier);
     ecs::Entity id = pHier->entity;
     const TagComponent* tagComponent = scene.GetComponent<TagComponent>(id);
     const char* name = tagComponent ? tagComponent->GetTag().c_str() : "Untitled";
 
-    auto nodeTag = fmt::format("##{}", id.GetID());
-    auto tag = fmt::format("{}{}", name, nodeTag);
+    auto nodeTag = std::format("##{}", id.GetID());
+    auto tag = std::format("{}{}", name, nodeTag);
 
     flags |= ImGuiTreeNodeFlags_NoTreePushOnOpen;
     flags |= pHier->children.empty() ? ImGuiTreeNodeFlags_Leaf : 0;
@@ -93,7 +92,7 @@ void HierarchyCreator::Build(const Scene& scene) {
             mRoot = it.second.get();
         }
     }
-    check(nodesWithNoParent == 1);
+    DEV_ASSERT(nodesWithNoParent == 1);
 }
 
 void HierarchyPanel::RenderInternal(Scene& scene) {

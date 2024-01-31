@@ -3,9 +3,6 @@
 
 #include <string>
 
-#include "Core/Check.h"
-#include "Core/Log.h"
-
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -75,7 +72,7 @@ void GpuTexture::Create2DImageFromFile(const std::string& path) {
     //     case 3: format = GL_RGB; break;
     //     case 2: format = GL_RG; break;
     //     case 1: format = GL_RED; break;
-    //     default: unreachable();
+    //     default: CRASH_NOW();
     // }
 
     glTexImage2D(m_type, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, image);

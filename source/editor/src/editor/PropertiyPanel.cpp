@@ -126,7 +126,7 @@ static bool draw_drag_float(const char* tag, float* p, float speed, float min, f
     ImGui::SetColumnWidth(0, columnWidth);
     ImGui::Text(tag);
     ImGui::NextColumn();
-    auto dragFloatTag = fmt::format("##{}", tag);
+    auto dragFloatTag = std::format("##{}", tag);
     bool dirty = ImGui::DragFloat(dragFloatTag.c_str(), p, speed, min, max);
     ImGui::Columns(1);
     return dirty;

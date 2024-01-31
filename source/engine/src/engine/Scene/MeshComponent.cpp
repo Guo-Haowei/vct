@@ -1,7 +1,6 @@
 #include "MeshComponent.h"
 
 #include "Archive.h"
-#include "Core/Check.h"
 
 static uint32_t GetStride(MeshComponent::VertexAttribute::NAME name) {
     switch (name) {
@@ -18,7 +17,7 @@ static uint32_t GetStride(MeshComponent::VertexAttribute::NAME name) {
         case MeshComponent::VertexAttribute::WEIGHTS_0:
             return sizeof(vec4);
         default:
-            unreachable();
+            CRASH_NOW();
             return 0;
     }
 }
@@ -45,8 +44,8 @@ void MeshComponent::CreateBounds() {
 }
 
 void MeshComponent::CreateRenderData() {
-    check(mTexcoords_0.size());
-    check(mNormals.size());
+    DEV_ASSERT(mTexcoords_0.size());
+    DEV_ASSERT(mNormals.size());
     // AABB
     CreateBounds();
 

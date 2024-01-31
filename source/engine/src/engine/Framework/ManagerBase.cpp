@@ -1,8 +1,6 @@
 #include "ManagerBase.h"
 
-#include "Core/Check.h"
-
-#define DEBUG_MANAGER_BASE(FMT, ...) LOG_DEBUG(__FUNCTION__ "() " FMT, ##__VA_ARGS__)
+#define DEBUG_MANAGER_BASE(FMT, ...) LOG_VERBOSE(__FUNCTION__ "() " FMT, ##__VA_ARGS__)
 
 bool ManagerBase::Initialize() {
     DEBUG_MANAGER_BASE("Initializing '{}'...", mName);

@@ -1,7 +1,6 @@
 #include "TransformComponent.h"
 
 #include "Archive.h"
-#include "Core/Check.h"
 
 mat4 TransformComponent::GetLocalMatrix() const {
     mat4 rotationMatrix = glm::toMat4(quat(mRotation.w, mRotation.x, mRotation.y, mRotation.z));
@@ -33,7 +32,7 @@ void TransformComponent::Translate(const vec3& translation) {
 
 void TransformComponent::Rotate(const vec3& euler) {
     unused(euler);
-    checkmsg("TODO");
+    CRASH_NOW_MSG("TODO");
     SetDirty();
 }
 
@@ -48,7 +47,7 @@ void TransformComponent::MatrixTransform(const mat4& matrix) {
 }
 
 void TransformComponent::UpdateTransform_Parented(const TransformComponent& parent) {
-    unreachable();
+    CRASH_NOW();
     mat4 worldMatrix = GetLocalMatrix();
     const mat4& worldMatrixParent = parent.mWorldMatrix;
     mWorldMatrix = worldMatrixParent * worldMatrix;

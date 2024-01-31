@@ -1,7 +1,6 @@
 #pragma once
 #include "MainRenderer.h"
 
-#include "Core/Check.h"
 #include "Core/CommonDvars.h"
 #include "Core/DynamicVariable.h"
 #include "Core/geometry.h"
@@ -97,7 +96,7 @@ void MainRenderer::createGpuResources() {
     }
 
     // create material
-    check(scene.GetCount<MaterialComponent>() < array_length(g_constantCache.cache.AlbedoMaps));
+    DEV_ASSERT(scene.GetCount<MaterialComponent>() < array_length(g_constantCache.cache.AlbedoMaps));
 
     for (int idx = 0; idx < scene.GetCount<MaterialComponent>(); ++idx) {
         const auto& mat = scene.GetComponentArray<MaterialComponent>()[idx];
@@ -128,7 +127,7 @@ void MainRenderer::createGpuResources() {
             if (!textureMap.empty()) {
                 matData->normalMap.Create2DImageFromFile(textureMap);
                 g_constantCache.cache.NormalMaps[idx].data = gl::MakeTextureResident(matData->normalMap.GetHandle());
-                // LOG_INFO("material has bump {}", mat->normalTexture.c_str());
+                // LOG("material has bump {}", mat->normalTexture.c_str());
             }
         }
 
@@ -207,9 +206,9 @@ void MainRenderer::renderToVoxelTexture() {
     for (uint32_t i = 0; i < numObjects; ++i) {
         const ObjectComponent& obj = scene.GetComponentArray<ObjectComponent>()[i];
         ecs::Entity entity = scene.GetEntity<ObjectComponent>(i);
-        check(scene.Contains<TransformComponent>(entity));
+        DEV_ASSERT(scene.Contains<TransformComponent>(entity));
         const TransformComponent& transform = *scene.GetComponent<TransformComponent>(entity);
-        check(scene.Contains<MeshComponent>(obj.meshID));
+        DEV_ASSERT(scene.Contains<MeshComponent>(obj.meshID));
         const MeshComponent& mesh = *scene.GetComponent<MeshComponent>(obj.meshID);
 
         const mat4& M = transform.GetWorldMatrix();

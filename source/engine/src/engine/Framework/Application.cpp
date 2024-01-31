@@ -3,7 +3,6 @@
 #include "Core/CommonDvars.h"
 #include "Core/Input.h"
 #include "Core/JobSystem.h"
-#include "Core/Log.h"
 #include "GraphicsManager.h"
 #include "LogManager.h"
 #include "ProgramManager.h"
@@ -84,7 +83,7 @@ int Application::Run(int argc, const char** argv) {
 
     for (auto& layer : mLayers) {
         layer->Attach();
-        LOG_OK("[Runtime] layer '{}' attached!", layer->GetName());
+        LOG("[Runtime] layer '{}' attached!", layer->GetName());
     }
 
     float dt = 0.0f;

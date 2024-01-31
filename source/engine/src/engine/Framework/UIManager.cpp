@@ -1,6 +1,5 @@
 #include "UIManager.h"
 
-#include "Core/Log.h"
 #include "Core/Utility.h"
 #include "imgui/imgui.h"
 
@@ -15,7 +14,7 @@ bool UIManager::InitializeInternal() {
     fs::path path(ROOT_FOLDER);
     path = path.parent_path() / "Config/imgui.ini";
     gIniPath = path.string();
-    LOG_DEBUG("Set imgui ini file to {}", gIniPath);
+    LOG_VERBOSE("Set imgui ini file to {}", gIniPath);
 
     ImGuiIO& io = ImGui::GetIO();
     io.IniFilename = gIniPath.c_str();

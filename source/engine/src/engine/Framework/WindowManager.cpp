@@ -1,10 +1,8 @@
 #include "WindowManager.h"
 
 #include "Application.h"
-#include "Core/Check.h"
 #include "Core/CommonDvars.h"
 #include "Core/Input.h"
-#include "Core/Log.h"
 #include "GLFW/glfw3.h"
 #include "imgui/backends/imgui_impl_glfw.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
@@ -14,7 +12,7 @@ WindowManager* gWindowManager = new WindowManager();
 bool WindowManager::InitializeInternal() {
     const auto& info = mApplication->GetInfo();
 
-    check(!mInitialized);
+    DEV_ASSERT(!mInitialized);
 
     glfwSetErrorCallback([](int code, const char* desc) { LOG_FATAL("[glfw] error({}): {}", code, desc); });
 
@@ -35,11 +33,11 @@ bool WindowManager::InitializeInternal() {
     const ivec2 size = glm::clamp(ivec2(info.width, info.height), minSize, maxSize);
 
     mWindow = glfwCreateWindow(int(size.x), int(size.y), info.title, 0, 0);
-    check(mWindow);
+    DEV_ASSERT(mWindow);
 
     glfwMakeContextCurrent(mWindow);
 
-    LOG_OK("GLFWwindow created {} x {}", size.x, size.y);
+    LOG("GLFWwindow created {} x {}", size.x, size.y);
     glfwGetFramebufferSize(mWindow, &mFrameSize.x, &mFrameSize.y);
 
     ImGui_ImplGlfw_InitForOpenGL(mWindow, false);
@@ -73,7 +71,7 @@ void WindowManager::FinalizeInternal() {
 bool WindowManager::ShouldClose() { return glfwWindowShouldClose(mWindow); }
 
 GLFWwindow* WindowManager::GetRaw() {
-    check(mInitialized && mWindow);
+    DEV_ASSERT(mInitialized && mWindow);
     return mWindow;
 }
 

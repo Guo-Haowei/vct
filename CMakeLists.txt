@@ -23,11 +23,6 @@ add_subdirectory(thirdparty/glad)
 set_target_properties(glad PROPERTIES FOLDER thirdparty)
 
 ################################################################################
-message(STATUS "Configuring fmt...")
-add_subdirectory(thirdparty/fmt)
-set_target_properties(fmt PROPERTIES FOLDER thirdparty)
-
-################################################################################
 message(STATUS "Configuring Bullet3...")
 add_subdirectory(thirdparty/bullet3)
 set_target_properties(bullet PROPERTIES FOLDER thirdparty)

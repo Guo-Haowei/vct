@@ -1,5 +1,4 @@
 #pragma once
-#include "Core/Log.h"
 #include "GpuTexture.h"
 #include "Math/GeoMath.h"
 
@@ -50,7 +49,7 @@ template<typename T>
 struct ConstantBuffer {
     void Destroy() {
         if (mHandle != 0) {
-            LOG_DEBUG("[opengl] destroy cbuffer {}", mHandle);
+            LOG_VERBOSE("[opengl] destroy cbuffer {}", mHandle);
             glDeleteBuffers(1, &mHandle);
         }
         mHandle = 0;

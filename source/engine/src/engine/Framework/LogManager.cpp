@@ -1,7 +1,5 @@
 #include "LogManager.h"
 
-#include "Core/Check.h"
-
 LogManager* Singleton<LogManager>::msSingleton;
 static LogManager sLogManager;
 

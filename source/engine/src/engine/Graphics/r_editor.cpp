@@ -1,6 +1,5 @@
 #include "r_editor.h"
 
-#include "Core/Check.h"
 #include "Core/geometry.h"
 #include "Framework/ProgramManager.h"
 #include "Framework/SceneManager.h"
@@ -100,11 +99,11 @@ void R_DrawEditor() {
     auto selected = scene.mSelected;
     if (selected.IsValid()) {
         auto transformComponent = scene.GetComponent<TransformComponent>(selected);
-        check(transformComponent);
+        DEV_ASSERT(transformComponent);
         auto objComponent = scene.GetComponent<ObjectComponent>(selected);
-        check(objComponent);
+        DEV_ASSERT(objComponent);
         auto meshComponent = scene.GetComponent<MeshComponent>(objComponent->meshID);
-        check(meshComponent);
+        DEV_ASSERT(meshComponent);
         AABB aabb = meshComponent->mLocalBound;
         aabb.ApplyMatrix(transformComponent->GetWorldMatrix());
 
