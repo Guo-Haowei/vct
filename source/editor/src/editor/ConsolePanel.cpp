@@ -1,11 +1,37 @@
 #include "ConsolePanel.h"
 
-#include <cstdlib>
-#include <mutex>
-#include <string>
-#include <vector>
+#include "core/io/logger.h"
+#include "core/math/color.h"
+
+// #include <cstdlib>
+// #include <mutex>
+// #include <string>
+// #include <vector>
 
 #include "imgui/imgui.h"
+
+using namespace vct;
+
+static ImVec4 log_level_to_color(LogLevel level) {
+    Color color = Color::hex(ColorCode::COLOR_WHITE);
+    switch (level) {
+        case vct::LOG_LEVEL_VERBOSE:
+            color = Color::hex(ColorCode::COLOR_SILVER);
+            break;
+        case vct::LOG_LEVEL_WARN:
+            color = Color::hex(ColorCode::COLOR_YELLOW);
+            break;
+        case vct::LOG_LEVEL_ERROR:
+            [[fallthrough]];
+        case vct::LOG_LEVEL_FATAL:
+            color = Color::hex(ColorCode::COLOR_RED);
+            break;
+        default:
+            break;
+    }
+
+    return ImVec4(color.r, color.g, color.b, 1.0f);
+}
 
 void ConsolePanel::RenderInternal(Scene&) {
     ImGui::Separator();
@@ -17,22 +43,11 @@ void ConsolePanel::RenderInternal(Scene&) {
 
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));  // Tighten spacing
 
-    {
-        LogManager* pLogManager = LogManager::GetSingletonPtr();
-        if (pLogManager) {
-            pLogManager->GetLog(mLogs);
-        }
-    }
-
-    for (const auto& logItem : mLogs) {
-        uint32_t colorCode = logItem.first;
-        float r = ((colorCode & 0xFF0000) >> 16) / 255.f;
-        float g = ((colorCode & 0x00FF00) >> 8) / 255.f;
-        float b = ((colorCode & 0x0000FF) >> 0) / 255.f;
-        ImVec4 color = ImVec4(r, g, b, 1.0f);
-
-        ImGui::PushStyleColor(ImGuiCol_Text, color);
-        ImGui::TextUnformatted(logItem.second.c_str());
+    std::vector<vct::CompositeLogger::Log> logs;
+    vct::CompositeLogger::singleton().retrieve_log(logs);
+    for (const auto& log : logs) {
+        ImGui::PushStyleColor(ImGuiCol_Text, log_level_to_color(log.level));
+        ImGui::TextUnformatted(log.buffer);
         ImGui::PopStyleColor();
     }
 
@@ -45,12 +60,6 @@ void ConsolePanel::RenderInternal(Scene&) {
     ImGui::EndChild();
     ImGui::Separator();
 
-    if (ImGui::SmallButton("Clear")) {
-        LogManager* pLogManager = LogManager::GetSingletonPtr();
-        if (pLogManager) {
-            pLogManager->ClearLog();
-        }
-    }
     ImGui::SameLine();
 
     ImGui::Separator();

@@ -4,7 +4,6 @@
 #include "Core/Input.h"
 #include "Core/JobSystem.h"
 #include "GraphicsManager.h"
-#include "LogManager.h"
 #include "ProgramManager.h"
 #include "SceneManager.h"
 #include "UIManager.h"
@@ -36,7 +35,6 @@ void Application::RegisterManager(ManagerBase* manager) {
 }
 
 bool Application::RegisterManagers() {
-    RegisterManager(LogManager::GetSingletonPtr());
     RegisterManager(&gJobSystemManager);
     RegisterManager(gUIManager);
     RegisterManager(gWindowManager);

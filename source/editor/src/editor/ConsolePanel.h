@@ -1,5 +1,4 @@
 #pragma once
-#include "Engine/Framework/LogManager.h"
 #include "Panel.h"
 
 class ConsolePanel : public Panel {
@@ -12,5 +11,4 @@ protected:
 private:
     bool mAutoScroll = true;
     bool mScrollToBottom = false;
-    LogManager::Buffer mLogs;
 };
