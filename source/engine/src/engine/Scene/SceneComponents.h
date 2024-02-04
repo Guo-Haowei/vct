@@ -1,9 +1,6 @@
 #pragma once
 #include "Entity.h"
-
-// #include "Core/Image.h"
-#include "Math/AABB.h"
-// #include "Graphics/Graphics.h"
+#include "core/math/aabb.h"
 
 class Archive;
 

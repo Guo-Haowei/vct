@@ -2,12 +2,6 @@
 
 #include "core/io/logger.h"
 #include "core/math/color.h"
-
-// #include <cstdlib>
-// #include <mutex>
-// #include <string>
-// #include <vector>
-
 #include "imgui/imgui.h"
 
 using namespace vct;

@@ -2,6 +2,8 @@
 
 #include "Archive.h"
 
+using namespace vct;
+
 static uint32_t GetStride(MeshComponent::VertexAttribute::NAME name) {
     switch (name) {
         case MeshComponent::VertexAttribute::POSITION:
@@ -25,21 +27,21 @@ static uint32_t GetStride(MeshComponent::VertexAttribute::NAME name) {
 template<typename T>
 void VertexAttribHelper(MeshComponent::VertexAttribute& attrib, const std::vector<T>& buffer, size_t& outOffset) {
     attrib.offsetInByte = static_cast<uint32_t>(outOffset);
-    attrib.sizeInByte = (uint32_t)(ALIGN(sizeof(T) * buffer.size(), 16));
+    attrib.sizeInByte = (uint32_t)(align(sizeof(T) * buffer.size(), 16llu));
     attrib.stride = GetStride(attrib.name);
     outOffset += attrib.sizeInByte;
 }
 
 void MeshComponent::CreateBounds() {
-    mLocalBound.MakeInvalid();
+    mLocalBound.make_invalid();
     for (MeshSubset& subset : mSubsets) {
-        subset.localBound.MakeInvalid();
+        subset.localBound.make_invalid();
         for (uint32_t i = 0; i < subset.indexCount; ++i) {
             const vec3& point = mPositions[mIndices[i + subset.indexOffset]];
-            subset.localBound.Expand(point);
+            subset.localBound.expand_point(point);
         }
-        subset.localBound.MakeValid();
-        mLocalBound.Union(subset.localBound);
+        subset.localBound.make_valid();
+        mLocalBound.union_box(subset.localBound);
     }
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "GpuTexture.h"
-#include "Math/GeoMath.h"
+#include "core/math/geomath.h"
 
 struct MeshData {
     GLuint vao = 0;

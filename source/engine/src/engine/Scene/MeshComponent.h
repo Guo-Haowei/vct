@@ -1,6 +1,6 @@
 #pragma once
 #include "Entity.h"
-#include "Math/AABB.h"
+#include "core/math/aabb.h"
 
 class Archive;
 
@@ -33,7 +33,7 @@ struct MeshComponent {
         ecs::Entity materialID;
         uint32_t indexOffset = 0;
         uint32_t indexCount = 0;
-        AABB localBound;
+        vct::AABB localBound;
 
         void Serialize(Archive& archive);
     };
@@ -63,7 +63,7 @@ struct MeshComponent {
     ecs::Entity mArmatureID;
 
     // Non-serialized
-    AABB mLocalBound;
+    vct::AABB mLocalBound;
     VertexAttribute mAttributes[VertexAttribute::COUNT];
     size_t mVertexBufferSize = 0;  // combine vertex buffer
 

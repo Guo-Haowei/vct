@@ -8,10 +8,11 @@
 #include "Framework/ProgramManager.h"
 #include "Framework/SceneManager.h"
 #include "Framework/WindowManager.h"
-#include "Math/Frustum.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"
 #include "r_rendertarget.h"
+/////////////////////
+#include "core/math/frustum.h"
 
 static GLuint g_noiseTexture;
 
@@ -42,8 +43,8 @@ void R_Gbuffer_Pass() {
 
         const mat4& M = transform.GetWorldMatrix();
         AABB aabb = mesh.mLocalBound;
-        aabb.ApplyMatrix(M);
-        if (!frustum.Intersects(aabb)) {
+        aabb.apply_matrix(M);
+        if (!frustum.intersects(aabb)) {
             continue;
         }
 
@@ -56,8 +57,8 @@ void R_Gbuffer_Pass() {
 
         for (const auto& subset : mesh.mSubsets) {
             aabb = subset.localBound;
-            aabb.ApplyMatrix(M);
-            if (!frustum.Intersects(aabb)) {
+            aabb.apply_matrix(M);
+            if (!frustum.intersects(aabb)) {
                 continue;
             }
 

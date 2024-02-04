@@ -1,16 +1,17 @@
 #pragma once
-#include "Math/GeoMath.h"
+#include "core/math/geomath.h"
 
-enum class EDvarType {
-    Invalid,
-    Integer,
-    Float,
-    String,
-    Vec2,
-    Vec3,
-    Vec4,
+enum VariantType {
+    VARIANT_TYPE_INVALID,
+    VARIANT_TYPE_INT,
+    VARIANT_TYPE_FLOAT,
+    VARIANT_TYPE_STRING,
+    VARIANT_TYPE_VEC2,
+    VARIENT_TYPE_VEC3,
+    VARIANT_TYPE_VEC4,
 };
 
+// @TODO: refactor
 enum class EDvarError {
     Ok,
     NotExisted,
@@ -44,7 +45,7 @@ public:
     EDvarError SetFromSourceString(const char* str);
 
 private:
-    EDvarType mType;
+    VariantType mType;
 
     union {
         int mIntegerValue;

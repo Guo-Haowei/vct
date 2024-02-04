@@ -9,8 +9,8 @@ void gizmo_control(ImGuizmo::OPERATION op, const glm::mat4& view, const glm::mat
     ImGuizmo::SetOrthographic(false);
     ImGuizmo::BeginFrame();
 
-    const vec2& topLeft = rect.GetMin();
-    const vec2 extent = rect.Size();
+    const vec2& topLeft = rect.get_min();
+    const vec2 extent = rect.size();
 
     ImGuizmo::SetDrawlist();
     ImGuizmo::SetRect(topLeft.x, topLeft.y, extent.x, extent.y);

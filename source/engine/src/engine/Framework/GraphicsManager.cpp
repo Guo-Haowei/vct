@@ -38,8 +38,8 @@ void GraphicsManager::FinalizeInternal() { ImGui_ImplOpenGL3_Shutdown(); }
 
 static void APIENTRY gl_debug_callback(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length,
                                        const char *message, const void *userParam) {
-    unused(length);
-    unused(userParam);
+    vct::unused(length);
+    vct::unused(userParam);
 
     switch (id) {
         case 131185:

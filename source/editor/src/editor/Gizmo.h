@@ -1,7 +1,6 @@
 #pragma once
 
 #include "EditorLayer.h"
-#include "Math/Box.h"
 
 namespace ImGuizmo {
 enum OPERATION;

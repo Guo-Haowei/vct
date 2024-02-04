@@ -2,8 +2,12 @@
 #include "ComponentManager.h"
 #include "Core/Types.h"
 #include "EntityGenerator.h"
-#include "Math/Ray.h"
 #include "SceneComponents.h"
+////////////////////
+#include "core/math/ray.h"
+
+// @TODO: remove
+using namespace vct;
 
 namespace jobsystem {
 class Context;

@@ -105,9 +105,9 @@ void R_DrawEditor() {
         auto meshComponent = scene.GetComponent<MeshComponent>(objComponent->meshID);
         DEV_ASSERT(meshComponent);
         AABB aabb = meshComponent->mLocalBound;
-        aabb.ApplyMatrix(transformComponent->GetWorldMatrix());
+        aabb.apply_matrix(transformComponent->GetWorldMatrix());
 
-        const mat4 M = glm::translate(mat4(1), aabb.Center()) * glm::scale(mat4(1), aabb.Size());
+        const mat4 M = glm::translate(mat4(1), aabb.center()) * glm::scale(mat4(1), aabb.size());
 
         gProgramManager->GetShaderProgram(ProgramType::LINE3D).Bind();
         glBindVertexArray(g_boxWireFrame.vao);
