@@ -49,7 +49,7 @@ void SceneLoader::LoadGLTF(const char* path, bool flipUVs) {
     mScene.mRoot = root;
     // scene bounding box
     mScene.Update(0.0f);
-    mScene.bound.MakeInvalid();
+    mScene.bound.make_invalid();
 
     // @TODO: refactor
     const uint32_t numObjects = (uint32_t)mScene.GetCount<ObjectComponent>();
@@ -63,8 +63,8 @@ void SceneLoader::LoadGLTF(const char* path, bool flipUVs) {
 
         mat4 M = transform.GetWorldMatrix();
         AABB aabb = mesh.mLocalBound;
-        aabb.ApplyMatrix(M);
-        mScene.bound.Union(aabb);
+        aabb.apply_matrix(M);
+        mScene.bound.union_box(aabb);
     }
 }
 

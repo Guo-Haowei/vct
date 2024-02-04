@@ -11,6 +11,7 @@ enum VariantType {
     VARIANT_TYPE_VEC4,
 };
 
+// @TODO: refactor
 enum class EDvarError {
     Ok,
     NotExisted,

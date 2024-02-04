@@ -33,15 +33,15 @@ void VertexAttribHelper(MeshComponent::VertexAttribute& attrib, const std::vecto
 }
 
 void MeshComponent::CreateBounds() {
-    mLocalBound.MakeInvalid();
+    mLocalBound.make_invalid();
     for (MeshSubset& subset : mSubsets) {
-        subset.localBound.MakeInvalid();
+        subset.localBound.make_invalid();
         for (uint32_t i = 0; i < subset.indexCount; ++i) {
             const vec3& point = mPositions[mIndices[i + subset.indexOffset]];
-            subset.localBound.Expand(point);
+            subset.localBound.expand_point(point);
         }
-        subset.localBound.MakeValid();
-        mLocalBound.Union(subset.localBound);
+        subset.localBound.make_valid();
+        mLocalBound.union_box(subset.localBound);
     }
 }
 

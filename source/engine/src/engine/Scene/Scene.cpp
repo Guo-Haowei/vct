@@ -423,10 +423,10 @@ Scene::RayIntersectionResult Scene::Intersects(Ray& ray) {
         }
 
         mat4 inversedModel = glm::inverse(transform->GetWorldMatrix());
-        Ray inversedRay = ray.Inverse(inversedModel);
+        Ray inversedRay = ray.inverse(inversedModel);
         Ray inversedRayAABB = inversedRay;  // make a copy, we don't want dist to be modified by AABB
         // Perform aabb test
-        if (!inversedRayAABB.Intersects(mesh->mLocalBound)) {
+        if (!inversedRayAABB.intersects(mesh->mLocalBound)) {
             continue;
         }
 
@@ -437,8 +437,8 @@ Scene::RayIntersectionResult Scene::Intersects(Ray& ray) {
             const vec3& A = mesh->mPositions[mesh->mIndices[i]];
             const vec3& B = mesh->mPositions[mesh->mIndices[i + 1]];
             const vec3& C = mesh->mPositions[mesh->mIndices[i + 2]];
-            if (inversedRay.Intersects(A, B, C)) {
-                ray.CopyDist(inversedRay);
+            if (inversedRay.intersects(A, B, C)) {
+                ray.copy_dist(inversedRay);
                 result.entity = entity;
                 break;
             }

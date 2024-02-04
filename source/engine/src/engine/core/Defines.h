@@ -45,18 +45,5 @@
 #include <Windows.h>
 #endif
 
-#define ALIGN(x, a) (((x) + ((a)-1)) & ~((a)-1))
-
-inline constexpr size_t KB = 1024;
-inline constexpr size_t MB = 1024 * KB;
-inline constexpr size_t GB = 1024 * MB;
-
 inline constexpr int OPENGL_VERSION_MAJOR = 4;
 inline constexpr int OPENGL_VERSION_MINOR = 6;
-
-inline constexpr unsigned int log_two(unsigned int x) { return x == 1 ? 0 : 1 + log_two(x >> 1); }
-
-inline constexpr bool is_power_of_two(unsigned int x) { return (x & (x - 1)) == 0; }
-
-template<typename T>
-void unused(T&){};

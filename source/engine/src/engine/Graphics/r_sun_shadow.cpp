@@ -5,15 +5,16 @@
 #include "Framework/ProgramManager.h"
 #include "Framework/SceneManager.h"
 #include "Framework/WindowManager.h"
-#include "Math/Frustum.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"
 #include "r_rendertarget.h"
+//////////////////////////
+#include "core/math/frustum.h"
 
 static mat4 R_HackLightSpaceMatrix(const vec3& lightDir) {
     const Scene& scene = Com_GetScene();
-    const vec3 center = scene.bound.Center();
-    const vec3 extents = scene.bound.Size();
+    const vec3 center = scene.bound.center();
+    const vec3 extents = scene.bound.size();
     const float size = 0.5f * max_val(extents.x, max_val(extents.y, extents.z));
     const mat4 V = glm::lookAt(center + glm::normalize(lightDir) * size, center, vec3(0, 1, 0));
     const mat4 P = glm::ortho(-size, size, -size, size, 0.0f, 2.0f * size);
@@ -56,8 +57,8 @@ void R_ShadowPass() {
 
             const mat4& M = transform.GetWorldMatrix();
             AABB aabb = mesh.mLocalBound;
-            aabb.ApplyMatrix(M);
-            if (!frustum.Intersects(aabb)) {
+            aabb.apply_matrix(M);
+            if (!frustum.intersects(aabb)) {
                 continue;
             }
 

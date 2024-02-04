@@ -1,8 +1,5 @@
 #include "DynamicVariable.h"
 
-#include <string>
-#include <unordered_map>
-
 static std::unordered_map<std::string, DynamicVariable*> sDVARMap;
 
 void DynamicVariable::RegisterInt(const char* key, int value) {
