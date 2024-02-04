@@ -3,10 +3,8 @@
 Input Input::gInput;
 
 Input::Input() {
-#if USING(ENABLE_CHECK)
     static int sCounter = 0;
     DEV_ASSERT(++sCounter == 1);
-#endif
 
     mKeys.fill(false);
     mPrevKeys.fill(false);
