@@ -1,9 +1,9 @@
 #include "r_sun_shadow.h"
 
-#include "Core/CommonDvars.h"
 #include "Framework/ProgramManager.h"
 #include "Framework/SceneManager.h"
 #include "Framework/WindowManager.h"
+#include "core/dynamic_variable/common_dvars.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"
 #include "r_rendertarget.h"

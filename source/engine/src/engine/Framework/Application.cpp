@@ -1,6 +1,5 @@
 #include "Application.h"
 
-#include "Core/CommonDvars.h"
 #include "Core/Input.h"
 #include "Core/JobSystem.h"
 #include "GraphicsManager.h"
@@ -8,6 +7,7 @@
 #include "SceneManager.h"
 #include "UIManager.h"
 #include "WindowManager.h"
+#include "core/dynamic_variable/common_dvars.h"
 
 // @TODO: refactor
 #include "Core/lua_script.h"
@@ -100,6 +100,11 @@ int Application::Run(int, const char**) {
 
         ImGui::EndFrame();
     }
+
+    auto [w, h] = gWindowManager->GetFrameSize();
+    DVAR_SET_IVEC2(window_resolution, w, h);
+    auto [x, y] = gWindowManager->GetWindowPos();
+    DVAR_SET_IVEC2(window_position, x, y);
 
     renderer.destroyGpuResources();
 

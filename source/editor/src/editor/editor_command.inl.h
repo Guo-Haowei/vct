@@ -16,9 +16,10 @@
 #endif
 
 EDITOR_COMMAND("-h", "--help", "", "Display this help message.", editor_command_help, nullptr)
-// EDITOR_COMMAND("-v",    "--verbose", "",                    TYPE_VOID, vct::cmd_line_default_set_true_callback, "Use verbose stdout mode.", &config.verbose)
+EDITOR_COMMAND("-v", "--verbose", "", "Use verbose stdout mode.", command_line_set_dvar_func, &DVAR_verbose)
 EDITOR_COMMAND("", "--rendering-driver", "<driver>", "Select rendering driver.", command_line_set_dvar_func, &DVAR_r_backend)
 EDITOR_COMMAND("", "--resolution", "<W> <H>", "Request window resolution.", command_line_set_dvar_func, &DVAR_window_resolution)
+EDITOR_COMMAND("", "--position", "<X> <Y>", "Request window position.", command_line_set_dvar_func, &DVAR_window_position)
 EDITOR_COMMAND("", "--path", "<directory>", "Path to a project <directory>", command_line_set_dvar_func, &DVAR_scene)
 EDITOR_COMMAND("", "--gpu-validation", "", "Enable graphics API validation layers for debugging.", command_line_set_dvar_func, &DVAR_r_gpu_validation)
 

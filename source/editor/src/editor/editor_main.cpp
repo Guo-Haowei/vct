@@ -1,15 +1,16 @@
 #include "EditorLayer.h"
-#include "command_line.h"
 #include "core/os/os.h"
+#include "core/utility/command_line.h"
 
 #define DEFINE_DVAR
-#include "core/CommonDvars.h"
+#include "core/dynamic_variable/common_dvars.h"
 
 static void register_common_dvars() {
 #define REGISTER_DVAR
-#include "core/CommonDvars.h"
+#include "core/dynamic_variable/common_dvars.h"
 }
 
+////////////////////////////////////////////////////////////
 class Editor : public Application {
 public:
     Editor() : Application(Application::InitInfo{ "Editor", false }) {
@@ -41,7 +42,7 @@ static std::string editor_command_help_option(std::string_view alias, std::strin
 static bool editor_command_help(void*, std::span<const char*>) {
     using vct::print_impl;
 
-    vct::print_impl(vct::LOG_LEVEL_NORMAL, "Usage: editor.exe [options] [path to scene]\n");
+    vct::print_impl(vct::LOG_LEVEL_NORMAL, "Usage: editor.exe [options]\n");
     vct::print_impl(vct::LOG_LEVEL_NORMAL, "Options:\n");
 #define EDITOR_COMMAND_HELP_FUNC
 #include "editor_command.inl.h"
@@ -67,15 +68,22 @@ static void process_command_line(int argc, const char** argv) {
     }
 }
 
+// @TODO: init os properly
+static vct::OS s_os;
+
 int main(int argc, const char** argv) {
-    // @TODO: init os properly
-    static vct::OS s_os;
-    s_os.add_logger(std::make_shared<vct::StdLogger>());
+    OS::singleton().initialize();
 
     register_common_dvars();
-    // @TODO: read from cache
+    DynamicVariable::deserialize();
     process_command_line(argc, argv);
 
     Editor editor;
-    return editor.Run(argc, argv);
+    editor.Run(argc, argv);
+
+    DynamicVariable::serialize();
+
+    OS::singleton().finalize();
+
+    return 0;
 }

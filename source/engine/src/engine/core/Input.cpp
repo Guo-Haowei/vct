@@ -36,21 +36,21 @@ static inline bool InputChange(const std::array<bool, N>& current, const std::ar
     return current[index] == true && prev[index] == false;
 }
 
-bool Input::IsButtonDown(EMouseButton key) { return InputIsDown(gInput.mButtons, underlying(key)); }
+bool Input::IsButtonDown(EMouseButton key) { return InputIsDown(gInput.mButtons, std::to_underlying(key)); }
 
 bool Input::IsButtonPressed(EMouseButton key) {
-    return InputChange(gInput.mButtons, gInput.mPrevButtons, underlying(key));
+    return InputChange(gInput.mButtons, gInput.mPrevButtons, std::to_underlying(key));
 }
 
 bool Input::IsButtonReleased(EMouseButton key) {
-    return InputChange(gInput.mPrevButtons, gInput.mButtons, underlying(key));
+    return InputChange(gInput.mPrevButtons, gInput.mButtons, std::to_underlying(key));
 }
 
-bool Input::IsKeyDown(EKeyCode key) { return InputIsDown(gInput.mKeys, underlying(key)); }
+bool Input::IsKeyDown(EKeyCode key) { return InputIsDown(gInput.mKeys, std::to_underlying(key)); }
 
-bool Input::IsKeyPressed(EKeyCode key) { return InputChange(gInput.mKeys, gInput.mPrevKeys, underlying(key)); }
+bool Input::IsKeyPressed(EKeyCode key) { return InputChange(gInput.mKeys, gInput.mPrevKeys, std::to_underlying(key)); }
 
-bool Input::IsKeyReleased(EKeyCode key) { return InputChange(gInput.mPrevKeys, gInput.mKeys, underlying(key)); }
+bool Input::IsKeyReleased(EKeyCode key) { return InputChange(gInput.mPrevKeys, gInput.mKeys, std::to_underlying(key)); }
 
 vec2 Input::MouseMove() {
     vec2 point;

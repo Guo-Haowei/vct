@@ -1,7 +1,7 @@
 #include "r_rendertarget.h"
 
-#include "Core/CommonDvars.h"
 #include "Framework/WindowManager.h"
+#include "core/dynamic_variable/common_dvars.h"
 #include "r_cbuffers.h"
 
 void RenderTarget::Bind() { glBindFramebuffer(GL_FRAMEBUFFER, mHandle); }

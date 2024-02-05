@@ -86,7 +86,7 @@ Program ProgramManager::Create(const ProgramCreateInfo &info) {
         }
     };
 
-    on_scope_exit([&]() {
+    ON_SCOPE_EXIT([&]() {
         for (GLuint id : shaders) {
             glDeleteShader(id);
         }
@@ -134,67 +134,67 @@ bool ProgramManager::InitializeInternal() {
         ProgramCreateInfo info;
         info.vs = "editor/line3d.vert";
         info.ps = "editor/line3d.frag";
-        g_shaderCache[underlying(ProgramType::LINE3D)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::LINE3D)] = Create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "editor/image.vert";
         info.ps = "editor/image.frag";
-        g_shaderCache[underlying(ProgramType::IMAGE2D)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::IMAGE2D)] = Create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "depth.vert";
         info.ps = "depth.frag";
-        g_shaderCache[underlying(ProgramType::SHADOW)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::SHADOW)] = Create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "gbuffer.vert";
         info.ps = "gbuffer.frag";
-        g_shaderCache[underlying(ProgramType::GBUFFER)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::GBUFFER)] = Create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "fullscreen.vert";
         info.ps = "ssao.frag";
-        g_shaderCache[underlying(ProgramType::SSAO)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::SSAO)] = Create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "fullscreen.vert";
         info.ps = "vct_deferred.frag";
-        g_shaderCache[underlying(ProgramType::VCT_DEFERRED)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::VCT_DEFERRED)] = Create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "fullscreen.vert";
         info.ps = "fxaa.frag";
-        g_shaderCache[underlying(ProgramType::FXAA)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::FXAA)] = Create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "fullscreen.vert";
         info.ps = "debug/texture.frag";
-        g_shaderCache[underlying(ProgramType::DebugTexture)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::DebugTexture)] = Create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "voxel/voxelization.vert";
         info.gs = "voxel/voxelization.geom";
         info.ps = "voxel/voxelization.frag";
-        g_shaderCache[underlying(ProgramType::Voxel)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::Voxel)] = Create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "voxel/visualization.vert";
         info.ps = "voxel/visualization.frag";
-        g_shaderCache[underlying(ProgramType::Visualization)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::Visualization)] = Create(info);
     }
     {
         ProgramCreateInfo info;
         info.cs = "voxel/post.comp";
-        g_shaderCache[underlying(ProgramType::VoxelPost)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::VoxelPost)] = Create(info);
     }
 
     return true;
@@ -208,5 +208,5 @@ void ProgramManager::FinalizeInternal() {
 
 const Program &ProgramManager::GetShaderProgram(ProgramType type) {
     DEV_ASSERT_INDEX(type, g_shaderCache.size());
-    return g_shaderCache[underlying(type)];
+    return g_shaderCache[std::to_underlying(type)];
 }

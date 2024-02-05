@@ -1,9 +1,9 @@
 #include "WindowManager.h"
 
 #include "Application.h"
-#include "Core/CommonDvars.h"
 #include "Core/Input.h"
 #include "GLFW/glfw3.h"
+#include "core/dynamic_variable/common_dvars.h"
 #include "imgui/backends/imgui_impl_glfw.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
 
@@ -28,13 +28,16 @@ bool WindowManager::InitializeInternal() {
 
     const GLFWvidmode* vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
-    const vec2 resolution = DVAR_GET_VEC2(window_resolution);
+    const ivec2 resolution = DVAR_GET_IVEC2(window_resolution);
     const ivec2 minSize = ivec2(600, 400);
     const ivec2 maxSize = ivec2(vidmode->width, vidmode->height);
-    const ivec2 size = glm::clamp(ivec2(resolution.x, resolution.y), minSize, maxSize);
+    const ivec2 size = glm::clamp(resolution, minSize, maxSize);
 
     mWindow = glfwCreateWindow(size.x, size.y, info.title, nullptr, nullptr);
     DEV_ASSERT(mWindow);
+
+    const ivec2 position = DVAR_GET_IVEC2(window_position);
+    glfwSetWindowPos(mWindow, position.x, position.y);
 
     glfwMakeContextCurrent(mWindow);
 

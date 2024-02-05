@@ -1,6 +1,9 @@
 #pragma once
 
+namespace vct {
 class Archive;
+}
+using namespace vct;
 
 struct LightComponent {
     // LIGHT_TYPE type = LIGHT_TYPE_NONE;

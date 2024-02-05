@@ -5,6 +5,8 @@
 #endif  // !_STR
 #define _STR(x) #x
 
+#define ON_SCOPE_EXIT(FUNC) auto __on_scope_exit_call = ::vct::MakeScopeDrop(FUNC)
+
 namespace vct {
 
 inline constexpr size_t KB = 1024;
@@ -18,4 +20,20 @@ inline constexpr int array_length(T (&)[N]) {
 
 template<typename T>
 void unused(T &) {}
+
+template<typename FUNC>
+class ScopeDrop {
+public:
+    ScopeDrop(FUNC func) : mFunc(func) {}
+    ~ScopeDrop() { mFunc(); }
+
+private:
+    FUNC mFunc;
+};
+
+template<typename FUNC>
+ScopeDrop<FUNC> MakeScopeDrop(FUNC func) {
+    return ScopeDrop<FUNC>(func);
+}
+
 }  // namespace vct

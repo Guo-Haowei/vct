@@ -117,6 +117,7 @@ bool command_line_set_dvar_func(void* user_data, std::span<const char*> command_
     }
 
     float x = 0.0f, y = 0.0f, z = 0.0f, w = 0.0f;
+    int ix = 0, iy = 0, iz = 0, iw = 0;
     switch (dvar->get_type()) {
         case VARIANT_TYPE_INT:
             dvar->set_int(atoi(command_line[0]));
@@ -137,9 +138,18 @@ bool command_line_set_dvar_func(void* user_data, std::span<const char*> command_
             y = static_cast<float>(atof(command_line[1]));
             x = static_cast<float>(atof(command_line[0]));
             break;
+        case VARIANT_TYPE_IVEC4:
+            iw = atoi(command_line[3]);
+            [[fallthrough]];
+        case VARIANT_TYPE_IVEC3:
+            iz = atoi(command_line[2]);
+            [[fallthrough]];
+        case VARIANT_TYPE_IVEC2:
+            iy = atoi(command_line[1]);
+            ix = atoi(command_line[0]);
+            break;
         default:
-            // @TODO:
-            DEV_ASSERT(0 && "TODO: ERROR HANDLING");
+            CRASH_NOW_MSG("TODO: ERROR HANDLING");
             return false;
     }
 
@@ -153,9 +163,20 @@ bool command_line_set_dvar_func(void* user_data, std::span<const char*> command_
         case VARIANT_TYPE_VEC4:
             dvar->set_vec4(x, y, z, w);
             break;
+        case VARIANT_TYPE_IVEC2:
+            dvar->set_ivec2(ix, iy);
+            break;
+        case VARIANT_TYPE_IVEC3:
+            dvar->set_ivec3(ix, iy, iz);
+            break;
+        case VARIANT_TYPE_IVEC4:
+            dvar->set_ivec4(ix, iy, iz, iw);
+            break;
         default:
             break;
     }
+
+    dvar->print_value_change("command line");
 
     return true;
 }

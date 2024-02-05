@@ -2,7 +2,10 @@
 #include "Entity.h"
 #include "core/math/aabb.h"
 
+namespace vct {
 class Archive;
+}
+using namespace vct;
 
 class HierarchyComponent {
 public:

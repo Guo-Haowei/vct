@@ -7,7 +7,7 @@
 #include <assimp/Importer.hpp>
 #include <filesystem>
 
-#include "Core/CommonDvars.h"
+#include "core/dynamic_variable/common_dvars.h"
 
 using std::string;
 using std::vector;

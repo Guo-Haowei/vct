@@ -3,8 +3,8 @@
 #include <filesystem>
 #include <set>
 
-#include "Core/CommonDvars.h"
 #include "cbuffer.glsl"
+#include "core/dynamic_variable/common_dvars.h"
 
 static MeshData g_quad;
 
