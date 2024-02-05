@@ -1,10 +1,10 @@
 #include "SceneManager.h"
 
-#include "Core/CommonDvars.h"
 #include "Framework/WindowManager.h"
 #include "Graphics/r_cbuffers.h"
 #include "Graphics/r_sun_shadow.h"
 #include "Scene/AssimpSceneLoader.h"
+#include "core/dynamic_variable/common_dvars.h"
 #include "imgui/imgui.h"
 
 static Scene g_scene;

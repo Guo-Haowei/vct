@@ -1,6 +1,5 @@
 #include "Application.h"
 
-#include "Core/CommonDvars.h"
 #include "Core/Input.h"
 #include "Core/JobSystem.h"
 #include "GraphicsManager.h"
@@ -8,6 +7,7 @@
 #include "SceneManager.h"
 #include "UIManager.h"
 #include "WindowManager.h"
+#include "core/dynamic_variable/common_dvars.h"
 
 // @TODO: refactor
 #include "Core/lua_script.h"

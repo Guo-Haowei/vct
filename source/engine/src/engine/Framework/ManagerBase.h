@@ -1,11 +1,9 @@
 #pragma once
-#include "Core/Singleton.h"
+#include "core/objects/singleton.h"
 
 class Application;
 
 class ManagerBase {
-    DISABLE_COPY(ManagerBase);
-
 public:
     ManagerBase(const char* name) : mName(name) {}
     virtual ~ManagerBase() = default;

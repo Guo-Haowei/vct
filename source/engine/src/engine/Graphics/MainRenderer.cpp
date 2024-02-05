@@ -1,11 +1,11 @@
 #pragma once
 #include "MainRenderer.h"
 
-#include "Core/CommonDvars.h"
 #include "Core/geometry.h"
 #include "Framework/ProgramManager.h"
 #include "Framework/SceneManager.h"
 #include "Framework/WindowManager.h"
+#include "core/dynamic_variable/common_dvars.h"
 #include "r_defines.h"
 #include "r_editor.h"
 #include "r_passes.h"

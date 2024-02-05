@@ -43,6 +43,7 @@ void CompositeLogger::add_logger(std::shared_ptr<ILogger> logger) {
 }
 
 void CompositeLogger::print(LogLevel level, std::string_view message) {
+    // @TODO: set verbose
     if (!(m_channels & level)) {
         return;
     }

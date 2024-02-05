@@ -1,9 +1,9 @@
 #include "WindowManager.h"
 
 #include "Application.h"
-#include "Core/CommonDvars.h"
 #include "Core/Input.h"
 #include "GLFW/glfw3.h"
+#include "core/dynamic_variable/common_dvars.h"
 #include "imgui/backends/imgui_impl_glfw.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
 

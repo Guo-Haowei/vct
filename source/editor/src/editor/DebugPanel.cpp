@@ -1,9 +1,11 @@
 #include "DebugPanel.h"
 
-#include "Engine/Core/CommonDvars.h"
 #include "Engine/Core/camera.h"
 #include "Engine/Graphics/r_defines.h"
 #include "Engine/Scene/Scene.h"
+
+/////////////////////
+#include "core/dynamic_variable/common_dvars.h"
 
 static const char* DrawTextureToStr(int mode) {
     const char* str = "scene";

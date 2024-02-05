@@ -1,7 +1,7 @@
 #include "GraphicsManager.h"
 
-#include "Core/CommonDvars.h"
 #include "Graphics/GLPrerequisites.h"
+#include "core/dynamic_variable/common_dvars.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
 
 using namespace vct;

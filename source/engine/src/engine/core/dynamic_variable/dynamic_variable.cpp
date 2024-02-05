@@ -2,8 +2,6 @@
 
 namespace vct {
 
-static std::unordered_map<std::string, DynamicVariable*> sDVARMap;
-
 void DynamicVariable::register_int(std::string_view key, int value) {
     m_int = value;
     register_dvar(key, this);
@@ -139,8 +137,8 @@ bool DynamicVariable::set_vec4(float x, float y, float z, float w) {
 }
 
 DynamicVariable* DynamicVariable::find_dvar(std::string_view name) {
-    auto it = sDVARMap.find(std::string(name));
-    if (it == sDVARMap.end()) {
+    auto it = s_map.find(std::string(name));
+    if (it == s_map.end()) {
         return nullptr;
     }
     return it->second;
@@ -148,14 +146,14 @@ DynamicVariable* DynamicVariable::find_dvar(std::string_view name) {
 
 void DynamicVariable::register_dvar(std::string_view key, DynamicVariable* dvar) {
     const std::string keyStr(key);
-    auto it = sDVARMap.find(keyStr);
-    if (it != sDVARMap.end()) {
+    auto it = s_map.find(keyStr);
+    if (it != s_map.end()) {
         LOG_ERROR("duplicated dvar {} detected", key);
     }
 
     dvar->m_debug_name = key;
 
-    sDVARMap.insert(std::make_pair(keyStr, dvar));
+    s_map.insert(std::make_pair(keyStr, dvar));
 }
 
 }  // namespace vct

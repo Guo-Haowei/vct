@@ -1,13 +1,12 @@
 #pragma once
-#include "Core/Types.h"
 #include "InputCode.h"
 #include "core/math/geomath.h"
 
 class WindowManager;
 
 class Input {
-    using KeyArray = std::array<bool, underlying(EKeyCode::COUNT)>;
-    using ButtonArray = std::array<bool, underlying(EMouseButton::COUNT)>;
+    using KeyArray = std::array<bool, std::to_underlying(EKeyCode::COUNT)>;
+    using ButtonArray = std::array<bool, std::to_underlying(EMouseButton::COUNT)>;
 
 public:
     static void BeginFrame();

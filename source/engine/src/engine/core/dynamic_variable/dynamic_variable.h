@@ -13,14 +13,14 @@ enum VariantType {
     VARIANT_TYPE_VEC4,
 };
 
+enum DvarFlags {
+    DVAR_FLAG_NONE = 0,
+    DVAR_FLAG_SERIALIZE = 1,
+};
+
 class DynamicVariable {
 public:
-    enum Flags {
-        FLAG_NONE = 0,
-        FLAG_SERIALIZE = 1,
-    };
-
-    DynamicVariable(VariantType type, int flags)
+    DynamicVariable(VariantType type, uint32_t flags)
         : m_type(type), m_flags(flags), m_int(0) {}
 
     void register_int(std::string_view key, int value);
@@ -63,6 +63,8 @@ private:
     };
     std::string m_string;
     std::string m_debug_name;
+
+    inline static std::unordered_map<std::string, DynamicVariable*> s_map;
 };
 
 }  // namespace vct

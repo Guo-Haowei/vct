@@ -1,10 +1,10 @@
 #pragma once
 #include "ComponentManager.h"
-#include "Core/Types.h"
 #include "EntityGenerator.h"
 #include "SceneComponents.h"
 ////////////////////
 #include "core/math/ray.h"
+#include "core/objects/noncopyable.h"
 
 // @TODO: remove
 using namespace vct;
@@ -18,9 +18,7 @@ struct Light {
     vec3 color;
 };
 
-class Scene {
-    DISABLE_COPY(Scene);
-
+class Scene : public NonCopyable {
 public:
     static constexpr const char* EXTENSION = ".scene";
 
