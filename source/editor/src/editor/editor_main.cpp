@@ -13,12 +13,13 @@ static void register_common_dvars() {
 ////////////////////////////////////////////////////////////
 class Editor : public Application {
 public:
-    Editor() : Application(Application::InitInfo{ "Editor", false }) {
+    Editor() {
         AddLayer(std::make_shared<EditorLayer>());
     }
 };
 
 ////////////////////////////////////////////////////////////
+
 static std::string editor_command_help_option(std::string_view alias, std::string_view name, std::string_view param, std::string_view desc) {
     std::string result;
     result.reserve(128);

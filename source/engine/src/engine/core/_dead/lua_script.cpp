@@ -1,4 +1,4 @@
-#include "lua_script.h"
+#if 0
 
 extern "C" {
 #include <lua/lauxlib.h>
@@ -127,3 +127,5 @@ bool Com_ExecLua(const char* path) {
     lua_close(L);
     return code == LUA_OK;
 }
+
+#endif

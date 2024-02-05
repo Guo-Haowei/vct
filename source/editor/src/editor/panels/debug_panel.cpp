@@ -1,4 +1,4 @@
-#include "DebugPanel.h"
+#include "debug_panel.h"
 
 #include "Engine/Core/camera.h"
 #include "Engine/Graphics/r_defines.h"

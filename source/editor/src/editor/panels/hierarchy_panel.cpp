@@ -1,9 +1,4 @@
-#include "HierarchyPanel.h"
-
-#include <map>
-#include <memory>
-#include <unordered_set>
-#include <vector>
+#include "hierarchy_panel.h"
 
 #include "Engine/Scene/Scene.h"
 #include "imgui/imgui_internal.h"

@@ -1,4 +1,4 @@
-#include "Panel.h"
+#include "panel.h"
 
 #include "imgui/imgui_internal.h"
 

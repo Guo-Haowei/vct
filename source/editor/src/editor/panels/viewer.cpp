@@ -1,11 +1,11 @@
-#include "Viewer.h"
+#include "viewer.h"
 
 #include "Engine/Core/Input.h"
 #include "Engine/Framework/SceneManager.h"
 #include "Engine/Framework/WindowManager.h"
-#include "Gizmo.h"
 #include "ImGuizmo/ImGuizmo.h"
 #include "core/math/ray.h"
+#include "gizmo.h"
 #include "imgui/imgui_internal.h"
 
 // @TODO: refactor

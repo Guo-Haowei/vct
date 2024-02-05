@@ -10,7 +10,6 @@
 #include "core/dynamic_variable/common_dvars.h"
 
 // @TODO: refactor
-#include "Core/lua_script.h"
 #include "Graphics/MainRenderer.h"
 #include "imgui/imgui.h"
 

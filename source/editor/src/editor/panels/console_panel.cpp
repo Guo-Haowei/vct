@@ -1,4 +1,4 @@
-#include "ConsolePanel.h"
+#include "console_panel.h"
 
 #include "core/io/logger.h"
 #include "core/math/color.h"

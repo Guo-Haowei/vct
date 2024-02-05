@@ -10,15 +10,14 @@
 WindowManager* gWindowManager = new WindowManager();
 
 bool WindowManager::InitializeInternal() {
-    const auto& info = mApplication->GetInfo();
-
     DEV_ASSERT(!mInitialized);
 
     glfwSetErrorCallback([](int code, const char* desc) { LOG_FATAL("[glfw] error({}): {}", code, desc); });
 
     glfwInit();
 
-    glfwWindowHint(GLFW_DECORATED, !info.frameless);
+    bool frameless = false;
+    glfwWindowHint(GLFW_DECORATED, !frameless);
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -33,7 +32,7 @@ bool WindowManager::InitializeInternal() {
     const ivec2 maxSize = ivec2(vidmode->width, vidmode->height);
     const ivec2 size = glm::clamp(resolution, minSize, maxSize);
 
-    mWindow = glfwCreateWindow(size.x, size.y, info.title, nullptr, nullptr);
+    mWindow = glfwCreateWindow(size.x, size.y, "Editor", nullptr, nullptr);
     DEV_ASSERT(mWindow);
 
     const ivec2 position = DVAR_GET_IVEC2(window_position);
@@ -86,10 +85,14 @@ void WindowManager::NewFrame() {
     glfwGetWindowPos(mWindow, &mWindowPos.x, &mWindowPos.y);
 
     // title
-    char buffer[1024];
-    snprintf(buffer, sizeof(buffer), "%s | Pos: %d x %d | Size: %d x %d | FPS: %.1f", mApplication->GetInfo().title,
-             mWindowPos.x, mWindowPos.y, mFrameSize.x, mFrameSize.y, ImGui::GetIO().Framerate);
-    glfwSetWindowTitle(mWindow, buffer);
+    auto title = std::format("{} | Pos: {}x{} | Size: {}x{} | FPS: {:.1f}",
+                             "Editor",
+                             mWindowPos.x,
+                             mWindowPos.y,
+                             mFrameSize.x,
+                             mFrameSize.y,
+                             ImGui::GetIO().Framerate);
+    glfwSetWindowTitle(mWindow, title.c_str());
 
     ImGui_ImplGlfw_NewFrame();
 }

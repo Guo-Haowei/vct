@@ -1,4 +1,4 @@
-#include "PropertiyPanel.h"
+#include "propertiy_panel.h"
 
 #include "Engine/Scene/Scene.h"
 #include "ImGuizmo/ImGuizmo.h"

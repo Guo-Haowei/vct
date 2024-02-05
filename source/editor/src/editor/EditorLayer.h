@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Framework/Application.h"
 #include "Engine/Scene/Scene.h"
-#include "Panel.h"
+#include "panels/panel.h"
 
 class EditorLayer : public Layer {
 public:
