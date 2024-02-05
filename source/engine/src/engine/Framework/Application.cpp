@@ -101,6 +101,11 @@ int Application::Run(int, const char**) {
         ImGui::EndFrame();
     }
 
+    auto [w, h] = gWindowManager->GetFrameSize();
+    DVAR_SET_IVEC2(window_resolution, w, h);
+    auto [x, y] = gWindowManager->GetWindowPos();
+    DVAR_SET_IVEC2(window_position, x, y);
+
     renderer.destroyGpuResources();
 
     FinalizeManagers();

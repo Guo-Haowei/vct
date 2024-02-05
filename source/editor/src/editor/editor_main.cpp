@@ -10,6 +10,7 @@ static void register_common_dvars() {
 #include "core/dynamic_variable/common_dvars.h"
 }
 
+////////////////////////////////////////////////////////////
 class Editor : public Application {
 public:
     Editor() : Application(Application::InitInfo{ "Editor", false }) {
@@ -67,15 +68,22 @@ static void process_command_line(int argc, const char** argv) {
     }
 }
 
+// @TODO: init os properly
+static vct::OS s_os;
+
 int main(int argc, const char** argv) {
-    // @TODO: init os properly
-    static vct::OS s_os;
-    s_os.add_logger(std::make_shared<vct::StdLogger>());
+    OS::singleton().initialize();
 
     register_common_dvars();
-    // @TODO: read from cache
+    DynamicVariable::deserialize();
     process_command_line(argc, argv);
 
     Editor editor;
-    return editor.Run(argc, argv);
+    editor.Run(argc, argv);
+
+    DynamicVariable::serialize();
+
+    OS::singleton().finalize();
+
+    return 0;
 }

@@ -3,7 +3,9 @@
 DVAR_STRING(scene, DVAR_FLAG_NONE, "");
 
 // @TODO: refactor
-DVAR_VEC2(window_resolution, DVAR_FLAG_SERIALIZE, 800, 600);
+DVAR_IVEC2(window_resolution, DVAR_FLAG_SERIALIZE, 800, 600);
+DVAR_IVEC2(window_position, DVAR_FLAG_SERIALIZE, 40, 40);
+
 DVAR_BOOL(verbose, DVAR_FLAG_NONE, false);
 
 DVAR_STRING(r_backend, DVAR_FLAG_NONE, "opengl");
