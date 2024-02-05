@@ -1,9 +1,9 @@
 #include "MaterialComponent.h"
 
-#include "Archive.h"
+#include "core/io/archive.h"
 
 void MaterialComponent::Serialize(Archive& archive) {
-    if (archive.IsWriteMode()) {
+    if (archive.is_write_mode()) {
         archive << mMetallic;
         archive << mRoughness;
         archive << mBaseColor;

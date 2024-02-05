@@ -1,7 +1,10 @@
 #pragma once
 #include "core/math/geomath.h"
 
+namespace vct {
 class Archive;
+}
+using namespace vct;
 
 struct CameraComponent {
     static constexpr float DEFAULT_ZNEAR = 0.1f;

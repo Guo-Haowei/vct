@@ -1,6 +1,8 @@
 #pragma once
-#include "Archive.h"
 #include "EntityGenerator.h"
+#include "core/io/archive.h"
+
+using namespace vct;
 
 namespace ecs {
 
@@ -148,7 +150,7 @@ public:
 
     void Serialize(Archive& archive) {
         size_t count;
-        if (archive.IsWriteMode()) {
+        if (archive.is_write_mode()) {
             count = static_cast<uint32_t>(mComponentArray.size());
             archive << count;
             for (auto& component : mComponentArray) {

@@ -1,6 +1,9 @@
 #pragma once
 
+namespace vct {
 class Archive;
+}
+using namespace vct;
 
 class TagComponent {
 public:

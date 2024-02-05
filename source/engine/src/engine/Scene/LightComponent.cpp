@@ -1,10 +1,10 @@
 #include "LightComponent.h"
 
-#include "Archive.h"
+#include "core/io/archive.h"
 
 void LightComponent::Serialize(Archive& archive) {
     (void)archive;
-    // if (archive.IsWriteMode())
+    // if (archive.is_write_mode())
     // {
     //     archive << type;
     //     archive << color;

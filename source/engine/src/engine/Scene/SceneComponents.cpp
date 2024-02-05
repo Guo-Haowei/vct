@@ -1,7 +1,7 @@
 #pragma once
 #include "SceneComponents.h"
 
-#include "Archive.h"
+#include "core/io/archive.h"
 
 using namespace vct;
 
@@ -20,7 +20,7 @@ void ArmatureComponent::Serialize(Archive& archive) {
 }
 
 void RigidBodyPhysicsComponent::Serialize(Archive& archive) {
-    if (archive.IsWriteMode()) {
+    if (archive.is_write_mode()) {
         archive << shape;
         archive << param;
         archive << mass;

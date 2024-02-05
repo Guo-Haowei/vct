@@ -1,6 +1,6 @@
 #include "MeshComponent.h"
 
-#include "Archive.h"
+#include "core/io/archive.h"
 
 using namespace vct;
 
@@ -93,14 +93,14 @@ std::vector<char> MeshComponent::GenerateCombinedBuffer() const {
 
 void MeshComponent::MeshSubset::Serialize(Archive& archive) {
     materialID.Serialize(archive);
-    if (archive.IsWriteMode()) {
+    if (archive.is_write_mode()) {
         archive << indexOffset;
         archive << indexCount;
-        archive.Write(&localBound, sizeof(AABB));
+        archive.write(&localBound, sizeof(AABB));
     } else {
         archive >> indexOffset;
         archive >> indexCount;
-        archive.Read(&localBound, sizeof(AABB));
+        archive.read(&localBound, sizeof(AABB));
     }
 }
 
@@ -119,24 +119,25 @@ void MeshComponent::Serialize(Archive& archive) {
 #define SERIALIZE()   SERIALIZE_MESH(<<)
 #define DESERIALIZE() SERIALIZE_MESH(>>)
 
-    if (archive.IsWriteMode()) {
-        SERIALIZE();
+    CRASH_NOW_MSG("TODO");
+    // if (archive.is_write_mode()) {
+    //     SERIALIZE();
 
-        size_t size = mSubsets.size();
-        archive << size;
-        for (auto& subset : mSubsets) {
-            subset.Serialize(archive);
-        }
-    } else {
-        DESERIALIZE();
+    //    size_t size = mSubsets.size();
+    //    archive << size;
+    //    for (auto& subset : mSubsets) {
+    //        subset.Serialize(archive);
+    //    }
+    //} else {
+    //    DESERIALIZE();
 
-        size_t size = 0;
-        archive >> size;
-        mSubsets.resize(size);
-        for (size_t i = 0; i < size; ++i) {
-            mSubsets[i].Serialize(archive);
-        }
-    }
+    //    size_t size = 0;
+    //    archive >> size;
+    //    mSubsets.resize(size);
+    //    for (size_t i = 0; i < size; ++i) {
+    //        mSubsets[i].Serialize(archive);
+    //    }
+    //}
 
-    mArmatureID.Serialize(archive);
+    // mArmatureID.Serialize(archive);
 }

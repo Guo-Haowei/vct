@@ -1,6 +1,6 @@
 #include "TransformComponent.h"
 
-#include "Archive.h"
+#include "core/io/archive.h"
 
 using namespace vct;
 
@@ -56,7 +56,7 @@ void TransformComponent::UpdateTransform_Parented(const TransformComponent& pare
 }
 
 void TransformComponent::Serialize(Archive& archive) {
-    if (archive.IsWriteMode()) {
+    if (archive.is_write_mode()) {
         archive << mFlags;
         archive << mScale;
         archive << mTranslation;

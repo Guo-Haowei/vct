@@ -1,7 +1,10 @@
 #pragma once
 #include "core/math/geomath.h"
 
+namespace vct {
 class Archive;
+}
+using namespace vct;
 
 class TransformComponent {
 public:

@@ -1,6 +1,6 @@
 #include "CameraComponent.h"
 
-#include "Archive.h"
+#include "core/io/archive.h"
 
 mat4 CameraComponent::CalculateViewMatrix() const { return glm::lookAt(eye, center, glm::normalize(vec3(0, 1, 0))); }
 
@@ -15,7 +15,7 @@ void CameraComponent::UpdateCamera() {
 }
 
 void CameraComponent::Serialize(Archive& archive) {
-    if (archive.IsWriteMode()) {
+    if (archive.is_write_mode()) {
         archive << flags;
         archive << zNear;
         archive << zFar;

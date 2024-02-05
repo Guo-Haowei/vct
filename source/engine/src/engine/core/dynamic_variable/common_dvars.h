@@ -38,6 +38,6 @@ DVAR_INT(r_ssaoNoiseSize, DVAR_FLAG_NONE, 4);
 DVAR_FLOAT(r_ssaoKernelRadius, DVAR_FLAG_NONE, 0.5f);
 
 // FXAA
-DVAR_INT(r_enableFXAA, DVAR_FALG_NONE, 1);
+DVAR_INT(r_enableFXAA, DVAR_FLAG_NONE, 1);
 
 #include "dynamic_variable_end.h"
