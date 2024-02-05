@@ -11,7 +11,7 @@ class SceneLoader {
 public:
     SceneLoader(Scene& scene) : mScene(scene) {}
 
-    void LoadGLTF(const char* path, bool flipUVs = true);
+    void LoadGLTF(std::string_view path, bool flipUVs = true);
 
 private:
     void ProcessMaterial(aiMaterial& material);

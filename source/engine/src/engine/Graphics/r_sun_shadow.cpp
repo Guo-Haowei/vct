@@ -1,7 +1,6 @@
 #include "r_sun_shadow.h"
 
 #include "Core/CommonDvars.h"
-#include "Core/DynamicVariable.h"
 #include "Framework/ProgramManager.h"
 #include "Framework/SceneManager.h"
 #include "Framework/WindowManager.h"

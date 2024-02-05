@@ -159,13 +159,13 @@ bool Application::ProcessCmdLine() {
     while (cmdHelper.TryConsume(arg)) {
         if (arg == "+set") {
             cmdHelper.Consume(arg);
-            DynamicVariable* dvar = DynamicVariableManager::Find(arg.c_str());
+            DynamicVariable* dvar = DynamicVariable::find_dvar(arg.c_str());
             if (dvar == nullptr) {
                 LOG_ERROR("[dvar] Dvar '{}' not found", arg);
                 return false;
             }
             cmdHelper.Consume(arg);
-            dvar->SetFromSourceString(arg.c_str());
+            dvar->set_from_source_string(arg.c_str());
         } else if (arg == "+exec") {
             cmdHelper.Consume(arg);
             if (!Com_ExecLua(arg.c_str())) {

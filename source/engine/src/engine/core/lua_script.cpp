@@ -6,19 +6,18 @@ extern "C" {
 #include <lua/lualib.h>
 }
 
-#include "Core/DynamicVariable.h"
+#include "core/dynamic_variable/dynamic_variable.h"
 
-#define FIND_DVAR_OR_RETURN(variable, name)                         \
-    DynamicVariable* variable = DynamicVariableManager::Find(name); \
-    if (!variable) {                                                \
-        LOG_ERROR("dvar '{}' not found!", name);                    \
-        return 0;                                                   \
+#define FIND_DVAR_OR_RETURN(variable, name)                                 \
+    vct::DynamicVariable* variable = vct::DynamicVariable::find_dvar(name); \
+    if (!variable) {                                                        \
+        LOG_ERROR("dvar '{}' not found!", name);                            \
+        return 0;                                                           \
     }
 
 #define SET_DVAR(expr)                     \
     {                                      \
-        EDvarError err = (expr);           \
-        if (err != EDvarError::Ok) {       \
+        if (!(expr)) {                     \
             LOG_ERROR("{} failed", #expr); \
         }                                  \
     }
@@ -31,7 +30,7 @@ static int LuaDvarFunc_SetInt(lua_State* L) {
     lua_Integer value = luaL_checkinteger(L, 2);
 
     FIND_DVAR_OR_RETURN(dvar, name);
-    SET_DVAR(dvar->SetInt(static_cast<int>(value)));
+    SET_DVAR(dvar->set_int(static_cast<int>(value)));
     return 0;
 }
 
@@ -41,7 +40,7 @@ static int LuaDvarFunc_SetFloat(lua_State* L) {
     const lua_Number value = luaL_checknumber(L, 2);
 
     FIND_DVAR_OR_RETURN(dvar, name);
-    SET_DVAR(dvar->SetFloat(static_cast<float>(value)));
+    SET_DVAR(dvar->set_float(static_cast<float>(value)));
     return 0;
 }
 
@@ -51,7 +50,7 @@ static int LuaDvarFunc_SetString(lua_State* L) {
     const char* value = luaL_checkstring(L, 2);
 
     FIND_DVAR_OR_RETURN(dvar, name);
-    SET_DVAR(dvar->SetString(value));
+    SET_DVAR(dvar->set_string(value));
     return 0;
 }
 
@@ -62,7 +61,7 @@ static int LuaDvarFunc_SetVec2(lua_State* L) {
     const lua_Number y = luaL_checknumber(L, 3);
 
     FIND_DVAR_OR_RETURN(dvar, name);
-    SET_DVAR(dvar->SetVec2(static_cast<float>(x), static_cast<float>(y)));
+    SET_DVAR(dvar->set_vec2(static_cast<float>(x), static_cast<float>(y)));
     return 0;
 }
 
@@ -74,7 +73,7 @@ static int LuaDvarFunc_SetVec3(lua_State* L) {
     const lua_Number z = luaL_checknumber(L, 4);
 
     FIND_DVAR_OR_RETURN(dvar, name);
-    SET_DVAR(dvar->SetVec3(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)));
+    SET_DVAR(dvar->set_vec3(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)));
     return 0;
 }
 
@@ -87,7 +86,7 @@ static int LuaDvarFunc_SetVec4(lua_State* L) {
     const lua_Number w = luaL_checknumber(L, 5);
 
     FIND_DVAR_OR_RETURN(dvar, name);
-    SET_DVAR(dvar->SetVec4(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z), static_cast<float>(w)));
+    SET_DVAR(dvar->set_vec4(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z), static_cast<float>(w)));
     return 0;
 }
 
