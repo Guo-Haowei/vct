@@ -4,6 +4,8 @@
 #include "Graphics/GLPrerequisites.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
 
+using namespace vct;
+
 GraphicsManager *gGraphicsManager = new GraphicsManager;
 
 static void APIENTRY gl_debug_callback(GLenum, GLenum, unsigned int, GLenum, GLsizei, const char *, const void *);
@@ -17,7 +19,7 @@ bool GraphicsManager::InitializeInternal() {
     LOG_VERBOSE("[opengl] renderer: {}", (const char *)glGetString(GL_RENDERER));
     LOG_VERBOSE("[opengl] version: {}", (const char *)glGetString(GL_VERSION));
 
-    if (DVAR_GET_BOOL(r_debug)) {
+    if (DVAR_GET_BOOL(r_gpu_validation)) {
         int flags;
         glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
         if (flags & GL_CONTEXT_FLAG_DEBUG_BIT) {
@@ -97,17 +99,17 @@ static void APIENTRY gl_debug_callback(GLenum source, GLenum type, unsigned int 
             break;
     }
 
-    // ELogLevel level = ELogLevel::Debug;
-    // switch (severity) {
-    //     case GL_DEBUG_SEVERITY_HIGH:
-    //         level = ELogLevel::Error;
-    //         break;
-    //     case GL_DEBUG_SEVERITY_MEDIUM:
-    //         level = ELogLevel::Warn;
-    //         break;
-    //     default:
-    //         break;
-    // }
+    LogLevel level = LOG_LEVEL_NORMAL;
+    switch (severity) {
+        case GL_DEBUG_SEVERITY_HIGH:
+            level = LOG_LEVEL_ERROR;
+            break;
+        case GL_DEBUG_SEVERITY_MEDIUM:
+            level = LOG_LEVEL_WARN;
+            break;
+        default:
+            break;
+    }
 
-    LOG_ERROR(std::format("[opengl] {}\n\t| id: {} | source: {} | type: {}", message, id, sourceStr, typeStr));
+    vct::log_impl(level, std::format("[opengl] {}\n\t| id: {} | source: {} | type: {}", message, id, sourceStr, typeStr));
 }

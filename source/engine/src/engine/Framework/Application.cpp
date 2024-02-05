@@ -14,9 +14,6 @@
 #include "Graphics/MainRenderer.h"
 #include "imgui/imgui.h"
 
-#define DEFINE_DVAR
-#include "Core/CommonDvars.h"
-
 class JobSystemManager : public ManagerBase {
 public:
     JobSystemManager() : ManagerBase("JobSystemManager") {}
@@ -62,13 +59,8 @@ void Application::FinalizeManagers() {
 
 void Application::AddLayer(std::shared_ptr<Layer> layer) { mLayers.emplace_back(layer); }
 
-int Application::Run(int argc, const char** argv) {
-    for (int i = 1; i < argc; ++i) {
-        mCommandLine.emplace_back(std::string(argv[i]));
-    }
-
+int Application::Run(int, const char**) {
     bool ok = true;
-    ok = ok && ProcessCmdLine();
     ok = ok && RegisterManagers();
     ok = ok && InitializeManagers();
 
@@ -114,69 +106,4 @@ int Application::Run(int argc, const char** argv) {
     FinalizeManagers();
 
     return 0;
-}
-
-static void register_common_dvars() {
-#define REGISTER_DVAR
-#include "Core/CommonDvars.h"
-}
-
-class CommandHelper {
-public:
-    CommandHelper(const CommandLine& cmdLine) : mCommandLine(cmdLine) {}
-
-    bool TryConsume(std::string& str) {
-        if (mCommandLine.empty()) {
-            str.clear();
-            return false;
-        }
-
-        str = mCommandLine.front();
-        mCommandLine.pop_front();
-        return true;
-    }
-
-    bool Consume(std::string& str) {
-        if (mCommandLine.empty()) {
-            LOG_ERROR("Unexpected EOF");
-            str.clear();
-            return false;
-        }
-
-        return TryConsume(str);
-    }
-
-private:
-    CommandLine mCommandLine;
-};
-
-bool Application::ProcessCmdLine() {
-    register_common_dvars();
-
-    CommandHelper cmdHelper(mCommandLine);
-
-    std::string arg;
-    while (cmdHelper.TryConsume(arg)) {
-        if (arg == "+set") {
-            cmdHelper.Consume(arg);
-            DynamicVariable* dvar = DynamicVariable::find_dvar(arg.c_str());
-            if (dvar == nullptr) {
-                LOG_ERROR("[dvar] Dvar '{}' not found", arg);
-                return false;
-            }
-            cmdHelper.Consume(arg);
-            dvar->set_from_source_string(arg.c_str());
-        } else if (arg == "+exec") {
-            cmdHelper.Consume(arg);
-            if (!Com_ExecLua(arg.c_str())) {
-                LOG_ERROR("[lua] failed to execute script '{}'", arg);
-                return false;
-            }
-        } else {
-            LOG_ERROR("Unknown command '{}'", arg);
-            return false;
-        }
-    }
-
-    return true;
 }

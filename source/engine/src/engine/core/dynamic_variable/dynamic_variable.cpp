@@ -20,17 +20,23 @@ void DynamicVariable::register_string(std::string_view key, std::string_view val
 }
 
 void DynamicVariable::register_vec2(std::string_view key, float x, float y) {
-    set_vec2(x, y);
+    m_vec.x = x;
+    m_vec.y = y;
     register_dvar(key, this);
 }
 
 void DynamicVariable::register_vec3(std::string_view key, float x, float y, float z) {
-    set_vec3(x, y, z);
+    m_vec.x = x;
+    m_vec.y = y;
+    m_vec.z = z;
     register_dvar(key, this);
 }
 
 void DynamicVariable::register_vec4(std::string_view key, float x, float y, float z, float w) {
-    set_vec4(x, y, z, w);
+    m_vec.x = x;
+    m_vec.y = y;
+    m_vec.z = z;
+    m_vec.w = w;
     register_dvar(key, this);
 }
 
@@ -82,6 +88,7 @@ bool DynamicVariable::set_int(int value) {
     ERR_FAIL_COND_V(m_type != VARIANT_TYPE_INT, false);
 
     m_int = value;
+    LOG_VERBOSE("change dvar '{}'(int) to {}", m_debug_name, m_int);
     return true;
 }
 
@@ -89,6 +96,7 @@ bool DynamicVariable::set_float(float value) {
     ERR_FAIL_COND_V(m_type != VARIANT_TYPE_FLOAT, false);
 
     m_float = value;
+    LOG_VERBOSE("change dvar '{}'(float) to {}", m_debug_name, m_float);
     return true;
 }
 
@@ -96,6 +104,7 @@ bool DynamicVariable::set_string(std::string_view value) {
     ERR_FAIL_COND_V(m_type != VARIANT_TYPE_STRING, false);
 
     m_string = value;
+    LOG_VERBOSE("change dvar '{}'(string) to \"{}\"", m_debug_name, m_string);
     return true;
 }
 
@@ -104,6 +113,7 @@ bool DynamicVariable::set_vec2(float x, float y) {
 
     m_vec.x = x;
     m_vec.y = y;
+    LOG_VERBOSE("change dvar '{}'(vec2) to {},{}", m_debug_name, m_vec.x, m_vec.y);
     return true;
 }
 
@@ -113,6 +123,7 @@ bool DynamicVariable::set_vec3(float x, float y, float z) {
     m_vec.x = x;
     m_vec.y = y;
     m_vec.z = z;
+    LOG_VERBOSE("change dvar '{}'(vec3) to {},{},{}", m_debug_name, m_vec.x, m_vec.y, m_vec.z);
     return true;
 }
 
@@ -123,28 +134,7 @@ bool DynamicVariable::set_vec4(float x, float y, float z, float w) {
     m_vec.y = y;
     m_vec.z = z;
     m_vec.w = w;
-    return true;
-}
-
-bool DynamicVariable::set_from_source_string(const char* str) {
-    switch (m_type) {
-        case VARIANT_TYPE_INT:
-            m_int = atoi(str);
-            LOG_VERBOSE("change dvar '{}'(int) to {}", m_debug_name.c_str(), m_int);
-            break;
-        case VARIANT_TYPE_FLOAT:
-            m_float = float(atof(str));
-            LOG_VERBOSE("change dvar '{}'(float) to {}", m_debug_name.c_str(), m_float);
-            break;
-        case VARIANT_TYPE_STRING:
-            m_string = str;
-            LOG_VERBOSE("change dvar '{}'(string) to \"{}\"", m_debug_name.c_str(), m_string.c_str());
-            break;
-        default:
-            LOG_FATAL("Unknown dvar type {}", static_cast<int>(m_type));
-            return false;
-    }
-
+    LOG_VERBOSE("change dvar '{}'(vec4) to {},{},{},{}", m_debug_name, m_vec.x, m_vec.y, m_vec.z, m_vec.w);
     return true;
 }
 
@@ -166,31 +156,6 @@ void DynamicVariable::register_dvar(std::string_view key, DynamicVariable* dvar)
     dvar->m_debug_name = key;
 
     sDVARMap.insert(std::make_pair(keyStr, dvar));
-    switch (dvar->m_type) {
-        case VARIANT_TYPE_INT:
-            LOG_VERBOSE("register dvar '{}'(int) {}", key, dvar->m_int);
-            break;
-        case VARIANT_TYPE_FLOAT:
-            LOG_VERBOSE("register dvar '{}'(float) {}", key, dvar->m_float);
-            break;
-        case VARIANT_TYPE_STRING:
-            LOG_VERBOSE("register dvar '{}'(string) \"{}\"", key, dvar->m_string.c_str());
-            break;
-        case VARIANT_TYPE_VEC2:
-            LOG_VERBOSE("register dvar '{}'(vec2) {} {}", key, dvar->m_vec.x, dvar->m_vec.y);
-            break;
-        case VARIANT_TYPE_VEC3:
-            LOG_VERBOSE("register dvar '{}'(vec3) {} {} {}", key, dvar->m_vec.x, dvar->m_vec.y,
-                        dvar->m_vec.z);
-            break;
-        case VARIANT_TYPE_VEC4:
-            LOG_VERBOSE("register dvar '{}'(vec4) {} {} {} {}", key, dvar->m_vec.x, dvar->m_vec.y,
-                        dvar->m_vec.z, dvar->m_vec.w);
-            break;
-        default:
-            LOG_FATAL("Unknown dvar type {}", static_cast<int>(dvar->m_type));
-            break;
-    }
 }
 
 }  // namespace vct

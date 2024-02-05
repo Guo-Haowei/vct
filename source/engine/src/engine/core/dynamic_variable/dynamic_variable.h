@@ -44,7 +44,8 @@ public:
     bool set_vec2(float x, float y);
     bool set_vec3(float x, float y, float z);
     bool set_vec4(float x, float y, float z, float w);
-    bool set_from_source_string(const char* str);
+
+    VariantType get_type() const { return m_type; }
 
     static DynamicVariable* find_dvar(std::string_view name);
     static void register_dvar(std::string_view key, DynamicVariable* dvar);

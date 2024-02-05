@@ -44,6 +44,3 @@
 
 #include <Windows.h>
 #endif
-
-inline constexpr int OPENGL_VERSION_MAJOR = 4;
-inline constexpr int OPENGL_VERSION_MINOR = 6;
