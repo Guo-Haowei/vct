@@ -1,6 +1,6 @@
 #include "core/math/geomath.h"
 
-namespace vct {
+namespace vct::math {
 
 TEST(align, roundup) {
     EXPECT_EQ(align(1, 4), 4);
@@ -37,6 +37,27 @@ TEST(align, compile_time) {
     static_assert(align(31, 16) == 32);
 }
 
+TEST(log_two, power_of_two) {
+    EXPECT_EQ(log_two(16), 4);
+    EXPECT_EQ(log_two(128), 7);
+}
+
+TEST(is_power_of_two, success) {
+    EXPECT_TRUE(is_power_of_two(16));
+    EXPECT_TRUE(is_power_of_two(128));
+}
+
+TEST(is_power_of_two, fail) {
+    EXPECT_FALSE(is_power_of_two(7));
+    EXPECT_FALSE(is_power_of_two(124));
+}
+
+TEST(is_power_of_two, compile_time) {
+    static_assert(is_power_of_two(16) == true);
+    static_assert(is_power_of_two(128) == true);
+    static_assert(is_power_of_two(127) == false);
+}
+
 TEST(next_power_of_two, roundup) {
     EXPECT_EQ(next_power_of_two(3), 4);
     EXPECT_EQ(next_power_of_two(9), 16);
@@ -60,4 +81,4 @@ TEST(next_power_of_two, compile_time) {
     static_assert(next_power_of_two(17) == 32);
 }
 
-}  // namespace vct
+}  // namespace vct::math

@@ -4,7 +4,6 @@
 #include <set>
 
 #include "Core/CommonDvars.h"
-#include "Core/DynamicVariable.h"
 #include "cbuffer.glsl"
 
 static MeshData g_quad;

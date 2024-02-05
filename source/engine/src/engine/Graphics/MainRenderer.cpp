@@ -2,7 +2,6 @@
 #include "MainRenderer.h"
 
 #include "Core/CommonDvars.h"
-#include "Core/DynamicVariable.h"
 #include "Core/geometry.h"
 #include "Framework/ProgramManager.h"
 #include "Framework/SceneManager.h"

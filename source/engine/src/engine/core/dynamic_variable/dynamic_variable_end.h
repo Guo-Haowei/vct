@@ -10,6 +10,7 @@
 #undef REGISTER_DVAR
 #endif
 
+#undef DVAR_BOOL
 #undef DVAR_INT
 #undef DVAR_FLOAT
 #undef DVAR_VEC2

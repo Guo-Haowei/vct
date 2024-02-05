@@ -20,7 +20,7 @@ static bool Com_LoadScene() {
     Scene& scene = g_scene;
     SceneLoader loader(scene);
 
-    const char* scenePath = DVAR_GET_STRING(scene);
+    std::string_view scenePath = DVAR_GET_STRING(scene);
 
     if (!scenePath[0]) {
         LOG_FATAL("Scene not specified, set it by +set scene <name> or +exec <lua-file>");

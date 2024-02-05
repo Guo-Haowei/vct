@@ -8,18 +8,18 @@
 #include <filesystem>
 
 #include "Core/CommonDvars.h"
-#include "Core/DynamicVariable.h"
 
 using std::string;
 using std::vector;
 namespace fs = std::filesystem;
 
-void SceneLoader::LoadGLTF(const char* path, bool flipUVs) {
+void SceneLoader::LoadGLTF(std::string_view path, bool flipUVs) {
     Assimp::Importer importer;
 
     unsigned int flag = aiProcess_CalcTangentSpace | aiProcess_Triangulate;
     flag |= flipUVs ? aiProcess_FlipUVs : 0;
-    const aiScene* aiscene = importer.ReadFile(path, flag);
+
+    const aiScene* aiscene = importer.ReadFile(std::string(path), flag);
 
     // check for errors
     if (!aiscene || aiscene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !aiscene->mRootNode)  // if is Not Zero
