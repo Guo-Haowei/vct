@@ -58,7 +58,7 @@ private:
     static std::string s_buffer;
 };
 
-static void assert_handler(void*, std::string_view, std::string_view, int, std::string_view) { exit(99); }
+void assert_handler(void*, std::string_view, std::string_view, int, std::string_view) { exit(99); }
 
 std::string TestErrorHandler::s_buffer;
 
