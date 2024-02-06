@@ -58,9 +58,7 @@ static std::shared_ptr<MeshData> CreateMeshData(const MeshComponent& mesh) {
     return std::shared_ptr<MeshData>(ret);
 }
 
-static uint32_t s_scene_rev = 0;
-
-void MainRenderer::on_scene_change() {
+void MainRenderer::begin_scene() {
     Scene& scene = SceneManager::get_scene();
     // create mesh
     for (const auto& mesh : scene.GetComponentArray<MeshComponent>()) {
@@ -321,10 +319,7 @@ void MainRenderer::renderFrameBufferTextures(int width, int height) {
 }
 
 void MainRenderer::render() {
-    if (s_scene_rev < g_scene_revision) {
-        on_scene_change();
-        s_scene_rev = g_scene_revision;
-    }
+    check_scene_update();
 
     g_perFrameCache.Update();
 

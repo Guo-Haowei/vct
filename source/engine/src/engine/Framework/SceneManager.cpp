@@ -129,10 +129,11 @@ static void Com_UpdateWorld() {
 }
 
 bool SceneManager::initialize() {
+    m_revision = 1;
+
     m_scene = new Scene;
     ecs::Entity root = m_scene->Entity_CreateTransform("world");
     m_scene->mRoot = root;
-    ++g_scene_revision;
 
     {
         // ecs::Entity omniLight = m_scene.Entity_CreateOmniLight("omni light", vec3(1), 30.f);
@@ -159,7 +160,7 @@ void SceneManager::update(float dt) {
         // @TODO: bump revision
 
         on_scene_changed(m_scene);
-        ++g_scene_revision;
+        ++m_revision;
     }
 
     Com_UpdateWorld();
@@ -167,5 +168,3 @@ void SceneManager::update(float dt) {
 }
 
 }  // namespace vct
-
-uint32_t g_scene_revision = 0;

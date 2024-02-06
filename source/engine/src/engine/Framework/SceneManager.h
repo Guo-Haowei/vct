@@ -21,13 +21,15 @@ public:
         m_loading_scene.store(scene);
     }
 
+    uint32_t get_revision() const { return m_revision; }
+
     static Scene& get_scene();
 
-protected:
+private:
     Scene* m_scene{ nullptr };
     std::atomic<Scene*> m_loading_scene{ nullptr };
+
+    uint32_t m_revision;
 };
 
 }  // namespace vct
-
-extern uint32_t g_scene_revision;

@@ -22,8 +22,7 @@ class Scene : public NonCopyable {
 public:
     static constexpr const char* EXTENSION = ".scene";
 
-    Scene() {}
-    Scene(uint32_t revision) : mRevision(revision) {}
+    Scene() = default;
 
 #pragma region WORLD_COMPONENTS_REGISTERY
 #define REGISTER_COMPONENT(T, VER)                                                        \
@@ -201,8 +200,6 @@ public:                                                                         
 
     ecs::Entity mRoot;
     float mDeltaTime = 0.0f;
-
-    uint32_t mRevision = 0;
 
     // @TODO: refactor
     Light light;

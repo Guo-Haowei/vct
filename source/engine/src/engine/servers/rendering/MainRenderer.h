@@ -4,12 +4,17 @@
 #include "passes.h"
 #include "r_cbuffers.h"
 
+#include "Framework/scene_listener.h"
+
 namespace vct {
 
-class MainRenderer {
+class MainRenderer : public SceneListener {
 public:
+    MainRenderer() : SceneListener("renderer") {}
+
+    virtual void begin_scene() override;
+
     void createGpuResources();
-    void on_scene_change();
     void render();
     void renderFrameBufferTextures(int width, int height);
     void renderToVoxelTexture();

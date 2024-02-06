@@ -8,7 +8,7 @@ in struct PS_INPUT {
     mat3 TBN;
 } ps_in;
 
-#include "cbuffer.glsl"
+#include "cbuffer.glsl.h"
 
 void main() {
     vec4 albedo = AlbedoColor;
