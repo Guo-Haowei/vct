@@ -58,8 +58,10 @@ static std::shared_ptr<MeshData> CreateMeshData(const MeshComponent& mesh) {
     return std::shared_ptr<MeshData>(ret);
 }
 
+static uint32_t s_scene_rev = 0;
+
 void MainRenderer::on_scene_change() {
-    Scene& scene = Com_GetScene();
+    Scene& scene = SceneManager::get_scene();
     // create mesh
     for (const auto& mesh : scene.GetComponentArray<MeshComponent>()) {
         g_meshdata.emplace_back(CreateMeshData(mesh));
@@ -207,7 +209,7 @@ void MainRenderer::createGpuResources() {
 
     g_constantCache.Update();
 
-    on_scene_change();
+    // on_scene_change();
 }
 
 // void MainRenderer::visualizeVoxels() {
@@ -246,7 +248,7 @@ struct MaterialCache {
 };
 
 void MainRenderer::renderToVoxelTexture() {
-    const Scene& scene = Com_GetScene();
+    const Scene& scene = SceneManager::get_scene();
     const int voxelSize = DVAR_GET_INT(r_voxelSize);
 
     glDisable(GL_CULL_FACE);
@@ -319,6 +321,11 @@ void MainRenderer::renderFrameBufferTextures(int width, int height) {
 }
 
 void MainRenderer::render() {
+    if (s_scene_rev < g_scene_revision) {
+        on_scene_change();
+        s_scene_rev = g_scene_revision;
+    }
+
     g_perFrameCache.Update();
 
     // clear window
@@ -344,6 +351,7 @@ void MainRenderer::render() {
 
         // @TODO: make it a pass
         g_viewer_rt.bind();
+        glClearColor(1.f, 1.f, 1.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderFrameBufferTextures(frameW, frameH);
         R_DrawEditor();

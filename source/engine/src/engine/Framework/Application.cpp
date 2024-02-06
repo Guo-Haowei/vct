@@ -22,7 +22,6 @@ void Application::RegisterManager(ManagerBase* manager) {
 bool Application::RegisterManagers() {
     RegisterManager(gGraphicsManager);
     RegisterManager(gProgramManager);
-    RegisterManager(gSceneManager);
     return true;
 }
 
@@ -49,6 +48,8 @@ int Application::Run(int, const char**) {
     ok = ok && RegisterManagers();
     ok = ok && InitializeManagers();
 
+    SceneManager::singleton().initialize();
+
     if (!ok) {
         return -1;
     }
@@ -67,7 +68,8 @@ int Application::Run(int, const char**) {
 
         Input::BeginFrame();
 
-        gSceneManager->Update(dt);
+        // @TODO:
+        SceneManager::singleton().update(dt);
 
         ImGui::NewFrame();
         for (auto& layer : mLayers) {
@@ -92,6 +94,8 @@ int Application::Run(int, const char**) {
     DVAR_SET_IVEC2(window_position, x, y);
 
     renderer.destroyGpuResources();
+
+    SceneManager::singleton().finalize();
 
     FinalizeManagers();
 

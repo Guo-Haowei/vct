@@ -1,7 +1,7 @@
 #pragma once
 #include "ComponentManager.h"
-#include "EntityGenerator.h"
 #include "SceneComponents.h"
+#include "entity.h"
 ////////////////////
 #include "core/math/ray.h"
 #include "core/objects/noncopyable.h"
@@ -204,15 +204,10 @@ public:                                                                         
 
     uint32_t mRevision = 0;
 
-    ecs::Entity CreateEntity() { return mGenerator.Create(); }
-
     // @TODO: refactor
     Light light;
     AABB bound;
     ecs::Entity mSelected = ecs::Entity::INVALID;
-
-private:
-    ecs::EntityGenerator mGenerator;
 };
 
 // @TODO: refactor

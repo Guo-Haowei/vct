@@ -30,6 +30,8 @@ public:
 
     void Serialize(Archive& archive);
 
+    static Entity create();
+
     static const Entity INVALID;
 
 private:

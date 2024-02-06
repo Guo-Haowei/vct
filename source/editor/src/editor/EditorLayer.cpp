@@ -114,7 +114,7 @@ void EditorLayer::Update(float dt) {
 }
 
 void EditorLayer::Render() {
-    Scene& scene = Com_GetScene();
+    Scene& scene = SceneManager::get_scene();
     for (auto& it : mPanels) {
         it->Render(scene);
     }

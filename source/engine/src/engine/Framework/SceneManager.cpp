@@ -10,22 +10,35 @@
 
 using namespace vct;
 
-static Scene g_scene;
+namespace vct {
 
-static std::atomic<Scene*> s_scene_ptr;
+SceneManager* g_scene_manager = new SceneManager;
 
-SceneManager* gSceneManager = new SceneManager;
+Scene& SceneManager::get_scene() {
+    assert(singleton().m_scene);
+    return *singleton().m_scene;
+}
 
-static bool load_scene(std::string_view scene_path) {
-    // validate dvars
+void SceneManager::request_scene(std::string_view path) {
+    std::thread t([](std::string_view scene_path) {
+        Scene* new_scene = new Scene;
+        SceneLoader loader(*new_scene);
+
+        loader.LoadGLTF(scene_path);
+        LOG("Scene '{}' loaded", scene_path);
+
+        // @TODO:
+        SceneManager::singleton().set_loading_scene(new_scene);
+    },
+                  path);
+
+    t.detach();
+}
+
+void SceneManager::on_scene_changed(Scene* new_scene) {
     const int voxelTextureSize = DVAR_GET_INT(r_voxelSize);
     DEV_ASSERT(is_power_of_two(voxelTextureSize));
     DEV_ASSERT(voxelTextureSize <= 256);
-
-    Scene& scene = g_scene;
-    SceneLoader loader(scene);
-
-    loader.LoadGLTF(scene_path);
 
     Camera& camera = gCamera;
 
@@ -39,10 +52,10 @@ static bool load_scene(std::string_view scene_path) {
     camera.pitch = 0.0f;
     camera.position = DVAR_GET_VEC3(cam_pos);
 
-    scene.light.color = vec3(glm::clamp(DVAR_GET_FLOAT(light_power), 5.0f, 30.0f));
+    new_scene->light.color = vec3(glm::clamp(DVAR_GET_FLOAT(light_power), 5.0f, 30.0f));
 
-    const vec3 center = scene.bound.center();
-    const vec3 size = scene.bound.size();
+    const vec3 center = new_scene->bound.center();
+    const vec3 size = new_scene->bound.size();
     const float worldSize = glm::max(size.x, glm::max(size.y, size.z));
     const float texelSize = 1.0f / static_cast<float>(voxelTextureSize);
     const float voxelSize = worldSize * texelSize;
@@ -51,16 +64,11 @@ static bool load_scene(std::string_view scene_path) {
     g_perFrameCache.cache.WorldSizeHalf = 0.5f * worldSize;
     g_perFrameCache.cache.TexelSize = texelSize;
     g_perFrameCache.cache.VoxelSize = voxelSize;
-
-    LOG("Scene '{}' loaded", scene_path);
-    return true;
 }
-
-Scene& Com_GetScene() { return g_scene; }
 
 // @TODO: fix
 static mat4 R_HackLightSpaceMatrix(const vec3& lightDir) {
-    const Scene& scene = Com_GetScene();
+    const Scene& scene = SceneManager::get_scene();
     const vec3 center = scene.bound.center();
     const vec3 extents = scene.bound.size();
     const float size = 0.5f * glm::max(extents.x, glm::max(extents.y, extents.z));
@@ -76,7 +84,7 @@ static void R_LightSpaceMatrix(const Camera& camera, const vec3& lightDir, mat4 
 }
 
 static void Com_UpdateWorld() {
-    Scene& scene = Com_GetScene();
+    Scene& scene = SceneManager::get_scene();
 
     // update camera
     auto [frameW, frameH] = DisplayServer::singleton().get_frame_size();
@@ -120,20 +128,44 @@ static void Com_UpdateWorld() {
     g_perFrameCache.cache.EnableFXAA = DVAR_GET_BOOL(r_enableFXAA);
 }
 
-bool SceneManager::InitializeInternal() {
-    std::string_view scene_path = DVAR_GET_STRING(scene);
+bool SceneManager::initialize() {
+    m_scene = new Scene;
+    ecs::Entity root = m_scene->Entity_CreateTransform("world");
+    m_scene->mRoot = root;
+    ++g_scene_revision;
 
-    if (scene_path.empty()) {
-        LOG_WARN("Scene not specified, set it with --path <file>");
-        return true;
+    {
+        // ecs::Entity omniLight = m_scene.Entity_CreateOmniLight("omni light", vec3(1), 30.f);
+        // m_scene->Component_Attach(omniLight, root);
     }
 
-    return load_scene(scene_path);
+    std::string_view scene_path = DVAR_GET_STRING(scene);
+
+    if (!scene_path.empty()) {
+        request_scene(scene_path);
+    }
+
+    return true;
 }
 
-void SceneManager::FinalizeInternal() {}
+void SceneManager::finalize() {}
 
-void SceneManager::Update(float dt) {
+void SceneManager::update(float dt) {
+    Scene* new_scene = m_loading_scene.load();
+    if (new_scene) {
+        m_scene->Merge(*new_scene);
+        delete new_scene;
+        m_loading_scene.store(nullptr);
+        // @TODO: bump revision
+
+        on_scene_changed(m_scene);
+        ++g_scene_revision;
+    }
+
     Com_UpdateWorld();
-    Com_GetScene().Update(dt);
+    SceneManager::get_scene().Update(dt);
 }
+
+}  // namespace vct
+
+uint32_t g_scene_revision = 0;

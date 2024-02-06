@@ -96,7 +96,7 @@ static inline void FillTextureIconBuffer(std::vector<TextureVertex>& iconBuffer,
 // draw grid, bounding box, ui
 void R_DrawEditor() {
     glDisable(GL_DEPTH_TEST);
-    const Scene& scene = Com_GetScene();
+    const Scene& scene = SceneManager::get_scene();
     auto selected = scene.mSelected;
     if (selected.IsValid()) {
         auto transformComponent = scene.GetComponent<TransformComponent>(selected);

@@ -10,6 +10,8 @@
 
 using namespace vct::jobsystem;
 
+using ecs::Entity;
+
 // @TODO: refactor
 #if 1
 #define JS_PARALLEL_FOR(CTX, INDEX, COUNT, SUBCOUNT, BODY) \
@@ -46,12 +48,18 @@ void Scene::Update(float dt) {
 }
 
 void Scene::Merge(Scene& other) {
-    unused(other);
-    CRASH_NOW_MSG("FIX");
+    for (auto& entry : mComponentLibrary.mEntries) {
+        entry.second.mManager->Merge(*other.mComponentLibrary.mEntries[entry.first].mManager);
+    }
+    if (other.mRoot.IsValid()) {
+        Component_Attach(other.mRoot, mRoot);
+    }
+
+    bound.union_box(other.bound);
 }
 
 ecs::Entity Scene::Entity_CreateName(const std::string& name) {
-    ecs::Entity entity = mGenerator.Create();
+    ecs::Entity entity = ecs::Entity::create();
     Create<TagComponent>(entity).SetTag(name);
     return entity;
 }
@@ -398,7 +406,7 @@ void Scene::RunCameraUpdateSystem() {
 void Scene::RunLightUpdateSystem() {}
 
 void Scene::Serialize(Archive& archive) {
-    mGenerator.Serialize(archive);
+    // mGenerator.Serialize(archive);
     mRoot.Serialize(archive);
 
     mTagComponents.Serialize(archive);

@@ -111,7 +111,7 @@ void destroy_passes() {
 extern void FillMaterialCB(const MaterialData* mat, MaterialCB& cb);
 
 static void shadow_pass_func() {
-    const Scene& scene = Com_GetScene();
+    const Scene& scene = SceneManager::get_scene();
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -158,7 +158,7 @@ static void shadow_pass_func() {
 }
 
 static void gbuffer_pass_func() {
-    Scene& scene = Com_GetScene();
+    Scene& scene = SceneManager::get_scene();
     const auto& program = gProgramManager->GetShaderProgram(ProgramType::GBUFFER);
 
     program.Bind();

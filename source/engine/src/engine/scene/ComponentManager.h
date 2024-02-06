@@ -1,8 +1,10 @@
 #pragma once
-#include "EntityGenerator.h"
 #include "core/io/archive.h"
+#include "entity.h"
 
 using namespace vct;
+
+class Scene;
 
 namespace ecs {
 
