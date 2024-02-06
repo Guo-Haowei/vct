@@ -98,16 +98,16 @@ static std::shared_ptr<MeshData> CreateMeshData(const MeshComponent& mesh) {
 
 void RenderingServer::begin_scene(Scene& scene) {
     // create mesh
-    for (const auto& mesh : scene.GetComponentArray<MeshComponent>()) {
+    for (const auto& mesh : scene.get_component_array<MeshComponent>()) {
         g_meshdata.emplace_back(CreateMeshData(mesh));
         mesh.gpuResource = g_meshdata.back().get();
     }
 
     // create material
-    DEV_ASSERT(scene.GetCount<MaterialComponent>() < array_length(g_constantCache.cache.AlbedoMaps));
+    DEV_ASSERT(scene.get_count<MaterialComponent>() < array_length(g_constantCache.cache.AlbedoMaps));
 
-    for (int idx = 0; idx < scene.GetCount<MaterialComponent>(); ++idx) {
-        const auto& mat = scene.GetComponentArray<MaterialComponent>()[idx];
+    for (int idx = 0; idx < scene.get_count<MaterialComponent>(); ++idx) {
+        const auto& mat = scene.get_component_array<MaterialComponent>()[idx];
 
         auto matData = std::make_shared<MaterialData>();
 
@@ -296,14 +296,14 @@ void RenderingServer::renderToVoxelTexture() {
     m_normalVoxel.bindImageTexture(IMAGE_VOXEL_NORMAL_SLOT);
     gProgramManager->GetShaderProgram(ProgramType::Voxel).Bind();
 
-    const uint32_t numObjects = (uint32_t)scene.GetCount<ObjectComponent>();
+    const uint32_t numObjects = (uint32_t)scene.get_count<ObjectComponent>();
     for (uint32_t i = 0; i < numObjects; ++i) {
-        const ObjectComponent& obj = scene.GetComponentArray<ObjectComponent>()[i];
-        ecs::Entity entity = scene.GetEntity<ObjectComponent>(i);
-        DEV_ASSERT(scene.Contains<TransformComponent>(entity));
-        const TransformComponent& transform = *scene.GetComponent<TransformComponent>(entity);
-        DEV_ASSERT(scene.Contains<MeshComponent>(obj.meshID));
-        const MeshComponent& mesh = *scene.GetComponent<MeshComponent>(obj.meshID);
+        const ObjectComponent& obj = scene.get_component_array<ObjectComponent>()[i];
+        ecs::Entity entity = scene.get_entity<ObjectComponent>(i);
+        DEV_ASSERT(scene.contains<TransformComponent>(entity));
+        const TransformComponent& transform = *scene.get_component<TransformComponent>(entity);
+        DEV_ASSERT(scene.contains<MeshComponent>(obj.meshID));
+        const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
 
         const mat4& M = transform.GetWorldMatrix();
         g_perBatchCache.cache.Model = M;
@@ -314,7 +314,7 @@ void RenderingServer::renderToVoxelTexture() {
         glBindVertexArray(drawData->vao);
 
         for (const auto& subset : mesh.mSubsets) {
-            const MaterialComponent& material = *scene.GetComponent<MaterialComponent>(subset.materialID);
+            const MaterialComponent& material = *scene.get_component<MaterialComponent>(subset.materialID);
             const MaterialData* matData = reinterpret_cast<MaterialData*>(material.gpuResource);
 
             FillMaterialCB(matData, g_materialCache.cache);

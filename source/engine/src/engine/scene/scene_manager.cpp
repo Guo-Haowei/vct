@@ -8,8 +8,6 @@
 #include "core/dynamic_variable/common_dvars.h"
 #include "servers/display_server.h"
 
-using namespace vct;
-
 namespace vct {
 
 SceneManager* g_scene_manager = new SceneManager;
@@ -52,10 +50,8 @@ void SceneManager::on_scene_changed(Scene* new_scene) {
     camera.pitch = 0.0f;
     camera.position = DVAR_GET_VEC3(cam_pos);
 
-    new_scene->light.color = vec3(glm::clamp(DVAR_GET_FLOAT(light_power), 5.0f, 30.0f));
-
-    const vec3 center = new_scene->bound.center();
-    const vec3 size = new_scene->bound.size();
+    const vec3 center = new_scene->m_bound.center();
+    const vec3 size = new_scene->m_bound.size();
     const float worldSize = glm::max(size.x, glm::max(size.y, size.z));
     const float texelSize = 1.0f / static_cast<float>(voxelTextureSize);
     const float voxelSize = worldSize * texelSize;
@@ -69,8 +65,8 @@ void SceneManager::on_scene_changed(Scene* new_scene) {
 // @TODO: fix
 static mat4 R_HackLightSpaceMatrix(const vec3& lightDir) {
     const Scene& scene = SceneManager::get_scene();
-    const vec3 center = scene.bound.center();
-    const vec3 extents = scene.bound.size();
+    const vec3 center = scene.m_bound.center();
+    const vec3 extents = scene.m_bound.size();
     const float size = 0.5f * glm::max(extents.x, glm::max(extents.y, extents.z));
     const mat4 V = glm::lookAt(center + glm::normalize(lightDir) * size, center, vec3(0, 1, 0));
     const mat4 P = glm::ortho(-size, size, -size, size, 0.0f, 2.0f * size);
@@ -95,17 +91,25 @@ static void Com_UpdateWorld() {
     camera.SetAspect(aspect);
     camera.UpdatePV();
 
+    DEV_ASSERT(scene.get_count<LightComponent>());
+    const LightComponent& light_component = scene.get_component_array<LightComponent>()[0];
+    auto light_entity = scene.get_entity<LightComponent>(0);
+    const TransformComponent* light_transform = scene.get_component<TransformComponent>(light_entity);
+    DEV_ASSERT(light_transform);
+
+    vec3 light_dir = light_transform->GetLocalMatrix() * vec4(0, 1, 0, 0);
+
     // update lightspace matrices
     mat4 lightPVs[NUM_CASCADES];
-    R_LightSpaceMatrix(camera, scene.light.direction, lightPVs);
+    R_LightSpaceMatrix(camera, light_dir, lightPVs);
 
     for (size_t idx = 0; idx < vct::array_length(lightPVs); ++idx) {
         g_perFrameCache.cache.LightPVs[idx] = lightPVs[idx];
     }
 
     // update constants
-    g_perFrameCache.cache.SunDir = scene.light.direction;
-    g_perFrameCache.cache.LightColor = scene.light.color;
+    g_perFrameCache.cache.SunDir = light_dir;
+    g_perFrameCache.cache.LightColor = light_component.color * light_component.energy;
     g_perFrameCache.cache.CamPos = camera.position;
     g_perFrameCache.cache.View = camera.View();
     g_perFrameCache.cache.Proj = camera.Proj();
@@ -131,13 +135,18 @@ static void Com_UpdateWorld() {
 bool SceneManager::initialize() {
     m_revision = 1;
 
-    m_scene = new Scene;
-    ecs::Entity root = m_scene->Entity_CreateTransform("world");
-    m_scene->mRoot = root;
-
+    // make a simple scene
     {
-        // ecs::Entity omniLight = m_scene.Entity_CreateOmniLight("omni light", vec3(1), 30.f);
-        // m_scene->Component_Attach(omniLight, root);
+        m_scene = new Scene;
+        auto root = m_scene->create_transform_entity("world");
+        m_scene->m_root = root;
+        auto light = m_scene->create_omnilight_entity("omni light", vec3(1), 20.f);
+        m_scene->attach_component(light, root);
+        auto transform = m_scene->get_component<TransformComponent>(light);
+        DEV_ASSERT(transform);
+        mat4 rx = glm::rotate(glm::radians(10.0f), glm::vec3(1, 0, 0));
+        mat4 rz = glm::rotate(glm::radians(10.0f), glm::vec3(0, 0, 1));
+        transform->SetLocalTransform(rx * rz);
     }
 
     std::string_view scene_path = DVAR_GET_STRING(scene);
@@ -154,7 +163,7 @@ void SceneManager::finalize() {}
 void SceneManager::update(float dt) {
     Scene* new_scene = m_loading_scene.load();
     if (new_scene) {
-        m_scene->Merge(*new_scene);
+        m_scene->merge(*new_scene);
         delete new_scene;
         m_loading_scene.store(nullptr);
         // @TODO: bump revision
@@ -164,7 +173,7 @@ void SceneManager::update(float dt) {
     }
 
     Com_UpdateWorld();
-    SceneManager::get_scene().Update(dt);
+    SceneManager::get_scene().update(dt);
 }
 
 }  // namespace vct

@@ -77,7 +77,7 @@ void Viewer::RenderInternal(Scene& scene) {
     ImGui::GetWindowDrawList()->AddImage((ImTextureID)g_final_image, topLeft, bottomRight, ImVec2(0, 1), ImVec2(1, 0));
 
     if (mpSelected->IsValid()) {
-        TransformComponent* transform = scene.GetComponent<TransformComponent>(*mpSelected);
+        TransformComponent* transform = scene.get_component<TransformComponent>(*mpSelected);
 
         auto op = ImGuizmo::ROTATE;
         if (transform) {

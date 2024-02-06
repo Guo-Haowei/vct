@@ -7,6 +7,8 @@ struct aiMaterial;
 struct aiScene;
 struct aiAnimation;
 
+namespace vct {
+
 class SceneLoader {
 public:
     SceneLoader(Scene& scene) : mScene(scene) {}
@@ -24,3 +26,5 @@ private:
     std::vector<ecs::Entity> mMaterials;
     std::vector<ecs::Entity> mMeshes;
 };
+
+}  // namespace vct

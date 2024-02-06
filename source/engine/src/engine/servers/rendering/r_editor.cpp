@@ -97,37 +97,36 @@ static inline void FillTextureIconBuffer(std::vector<TextureVertex>& iconBuffer,
 void R_DrawEditor() {
     glDisable(GL_DEPTH_TEST);
     const Scene& scene = SceneManager::get_scene();
-    auto selected = scene.mSelected;
+    auto selected = scene.m_selected;
     if (selected.IsValid()) {
-        auto transformComponent = scene.GetComponent<TransformComponent>(selected);
+        auto transformComponent = scene.get_component<TransformComponent>(selected);
         DEV_ASSERT(transformComponent);
-        auto objComponent = scene.GetComponent<ObjectComponent>(selected);
-        DEV_ASSERT(objComponent);
-        auto meshComponent = scene.GetComponent<MeshComponent>(objComponent->meshID);
-        DEV_ASSERT(meshComponent);
-        AABB aabb = meshComponent->mLocalBound;
-        aabb.apply_matrix(transformComponent->GetWorldMatrix());
+        auto objComponent = scene.get_component<ObjectComponent>(selected);
+        if (objComponent) {
+            DEV_ASSERT(objComponent);
+            auto meshComponent = scene.get_component<MeshComponent>(objComponent->meshID);
+            DEV_ASSERT(meshComponent);
+            AABB aabb = meshComponent->mLocalBound;
+            aabb.apply_matrix(transformComponent->GetWorldMatrix());
 
-        const mat4 M = glm::translate(mat4(1), aabb.center()) * glm::scale(mat4(1), aabb.size());
+            const mat4 M = glm::translate(mat4(1), aabb.center()) * glm::scale(mat4(1), aabb.size());
 
-        gProgramManager->GetShaderProgram(ProgramType::LINE3D).Bind();
-        glBindVertexArray(g_boxWireFrame.vao);
-        g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
-        g_perBatchCache.cache.Model = mat4(1);
-        g_perBatchCache.Update();
-        glDrawElements(GL_LINES, g_boxWireFrame.count, GL_UNSIGNED_INT, 0);
+            gProgramManager->GetShaderProgram(ProgramType::LINE3D).Bind();
+            glBindVertexArray(g_boxWireFrame.vao);
+            g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
+            g_perBatchCache.cache.Model = mat4(1);
+            g_perBatchCache.Update();
+            glDrawElements(GL_LINES, g_boxWireFrame.count, GL_UNSIGNED_INT, 0);
+        }
     }
 
-    AABB aabb(vec3(-1), vec3(1));
-    const mat4 M = glm::translate(mat4(1), aabb.center()) * glm::scale(mat4(1), aabb.size());
+    // AABB aabb(vec3(-1), vec3(1));
+    // const mat4 M = glm::translate(mat4(1), aabb.center()) * glm::scale(mat4(1), aabb.size());
 
-    gProgramManager->GetShaderProgram(ProgramType::LINE3D).Bind();
-    glBindVertexArray(g_boxWireFrame.vao);
-    g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
-    g_perBatchCache.cache.Model = mat4(1);
-    g_perBatchCache.Update();
-    glDrawElements(GL_LINES, g_boxWireFrame.count, GL_UNSIGNED_INT, 0);
-
-    // @TODO: draw grid
-    glEnable(GL_DEPTH_TEST);
+    // gProgramManager->GetShaderProgram(ProgramType::LINE3D).Bind();
+    // glBindVertexArray(g_boxWireFrame.vao);
+    // g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
+    // g_perBatchCache.cache.Model = mat4(1);
+    // g_perBatchCache.Update();
+    // glDrawElements(GL_LINES, g_boxWireFrame.count, GL_UNSIGNED_INT, 0);
 }

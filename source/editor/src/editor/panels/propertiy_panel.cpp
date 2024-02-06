@@ -139,7 +139,7 @@ void PropertyPanel::RenderInternal(Scene& scene) {
         return;
     }
 
-    TagComponent* tagComponent = scene.GetComponent<TagComponent>(id);
+    TagComponent* tagComponent = scene.get_component<TagComponent>(id);
     if (!tagComponent) {
         LOG_WARN("Entity {} does not have name", id.GetID());
         return;
@@ -164,16 +164,14 @@ void PropertyPanel::RenderInternal(Scene& scene) {
         ImGui::EndPopup();
     }
 
-#if 0
-    LightComponent* lightComponent = scene.GetComponent<LightComponent>(id);
+    LightComponent* lightComponent = scene.get_component<LightComponent>(id);
     DrawComponent("Light", lightComponent, [&](LightComponent& light) {
         ImGui::Text("Light Component");
         ImGui::DragFloat3("color:", &light.color.x);
         ImGui::DragFloat("energy:", &light.energy);
     });
-#endif
 
-    TransformComponent* transformComponent = scene.GetComponent<TransformComponent>(id);
+    TransformComponent* transformComponent = scene.get_component<TransformComponent>(id);
     DrawComponent("Transform", transformComponent, [&](TransformComponent& transform) {
         mat4 transformMatrix = transform.GetLocalMatrix();
         vec3 translation;
@@ -183,23 +181,13 @@ void PropertyPanel::RenderInternal(Scene& scene) {
                                               glm::value_ptr(rotation), glm::value_ptr(scale));
 
         bool dirty = false;
-        bool wantTranslation = false, wantRotation = false, wantScale = false;
-        // if (lightComponent)
-        // {
-        //     switch (lightComponent->type)
-        //     {
-        //         case LIGHT_TYPE_POINT:
-        //             wantTranslation = true;
-        //             break;
-        //         case LIGHT_TYPE_OMNI:
-        //             wantRotation = true;
-        //             break;
-        //         default:
-        //             break;
-        //     }
-        // }
-        // else
-        { wantTranslation = wantRotation = wantScale = true; }
+        bool wantTranslation = true;
+        bool wantRotation = true;
+        bool wantScale = true;
+        if (lightComponent) {
+            wantTranslation = false;
+            wantScale = false;
+        }
 
         if (wantTranslation) {
             dirty |= draw_vec3_control("translation", translation);
@@ -217,7 +205,7 @@ void PropertyPanel::RenderInternal(Scene& scene) {
         }
     });
 
-    RigidBodyPhysicsComponent* rigidBodyComponent = scene.GetComponent<RigidBodyPhysicsComponent>(id);
+    RigidBodyPhysicsComponent* rigidBodyComponent = scene.get_component<RigidBodyPhysicsComponent>(id);
     DrawComponent("RigidBody", rigidBodyComponent, [](RigidBodyPhysicsComponent& rigidbody) {
         switch (rigidbody.shape) {
             case RigidBodyPhysicsComponent::BOX: {
@@ -231,7 +219,7 @@ void PropertyPanel::RenderInternal(Scene& scene) {
         }
     });
 
-    CameraComponent* cameraComponent = scene.GetComponent<CameraComponent>(id);
+    CameraComponent* cameraComponent = scene.get_component<CameraComponent>(id);
     DrawComponent("Camera", cameraComponent, [](CameraComponent& camera) {
         const float width = 50.0f;
         float fovy = glm::degrees(camera.fovy);
@@ -241,10 +229,10 @@ void PropertyPanel::RenderInternal(Scene& scene) {
         camera.fovy = glm::radians(fovy);
     });
 
-    ObjectComponent* objectComponent = scene.GetComponent<ObjectComponent>(id);
+    ObjectComponent* objectComponent = scene.get_component<ObjectComponent>(id);
     DrawComponent("Object", objectComponent, [&](ObjectComponent& object) {
-        MeshComponent* mesh = scene.GetComponent<MeshComponent>(object.meshID);
-        TagComponent* meshName = scene.GetComponent<TagComponent>(object.meshID);
+        MeshComponent* mesh = scene.get_component<MeshComponent>(object.meshID);
+        TagComponent* meshName = scene.get_component<TagComponent>(object.meshID);
         ImGui::Text("Mesh Component (%d)", object.meshID);
         if (mesh) {
             const char* meshNameStr = meshName ? meshName->GetTag().c_str() : "untitled";

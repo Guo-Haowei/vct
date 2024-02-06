@@ -33,7 +33,7 @@ private:
 void HierarchyCreator::DrawNode(const Scene& scene, HierarchyNode* pHier, ImGuiTreeNodeFlags flags) {
     DEV_ASSERT(pHier);
     ecs::Entity id = pHier->entity;
-    const TagComponent* tagComponent = scene.GetComponent<TagComponent>(id);
+    const TagComponent* tagComponent = scene.get_component<TagComponent>(id);
     const char* name = tagComponent ? tagComponent->GetTag().c_str() : "Untitled";
 
     auto nodeTag = std::format("##{}", id.GetID());
@@ -58,7 +58,7 @@ void HierarchyCreator::DrawNode(const Scene& scene, HierarchyNode* pHier, ImGuiT
 }
 
 bool HierarchyCreator::Build(const Scene& scene) {
-    const size_t hierarchy_count = scene.GetCount<HierarchyComponent>();
+    const size_t hierarchy_count = scene.get_count<HierarchyComponent>();
     if (hierarchy_count == 0) {
         return false;
     }
@@ -73,8 +73,8 @@ bool HierarchyCreator::Build(const Scene& scene) {
             return it->second.get();
         };
 
-        const HierarchyComponent& hier = scene.GetComponent<HierarchyComponent>(i);
-        const ecs::Entity selfId = scene.GetEntity<HierarchyComponent>(i);
+        const HierarchyComponent& hier = scene.get_component<HierarchyComponent>(i);
+        const ecs::Entity selfId = scene.get_entity<HierarchyComponent>(i);
         const ecs::Entity parentId = hier.GetParent();
         HierarchyNode* parentNode = FindOrCreate(parentId);
         HierarchyNode* selfNode = FindOrCreate(selfId);

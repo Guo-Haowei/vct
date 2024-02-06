@@ -1,8 +1,6 @@
 #include "Entity.h"
 
-#include "core/io/archive.h"
-
-namespace ecs {
+namespace vct::ecs {
 
 const Entity Entity::INVALID{};
 
@@ -21,4 +19,4 @@ Entity Entity::create() {
     return entity;
 }
 
-}  // namespace ecs
+}  // namespace vct::ecs

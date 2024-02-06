@@ -119,5 +119,5 @@ void EditorLayer::Render() {
         it->Render(scene);
     }
 
-    scene.mSelected = mSelected;
+    scene.m_selected = mSelected;
 }

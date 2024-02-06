@@ -75,23 +75,4 @@ void DebugPanel::RenderInternal(Scene& scene) {
     ImGui::SliderInt("Display Texture", (int*)(DVAR_GET_POINTER(r_debugTexture)), DrawTexture::TEXTURE_FINAL_IMAGE,
                      DrawTexture::TEXTURE_MAX);
     ImGui::Text("%s", DrawTextureToStr(DVAR_GET_INT(r_debugTexture)));
-
-    ImGui::Separator();
-    ImGui::Text("Light");
-    float* lightDir = (float*)DVAR_GET_POINTER(light_dir);
-    dirty |= ImGui::SliderFloat("x", lightDir, -20.f, 20.f);
-    dirty |= ImGui::SliderFloat("z", lightDir + 2, -20.f, 20.f);
-
-#if 0
-    ImGui::Text("Floor");
-    if (scene.selected)
-    {
-        void* mat = scene.selected->material->gpuResource;
-        MaterialData* drawData = reinterpret_cast<MaterialData*>(mat);
-        dirty |= ImGui::SliderFloat("metallic", &drawData->metallic, 0.0f, 1.0f);
-        dirty |= ImGui::SliderFloat("roughness", &drawData->roughness, 0.0f, 1.0f);
-    }
-#endif
-
-    scene.light.direction = glm::normalize(DVAR_GET_VEC3(light_dir));
 }

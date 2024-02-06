@@ -2,9 +2,6 @@
 #include "core/objects/singleton.h"
 #include "scene/scene.h"
 
-// @TODO: refactor
-class Scene;
-
 namespace vct {
 
 class SceneManager : public Singleton<SceneManager> {

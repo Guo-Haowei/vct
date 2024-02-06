@@ -6,17 +6,11 @@
 #include "core/math/ray.h"
 #include "core/objects/noncopyable.h"
 
-// @TODO: remove
-using namespace vct;
+namespace vct {
 
-namespace vct::jobsystem {
+namespace jobsystem {
 class Context;
 }
-
-struct Light {
-    vec3 direction;
-    vec3 color;
-};
 
 class Scene : public NonCopyable {
 public:
@@ -25,104 +19,104 @@ public:
     Scene() = default;
 
 #pragma region WORLD_COMPONENTS_REGISTERY
-#define REGISTER_COMPONENT(T, VER)                                                        \
-private:                                                                                  \
-    ecs::ComponentManager<T>& m##T##s = mComponentLibrary.Register<T>("World::" #T, VER); \
-                                                                                          \
-public:                                                                                   \
-    template<>                                                                            \
-    inline const T* GetComponent<T>(const ecs::Entity& entity) const {                    \
-        return m##T##s.GetComponent(entity);                                              \
-    }                                                                                     \
-    template<>                                                                            \
-    inline T* GetComponent<T>(const ecs::Entity& entity) {                                \
-        return m##T##s.GetComponent(entity);                                              \
-    }                                                                                     \
-    template<>                                                                            \
-    inline const T& GetComponent<T>(size_t index) const {                                 \
-        return m##T##s[index];                                                            \
-    }                                                                                     \
-    template<>                                                                            \
-    inline T& GetComponent<T>(size_t index) {                                             \
-        return m##T##s[index];                                                            \
-    }                                                                                     \
-    template<>                                                                            \
-    inline std::vector<T>& GetComponentArray() {                                          \
-        return m##T##s.GetComponentArray();                                               \
-    }                                                                                     \
-    template<>                                                                            \
-    inline const std::vector<T>& GetComponentArray() const {                              \
-        return m##T##s.GetComponentArray();                                               \
-    }                                                                                     \
-    template<>                                                                            \
-    inline bool Contains<T>(const ecs::Entity& entity) const {                            \
-        return m##T##s.Contains(entity);                                                  \
-    }                                                                                     \
-    template<>                                                                            \
-    inline size_t GetIndex<T>(const ecs::Entity& entity) const {                          \
-        return m##T##s.GetIndex(entity);                                                  \
-    }                                                                                     \
-    template<>                                                                            \
-    inline size_t GetCount<T>() const {                                                   \
-        return m##T##s.GetCount();                                                        \
-    }                                                                                     \
-    template<>                                                                            \
-    inline ecs::Entity GetEntity<T>(size_t index) const {                                 \
-        return m##T##s.GetEntity(index);                                                  \
-    }                                                                                     \
-    template<>                                                                            \
-    T& Create<T>(const ecs::Entity& entity) {                                             \
-        return m##T##s.Create(entity);                                                    \
-    }                                                                                     \
+#define REGISTER_COMPONENT(T, VER)                                                      \
+private:                                                                                \
+    ecs::ComponentManager<T>& m##T##s = m_component_lib.Register<T>("World::" #T, VER); \
+                                                                                        \
+public:                                                                                 \
+    template<>                                                                          \
+    inline const T* get_component<T>(const ecs::Entity& entity) const {                 \
+        return m##T##s.get_component(entity);                                           \
+    }                                                                                   \
+    template<>                                                                          \
+    inline T* get_component<T>(const ecs::Entity& entity) {                             \
+        return m##T##s.get_component(entity);                                           \
+    }                                                                                   \
+    template<>                                                                          \
+    inline const T& get_component<T>(size_t index) const {                              \
+        return m##T##s[index];                                                          \
+    }                                                                                   \
+    template<>                                                                          \
+    inline T& get_component<T>(size_t index) {                                          \
+        return m##T##s[index];                                                          \
+    }                                                                                   \
+    template<>                                                                          \
+    inline std::vector<T>& get_component_array() {                                      \
+        return m##T##s.get_component_array();                                           \
+    }                                                                                   \
+    template<>                                                                          \
+    inline const std::vector<T>& get_component_array() const {                          \
+        return m##T##s.get_component_array();                                           \
+    }                                                                                   \
+    template<>                                                                          \
+    inline bool contains<T>(const ecs::Entity& entity) const {                          \
+        return m##T##s.contains(entity);                                                \
+    }                                                                                   \
+    template<>                                                                          \
+    inline size_t get_index<T>(const ecs::Entity& entity) const {                       \
+        return m##T##s.get_index(entity);                                               \
+    }                                                                                   \
+    template<>                                                                          \
+    inline size_t get_count<T>() const {                                                \
+        return m##T##s.get_count();                                                     \
+    }                                                                                   \
+    template<>                                                                          \
+    inline ecs::Entity get_entity<T>(size_t index) const {                              \
+        return m##T##s.get_entity(index);                                               \
+    }                                                                                   \
+    template<>                                                                          \
+    T& create<T>(const ecs::Entity& entity) {                                           \
+        return m##T##s.create(entity);                                                  \
+    }                                                                                   \
     enum { __DUMMY_ENUM_TO_FORCE_SEMI_COLON_##T }
 
 #pragma endregion WORLD_COMPONENTS_REGISTERY
     template<typename T>
-    const T* GetComponent(const ecs::Entity&) const {
+    const T* get_component(const ecs::Entity&) const {
         return nullptr;
     }
     template<typename T>
-    T* GetComponent(const ecs::Entity&) {
+    T* get_component(const ecs::Entity&) {
         return nullptr;
     }
     template<typename T>
-    const T& GetComponent(size_t) const {
+    const T& get_component(size_t) const {
         return *(reinterpret_cast<T*>(nullptr));
     }
     template<typename T>
-    T& GetComponent(size_t) {
+    T& get_component(size_t) {
         return *(reinterpret_cast<T*>(nullptr));
     }
     template<typename T>
-    std::vector<T>& GetComponentArray() {
+    std::vector<T>& get_component_array() {
         return *(reinterpret_cast<std::vector<T>*>(nullptr));
     }
     template<typename T>
-    const std::vector<T>& GetComponentArray() const {
+    const std::vector<T>& get_component_array() const {
         return *(reinterpret_cast<std::vector<T>*>(nullptr));
     }
     template<typename T>
-    bool Contains(const ecs::Entity&) const {
+    bool contains(const ecs::Entity&) const {
         return false;
     }
     template<typename T>
-    size_t GetIndex(const ecs::Entity&) const {
+    size_t get_index(const ecs::Entity&) const {
         return ecs::Entity::INVALID_INDEX;
     }
     template<typename T>
-    size_t GetCount() const {
+    size_t get_count() const {
         return 0;
     }
     template<typename T>
-    ecs::Entity GetEntity(size_t) const {
+    ecs::Entity get_entity(size_t) const {
         return ecs::Entity::INVALID;
     }
     template<typename T>
-    T& Create(const ecs::Entity&) {
+    T& create(const ecs::Entity&) {
         return *(T*)(nullptr);
     }
 
-    ecs::ComponentLibrary mComponentLibrary;
+    ecs::ComponentLibrary m_component_lib;
 
     REGISTER_COMPONENT(TagComponent, 0);
     REGISTER_COMPONENT(TransformComponent, 0);
@@ -136,61 +130,57 @@ public:                                                                         
     REGISTER_COMPONENT(AnimationComponent, 0);
     REGISTER_COMPONENT(RigidBodyPhysicsComponent, 0);
 
-    void Serialize(Archive& archive);
+    void serialize(Archive& archive);
 
     // Non-serialized attributes
-    void Update(float deltaTime);
+    void update(float deltaTime);
 
-    void Merge(Scene& other);
+    void merge(Scene& other);
 
-    ecs::Entity Entity_CreateName(const std::string& name);
+    ecs::Entity create_name_entity(const std::string& name);
+    ecs::Entity create_transform_entity(const std::string& name);
+    ecs::Entity create_object_entity(const std::string& name);
+    ecs::Entity create_mesh_entity(const std::string& name);
+    ecs::Entity create_material_entity(const std::string& name);
 
-    ecs::Entity Entity_CreateTransform(const std::string& name);
+    ecs::Entity create_camera_entity(const std::string& name, float width, float height,
+                                     float nearPlane = CameraComponent::DEFAULT_ZNEAR,
+                                     float farPlane = CameraComponent::DEFAULT_ZFAR,
+                                     float fovy = CameraComponent::DEFAULT_FOVY);
 
-    ecs::Entity Entity_CreateObject(const std::string& name);
+    ecs::Entity create_pointlight_entity(const std::string& name, const vec3& position, const vec3& color = vec3(1),
+                                         const float energy = 10.0f);
 
-    ecs::Entity Entity_CreateMesh(const std::string& name);
-
-    ecs::Entity Entity_CreateMaterial(const std::string& name);
-
-    ecs::Entity Entity_CreateCamera(const std::string& name, float width, float height,
-                                    float nearPlane = CameraComponent::DEFAULT_ZNEAR,
-                                    float farPlane = CameraComponent::DEFAULT_ZFAR,
-                                    float fovy = CameraComponent::DEFAULT_FOVY);
-
-    ecs::Entity Entity_CreatePointLight(const std::string& name, const vec3& position, const vec3& color = vec3(1),
+    ecs::Entity create_omnilight_entity(const std::string& name, const vec3& color = vec3(1),
                                         const float energy = 10.0f);
 
-    ecs::Entity Entity_CreateOmniLight(const std::string& name, const vec3& color = vec3(1),
-                                       const float energy = 10.0f);
+    ecs::Entity create_sphere_entity(const std::string& name, float radius = 0.5f, const mat4& transform = mat4(1.0f));
 
-    ecs::Entity Entity_CreateSphere(const std::string& name, float radius = 0.5f, const mat4& transform = mat4(1.0f));
+    ecs::Entity create_sphere_entity(const std::string& name, ecs::Entity materialID, float radius = 0.5f,
+                                     const mat4& transform = mat4(1.0f));
 
-    ecs::Entity Entity_CreateSphere(const std::string& name, ecs::Entity materialID, float radius = 0.5f,
-                                    const mat4& transform = mat4(1.0f));
+    ecs::Entity create_cube_entity(const std::string& name, const vec3& scale = vec3(0.5f),
+                                   const mat4& transform = mat4(1.0f));
 
-    ecs::Entity Entity_CreateCube(const std::string& name, const vec3& scale = vec3(0.5f),
-                                  const mat4& transform = mat4(1.0f));
+    ecs::Entity create_cube_entity(const std::string& name, ecs::Entity materialID, const vec3& scale = vec3(0.5f),
+                                   const mat4& transform = mat4(1.0f));
 
-    ecs::Entity Entity_CreateCube(const std::string& name, ecs::Entity materialID, const vec3& scale = vec3(0.5f),
-                                  const mat4& transform = mat4(1.0f));
+    void attach_component(ecs::Entity entity, ecs::Entity parent);
 
-    void Component_Attach(ecs::Entity entity, ecs::Entity parent);
+    void attach_component(ecs::Entity entity) { attach_component(entity, m_root); }
 
-    void Component_Attach(ecs::Entity entity) { Component_Attach(entity, mRoot); }
+    void detach_component(ecs::Entity entity);
 
-    void Component_Detach(ecs::Entity entity);
-
+    // @TODO: fix
     void Component_DetachChildren(ecs::Entity parent);
 
-    void RunAnimationUpdateSystem(jobsystem::Context& ctx);
-    void RunTransformUpdateSystem(jobsystem::Context& ctx);
-    void RunHierarchyUpdateSystem(jobsystem::Context& ctx);
-    void RunArmatureUpdateSystem(jobsystem::Context& ctx);
+    void update_animation(jobsystem::Context& ctx);
+    void update_transformation(jobsystem::Context& ctx);
+    void update_hierarchy(jobsystem::Context& ctx);
+    void update_armature(jobsystem::Context& ctx);
 
-    void RunObjectUpdateSystem();
+    // @TODO: fix
     void RunCameraUpdateSystem();
-    void RunLightUpdateSystem();
 
     struct RayIntersectionResult {
         ecs::Entity entity;
@@ -198,16 +188,17 @@ public:                                                                         
 
     RayIntersectionResult Intersects(Ray& ray);
 
-    ecs::Entity mRoot;
-    float mDeltaTime = 0.0f;
+    ecs::Entity m_root;
+    float m_delta_time = 0.0f;
 
     // @TODO: refactor
-    Light light;
-    AABB bound;
-    ecs::Entity mSelected = ecs::Entity::INVALID;
+    AABB m_bound;
+    ecs::Entity m_selected = ecs::Entity::INVALID;
 };
 
-// @TODO: refactor
-void ModelImporter_AssimpImport(const std::string& file_path, Scene& scene);
+}  // namespace vct
 
-void ModelImporter_TinyGLTFImport(const std::string& file_path, Scene& scene);
+// @TODO: refactor
+void ModelImporter_AssimpImport(const std::string& file_path, vct::Scene& scene);
+
+void ModelImporter_TinyGLTFImport(const std::string& file_path, vct::Scene& scene);
