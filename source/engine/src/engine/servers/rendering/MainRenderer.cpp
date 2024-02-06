@@ -56,38 +56,8 @@ static std::shared_ptr<MeshData> CreateMeshData(const MeshComponent& mesh) {
     return std::shared_ptr<MeshData>(ret);
 }
 
-void MainRenderer::createGpuResources() {
-    R_Create_Pass_Resources();
-
-    R_Alloc_Cbuffers();
-    R_CreateEditorResource();
-    R_CreateRT();
-
+void MainRenderer::on_scene_change() {
     Scene& scene = Com_GetScene();
-
-    // create shader
-
-    m_box = CreateMeshData(geometry::MakeBox());
-
-    // create box quad
-    R_CreateQuad();
-
-    const int voxelSize = DVAR_GET_INT(r_voxelSize);
-
-    /// create voxel image
-    {
-        Texture3DCreateInfo info;
-        info.wrapS = info.wrapT = info.wrapR = GL_CLAMP_TO_BORDER;
-        info.size = voxelSize;
-        info.minFilter = GL_LINEAR_MIPMAP_LINEAR;
-        info.magFilter = GL_NEAREST;
-        info.mipLevel = log_two(voxelSize);
-        info.format = GL_RGBA16F;
-
-        m_albedoVoxel.create3DEmpty(info);
-        m_normalVoxel.create3DEmpty(info);
-    }
-
     // create mesh
     for (const auto& mesh : scene.GetComponentArray<MeshComponent>()) {
         g_meshdata.emplace_back(CreateMeshData(mesh));
@@ -136,12 +106,39 @@ void MainRenderer::createGpuResources() {
         mat.gpuResource = g_materialdata.back().get();
     }
 
+    g_constantCache.Update();
+}
+
+void MainRenderer::createGpuResources() {
+    R_Create_Pass_Resources();
+
+    R_Alloc_Cbuffers();
+    R_CreateEditorResource();
+    R_CreateRT();
+
+    const int voxelSize = DVAR_GET_INT(r_voxelSize);
+
+    /// create voxel image
+    {
+        Texture3DCreateInfo info;
+        info.wrapS = info.wrapT = info.wrapR = GL_CLAMP_TO_BORDER;
+        info.size = voxelSize;
+        info.minFilter = GL_LINEAR_MIPMAP_LINEAR;
+        info.magFilter = GL_NEAREST;
+        info.mipLevel = log_two(voxelSize);
+        info.format = GL_RGBA16F;
+
+        m_albedoVoxel.create3DEmpty(info);
+        m_normalVoxel.create3DEmpty(info);
+    }
+
+    // create box quad
+    R_CreateQuad();
+
     g_constantCache.cache.ShadowMap = gl::MakeTextureResident(g_shadowRT.GetDepthTexture().GetHandle());
     g_constantCache.cache.GbufferDepthMap = gl::MakeTextureResident(g_gbufferRT.GetDepthTexture().GetHandle());
-    g_constantCache.cache.GbufferPositionMetallicMap =
-        gl::MakeTextureResident(g_gbufferRT.GetColorAttachment(0).GetHandle());
-    g_constantCache.cache.GbufferNormalRoughnessMap =
-        gl::MakeTextureResident(g_gbufferRT.GetColorAttachment(1).GetHandle());
+    g_constantCache.cache.GbufferPositionMetallicMap = gl::MakeTextureResident(g_gbufferRT.GetColorAttachment(0).GetHandle());
+    g_constantCache.cache.GbufferNormalRoughnessMap = gl::MakeTextureResident(g_gbufferRT.GetColorAttachment(1).GetHandle());
     g_constantCache.cache.GbufferAlbedoMap = gl::MakeTextureResident(g_gbufferRT.GetColorAttachment(2).GetHandle());
     g_constantCache.cache.VoxelAlbedoMap = gl::MakeTextureResident(m_albedoVoxel.GetHandle());
     g_constantCache.cache.VoxelNormalMap = gl::MakeTextureResident(m_normalVoxel.GetHandle());
@@ -150,22 +147,24 @@ void MainRenderer::createGpuResources() {
     g_constantCache.cache.FXAA = gl::MakeTextureResident(g_fxaaRT.GetColorAttachment().GetHandle());
 
     g_constantCache.Update();
+
+    on_scene_change();
 }
 
-void MainRenderer::visualizeVoxels() {
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
+// void MainRenderer::visualizeVoxels() {
+//  glEnable(GL_CULL_FACE);
+//  glEnable(GL_DEPTH_TEST);
 
-    const auto& program = gProgramManager->GetShaderProgram(ProgramType::Visualization);
+// const auto& program = gProgramManager->GetShaderProgram(ProgramType::Visualization);
 
-    glBindVertexArray(m_box->vao);
-    program.Bind();
+// glBindVertexArray(m_box->vao);
+// program.Bind();
 
-    const int size = DVAR_GET_INT(r_voxelSize);
-    glDrawElementsInstanced(GL_TRIANGLES, m_box->count, GL_UNSIGNED_INT, 0, size * size * size);
+// const int size = DVAR_GET_INT(r_voxelSize);
+// glDrawElementsInstanced(GL_TRIANGLES, m_box->count, GL_UNSIGNED_INT, 0, size * size * size);
 
-    program.Unbind();
-}
+// program.Unbind();
+//}
 
 struct MaterialCache {
     vec4 albedo_color;  // if it doesn't have albedo color, then it's alpha is 0.0f
@@ -282,24 +281,13 @@ void MainRenderer::render() {
         R_Gbuffer_Pass();
         R_SSAO_Pass();
 
-        const int mode = DVAR_GET_INT(r_debugTexture);
+        R_Deferred_VCT_Pass();
+        R_FXAA_Pass();
 
-        switch (mode) {
-            case DrawTexture::TEXTURE_VOXEL_ALBEDO:
-            case DrawTexture::TEXTURE_VOXEL_NORMAL:
-                visualizeVoxels();
-                R_DrawEditor();
-                break;
-            default: {
-                R_Deferred_VCT_Pass();
-                R_FXAA_Pass();
-
-                g_viewerRT.Bind();
-                renderFrameBufferTextures(frameW, frameH);
-                R_DrawEditor();
-                g_viewerRT.Unbind();
-            } break;
-        }
+        g_viewerRT.Bind();
+        renderFrameBufferTextures(frameW, frameH);
+        R_DrawEditor();
+        g_viewerRT.Unbind();
     }
 }
 

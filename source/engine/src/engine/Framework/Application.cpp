@@ -1,11 +1,11 @@
 #include "Application.h"
 
 #include "Core/Input.h"
-#include "Graphics/MainRenderer.h"
 #include "GraphicsManager.h"
 #include "ProgramManager.h"
 #include "SceneManager.h"
 #include "imgui/imgui.h"
+#include "servers/rendering/MainRenderer.h"
 // @TODO: refactor
 
 #include "core/dynamic_variable/common_dvars.h"

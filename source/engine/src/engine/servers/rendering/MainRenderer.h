@@ -9,10 +9,10 @@ namespace vct {
 class MainRenderer {
 public:
     void createGpuResources();
+    void on_scene_change();
     void render();
     void renderFrameBufferTextures(int width, int height);
     void renderToVoxelTexture();
-    void visualizeVoxels();
     void destroyGpuResources();
 
     void gbufferPass();
@@ -20,7 +20,6 @@ public:
 
 private:
     /// vertex arrays
-    std::shared_ptr<MeshData> m_box;  // no normals
 
     /// textures
     GpuTexture m_albedoVoxel;

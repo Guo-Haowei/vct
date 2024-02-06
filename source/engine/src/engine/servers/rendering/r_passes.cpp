@@ -17,6 +17,9 @@ static GLuint g_noiseTexture;
 
 extern void FillMaterialCB(const MaterialData* mat, MaterialCB& cb);
 
+//////////////////////////
+#include "core/collections/fixed_stack.h"
+
 void R_Gbuffer_Pass() {
     Scene& scene = Com_GetScene();
     const auto& program = gProgramManager->GetShaderProgram(ProgramType::GBUFFER);

@@ -1,10 +1,17 @@
 #include "r_rendertarget.h"
 
+#include "core/collections/fixed_stack.h"
 #include "core/dynamic_variable/common_dvars.h"
 #include "r_cbuffers.h"
 #include "servers/display_server.h"
 
 using namespace vct;
+
+struct Pass {
+    enum { RENDER_TARGET_MAX = 8 };
+
+    vct::FixedStack<RenderTarget, RENDER_TARGET_MAX> m_render_targets;
+};
 
 void RenderTarget::Bind() { glBindFramebuffer(GL_FRAMEBUFFER, mHandle); }
 

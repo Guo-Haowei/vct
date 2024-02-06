@@ -93,6 +93,8 @@ int main(int argc, const char** argv) {
     Editor editor;
     editor.Run(argc, argv);
 
+    thread::request_shutdown();
+
     DisplayServer::singleton().finalize();
     UIManager::finalize();
 

@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "Core/Utility.h"
-#include "Graphics/GLPrerequisites.h"
+#include "servers/rendering/GLPrerequisites.h"
 
 #define SHADER_FOLDER ROOT_FOLDER "/Source/Shaders"
 

@@ -78,15 +78,15 @@ void DisplayServerGLFW::new_frame() {
     glfwGetFramebufferSize(m_window, &m_frame_size.x, &m_frame_size.y);
     glfwGetWindowPos(m_window, &m_window_pos.x, &m_window_pos.y);
 
-    //// title
-    // auto title = std::format("{} | Pos: {}x{} | Size: {}x{} | FPS: {:.1f}",
-    //                          "Editor",
-    //                          m_window_pos.x,
-    //                          m_window_pos.y,
-    //                          m_frame_size.x,
-    //                          m_frame_size.y,
-    //                          ImGui::GetIO().Framerate);
-    // glfwSetWindowTitle(m_window, title.c_str());
+    // title
+    auto title = std::format("{} | Pos: {}x{} | Size: {}x{} | FPS: {:.1f}",
+                             "Editor",
+                             m_window_pos.x,
+                             m_window_pos.y,
+                             m_frame_size.x,
+                             m_frame_size.y,
+                             ImGui::GetIO().Framerate);
+    glfwSetWindowTitle(m_window, title.c_str());
 
     ImGui_ImplGlfw_NewFrame();
 }

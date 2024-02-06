@@ -1,8 +1,8 @@
 #include "debug_panel.h"
 
 #include "Engine/Core/camera.h"
-#include "Engine/Graphics/r_defines.h"
 #include "Engine/Scene/Scene.h"
+#include "servers/rendering/r_defines.h"
 
 /////////////////////
 #include "core/dynamic_variable/common_dvars.h"

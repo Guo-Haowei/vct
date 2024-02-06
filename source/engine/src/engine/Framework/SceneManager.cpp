@@ -1,9 +1,9 @@
 #include "SceneManager.h"
 
-#include "Graphics/r_cbuffers.h"
-#include "Graphics/r_sun_shadow.h"
 #include "Scene/AssimpSceneLoader.h"
 #include "imgui/imgui.h"
+#include "servers/rendering/r_cbuffers.h"
+#include "servers/rendering/r_sun_shadow.h"
 ///
 #include "core/dynamic_variable/common_dvars.h"
 #include "servers/display_server.h"
@@ -11,6 +11,8 @@
 using namespace vct;
 
 static Scene g_scene;
+
+static std::atomic<Scene*> s_scene_ptr;
 
 SceneManager* gSceneManager = new SceneManager;
 
