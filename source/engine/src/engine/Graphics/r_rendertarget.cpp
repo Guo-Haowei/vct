@@ -1,8 +1,10 @@
 #include "r_rendertarget.h"
 
-#include "Framework/WindowManager.h"
 #include "core/dynamic_variable/common_dvars.h"
 #include "r_cbuffers.h"
+#include "servers/display_server.h"
+
+using namespace vct;
 
 void RenderTarget::Bind() { glBindFramebuffer(GL_FRAMEBUFFER, mHandle); }
 
@@ -186,7 +188,7 @@ FinalImageRT g_viewerRT;
 uint32_t gFinalImage;
 
 void R_CreateRT() {
-    auto [w, h] = gWindowManager->GetFrameSize();
+    auto [w, h] = DisplayServerGLFW::singleton().get_frame_size();
 
     const int res = DVAR_GET_INT(r_shadowRes);
     DEV_ASSERT(is_power_of_two(res));

@@ -4,13 +4,13 @@
 #include "Core/geometry.h"
 #include "Framework/ProgramManager.h"
 #include "Framework/SceneManager.h"
-#include "Framework/WindowManager.h"
 #include "core/dynamic_variable/common_dvars.h"
 #include "r_defines.h"
 #include "r_editor.h"
 #include "r_passes.h"
 #include "r_rendertarget.h"
 #include "r_sun_shadow.h"
+#include "servers/display_server.h"
 
 static std::vector<std::shared_ptr<MeshData>> g_meshdata;
 static std::vector<std::shared_ptr<MaterialData>> g_materialdata;
@@ -274,7 +274,7 @@ void MainRenderer::render() {
         renderToVoxelTexture();
     }
 
-    auto [frameW, frameH] = gWindowManager->GetFrameSize();
+    auto [frameW, frameH] = DisplayServerGLFW::singleton().get_frame_size();
     if (frameW * frameH > 0) {
         // skip rendering if minimized
         glViewport(0, 0, frameW, frameH);

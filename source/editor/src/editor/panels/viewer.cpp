@@ -1,15 +1,15 @@
 #include "viewer.h"
 
 #include "Engine/Core/Input.h"
+#include "Engine/Core/camera.h"
 #include "Engine/Framework/SceneManager.h"
-#include "Engine/Framework/WindowManager.h"
 #include "ImGuizmo/ImGuizmo.h"
-#include "core/math/ray.h"
 #include "gizmo.h"
 #include "imgui/imgui_internal.h"
 
 // @TODO: refactor
-#include "Engine/Core/camera.h"
+#include "core/math/ray.h"
+#include "servers/display_server.h"
 extern uint32_t gFinalImage;
 
 static void camera_control(Camera& camera);
@@ -41,7 +41,7 @@ void Viewer::RenderInternal(Scene& scene) {
     if (IsFocused()) {
         if (Input::IsButtonPressed(EMouseButton::MIDDLE)) {
 
-            auto [windowX, windowY] = gWindowManager->GetWindowPos();
+            auto [windowX, windowY] = DisplayServerGLFW::singleton().get_window_pos();
             vec2 clicked = Input::GetCursor();
             clicked.x = (clicked.x + windowX - canvasMinToScreen.x) / contentSize.x;
             clicked.y = (clicked.y + windowY - canvasMinToScreen.y) / contentSize.y;

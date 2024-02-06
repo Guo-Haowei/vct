@@ -30,7 +30,7 @@ DVAR_INT(r_voxelSize, DVAR_FLAG_NONE, 64);
 
 // CSM
 DVAR_INT(r_debugCSM, DVAR_FLAG_NONE, 0);
-DVAR_INT(r_shadowRes, DVAR_FLAG_NONE, 1024);
+DVAR_INT(r_shadowRes, DVAR_FLAG_NONE, 1024 * 4);
 DVAR_INT(r_enableCSM, DVAR_FLAG_NONE, 1);
 
 // SSAO

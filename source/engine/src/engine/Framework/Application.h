@@ -3,7 +3,6 @@
 #include "ManagerBase.h"
 
 class UIManager;
-class WindowManager;
 
 class Application {
 public:

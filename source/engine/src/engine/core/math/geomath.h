@@ -27,18 +27,6 @@ using glm::mat4;
 
 using glm::quat;
 
-template<typename T>
-constexpr inline T min_val(const T& a, const T& b) {
-    return glm::min(a, b);
-    // return a < b ? a : b;
-}
-
-template<typename T>
-constexpr inline T max_val(const T& a, const T& b) {
-    return glm::max(a, b);
-    // return a > b ? a : b;
-}
-
 template<typename T, class = typename std::enable_if<std::is_integral<T>::value>::type>
 constexpr inline T align(T size, T alignment) {
     return (size + alignment - 1) & ~(alignment - 1);
@@ -84,4 +72,4 @@ static inline void Decompose(const mat4& matrix, vec3& scale, vec4& rotation, ve
     rotation.w = quaternion.w;
 }
 
-static inline float SaturateF(float x) { return min_val(1.0f, max_val(0.0f, x)); }
+static inline float SaturateF(float x) { return glm::min(1.0f, glm::max(0.0f, x)); }

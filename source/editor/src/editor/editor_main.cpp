@@ -1,6 +1,8 @@
 #include "EditorLayer.h"
+#include "Framework/UIManager.h"
 #include "core/os/os.h"
 #include "core/utility/command_line.h"
+#include "servers/display_server.h"
 
 #define DEFINE_DVAR
 #include "core/dynamic_variable/common_dvars.h"
@@ -79,8 +81,14 @@ int main(int argc, const char** argv) {
     DynamicVariable::deserialize();
     process_command_line(argc, argv);
 
+    UIManager::initialize();
+    DisplayServerGLFW::singleton().initialize();
+
     Editor editor;
     editor.Run(argc, argv);
+
+    DisplayServerGLFW::singleton().finalize();
+    UIManager::finalize();
 
     DynamicVariable::serialize();
 

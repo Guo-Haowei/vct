@@ -2,6 +2,7 @@
 
 #include "core/collections/fixed_stack.h"
 #include "core/collections/ring_buffer.h"
+#include "core/math/geomath.h"
 
 #define WIN_CALL(x) x
 
@@ -156,7 +157,7 @@ void Context::Dispatch(uint32_t jobCount, uint32_t groupSize, const std::functio
         job.task = task;
         job.groupID = groupID;
         job.groupJobOffset = groupID * groupSize;
-        job.groupJobEnd = min(job.groupJobOffset + groupSize, jobCount);
+        job.groupJobEnd = glm::min(job.groupJobOffset + groupSize, jobCount);
 
         while (!sJSGlob.jobQueue.PushBack(job)) {
             // if job queue is full, notify all and let main thread do the work as well

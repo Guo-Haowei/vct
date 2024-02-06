@@ -38,18 +38,18 @@ public:
     }
 
     void expand_point(const vec_type& point) {
-        m_min = min_val(m_min, point);
-        m_max = max_val(m_max, point);
+        m_min = glm::min(m_min, point);
+        m_max = glm::max(m_max, point);
     }
 
     void union_box(const self_type& o) {
-        m_min = min_val(m_min, o.m_min);
-        m_max = max_val(m_max, o.m_max);
+        m_min = glm::min(m_min, o.m_min);
+        m_max = glm::max(m_max, o.m_max);
     }
 
     void intersect_box(const self_type& o) {
-        m_min = max_val(m_min, o.m_min);
-        m_max = min_val(m_max, o.m_max);
+        m_min = glm::min(m_min, o.m_min);
+        m_max = glm::max(m_max, o.m_max);
     }
 
     vec_type center() const { return 0.5f * (m_min + m_max); }

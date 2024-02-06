@@ -10,13 +10,6 @@
 
 using jobsystem::Context;
 
-#ifdef min
-#undef min
-#endif
-#ifdef max
-#undef max
-#endif
-
 void Scene::Update(float dt) {
     mDeltaTime = dt;
 

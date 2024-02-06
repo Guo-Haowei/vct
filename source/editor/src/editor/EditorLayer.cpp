@@ -2,7 +2,6 @@
 
 #include "Engine/Core/Input.h"
 #include "Engine/Framework/SceneManager.h"
-#include "Engine/Framework/WindowManager.h"
 #include "Engine/Graphics/r_cbuffers.h"
 #include "imgui/imgui_internal.h"
 /////////////////////
@@ -12,6 +11,7 @@
 #include "panels/hierarchy_panel.h"
 #include "panels/propertiy_panel.h"
 #include "panels/viewer.h"
+#include "servers/display_server.h"
 
 EditorLayer::EditorLayer() : Layer("EditorLayer") {
     AddPanel(std::make_shared<ConsolePanel>());

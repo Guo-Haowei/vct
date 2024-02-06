@@ -2,8 +2,6 @@
 #include "InputCode.h"
 #include "core/math/geomath.h"
 
-class WindowManager;
-
 class Input {
     using KeyArray = std::array<bool, std::to_underlying(EKeyCode::COUNT)>;
     using ButtonArray = std::array<bool, std::to_underlying(EMouseButton::COUNT)>;
@@ -24,14 +22,16 @@ public:
     static const vec2& Wheel();
     static vec2 MouseMove();
 
-private:
-    Input();
-
     void SetButton(int button, bool pressed);
     void SetKey(int key, bool pressed);
 
     void SetCursor(float x, float y);
     void SetWheel(float x, float y);
+
+    static Input gInput;
+
+private:
+    Input();
 
     KeyArray mKeys;
     KeyArray mPrevKeys;
@@ -43,8 +43,4 @@ private:
     vec2 mPrevCursor{ 0, 0 };
 
     vec2 mWheel{ 0, 0 };
-
-    static Input gInput;
-
-    friend class WindowManager;
 };

@@ -2,16 +2,15 @@
 
 #include "Core/Input.h"
 #include "Core/JobSystem.h"
+#include "Graphics/MainRenderer.h"
 #include "GraphicsManager.h"
 #include "ProgramManager.h"
 #include "SceneManager.h"
-#include "UIManager.h"
-#include "WindowManager.h"
-#include "core/dynamic_variable/common_dvars.h"
-
-// @TODO: refactor
-#include "Graphics/MainRenderer.h"
 #include "imgui/imgui.h"
+// @TODO: refactor
+
+#include "core/dynamic_variable/common_dvars.h"
+#include "servers/display_server.h"
 
 class JobSystemManager : public ManagerBase {
 public:
@@ -32,8 +31,6 @@ void Application::RegisterManager(ManagerBase* manager) {
 
 bool Application::RegisterManagers() {
     RegisterManager(&gJobSystemManager);
-    RegisterManager(gUIManager);
-    RegisterManager(gWindowManager);
     RegisterManager(gGraphicsManager);
     RegisterManager(gProgramManager);
     RegisterManager(gSceneManager);
@@ -76,8 +73,8 @@ int Application::Run(int, const char**) {
     }
 
     float dt = 0.0f;
-    while (!gWindowManager->ShouldClose()) {
-        gWindowManager->NewFrame();
+    while (!DisplayServerGLFW::singleton().should_close()) {
+        DisplayServerGLFW::singleton().new_frame();
 
         Input::BeginFrame();
 
@@ -95,14 +92,14 @@ int Application::Run(int, const char**) {
 
         renderer.render();
 
-        gWindowManager->Present();
+        DisplayServerGLFW::singleton().present();
 
         ImGui::EndFrame();
     }
 
-    auto [w, h] = gWindowManager->GetFrameSize();
+    auto [w, h] = DisplayServerGLFW::singleton().get_frame_size();
     DVAR_SET_IVEC2(window_resolution, w, h);
-    auto [x, y] = gWindowManager->GetWindowPos();
+    auto [x, y] = DisplayServerGLFW::singleton().get_window_pos();
     DVAR_SET_IVEC2(window_position, x, y);
 
     renderer.destroyGpuResources();

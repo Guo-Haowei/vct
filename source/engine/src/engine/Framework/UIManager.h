@@ -1,16 +1,7 @@
 #pragma once
-#include "ManagerBase.h"
 
-class UIManager : public ManagerBase {
+class UIManager {
 public:
-    UIManager() : ManagerBase("UIManager") {}
-
-protected:
-    virtual bool InitializeInternal() override;
-    virtual void FinalizeInternal() override;
-
-private:
-    void SetupStyle();
+    static bool initialize();
+    static void finalize();
 };
-
-extern UIManager* gUIManager;
