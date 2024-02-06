@@ -1,4 +1,4 @@
-#include "display_server.h"
+#include "display_server_glfw.h"
 
 #include "Framework/Application.h"
 #include "GLFW/glfw3.h"
@@ -8,8 +8,6 @@
 #include "imgui/backends/imgui_impl_opengl3.h"
 
 namespace vct {
-
-static DisplayServerGLFW s_display_server;
 
 bool DisplayServerGLFW::initialize() {
     glfwSetErrorCallback([](int code, const char* desc) { LOG_FATAL("[glfw] error({}): {}", code, desc); });
@@ -71,27 +69,24 @@ void DisplayServerGLFW::finalize() {
     glfwTerminate();
 }
 
-bool DisplayServerGLFW::should_close() { return glfwWindowShouldClose(m_window); }
-
-GLFWwindow* DisplayServerGLFW::get_window_ptr() {
-    return m_window;
+bool DisplayServerGLFW::should_close() {
+    return glfwWindowShouldClose(m_window);
 }
 
 void DisplayServerGLFW::new_frame() {
     glfwPollEvents();
     glfwGetFramebufferSize(m_window, &m_frame_size.x, &m_frame_size.y);
-
     glfwGetWindowPos(m_window, &m_window_pos.x, &m_window_pos.y);
 
-    // title
-    auto title = std::format("{} | Pos: {}x{} | Size: {}x{} | FPS: {:.1f}",
-                             "Editor",
-                             m_window_pos.x,
-                             m_window_pos.y,
-                             m_frame_size.x,
-                             m_frame_size.y,
-                             ImGui::GetIO().Framerate);
-    glfwSetWindowTitle(m_window, title.c_str());
+    //// title
+    // auto title = std::format("{} | Pos: {}x{} | Size: {}x{} | FPS: {:.1f}",
+    //                          "Editor",
+    //                          m_window_pos.x,
+    //                          m_window_pos.y,
+    //                          m_frame_size.x,
+    //                          m_frame_size.y,
+    //                          ImGui::GetIO().Framerate);
+    // glfwSetWindowTitle(m_window, title.c_str());
 
     ImGui_ImplGlfw_NewFrame();
 }

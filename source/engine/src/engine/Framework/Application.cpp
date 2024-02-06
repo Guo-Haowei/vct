@@ -62,8 +62,8 @@ int Application::Run(int, const char**) {
     }
 
     float dt = 0.0f;
-    while (!DisplayServerGLFW::singleton().should_close()) {
-        DisplayServerGLFW::singleton().new_frame();
+    while (!DisplayServer::singleton().should_close()) {
+        DisplayServer::singleton().new_frame();
 
         Input::BeginFrame();
 
@@ -81,14 +81,14 @@ int Application::Run(int, const char**) {
 
         renderer.render();
 
-        DisplayServerGLFW::singleton().present();
+        DisplayServer::singleton().present();
 
         ImGui::EndFrame();
     }
 
-    auto [w, h] = DisplayServerGLFW::singleton().get_frame_size();
+    auto [w, h] = DisplayServer::singleton().get_frame_size();
     DVAR_SET_IVEC2(window_resolution, w, h);
-    auto [x, y] = DisplayServerGLFW::singleton().get_window_pos();
+    auto [x, y] = DisplayServer::singleton().get_window_pos();
     DVAR_SET_IVEC2(window_position, x, y);
 
     renderer.destroyGpuResources();

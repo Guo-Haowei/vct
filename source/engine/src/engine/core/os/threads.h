@@ -4,7 +4,9 @@ namespace vct::thread {
 
 using ThreadMainFunc = std::function<void()>;
 
-enum THREAD_ID : uint32_t {
+enum ThreadID : uint32_t {
+    THREAD_MAIN = 0,
+    THREAD_ASSET_LOADER,
     THREAD_JOB_SYSTEM_WORKER_0,
     THREAD_JOB_SYSTEM_WORKER_1,
     THREAD_JOB_SYSTEM_WORKER_2,
@@ -13,9 +15,7 @@ enum THREAD_ID : uint32_t {
     THREAD_JOB_SYSTEM_WORKER_5,
     THREAD_JOB_SYSTEM_WORKER_6,
     THREAD_JOB_SYSTEM_WORKER_7,
-    THREAD_COUNT,
-
-    THREAD_MAIN = static_cast<uint32_t>(-1),
+    THREAD_MAX,
 };
 
 void initialize();

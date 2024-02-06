@@ -1,10 +1,10 @@
 #include "EditorLayer.h"
 #include "Framework/UIManager.h"
 #include "core/os/os.h"
-#include "core/os/thread_pool.h"
+#include "core/os/threads.h"
 #include "core/systems/job_system.h"
 #include "core/utility/command_line.h"
-#include "servers/display_server.h"
+#include "servers/display_server_glfw.h"
 
 #define DEFINE_DVAR
 #include "core/dynamic_variable/common_dvars.h"
@@ -75,6 +75,7 @@ static void process_command_line(int argc, const char** argv) {
 
 // @TODO: init os properly
 static vct::OS s_os;
+static vct::DisplayServer* s_display_server = new vct::DisplayServerGLFW;
 
 int main(int argc, const char** argv) {
     OS::singleton().initialize();
@@ -87,12 +88,12 @@ int main(int argc, const char** argv) {
     jobsystem::initialize();
 
     UIManager::initialize();
-    DisplayServerGLFW::singleton().initialize();
+    DisplayServer::singleton().initialize();
 
     Editor editor;
     editor.Run(argc, argv);
 
-    DisplayServerGLFW::singleton().finalize();
+    DisplayServer::singleton().finalize();
     UIManager::finalize();
 
     jobsystem::finalize();

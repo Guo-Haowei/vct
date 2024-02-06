@@ -2,7 +2,7 @@
 
 #include "core/collections/thread_safe_ring_buffer.h"
 #include "core/math/geomath.h"
-#include "core/os/thread_pool.h"
+#include "core/os/threads.h"
 
 namespace vct::jobsystem {
 

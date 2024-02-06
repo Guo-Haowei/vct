@@ -1,9 +1,10 @@
-#include "thread_pool.h"
+#include "threads.h"
 
 #include <thread>
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
+#include "assets/asset_loader.h"
 #include "core/io/print.h"
 #include "core/systems/job_system.h"
 
@@ -20,22 +21,24 @@ static thread_local uint32_t g_threadID;
 static struct
 {
     std::atomic_bool shutdownRequested;
-    std::array<ThreadObject, THREAD_COUNT> threads = {
-        ThreadObject{ "THREAD_JOB_SYSTEM_WORKER_0", jobsystem::worker_main },
-        ThreadObject{ "THREAD_JOB_SYSTEM_WORKER_1", jobsystem::worker_main },
-        ThreadObject{ "THREAD_JOB_SYSTEM_WORKER_2", jobsystem::worker_main },
-        ThreadObject{ "THREAD_JOB_SYSTEM_WORKER_3", jobsystem::worker_main },
-        ThreadObject{ "THREAD_JOB_SYSTEM_WORKER_4", jobsystem::worker_main },
-        ThreadObject{ "THREAD_JOB_SYSTEM_WORKER_5", jobsystem::worker_main },
-        ThreadObject{ "THREAD_JOB_SYSTEM_WORKER_6", jobsystem::worker_main },
-        ThreadObject{ "THREAD_JOB_SYSTEM_WORKER_7", jobsystem::worker_main },
+    std::array<ThreadObject, THREAD_MAX> threads = {
+        ThreadObject{ "main" },
+        ThreadObject{ "asset loader", loader_main },
+        ThreadObject{ "js worker 0", jobsystem::worker_main },
+        ThreadObject{ "js worker 1", jobsystem::worker_main },
+        ThreadObject{ "js worker 2", jobsystem::worker_main },
+        ThreadObject{ "js worker 3", jobsystem::worker_main },
+        ThreadObject{ "js worker 4", jobsystem::worker_main },
+        ThreadObject{ "js worker 5", jobsystem::worker_main },
+        ThreadObject{ "js worker 6", jobsystem::worker_main },
+        ThreadObject{ "js worker 7", jobsystem::worker_main },
     };
 } s_glob;
 
 auto initialize() -> void {
     g_threadID = THREAD_MAIN;
 
-    for (uint32_t id = 0; id < THREAD_COUNT; ++id) {
+    for (uint32_t id = THREAD_MAIN + 1; id < THREAD_MAX; ++id) {
         ThreadObject& thread = s_glob.threads[id];
         thread.id = id;
         thread.thread = std::thread(
@@ -58,14 +61,15 @@ auto initialize() -> void {
         HRESULT hr = SetThreadDescription(handle, wname.c_str());
         DEV_ASSERT(!FAILED(hr));
 
-        LOG("[thread_pool] thread '{}'(id: {}) created.", thread.name, thread.id);
+        LOG_VERBOSE("[threads] thread '{}'(id: {}) created.", thread.name, thread.id);
     }
 }
 
 void finailize() {
-    for (auto& thread : s_glob.threads) {
+    for (uint32_t id = THREAD_MAIN + 1; id < THREAD_MAX; ++id) {
+        auto& thread = s_glob.threads[id];
         thread.thread.join();
-        LOG("[thread_pool] thread '{}'(id: {}) joined.", thread.name, thread.id);
+        LOG_VERBOSE("[threads] thread '{}'(id: {}) joined.", thread.name, thread.id);
     }
 }
 

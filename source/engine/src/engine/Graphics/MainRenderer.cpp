@@ -274,7 +274,7 @@ void MainRenderer::render() {
         renderToVoxelTexture();
     }
 
-    auto [frameW, frameH] = DisplayServerGLFW::singleton().get_frame_size();
+    auto [frameW, frameH] = DisplayServer::singleton().get_frame_size();
     if (frameW * frameH > 0) {
         // skip rendering if minimized
         glViewport(0, 0, frameW, frameH);

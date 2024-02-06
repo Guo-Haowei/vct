@@ -41,7 +41,7 @@ void Viewer::RenderInternal(Scene& scene) {
     if (IsFocused()) {
         if (Input::IsButtonPressed(EMouseButton::MIDDLE)) {
 
-            auto [windowX, windowY] = DisplayServerGLFW::singleton().get_window_pos();
+            auto [windowX, windowY] = DisplayServer::singleton().get_window_pos();
             vec2 clicked = Input::GetCursor();
             clicked.x = (clicked.x + windowX - canvasMinToScreen.x) / contentSize.x;
             clicked.y = (clicked.y + windowY - canvasMinToScreen.y) / contentSize.y;

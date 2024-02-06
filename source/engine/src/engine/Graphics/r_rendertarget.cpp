@@ -188,7 +188,7 @@ FinalImageRT g_viewerRT;
 uint32_t gFinalImage;
 
 void R_CreateRT() {
-    auto [w, h] = DisplayServerGLFW::singleton().get_frame_size();
+    auto [w, h] = DisplayServer::singleton().get_frame_size();
 
     const int res = DVAR_GET_INT(r_shadowRes);
     DEV_ASSERT(is_power_of_two(res));

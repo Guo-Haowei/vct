@@ -231,7 +231,7 @@ void DynamicVariable::print_value_change(std::string_view source) {
             break;
     }
 
-    LOG_VERBOSE("change dvar '{}'({}) to {} (source: {})", m_debug_name, s_names[m_type], value_string, source);
+    LOG_VERBOSE("[dvar] change dvar '{}'({}) to {} (source: {})", m_debug_name, s_names[m_type], value_string, source);
 }
 
 DynamicVariable* DynamicVariable::find_dvar(const std::string& name) {

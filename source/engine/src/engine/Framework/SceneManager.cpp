@@ -67,7 +67,7 @@ static void Com_UpdateWorld() {
     Scene& scene = Com_GetScene();
 
     // update camera
-    auto [frameW, frameH] = DisplayServerGLFW::singleton().get_frame_size();
+    auto [frameW, frameH] = DisplayServer::singleton().get_frame_size();
     const float aspect = (float)frameW / frameH;
     DEV_ASSERT(aspect > 0.0f);
 
