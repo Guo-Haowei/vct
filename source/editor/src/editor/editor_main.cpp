@@ -1,6 +1,10 @@
 #include "EditorLayer.h"
+#include "Framework/UIManager.h"
 #include "core/os/os.h"
+#include "core/os/threads.h"
+#include "core/systems/job_system.h"
 #include "core/utility/command_line.h"
+#include "servers/display_server_glfw.h"
 
 #define DEFINE_DVAR
 #include "core/dynamic_variable/common_dvars.h"
@@ -13,12 +17,13 @@ static void register_common_dvars() {
 ////////////////////////////////////////////////////////////
 class Editor : public Application {
 public:
-    Editor() : Application(Application::InitInfo{ "Editor", false }) {
+    Editor() {
         AddLayer(std::make_shared<EditorLayer>());
     }
 };
 
 ////////////////////////////////////////////////////////////
+
 static std::string editor_command_help_option(std::string_view alias, std::string_view name, std::string_view param, std::string_view desc) {
     std::string result;
     result.reserve(128);
@@ -70,6 +75,7 @@ static void process_command_line(int argc, const char** argv) {
 
 // @TODO: init os properly
 static vct::OS s_os;
+static vct::DisplayServer* s_display_server = new vct::DisplayServerGLFW;
 
 int main(int argc, const char** argv) {
     OS::singleton().initialize();
@@ -78,8 +84,22 @@ int main(int argc, const char** argv) {
     DynamicVariable::deserialize();
     process_command_line(argc, argv);
 
+    thread::initialize();
+    jobsystem::initialize();
+
+    UIManager::initialize();
+    DisplayServer::singleton().initialize();
+
     Editor editor;
     editor.Run(argc, argv);
+
+    thread::request_shutdown();
+
+    DisplayServer::singleton().finalize();
+    UIManager::finalize();
+
+    jobsystem::finalize();
+    thread::finailize();
 
     DynamicVariable::serialize();
 

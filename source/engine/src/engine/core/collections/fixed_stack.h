@@ -38,7 +38,7 @@ public:
     }
 
     void clear() { m_size = 0; }
-    void resize(size_t newSize) { m_size = newSize; }
+    void resize(size_t new_size) { m_size = new_size; }
 
     bool empty() const { return m_size == 0; }
     size_t size() const { return m_size; }

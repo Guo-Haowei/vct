@@ -1,6 +1,6 @@
 #pragma once
-#include "Graphics/Program.h"
 #include "ManagerBase.h"
+#include "servers/rendering/Program.h"
 
 enum class ProgramType {
     IMAGE2D,

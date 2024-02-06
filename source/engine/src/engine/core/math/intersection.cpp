@@ -12,11 +12,11 @@ bool TestIntersection::ray_aabb(const AABB& aabb, Ray& ray) {
     vec3 t0s = (aabb.m_min - ray.m_start) * inv_d;
     vec3 t1s = (aabb.m_max - ray.m_start) * inv_d;
 
-    vec3 tsmaller = min_val(t0s, t1s);
-    vec3 tbigger = max_val(t0s, t1s);
+    vec3 tsmaller = glm::min(t0s, t1s);
+    vec3 tbigger = glm::max(t0s, t1s);
 
-    float tmin = max_val(-FLT_MAX, max_val(tsmaller.x, max_val(tsmaller.y, tsmaller.z)));
-    float tmax = min_val(FLT_MAX, min_val(tbigger.x, min_val(tbigger.y, tbigger.z)));
+    float tmin = glm::max(-FLT_MAX, glm::max(tsmaller.x, glm::max(tsmaller.y, tsmaller.z)));
+    float tmax = glm::min(FLT_MAX, glm::min(tbigger.x, glm::min(tbigger.y, tbigger.z)));
 
     // check bounding box
     if (tmin >= tmax || tmin <= 0.0f || tmin >= ray.m_dist) {

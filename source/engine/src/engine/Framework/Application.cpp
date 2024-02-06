@@ -1,30 +1,18 @@
 #include "Application.h"
 
 #include "Core/Input.h"
-#include "Core/JobSystem.h"
 #include "GraphicsManager.h"
 #include "ProgramManager.h"
 #include "SceneManager.h"
-#include "UIManager.h"
-#include "WindowManager.h"
-#include "core/dynamic_variable/common_dvars.h"
-
-// @TODO: refactor
-#include "Core/lua_script.h"
-#include "Graphics/MainRenderer.h"
 #include "imgui/imgui.h"
+#include "servers/rendering/MainRenderer.h"
+// @TODO: refactor
 
-class JobSystemManager : public ManagerBase {
-public:
-    JobSystemManager() : ManagerBase("JobSystemManager") {}
+#include "core/dynamic_variable/common_dvars.h"
+#include "core/systems/job_system.h"
+#include "servers/display_server.h"
 
-protected:
-    virtual bool InitializeInternal() override { return jobsystem::initialize(); }
-
-    virtual void FinalizeInternal() override { jobsystem::finalize(); }
-};
-
-static JobSystemManager gJobSystemManager;
+using namespace vct;
 
 void Application::RegisterManager(ManagerBase* manager) {
     mManagers.emplace_back(manager);
@@ -32,9 +20,6 @@ void Application::RegisterManager(ManagerBase* manager) {
 }
 
 bool Application::RegisterManagers() {
-    RegisterManager(&gJobSystemManager);
-    RegisterManager(gUIManager);
-    RegisterManager(gWindowManager);
     RegisterManager(gGraphicsManager);
     RegisterManager(gProgramManager);
     RegisterManager(gSceneManager);
@@ -77,8 +62,8 @@ int Application::Run(int, const char**) {
     }
 
     float dt = 0.0f;
-    while (!gWindowManager->ShouldClose()) {
-        gWindowManager->NewFrame();
+    while (!DisplayServer::singleton().should_close()) {
+        DisplayServer::singleton().new_frame();
 
         Input::BeginFrame();
 
@@ -96,14 +81,14 @@ int Application::Run(int, const char**) {
 
         renderer.render();
 
-        gWindowManager->Present();
+        DisplayServer::singleton().present();
 
         ImGui::EndFrame();
     }
 
-    auto [w, h] = gWindowManager->GetFrameSize();
+    auto [w, h] = DisplayServer::singleton().get_frame_size();
     DVAR_SET_IVEC2(window_resolution, w, h);
-    auto [x, y] = gWindowManager->GetWindowPos();
+    auto [x, y] = DisplayServer::singleton().get_window_pos();
     DVAR_SET_IVEC2(window_position, x, y);
 
     renderer.destroyGpuResources();

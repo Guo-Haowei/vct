@@ -1,8 +1,8 @@
 #include "GraphicsManager.h"
 
-#include "Graphics/GLPrerequisites.h"
 #include "core/dynamic_variable/common_dvars.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
+#include "servers/rendering/GLPrerequisites.h"
 
 using namespace vct;
 
