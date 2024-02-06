@@ -1,7 +1,6 @@
 #include "Application.h"
 
 #include "Core/Input.h"
-#include "Core/JobSystem.h"
 #include "Graphics/MainRenderer.h"
 #include "GraphicsManager.h"
 #include "ProgramManager.h"
@@ -10,19 +9,10 @@
 // @TODO: refactor
 
 #include "core/dynamic_variable/common_dvars.h"
+#include "core/systems/job_system.h"
 #include "servers/display_server.h"
 
-class JobSystemManager : public ManagerBase {
-public:
-    JobSystemManager() : ManagerBase("JobSystemManager") {}
-
-protected:
-    virtual bool InitializeInternal() override { return jobsystem::initialize(); }
-
-    virtual void FinalizeInternal() override { jobsystem::finalize(); }
-};
-
-static JobSystemManager gJobSystemManager;
+using namespace vct;
 
 void Application::RegisterManager(ManagerBase* manager) {
     mManagers.emplace_back(manager);
@@ -30,7 +20,6 @@ void Application::RegisterManager(ManagerBase* manager) {
 }
 
 bool Application::RegisterManagers() {
-    RegisterManager(&gJobSystemManager);
     RegisterManager(gGraphicsManager);
     RegisterManager(gProgramManager);
     RegisterManager(gSceneManager);

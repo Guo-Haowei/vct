@@ -2,13 +2,26 @@
 
 #include <thread>
 
-#include "Core/JobSystem.h"
 #include "Core/Timer.h"
+// #include "Math/Primitives.h"
 #include "core/dynamic_variable/common_dvars.h"
 #include "core/io/archive.h"
-// #include "Math/Primitives.h"
+#include "core/systems/job_system.h"
 
-using jobsystem::Context;
+using namespace vct::jobsystem;
+
+// @TODO: refactor
+#if 1
+#define JS_PARALLEL_FOR(CTX, INDEX, COUNT, SUBCOUNT, BODY) \
+    CTX.dispatch(                                          \
+        static_cast<uint32_t>(COUNT),                      \
+        SUBCOUNT,                                          \
+        [&](JobArgs args) { const uint32_t INDEX = args.job_index; do BODY while(0); })
+#else
+#define JS_PARALLEL_FOR(CTX, INDEX, COUNT, SUBCOUNT, BODY) \
+    (void)(CTX);                                           \
+    for (uint32_t INDEX = 0; INDEX < static_cast<uint32_t>(COUNT); ++INDEX) BODY
+#endif
 
 void Scene::Update(float dt) {
     mDeltaTime = dt;
@@ -16,13 +29,13 @@ void Scene::Update(float dt) {
     Context ctx;
 
     RunAnimationUpdateSystem(ctx);  // update animation
-    ctx.Wait();
+    ctx.wait();
     RunTransformUpdateSystem(ctx);  // update local matrices
-    ctx.Wait();
+    ctx.wait();
     RunHierarchyUpdateSystem(ctx);  // update world matrices
-    ctx.Wait();
+    ctx.wait();
     RunArmatureUpdateSystem(ctx);  // update armature matrices
-    ctx.Wait();
+    ctx.wait();
 
     // update bounding boxes
     // RunObjectUpdateSystem();

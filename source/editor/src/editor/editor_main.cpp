@@ -1,6 +1,8 @@
 #include "EditorLayer.h"
 #include "Framework/UIManager.h"
 #include "core/os/os.h"
+#include "core/os/thread_pool.h"
+#include "core/systems/job_system.h"
 #include "core/utility/command_line.h"
 #include "servers/display_server.h"
 
@@ -81,6 +83,9 @@ int main(int argc, const char** argv) {
     DynamicVariable::deserialize();
     process_command_line(argc, argv);
 
+    thread::initialize();
+    jobsystem::initialize();
+
     UIManager::initialize();
     DisplayServerGLFW::singleton().initialize();
 
@@ -89,6 +94,9 @@ int main(int argc, const char** argv) {
 
     DisplayServerGLFW::singleton().finalize();
     UIManager::finalize();
+
+    jobsystem::finalize();
+    thread::finailize();
 
     DynamicVariable::serialize();
 

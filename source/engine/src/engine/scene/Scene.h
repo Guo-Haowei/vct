@@ -9,7 +9,7 @@
 // @TODO: remove
 using namespace vct;
 
-namespace jobsystem {
+namespace vct::jobsystem {
 class Context;
 }
 
