@@ -15,13 +15,14 @@ public:
     HierarchyCreator(HierarchyPanel& panel) : mPanel(panel) {}
 
     void Draw(const Scene& scene) {
-        Build(scene);
-        DEV_ASSERT(mRoot);
-        DrawNode(scene, mRoot, ImGuiTreeNodeFlags_DefaultOpen);
+        if (Build(scene)) {
+            DEV_ASSERT(mRoot);
+            DrawNode(scene, mRoot, ImGuiTreeNodeFlags_DefaultOpen);
+        }
     }
 
 private:
-    void Build(const Scene& scene);
+    bool Build(const Scene& scene);
     void DrawNode(const Scene& scene, HierarchyNode* pNode, ImGuiTreeNodeFlags flags = 0);
 
     std::map<ecs::Entity, std::shared_ptr<HierarchyNode>> m_nodes;
@@ -56,10 +57,13 @@ void HierarchyCreator::DrawNode(const Scene& scene, HierarchyNode* pHier, ImGuiT
     }
 }
 
-void HierarchyCreator::Build(const Scene& scene) {
-    const size_t hierarchyComponentCount = scene.GetCount<HierarchyComponent>();
+bool HierarchyCreator::Build(const Scene& scene) {
+    const size_t hierarchy_count = scene.GetCount<HierarchyComponent>();
+    if (hierarchy_count == 0) {
+        return false;
+    }
 
-    for (int i = 0; i < hierarchyComponentCount; ++i) {
+    for (int i = 0; i < hierarchy_count; ++i) {
         auto FindOrCreate = [this](ecs::Entity id) {
             auto it = m_nodes.find(id);
             if (it == m_nodes.end()) {
@@ -80,14 +84,15 @@ void HierarchyCreator::Build(const Scene& scene) {
         selfNode->entity = selfId;
     }
 
-    int nodesWithNoParent = 0;
+    int nodes_without_parent = 0;
     for (auto& it : m_nodes) {
         if (!it.second->parent) {
-            ++nodesWithNoParent;
+            ++nodes_without_parent;
             mRoot = it.second.get();
         }
     }
-    DEV_ASSERT(nodesWithNoParent == 1);
+    DEV_ASSERT(nodes_without_parent == 1);
+    return true;
 }
 
 void HierarchyPanel::RenderInternal(Scene& scene) {

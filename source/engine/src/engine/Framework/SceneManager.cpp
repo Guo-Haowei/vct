@@ -16,7 +16,7 @@ static std::atomic<Scene*> s_scene_ptr;
 
 SceneManager* gSceneManager = new SceneManager;
 
-static bool Com_LoadScene() {
+static bool load_scene(std::string_view scene_path) {
     // validate dvars
     const int voxelTextureSize = DVAR_GET_INT(r_voxelSize);
     DEV_ASSERT(is_power_of_two(voxelTextureSize));
@@ -25,14 +25,7 @@ static bool Com_LoadScene() {
     Scene& scene = g_scene;
     SceneLoader loader(scene);
 
-    std::string_view scenePath = DVAR_GET_STRING(scene);
-
-    if (!scenePath[0]) {
-        LOG_FATAL("Scene not specified, set it by +set scene <name> or +exec <lua-file>");
-        return false;
-    }
-
-    loader.LoadGLTF(scenePath);
+    loader.LoadGLTF(scene_path);
 
     Camera& camera = gCamera;
 
@@ -59,7 +52,7 @@ static bool Com_LoadScene() {
     g_perFrameCache.cache.TexelSize = texelSize;
     g_perFrameCache.cache.VoxelSize = voxelSize;
 
-    LOG("Scene '{}' loaded", scenePath);
+    LOG("Scene '{}' loaded", scene_path);
     return true;
 }
 
@@ -127,7 +120,16 @@ static void Com_UpdateWorld() {
     g_perFrameCache.cache.EnableFXAA = DVAR_GET_BOOL(r_enableFXAA);
 }
 
-bool SceneManager::InitializeInternal() { return Com_LoadScene(); }
+bool SceneManager::InitializeInternal() {
+    std::string_view scene_path = DVAR_GET_STRING(scene);
+
+    if (scene_path.empty()) {
+        LOG_WARN("Scene not specified, set it with --path <file>");
+        return true;
+    }
+
+    return load_scene(scene_path);
+}
 
 void SceneManager::FinalizeInternal() {}
 

@@ -322,7 +322,6 @@ void MainRenderer::render() {
     g_perFrameCache.Update();
 
     // clear window
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     g_shadow_rt.execute();
 
@@ -345,6 +344,7 @@ void MainRenderer::render() {
 
         // @TODO: make it a pass
         g_viewer_rt.bind();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderFrameBufferTextures(frameW, frameH);
         R_DrawEditor();
         g_viewer_rt.unbind();

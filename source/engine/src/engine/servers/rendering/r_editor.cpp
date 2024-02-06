@@ -95,6 +95,7 @@ static inline void FillTextureIconBuffer(std::vector<TextureVertex>& iconBuffer,
 
 // draw grid, bounding box, ui
 void R_DrawEditor() {
+    glDisable(GL_DEPTH_TEST);
     const Scene& scene = Com_GetScene();
     auto selected = scene.mSelected;
     if (selected.IsValid()) {
@@ -117,29 +118,16 @@ void R_DrawEditor() {
         glDrawElements(GL_LINES, g_boxWireFrame.count, GL_UNSIGNED_INT, 0);
     }
 
-    // if (const Geometry* node = scene.selected)
-    // {
-    // }
+    AABB aabb(vec3(-1), vec3(1));
+    const mat4 M = glm::translate(mat4(1), aabb.center()) * glm::scale(mat4(1), aabb.size());
 
-    // // draw light
-    // const Light& light = scene.light;
-    // const Camera& camera = scene.camera;
+    gProgramManager->GetShaderProgram(ProgramType::LINE3D).Bind();
+    glBindVertexArray(g_boxWireFrame.vao);
+    g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
+    g_perBatchCache.cache.Model = mat4(1);
+    g_perBatchCache.Update();
+    glDrawElements(GL_LINES, g_boxWireFrame.count, GL_UNSIGNED_INT, 0);
 
-    // constexpr float distance = 10.0f;
-    // vec4 lightPos = vec4(light.direction * distance, 1.0);
-    // lightPos = camera.ProjView() * lightPos;
-    // if (lightPos.z > 0.0f)
-    // {
-    //     lightPos /= lightPos.w;
-    //     const vec2 lightPos2d(camera.Proj() * lightPos);
-    //     std::vector<TextureVertex> iconBuffer;
-
-    //     FillTextureIconBuffer(iconBuffer, lightPos2d, camera.GetAspect());
-    //     glNamedBufferData(g_imageBuffer.vbos[0], sizeof(TextureVertex) * iconBuffer.size(), iconBuffer.data(),
-    //     GL_STREAM_DRAW);
-
-    //     gProgramManager->GetShaderProgram(ProgramType::IMAGE2D).Bind();
-    //     glBindVertexArray(g_imageBuffer.vao);
-    //     glDrawArrays(GL_TRIANGLES, 0, 6);
-    // }
+    // @TODO: draw grid
+    glEnable(GL_DEPTH_TEST);
 }
