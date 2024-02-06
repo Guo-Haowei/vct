@@ -1,7 +1,6 @@
 #include "EditorLayer.h"
 
 #include "Engine/Core/Input.h"
-#include "Engine/Framework/SceneManager.h"
 #include "imgui/imgui_internal.h"
 #include "servers/rendering/r_cbuffers.h"
 /////////////////////
@@ -11,6 +10,7 @@
 #include "panels/hierarchy_panel.h"
 #include "panels/propertiy_panel.h"
 #include "panels/viewer.h"
+#include "scene/scene_manager.h"
 #include "servers/display_server.h"
 
 EditorLayer::EditorLayer() : Layer("EditorLayer") {
@@ -114,10 +114,10 @@ void EditorLayer::Update(float dt) {
 }
 
 void EditorLayer::Render() {
-    Scene& scene = Com_GetScene();
+    Scene& scene = SceneManager::get_scene();
     for (auto& it : mPanels) {
         it->Render(scene);
     }
 
-    scene.mSelected = mSelected;
+    scene.m_selected = mSelected;
 }

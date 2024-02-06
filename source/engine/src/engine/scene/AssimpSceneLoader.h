@@ -1,11 +1,13 @@
 #pragma once
-#include "Scene/Scene.h"
+#include "scene/scene.h"
 
 struct aiMesh;
 struct aiNode;
 struct aiMaterial;
 struct aiScene;
 struct aiAnimation;
+
+namespace vct {
 
 class SceneLoader {
 public:
@@ -24,3 +26,5 @@ private:
     std::vector<ecs::Entity> mMaterials;
     std::vector<ecs::Entity> mMeshes;
 };
+
+}  // namespace vct

@@ -1,10 +1,12 @@
 #pragma once
-#include "EntityGenerator.h"
 #include "core/io/archive.h"
+#include "entity.h"
 
-using namespace vct;
+namespace vct {
+class Scene;
+}
 
-namespace ecs {
+namespace vct::ecs {
 
 class IComponentManager {
     IComponentManager(const IComponentManager&) = delete;
@@ -17,10 +19,10 @@ public:
     virtual void Copy(const IComponentManager& other) = 0;
     virtual void Merge(IComponentManager& other) = 0;
     virtual void Remove(const Entity& entity) = 0;
-    virtual bool Contains(const Entity& entity) const = 0;
-    virtual size_t GetIndex(const Entity& entity) const = 0;
-    virtual size_t GetCount() const = 0;
-    virtual Entity GetEntity(size_t index) const = 0;
+    virtual bool contains(const Entity& entity) const = 0;
+    virtual size_t get_index(const Entity& entity) const = 0;
+    virtual size_t get_count() const = 0;
+    virtual Entity get_entity(size_t index) const = 0;
 };
 
 template<typename T>
@@ -52,14 +54,14 @@ public:
     void Copy(const IComponentManager& other) override { Copy((ComponentManager<T>&)other); }
 
     void Merge(ComponentManager<T>& other) {
-        const size_t reserved = GetCount() + other.GetCount();
+        const size_t reserved = get_count() + other.get_count();
         mComponentArray.reserve(reserved);
         mEntityArray.reserve(reserved);
         mLookup.reserve(reserved);
 
-        for (size_t i = 0; i < other.GetCount(); ++i) {
+        for (size_t i = 0; i < other.get_count(); ++i) {
             Entity entity = other.mEntityArray[i];
-            DEV_ASSERT(!Contains(entity));
+            DEV_ASSERT(!contains(entity));
             mEntityArray.push_back(entity);
             mLookup[entity] = mComponentArray.size();
             mComponentArray.push_back(std::move(other.mComponentArray[i]));
@@ -79,19 +81,19 @@ public:
 
     // virtual void Remove_KeepSorted(Entity entity) = 0;
     // virtual void MoveItem(size_t index_from, size_t index_to) = 0;
-    virtual bool Contains(const Entity& entity) const override {
+    virtual bool contains(const Entity& entity) const override {
         if (mLookup.empty()) {
             return false;
         }
         return mLookup.find(entity) != mLookup.end();
     }
 
-    inline T& GetComponent(size_t idx) {
+    inline T& get_component(size_t idx) {
         DEV_ASSERT(idx < mComponentArray.size());
         return mComponentArray[idx];
     }
 
-    T* GetComponent(const Entity& entity) {
+    T* get_component(const Entity& entity) {
         if (!entity.IsValid() || mLookup.empty()) {
             return nullptr;
         }
@@ -105,7 +107,7 @@ public:
         return &mComponentArray[it->second];
     }
 
-    virtual size_t GetIndex(const Entity& entity) const override {
+    virtual size_t get_index(const Entity& entity) const override {
         if (mLookup.empty()) {
             return Entity::INVALID_INDEX;
         }
@@ -118,14 +120,14 @@ public:
         return it->second;
     }
 
-    inline virtual size_t GetCount() const override { return mComponentArray.size(); }
+    inline virtual size_t get_count() const override { return mComponentArray.size(); }
 
-    inline virtual Entity GetEntity(size_t index) const override {
+    inline virtual Entity get_entity(size_t index) const override {
         DEV_ASSERT(index < mEntityArray.size());
         return mEntityArray[index];
     }
 
-    T& Create(const Entity& entity) {
+    T& create(const Entity& entity) {
         DEV_ASSERT(entity.IsValid());
 
         const size_t componentCount = mComponentArray.size();
@@ -141,12 +143,12 @@ public:
 
     const std::vector<Entity>& GetEntityArray() const { return mEntityArray; }
     std::vector<Entity>& GetEntityArray() { return mEntityArray; }
-    const std::vector<T>& GetComponentArray() const { return mComponentArray; }
-    std::vector<T>& GetComponentArray() { return mComponentArray; }
+    const std::vector<T>& get_component_array() const { return mComponentArray; }
+    std::vector<T>& get_component_array() { return mComponentArray; }
 
-    const T& operator[](size_t idx) const { return GetComponent(idx); }
+    const T& operator[](size_t idx) const { return get_component(idx); }
 
-    T& operator[](size_t idx) { return GetComponent(idx); }
+    T& operator[](size_t idx) { return get_component(idx); }
 
     void Serialize(Archive& archive) {
         size_t count;
@@ -201,4 +203,4 @@ private:
     friend class Scene;
 };
 
-}  // namespace ecs
+}  // namespace vct::ecs

@@ -3,15 +3,14 @@
 
 #include "Engine/Scene/Entity.h"
 #include "imgui/imgui.h"
-
-class Scene;
+#include "scene/scene.h"
 
 class Panel {
 public:
     Panel(const std::string& name) : mName(name) {}
 
     virtual void Update(float) {}
-    void Render(Scene& scene);
+    void Render(vct::Scene& scene);
     bool IsFocused() const;
 
     void SetSelectedRef(ecs::Entity* pSelected) { mpSelected = pSelected; }
@@ -19,7 +18,7 @@ public:
     ecs::Entity GetSelected() const { return *mpSelected; }
 
 protected:
-    virtual void RenderInternal(Scene& scene) = 0;
+    virtual void RenderInternal(vct::Scene& scene) = 0;
 
     std::string mName;
     ecs::Entity* mpSelected = nullptr;

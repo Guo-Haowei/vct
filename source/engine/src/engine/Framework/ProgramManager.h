@@ -28,7 +28,7 @@ protected:
     virtual void FinalizeInternal() override;
 
 private:
-    Program Create(const ProgramCreateInfo& info);
+    Program create(const ProgramCreateInfo& info);
 };
 
 extern ProgramManager* gProgramManager;

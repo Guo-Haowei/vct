@@ -5,9 +5,10 @@
 #include <assimp/scene.h>
 
 #include <assimp/Importer.hpp>
-#include <filesystem>
 
 #include "core/dynamic_variable/common_dvars.h"
+
+namespace vct {
 
 using std::string;
 using std::vector;
@@ -44,33 +45,33 @@ void SceneLoader::LoadGLTF(std::string_view path, bool flipUVs) {
     }
 
     ecs::Entity root = ProcessNode(aiscene->mRootNode, ecs::Entity::INVALID);
-    mScene.GetComponent<TagComponent>(root)->SetTag(fullpath.filename().string());
+    mScene.get_component<TagComponent>(root)->SetTag(fullpath.filename().string());
 
-    mScene.mRoot = root;
+    mScene.m_root = root;
     // scene bounding box
-    mScene.Update(0.0f);
-    mScene.bound.make_invalid();
+    mScene.update(0.0f);
+    mScene.m_bound.make_invalid();
 
     // @TODO: refactor
-    const uint32_t numObjects = (uint32_t)mScene.GetCount<ObjectComponent>();
+    const uint32_t numObjects = (uint32_t)mScene.get_count<ObjectComponent>();
     for (uint32_t i = 0; i < numObjects; ++i) {
-        const ObjectComponent& obj = mScene.GetComponentArray<ObjectComponent>()[i];
-        ecs::Entity entity = mScene.GetEntity<ObjectComponent>(i);
-        DEV_ASSERT(mScene.Contains<TransformComponent>(entity));
-        const TransformComponent& transform = *mScene.GetComponent<TransformComponent>(entity);
-        DEV_ASSERT(mScene.Contains<MeshComponent>(obj.meshID));
-        const MeshComponent& mesh = *mScene.GetComponent<MeshComponent>(obj.meshID);
+        const ObjectComponent& obj = mScene.get_component_array<ObjectComponent>()[i];
+        ecs::Entity entity = mScene.get_entity<ObjectComponent>(i);
+        DEV_ASSERT(mScene.contains<TransformComponent>(entity));
+        const TransformComponent& transform = *mScene.get_component<TransformComponent>(entity);
+        DEV_ASSERT(mScene.contains<MeshComponent>(obj.meshID));
+        const MeshComponent& mesh = *mScene.get_component<MeshComponent>(obj.meshID);
 
         mat4 M = transform.GetWorldMatrix();
         AABB aabb = mesh.mLocalBound;
         aabb.apply_matrix(M);
-        mScene.bound.union_box(aabb);
+        mScene.m_bound.union_box(aabb);
     }
 }
 
 void SceneLoader::ProcessMaterial(aiMaterial& material) {
-    auto materialID = mScene.Entity_CreateMaterial(std::string("Material::") + material.GetName().C_Str());
-    MaterialComponent* materialComponent = mScene.GetComponent<MaterialComponent>(materialID);
+    auto materialID = mScene.create_material_entity(std::string("Material::") + material.GetName().C_Str());
+    MaterialComponent* materialComponent = mScene.get_component<MaterialComponent>(materialID);
     DEV_ASSERT(materialComponent);
 
     auto getMaterialPath = [&](aiTextureType type, unsigned int index) -> std::string {
@@ -107,8 +108,8 @@ void SceneLoader::ProcessMesh(const aiMesh& mesh) {
         LOG_WARN("mesh {} does not have texture coordinates", meshName);
     }
 
-    ecs::Entity meshID = mScene.Entity_CreateMesh("Mesh::" + meshName);
-    MeshComponent& meshComponent = *mScene.GetComponent<MeshComponent>(meshID);
+    ecs::Entity meshID = mScene.create_mesh_entity("Mesh::" + meshName);
+    MeshComponent& meshComponent = *mScene.get_component<MeshComponent>(meshID);
 
     for (uint32_t i = 0; i < mesh.mNumVertices; ++i) {
         auto& position = mesh.mVertices[i];
@@ -153,24 +154,24 @@ ecs::Entity SceneLoader::ProcessNode(const aiNode* node, ecs::Entity parent) {
     ecs::Entity entity;
 
     if (node->mNumMeshes == 1) {  // geometry node
-        entity = mScene.Entity_CreateObject("Geometry::" + key);
+        entity = mScene.create_object_entity("Geometry::" + key);
 
-        ObjectComponent& objComponent = *mScene.GetComponent<ObjectComponent>(entity);
+        ObjectComponent& objComponent = *mScene.get_component<ObjectComponent>(entity);
         objComponent.meshID = mMeshes[node->mMeshes[0]];
     } else {  // else make it a transform/bone node
-        entity = mScene.Entity_CreateTransform("Node::" + key);
+        entity = mScene.create_transform_entity("Node::" + key);
 
         for (uint32_t i = 0; i < node->mNumMeshes; ++i) {
-            ecs::Entity child = mScene.Entity_CreateObject("");
-            auto tagComponent = mScene.GetComponent<TagComponent>(child);
+            ecs::Entity child = mScene.create_object_entity("");
+            auto tagComponent = mScene.get_component<TagComponent>(child);
             tagComponent->SetTag("SubGeometry_" + std::to_string(child.GetID()));
-            ObjectComponent& objComponent = *mScene.GetComponent<ObjectComponent>(child);
+            ObjectComponent& objComponent = *mScene.get_component<ObjectComponent>(child);
             objComponent.meshID = mMeshes[node->mMeshes[i]];
-            mScene.Component_Attach(child, entity);
+            mScene.attach_component(child, entity);
         }
     }
 
-    DEV_ASSERT(mScene.Contains<TransformComponent>(entity));
+    DEV_ASSERT(mScene.contains<TransformComponent>(entity));
 
     const aiMatrix4x4& local = node->mTransformation;                       // row major matrix
     mat4 localTransformColumnMajor(local.a1, local.b1, local.c1, local.d1,  // x0 y0 z0 w0
@@ -178,11 +179,11 @@ ecs::Entity SceneLoader::ProcessNode(const aiNode* node, ecs::Entity parent) {
                                    local.a3, local.b3, local.c3, local.d3,  // x2 y2 z2 w2
                                    local.a4, local.b4, local.c4, local.d4   // x3 y3 z3 w3
     );
-    TransformComponent& transform = *mScene.GetComponent<TransformComponent>(entity);
+    TransformComponent& transform = *mScene.get_component<TransformComponent>(entity);
     transform.MatrixTransform(localTransformColumnMajor);
 
     if (parent.IsValid()) {
-        mScene.Component_Attach(entity, parent);
+        mScene.attach_component(entity, parent);
     }
 
     // process children
@@ -192,3 +193,5 @@ ecs::Entity SceneLoader::ProcessNode(const aiNode* node, ecs::Entity parent) {
 
     return entity;
 }
+
+}  // namespace vct

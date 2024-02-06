@@ -75,7 +75,7 @@ static GLuint create_shader(const std::string &file, GLenum type) {
     return shader;
 }
 
-Program ProgramManager::Create(const ProgramCreateInfo &info) {
+Program ProgramManager::create(const ProgramCreateInfo &info) {
     GLuint programID = glCreateProgram();
     std::vector<GLuint> shaders;
     auto createShader = [&](const std::string &path, GLenum type) {
@@ -134,67 +134,67 @@ bool ProgramManager::InitializeInternal() {
         ProgramCreateInfo info;
         info.vs = "editor/line3d.vert";
         info.ps = "editor/line3d.frag";
-        g_shaderCache[std::to_underlying(ProgramType::LINE3D)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::LINE3D)] = create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "editor/image.vert";
         info.ps = "editor/image.frag";
-        g_shaderCache[std::to_underlying(ProgramType::IMAGE2D)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::IMAGE2D)] = create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "depth.vert";
         info.ps = "depth.frag";
-        g_shaderCache[std::to_underlying(ProgramType::SHADOW)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::SHADOW)] = create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "gbuffer.vert";
         info.ps = "gbuffer.frag";
-        g_shaderCache[std::to_underlying(ProgramType::GBUFFER)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::GBUFFER)] = create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "fullscreen.vert";
         info.ps = "ssao.frag";
-        g_shaderCache[std::to_underlying(ProgramType::SSAO)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::SSAO)] = create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "fullscreen.vert";
         info.ps = "vct_deferred.frag";
-        g_shaderCache[std::to_underlying(ProgramType::VCT_DEFERRED)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::VCT_DEFERRED)] = create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "fullscreen.vert";
         info.ps = "fxaa.frag";
-        g_shaderCache[std::to_underlying(ProgramType::FXAA)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::FXAA)] = create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "fullscreen.vert";
         info.ps = "debug/texture.frag";
-        g_shaderCache[std::to_underlying(ProgramType::DebugTexture)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::DebugTexture)] = create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "voxel/voxelization.vert";
         info.gs = "voxel/voxelization.geom";
         info.ps = "voxel/voxelization.frag";
-        g_shaderCache[std::to_underlying(ProgramType::Voxel)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::Voxel)] = create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "voxel/visualization.vert";
         info.ps = "voxel/visualization.frag";
-        g_shaderCache[std::to_underlying(ProgramType::Visualization)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::Visualization)] = create(info);
     }
     {
         ProgramCreateInfo info;
         info.cs = "voxel/post.comp";
-        g_shaderCache[std::to_underlying(ProgramType::VoxelPost)] = Create(info);
+        g_shaderCache[std::to_underlying(ProgramType::VoxelPost)] = create(info);
     }
 
     return true;

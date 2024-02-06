@@ -17,13 +17,9 @@ DVAR_INT(r_debugTexture, DVAR_FLAG_NONE, 0);
 DVAR_INT(r_noTexture, DVAR_FLAG_NONE, 0);
 
 // camera
-DVAR_VEC3(cam_pos, DVAR_FLAG_NONE, -8.f, 2.f, 0.f);
-DVAR_VEC4(cam_cascades, DVAR_FLAG_NONE, 0.1f, 8.0f, 18.0f, 50.0f);
-DVAR_FLOAT(cam_fov, DVAR_FLAG_NONE, 60.0f);
-
-// light
-DVAR_VEC3(light_dir, DVAR_FLAG_NONE, -8.0f, 25.0f, 5.0f);
-DVAR_FLOAT(light_power, DVAR_FLAG_NONE, 20.0f);
+DVAR_VEC3(cam_pos, DVAR_FLAG_SERIALIZE, -8.f, 2.f, 0.f);
+DVAR_VEC4(cam_cascades, DVAR_FLAG_SERIALIZE, 0.1f, 8.0f, 18.0f, 50.0f);
+DVAR_FLOAT(cam_fov, DVAR_FLAG_SERIALIZE, 60.0f);
 
 // voxel GI
 DVAR_INT(r_voxelSize, DVAR_FLAG_NONE, 64);

@@ -1,16 +1,15 @@
 #include "Application.h"
 
 #include "Core/Input.h"
-#include "GraphicsManager.h"
 #include "ProgramManager.h"
-#include "SceneManager.h"
 #include "imgui/imgui.h"
-#include "servers/rendering/MainRenderer.h"
 // @TODO: refactor
 
 #include "core/dynamic_variable/common_dvars.h"
 #include "core/systems/job_system.h"
+#include "scene/scene_manager.h"
 #include "servers/display_server.h"
+#include "servers/rendering_server.h"
 
 using namespace vct;
 
@@ -20,9 +19,7 @@ void Application::RegisterManager(ManagerBase* manager) {
 }
 
 bool Application::RegisterManagers() {
-    RegisterManager(gGraphicsManager);
     RegisterManager(gProgramManager);
-    RegisterManager(gSceneManager);
     return true;
 }
 
@@ -53,9 +50,6 @@ int Application::Run(int, const char**) {
         return -1;
     }
 
-    vct::MainRenderer renderer;
-    renderer.createGpuResources();
-
     for (auto& layer : mLayers) {
         layer->Attach();
         LOG("[Runtime] layer '{}' attached!", layer->GetName());
@@ -67,7 +61,8 @@ int Application::Run(int, const char**) {
 
         Input::BeginFrame();
 
-        gSceneManager->Update(dt);
+        // @TODO:
+        SceneManager::singleton().update(dt);
 
         ImGui::NewFrame();
         for (auto& layer : mLayers) {
@@ -79,7 +74,7 @@ int Application::Run(int, const char**) {
         }
         ImGui::Render();
 
-        renderer.render();
+        RenderingServer::singleton().render();
 
         DisplayServer::singleton().present();
 
@@ -91,9 +86,6 @@ int Application::Run(int, const char**) {
     auto [x, y] = DisplayServer::singleton().get_window_pos();
     DVAR_SET_IVEC2(window_position, x, y);
 
-    renderer.destroyGpuResources();
-
     FinalizeManagers();
-
     return 0;
 }

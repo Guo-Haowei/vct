@@ -1,0 +1,15 @@
+set(LIB_NAME shaders)
+
+file(GLOB_RECURSE SRC
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.glsl"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.vert"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.frag"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.geom"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.comp"
+)
+
+add_library(${LIB_NAME} STATIC ${SRC})
+
+set_target_properties(${LIB_NAME} PROPERTIES LINKER_LANGUAGE CXX)
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/ FILES ${SRC})

@@ -1,15 +1,17 @@
 #pragma once
-#include "MainRenderer.h"
+#include "rendering_server.h"
 
 #include <random>
 
 #include "Core/geometry.h"
 #include "Framework/ProgramManager.h"
-#include "Framework/SceneManager.h"
+#include "imgui/backends/imgui_impl_opengl3.h"
+/////
 #include "core/dynamic_variable/common_dvars.h"
-#include "passes.h"
-#include "r_defines.h"
-#include "r_editor.h"
+#include "rendering/passes.h"
+#include "rendering/r_defines.h"
+#include "rendering/r_editor.h"
+#include "scene/scene_manager.h"
 #include "servers/display_server.h"
 
 static std::vector<std::shared_ptr<MeshData>> g_meshdata;
@@ -20,6 +22,42 @@ static GLuint g_noiseTexture;
 extern void FillMaterialCB(const MaterialData* mat, MaterialCB& cb);
 
 namespace vct {
+
+static void APIENTRY gl_debug_callback(GLenum, GLenum, unsigned int, GLenum, GLsizei, const char*, const void*);
+
+bool RenderingServer::initialize() {
+    if (gladLoadGL() == 0) {
+        LOG_FATAL("[glad] failed to load gl functions");
+        return false;
+    }
+
+    LOG_VERBOSE("[opengl] renderer: {}", (const char*)glGetString(GL_RENDERER));
+    LOG_VERBOSE("[opengl] version: {}", (const char*)glGetString(GL_VERSION));
+
+    if (DVAR_GET_BOOL(r_gpu_validation)) {
+        int flags;
+        glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+        if (flags & GL_CONTEXT_FLAG_DEBUG_BIT) {
+            glEnable(GL_DEBUG_OUTPUT);
+            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+            glDebugMessageCallback(gl_debug_callback, nullptr);
+            glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+            LOG_VERBOSE("[opengl] debug callback enabled");
+        }
+    }
+
+    ImGui_ImplOpenGL3_Init();
+    ImGui_ImplOpenGL3_CreateDeviceObjects();
+
+    createGpuResources();
+    return true;
+}
+
+void RenderingServer::finalize() {
+    destroyGpuResources();
+
+    ImGui_ImplOpenGL3_Shutdown();
+}
 
 static std::shared_ptr<MeshData> CreateMeshData(const MeshComponent& mesh) {
     MeshData* ret = new MeshData;
@@ -58,19 +96,18 @@ static std::shared_ptr<MeshData> CreateMeshData(const MeshComponent& mesh) {
     return std::shared_ptr<MeshData>(ret);
 }
 
-void MainRenderer::on_scene_change() {
-    Scene& scene = Com_GetScene();
+void RenderingServer::begin_scene(Scene& scene) {
     // create mesh
-    for (const auto& mesh : scene.GetComponentArray<MeshComponent>()) {
+    for (const auto& mesh : scene.get_component_array<MeshComponent>()) {
         g_meshdata.emplace_back(CreateMeshData(mesh));
         mesh.gpuResource = g_meshdata.back().get();
     }
 
     // create material
-    DEV_ASSERT(scene.GetCount<MaterialComponent>() < array_length(g_constantCache.cache.AlbedoMaps));
+    DEV_ASSERT(scene.get_count<MaterialComponent>() < array_length(g_constantCache.cache.AlbedoMaps));
 
-    for (int idx = 0; idx < scene.GetCount<MaterialComponent>(); ++idx) {
-        const auto& mat = scene.GetComponentArray<MaterialComponent>()[idx];
+    for (int idx = 0; idx < scene.get_count<MaterialComponent>(); ++idx) {
+        const auto& mat = scene.get_component_array<MaterialComponent>()[idx];
 
         auto matData = std::make_shared<MaterialData>();
 
@@ -155,7 +192,7 @@ static void create_ssao_resource() {
     g_noiseTexture = noiseTexture;
 }
 
-void MainRenderer::createGpuResources() {
+void RenderingServer::createGpuResources() {
     create_ssao_resource();
 
     R_Alloc_Cbuffers();
@@ -207,7 +244,7 @@ void MainRenderer::createGpuResources() {
 
     g_constantCache.Update();
 
-    on_scene_change();
+    // on_scene_change();
 }
 
 // void MainRenderer::visualizeVoxels() {
@@ -245,8 +282,8 @@ struct MaterialCache {
     }
 };
 
-void MainRenderer::renderToVoxelTexture() {
-    const Scene& scene = Com_GetScene();
+void RenderingServer::renderToVoxelTexture() {
+    const Scene& scene = SceneManager::get_scene();
     const int voxelSize = DVAR_GET_INT(r_voxelSize);
 
     glDisable(GL_CULL_FACE);
@@ -259,14 +296,14 @@ void MainRenderer::renderToVoxelTexture() {
     m_normalVoxel.bindImageTexture(IMAGE_VOXEL_NORMAL_SLOT);
     gProgramManager->GetShaderProgram(ProgramType::Voxel).Bind();
 
-    const uint32_t numObjects = (uint32_t)scene.GetCount<ObjectComponent>();
+    const uint32_t numObjects = (uint32_t)scene.get_count<ObjectComponent>();
     for (uint32_t i = 0; i < numObjects; ++i) {
-        const ObjectComponent& obj = scene.GetComponentArray<ObjectComponent>()[i];
-        ecs::Entity entity = scene.GetEntity<ObjectComponent>(i);
-        DEV_ASSERT(scene.Contains<TransformComponent>(entity));
-        const TransformComponent& transform = *scene.GetComponent<TransformComponent>(entity);
-        DEV_ASSERT(scene.Contains<MeshComponent>(obj.meshID));
-        const MeshComponent& mesh = *scene.GetComponent<MeshComponent>(obj.meshID);
+        const ObjectComponent& obj = scene.get_component_array<ObjectComponent>()[i];
+        ecs::Entity entity = scene.get_entity<ObjectComponent>(i);
+        DEV_ASSERT(scene.contains<TransformComponent>(entity));
+        const TransformComponent& transform = *scene.get_component<TransformComponent>(entity);
+        DEV_ASSERT(scene.contains<MeshComponent>(obj.meshID));
+        const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
 
         const mat4& M = transform.GetWorldMatrix();
         g_perBatchCache.cache.Model = M;
@@ -277,7 +314,7 @@ void MainRenderer::renderToVoxelTexture() {
         glBindVertexArray(drawData->vao);
 
         for (const auto& subset : mesh.mSubsets) {
-            const MaterialComponent& material = *scene.GetComponent<MaterialComponent>(subset.materialID);
+            const MaterialComponent& material = *scene.get_component<MaterialComponent>(subset.materialID);
             const MaterialData* matData = reinterpret_cast<MaterialData*>(material.gpuResource);
 
             FillMaterialCB(matData, g_materialCache.cache);
@@ -306,7 +343,7 @@ void MainRenderer::renderToVoxelTexture() {
     m_normalVoxel.genMipMap();
 }
 
-void MainRenderer::renderFrameBufferTextures(int width, int height) {
+void RenderingServer::renderFrameBufferTextures(int width, int height) {
     const auto& program = gProgramManager->GetShaderProgram(ProgramType::DebugTexture);
 
     program.Bind();
@@ -318,11 +355,12 @@ void MainRenderer::renderFrameBufferTextures(int width, int height) {
     program.Unbind();
 }
 
-void MainRenderer::render() {
+void RenderingServer::render() {
+    check_scene_update();
+
     g_perFrameCache.Update();
 
     // clear window
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     g_shadow_rt.execute();
 
@@ -345,19 +383,97 @@ void MainRenderer::render() {
 
         // @TODO: make it a pass
         g_viewer_rt.bind();
+        glClearColor(1.f, 1.f, 1.f, 1.f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderFrameBufferTextures(frameW, frameH);
         R_DrawEditor();
         g_viewer_rt.unbind();
     }
 }
 
-void MainRenderer::destroyGpuResources() {
+void RenderingServer::destroyGpuResources() {
     destroy_passes();
 
     R_DestroyEditorResource();
     R_Destroy_Cbuffers();
 
     glDeleteTextures(1, &g_noiseTexture);
+}
+
+static void APIENTRY gl_debug_callback(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length,
+                                       const char* message, const void* userParam) {
+    vct::unused(length);
+    vct::unused(userParam);
+
+    switch (id) {
+        case 131185:
+            return;
+    }
+
+    const char* sourceStr = "GL_DEBUG_SOURCE_OTHER";
+    switch (source) {
+        case GL_DEBUG_SOURCE_API:
+            sourceStr = "GL_DEBUG_SOURCE_API";
+            break;
+        case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
+            sourceStr = "GL_DEBUG_SOURCE_WINDOW_SYSTEM";
+            break;
+        case GL_DEBUG_SOURCE_SHADER_COMPILER:
+            sourceStr = "GL_DEBUG_SOURCE_SHADER_COMPILER";
+            break;
+        case GL_DEBUG_SOURCE_THIRD_PARTY:
+            sourceStr = "GL_DEBUG_SOURCE_THIRD_PARTY";
+            break;
+        case GL_DEBUG_SOURCE_APPLICATION:
+            sourceStr = "GL_DEBUG_SOURCE_APPLICATION";
+            break;
+        default:
+            break;
+    }
+
+    const char* typeStr = "GL_DEBUG_TYPE_OTHER";
+    switch (type) {
+        case GL_DEBUG_TYPE_ERROR:
+            typeStr = "GL_DEBUG_TYPE_ERROR";
+            break;
+        case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+            typeStr = "GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR";
+            break;
+        case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+            typeStr = "GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR";
+            break;
+        case GL_DEBUG_TYPE_PORTABILITY:
+            typeStr = "GL_DEBUG_TYPE_PORTABILITY";
+            break;
+        case GL_DEBUG_TYPE_PERFORMANCE:
+            typeStr = "GL_DEBUG_TYPE_PERFORMANCE";
+            break;
+        case GL_DEBUG_TYPE_MARKER:
+            typeStr = "GL_DEBUG_TYPE_MARKER";
+            break;
+        case GL_DEBUG_TYPE_PUSH_GROUP:
+            typeStr = "GL_DEBUG_TYPE_PUSH_GROUP";
+            break;
+        case GL_DEBUG_TYPE_POP_GROUP:
+            typeStr = "GL_DEBUG_TYPE_POP_GROUP";
+            break;
+        default:
+            break;
+    }
+
+    LogLevel level = LOG_LEVEL_NORMAL;
+    switch (severity) {
+        case GL_DEBUG_SEVERITY_HIGH:
+            level = LOG_LEVEL_ERROR;
+            break;
+        case GL_DEBUG_SEVERITY_MEDIUM:
+            level = LOG_LEVEL_WARN;
+            break;
+        default:
+            break;
+    }
+
+    vct::log_impl(level, std::format("[opengl] {}\n\t| id: {} | source: {} | type: {}", message, id, sourceStr, typeStr));
 }
 
 }  // namespace vct

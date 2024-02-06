@@ -4,7 +4,9 @@
 #include "core/os/threads.h"
 #include "core/systems/job_system.h"
 #include "core/utility/command_line.h"
+#include "scene/scene_manager.h"
 #include "servers/display_server_glfw.h"
+#include "servers/rendering_server.h"
 
 #define DEFINE_DVAR
 #include "core/dynamic_variable/common_dvars.h"
@@ -76,8 +78,10 @@ static void process_command_line(int argc, const char** argv) {
 // @TODO: init os properly
 static vct::OS s_os;
 static vct::DisplayServer* s_display_server = new vct::DisplayServerGLFW;
+static vct::RenderingServer* s_rendering_server = new vct::RenderingServer;
 
 int main(int argc, const char** argv) {
+    // intialize
     OS::singleton().initialize();
 
     register_common_dvars();
@@ -87,16 +91,21 @@ int main(int argc, const char** argv) {
     thread::initialize();
     jobsystem::initialize();
 
+    SceneManager::singleton().initialize();
     UIManager::initialize();
     DisplayServer::singleton().initialize();
+    RenderingServer::singleton().initialize();
 
+    // @TODO: move main loop here
     Editor editor;
     editor.Run(argc, argv);
-
     thread::request_shutdown();
 
+    // finalize
+    RenderingServer::singleton().finalize();
     DisplayServer::singleton().finalize();
     UIManager::finalize();
+    SceneManager::singleton().finalize();
 
     jobsystem::finalize();
     thread::finailize();

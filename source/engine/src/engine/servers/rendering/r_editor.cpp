@@ -2,10 +2,10 @@
 
 #include "Core/geometry.h"
 #include "Framework/ProgramManager.h"
-#include "Framework/SceneManager.h"
 #include "GpuTexture.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"
+#include "scene/scene_manager.h"
 
 struct VertexPoint3D {
     vec3 position;
@@ -95,51 +95,38 @@ static inline void FillTextureIconBuffer(std::vector<TextureVertex>& iconBuffer,
 
 // draw grid, bounding box, ui
 void R_DrawEditor() {
-    const Scene& scene = Com_GetScene();
-    auto selected = scene.mSelected;
+    glDisable(GL_DEPTH_TEST);
+    const Scene& scene = SceneManager::get_scene();
+    auto selected = scene.m_selected;
     if (selected.IsValid()) {
-        auto transformComponent = scene.GetComponent<TransformComponent>(selected);
+        auto transformComponent = scene.get_component<TransformComponent>(selected);
         DEV_ASSERT(transformComponent);
-        auto objComponent = scene.GetComponent<ObjectComponent>(selected);
-        DEV_ASSERT(objComponent);
-        auto meshComponent = scene.GetComponent<MeshComponent>(objComponent->meshID);
-        DEV_ASSERT(meshComponent);
-        AABB aabb = meshComponent->mLocalBound;
-        aabb.apply_matrix(transformComponent->GetWorldMatrix());
+        auto objComponent = scene.get_component<ObjectComponent>(selected);
+        if (objComponent) {
+            DEV_ASSERT(objComponent);
+            auto meshComponent = scene.get_component<MeshComponent>(objComponent->meshID);
+            DEV_ASSERT(meshComponent);
+            AABB aabb = meshComponent->mLocalBound;
+            aabb.apply_matrix(transformComponent->GetWorldMatrix());
 
-        const mat4 M = glm::translate(mat4(1), aabb.center()) * glm::scale(mat4(1), aabb.size());
+            const mat4 M = glm::translate(mat4(1), aabb.center()) * glm::scale(mat4(1), aabb.size());
 
-        gProgramManager->GetShaderProgram(ProgramType::LINE3D).Bind();
-        glBindVertexArray(g_boxWireFrame.vao);
-        g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
-        g_perBatchCache.cache.Model = mat4(1);
-        g_perBatchCache.Update();
-        glDrawElements(GL_LINES, g_boxWireFrame.count, GL_UNSIGNED_INT, 0);
+            gProgramManager->GetShaderProgram(ProgramType::LINE3D).Bind();
+            glBindVertexArray(g_boxWireFrame.vao);
+            g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
+            g_perBatchCache.cache.Model = mat4(1);
+            g_perBatchCache.Update();
+            glDrawElements(GL_LINES, g_boxWireFrame.count, GL_UNSIGNED_INT, 0);
+        }
     }
 
-    // if (const Geometry* node = scene.selected)
-    // {
-    // }
+    // AABB aabb(vec3(-1), vec3(1));
+    // const mat4 M = glm::translate(mat4(1), aabb.center()) * glm::scale(mat4(1), aabb.size());
 
-    // // draw light
-    // const Light& light = scene.light;
-    // const Camera& camera = scene.camera;
-
-    // constexpr float distance = 10.0f;
-    // vec4 lightPos = vec4(light.direction * distance, 1.0);
-    // lightPos = camera.ProjView() * lightPos;
-    // if (lightPos.z > 0.0f)
-    // {
-    //     lightPos /= lightPos.w;
-    //     const vec2 lightPos2d(camera.Proj() * lightPos);
-    //     std::vector<TextureVertex> iconBuffer;
-
-    //     FillTextureIconBuffer(iconBuffer, lightPos2d, camera.GetAspect());
-    //     glNamedBufferData(g_imageBuffer.vbos[0], sizeof(TextureVertex) * iconBuffer.size(), iconBuffer.data(),
-    //     GL_STREAM_DRAW);
-
-    //     gProgramManager->GetShaderProgram(ProgramType::IMAGE2D).Bind();
-    //     glBindVertexArray(g_imageBuffer.vao);
-    //     glDrawArrays(GL_TRIANGLES, 0, 6);
-    // }
+    // gProgramManager->GetShaderProgram(ProgramType::LINE3D).Bind();
+    // glBindVertexArray(g_boxWireFrame.vao);
+    // g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
+    // g_perBatchCache.cache.Model = mat4(1);
+    // g_perBatchCache.Update();
+    // glDrawElements(GL_LINES, g_boxWireFrame.count, GL_UNSIGNED_INT, 0);
 }

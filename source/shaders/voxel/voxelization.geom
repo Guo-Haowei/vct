@@ -8,7 +8,7 @@ in vec4 pass_light_space_positions0[];
 in vec4 pass_light_space_positions1[];
 in vec4 pass_light_space_positions2[];
 
-#include "cbuffer.glsl"
+#include "cbuffer.glsl.h"
 
 out vec3 pass_position;
 out vec3 pass_normal;

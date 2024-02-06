@@ -1,4 +1,4 @@
-#include "cbuffer.glsl"
+#include "cbuffer.glsl.h"
 
 layout(location = 0) in vec3 in_position;
 layout(location = 1) in vec3 in_normal;

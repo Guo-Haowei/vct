@@ -4,7 +4,8 @@
 
 namespace vct {
 class Archive;
-}
+class Scene;
+}  // namespace vct
 using namespace vct;
 
 class HierarchyComponent {

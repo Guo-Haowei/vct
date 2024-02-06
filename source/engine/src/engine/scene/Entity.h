@@ -1,11 +1,7 @@
 #pragma once
+#include "core/io/archive.h"
 
-namespace vct {
-class Archive;
-}
-using namespace vct;
-
-namespace ecs {
+namespace vct::ecs {
 
 class Entity {
 public:
@@ -30,6 +26,8 @@ public:
 
     void Serialize(Archive& archive);
 
+    static Entity create();
+
     static const Entity INVALID;
 
 private:
@@ -38,25 +36,25 @@ private:
     friend class EntityGenerator;
 };
 
-}  // namespace ecs
+}  // namespace vct::ecs
 
 namespace std {
 
 template<>
-struct hash<ecs::Entity> {
-    std::size_t operator()(const ecs::Entity& entity) const { return std::hash<uint32_t>{}(entity.GetID()); }
+struct hash<vct::ecs::Entity> {
+    std::size_t operator()(const vct::ecs::Entity& entity) const { return std::hash<uint32_t>{}(entity.GetID()); }
 };
 
 template<>
-struct less<ecs::Entity> {
-    constexpr bool operator()(const ecs::Entity& lhs, const ecs::Entity& rhs) const {
+struct less<vct::ecs::Entity> {
+    constexpr bool operator()(const vct::ecs::Entity& lhs, const vct::ecs::Entity& rhs) const {
         return lhs.GetID() < rhs.GetID();
     }
 };
 
 template<>
-struct equal_to<ecs::Entity> {
-    constexpr bool operator()(const ecs::Entity& lhs, const ecs::Entity& rhs) const {
+struct equal_to<vct::ecs::Entity> {
+    constexpr bool operator()(const vct::ecs::Entity& lhs, const vct::ecs::Entity& rhs) const {
         return lhs.GetID() == rhs.GetID();
     }
 };

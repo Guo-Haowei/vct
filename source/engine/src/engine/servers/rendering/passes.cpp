@@ -8,8 +8,8 @@
 // @TODO: refactor
 #include "Core/camera.h"
 #include "Framework/ProgramManager.h"
-#include "Framework/SceneManager.h"
 #include "r_cbuffers.h"
+#include "scene/scene_manager.h"
 using namespace vct;
 using namespace vct::rg;
 
@@ -111,7 +111,7 @@ void destroy_passes() {
 extern void FillMaterialCB(const MaterialData* mat, MaterialCB& cb);
 
 static void shadow_pass_func() {
-    const Scene& scene = Com_GetScene();
+    const vct::Scene& scene = SceneManager::get_scene();
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -123,19 +123,19 @@ static void shadow_pass_func() {
     const int res = DVAR_GET_INT(r_shadowRes);
     // render scene 3 times
 
-    const uint32_t numObjects = (uint32_t)scene.GetCount<ObjectComponent>();
+    const uint32_t numObjects = (uint32_t)scene.get_count<ObjectComponent>();
     for (int idx = 0; idx < NUM_CASCADES; ++idx) {
         glViewport(idx * res, 0, res, res);
         const mat4& PV = g_perFrameCache.cache.LightPVs[idx];
         const Frustum frustum(PV);
 
         for (uint32_t i = 0; i < numObjects; ++i) {
-            const ObjectComponent& obj = scene.GetComponentArray<ObjectComponent>()[i];
-            ecs::Entity entity = scene.GetEntity<ObjectComponent>(i);
-            DEV_ASSERT(scene.Contains<TransformComponent>(entity));
-            const TransformComponent& transform = *scene.GetComponent<TransformComponent>(entity);
-            DEV_ASSERT(scene.Contains<MeshComponent>(obj.meshID));
-            const MeshComponent& mesh = *scene.GetComponent<MeshComponent>(obj.meshID);
+            const ObjectComponent& obj = scene.get_component_array<ObjectComponent>()[i];
+            ecs::Entity entity = scene.get_entity<ObjectComponent>(i);
+            DEV_ASSERT(scene.contains<TransformComponent>(entity));
+            const TransformComponent& transform = *scene.get_component<TransformComponent>(entity);
+            DEV_ASSERT(scene.contains<MeshComponent>(obj.meshID));
+            const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
 
             const mat4& M = transform.GetWorldMatrix();
             AABB aabb = mesh.mLocalBound;
@@ -158,7 +158,7 @@ static void shadow_pass_func() {
 }
 
 static void gbuffer_pass_func() {
-    Scene& scene = Com_GetScene();
+    vct::Scene& scene = SceneManager::get_scene();
     const auto& program = gProgramManager->GetShaderProgram(ProgramType::GBUFFER);
 
     program.Bind();
@@ -170,14 +170,14 @@ static void gbuffer_pass_func() {
 
     Frustum frustum(gCamera.ProjView());
 
-    const uint32_t numObjects = (uint32_t)scene.GetCount<ObjectComponent>();
+    const uint32_t numObjects = (uint32_t)scene.get_count<ObjectComponent>();
     for (uint32_t i = 0; i < numObjects; ++i) {
-        const ObjectComponent& obj = scene.GetComponentArray<ObjectComponent>()[i];
-        ecs::Entity entity = scene.GetEntity<ObjectComponent>(i);
-        DEV_ASSERT(scene.Contains<TransformComponent>(entity));
-        const TransformComponent& transform = *scene.GetComponent<TransformComponent>(entity);
-        DEV_ASSERT(scene.Contains<MeshComponent>(obj.meshID));
-        const MeshComponent& mesh = *scene.GetComponent<MeshComponent>(obj.meshID);
+        const ObjectComponent& obj = scene.get_component_array<ObjectComponent>()[i];
+        ecs::Entity entity = scene.get_entity<ObjectComponent>(i);
+        DEV_ASSERT(scene.contains<TransformComponent>(entity));
+        const TransformComponent& transform = *scene.get_component<TransformComponent>(entity);
+        DEV_ASSERT(scene.contains<MeshComponent>(obj.meshID));
+        const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
 
         const mat4& M = transform.GetWorldMatrix();
         AABB aabb = mesh.mLocalBound;
@@ -200,7 +200,7 @@ static void gbuffer_pass_func() {
                 continue;
             }
 
-            const MaterialComponent& material = *scene.GetComponent<MaterialComponent>(subset.materialID);
+            const MaterialComponent& material = *scene.get_component<MaterialComponent>(subset.materialID);
             const MaterialData* matData = reinterpret_cast<MaterialData*>(material.gpuResource);
 
             FillMaterialCB(matData, g_materialCache.cache);

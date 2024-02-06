@@ -2,13 +2,13 @@
 
 #include "Engine/Core/Input.h"
 #include "Engine/Core/camera.h"
-#include "Engine/Framework/SceneManager.h"
 #include "ImGuizmo/ImGuizmo.h"
 #include "gizmo.h"
 #include "imgui/imgui_internal.h"
 
 // @TODO: refactor
 #include "core/math/ray.h"
+#include "scene/scene_manager.h"
 #include "servers/display_server.h"
 
 extern uint32_t g_final_image;
@@ -77,7 +77,7 @@ void Viewer::RenderInternal(Scene& scene) {
     ImGui::GetWindowDrawList()->AddImage((ImTextureID)g_final_image, topLeft, bottomRight, ImVec2(0, 1), ImVec2(1, 0));
 
     if (mpSelected->IsValid()) {
-        TransformComponent* transform = scene.GetComponent<TransformComponent>(*mpSelected);
+        TransformComponent* transform = scene.get_component<TransformComponent>(*mpSelected);
 
         auto op = ImGuizmo::ROTATE;
         if (transform) {

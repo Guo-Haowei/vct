@@ -1,7 +1,7 @@
 layout(location = 0) in vec4 pass_color;
 layout(location = 0) out vec4 out_color;
 
-#include "cbuffer.glsl"
+#include "cbuffer.glsl.h"
 
 void main() {
     if (DebugTexture == 1)  // abledo

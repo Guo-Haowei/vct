@@ -8,7 +8,9 @@
 #include "core/io/archive.h"
 #include "core/systems/job_system.h"
 
-using namespace vct::jobsystem;
+namespace vct {
+
+using ecs::Entity;
 
 // @TODO: refactor
 #if 1
@@ -16,75 +18,79 @@ using namespace vct::jobsystem;
     CTX.dispatch(                                          \
         static_cast<uint32_t>(COUNT),                      \
         SUBCOUNT,                                          \
-        [&](JobArgs args) { const uint32_t INDEX = args.job_index; do BODY while(0); })
+        [&](jobsystem::JobArgs args) { const uint32_t INDEX = args.job_index; do BODY while(0); })
 #else
 #define JS_PARALLEL_FOR(CTX, INDEX, COUNT, SUBCOUNT, BODY) \
     (void)(CTX);                                           \
     for (uint32_t INDEX = 0; INDEX < static_cast<uint32_t>(COUNT); ++INDEX) BODY
 #endif
 
-void Scene::Update(float dt) {
-    mDeltaTime = dt;
+void Scene::update(float dt) {
+    m_delta_time = dt;
 
-    Context ctx;
+    jobsystem::Context ctx;
 
-    RunAnimationUpdateSystem(ctx);  // update animation
+    update_animation(ctx);  // update animation
     ctx.wait();
-    RunTransformUpdateSystem(ctx);  // update local matrices
+    update_transformation(ctx);  // update local matrices
     ctx.wait();
-    RunHierarchyUpdateSystem(ctx);  // update world matrices
+    update_hierarchy(ctx);  // update world matrices
     ctx.wait();
-    RunArmatureUpdateSystem(ctx);  // update armature matrices
+    update_armature(ctx);  // update armature matrices
     ctx.wait();
 
     // update bounding boxes
     // RunObjectUpdateSystem();
 
     RunCameraUpdateSystem();
-
-    RunLightUpdateSystem();
 }
 
-void Scene::Merge(Scene& other) {
-    unused(other);
-    CRASH_NOW_MSG("FIX");
+void Scene::merge(Scene& other) {
+    for (auto& entry : m_component_lib.mEntries) {
+        entry.second.mManager->Merge(*other.m_component_lib.mEntries[entry.first].mManager);
+    }
+    if (other.m_root.IsValid()) {
+        attach_component(other.m_root, m_root);
+    }
+
+    m_bound.union_box(other.m_bound);
 }
 
-ecs::Entity Scene::Entity_CreateName(const std::string& name) {
-    ecs::Entity entity = mGenerator.Create();
-    Create<TagComponent>(entity).SetTag(name);
+ecs::Entity Scene::create_name_entity(const std::string& name) {
+    ecs::Entity entity = ecs::Entity::create();
+    create<TagComponent>(entity).SetTag(name);
     return entity;
 }
 
-ecs::Entity Scene::Entity_CreateTransform(const std::string& name) {
-    ecs::Entity entity = Entity_CreateName(name);
-    Create<TransformComponent>(entity);
+ecs::Entity Scene::create_transform_entity(const std::string& name) {
+    ecs::Entity entity = create_name_entity(name);
+    create<TransformComponent>(entity);
     return entity;
 }
 
-ecs::Entity Scene::Entity_CreateObject(const std::string& name) {
-    ecs::Entity entity = Entity_CreateName(name);
-    Create<ObjectComponent>(entity);
-    Create<TransformComponent>(entity);
+ecs::Entity Scene::create_object_entity(const std::string& name) {
+    ecs::Entity entity = create_name_entity(name);
+    create<ObjectComponent>(entity);
+    create<TransformComponent>(entity);
     return entity;
 }
 
-ecs::Entity Scene::Entity_CreateMesh(const std::string& name) {
-    ecs::Entity entity = Entity_CreateName(name);
-    Create<MeshComponent>(entity);
+ecs::Entity Scene::create_mesh_entity(const std::string& name) {
+    ecs::Entity entity = create_name_entity(name);
+    create<MeshComponent>(entity);
     return entity;
 }
 
-ecs::Entity Scene::Entity_CreateMaterial(const std::string& name) {
-    ecs::Entity entity = Entity_CreateName(name);
-    Create<MaterialComponent>(entity);
+ecs::Entity Scene::create_material_entity(const std::string& name) {
+    ecs::Entity entity = create_name_entity(name);
+    create<MaterialComponent>(entity);
     return entity;
 }
 
-ecs::Entity Scene::Entity_CreateCamera(const std::string& name, float width, float height, float near_plane,
-                                       float far_plane, float fovy) {
-    ecs::Entity entity = Entity_CreateName(name);
-    CameraComponent& cameraComponent = Create<CameraComponent>(entity);
+ecs::Entity Scene::create_camera_entity(const std::string& name, float width, float height, float near_plane,
+                                        float far_plane, float fovy) {
+    ecs::Entity entity = create_name_entity(name);
+    CameraComponent& cameraComponent = create<CameraComponent>(entity);
     cameraComponent.width = width;
     cameraComponent.height = height;
     cameraComponent.zNear = near_plane;
@@ -94,16 +100,16 @@ ecs::Entity Scene::Entity_CreateCamera(const std::string& name, float width, flo
     return entity;
 }
 
-ecs::Entity Scene::Entity_CreatePointLight(const std::string& name, const vec3& position, const vec3& color,
-                                           const float energy) {
-    ecs::Entity entity = Entity_CreateName(name);
+ecs::Entity Scene::create_pointlight_entity(const std::string& name, const vec3& position, const vec3& color,
+                                            const float energy) {
+    ecs::Entity entity = create_name_entity(name);
     (void)name;
     (void)position;
     (void)color;
     (void)energy;
-    // TransformComponent& transComponent = Create<TransformComponent>(entity);
+    // TransformComponent& transComponent = create<TransformComponent>(entity);
     // transComponent.SetPosition(position);
-    // LightComponent& lightComponent = Create<LightComponent>(entity);
+    // LightComponent& lightComponent = create<LightComponent>(entity);
     // lightComponent.type = LIGHT_TYPE_POINT;
     // lightComponent.color = color;
     // lightComponent.energy = energy;
@@ -111,39 +117,37 @@ ecs::Entity Scene::Entity_CreatePointLight(const std::string& name, const vec3& 
     return entity;
 }
 
-ecs::Entity Scene::Entity_CreateOmniLight(const std::string& name, const vec3& color, const float energy) {
-    ecs::Entity entity = Entity_CreateName(name);
-    (void)color;
-    (void)energy;
-    // Create<TransformComponent>(entity);
-    // LightComponent& lightComponent = Create<LightComponent>(entity);
-    // lightComponent.type = LIGHT_TYPE_OMNI;
-    // lightComponent.color = color;
-    // lightComponent.energy = energy;
+ecs::Entity Scene::create_omnilight_entity(const std::string& name, const vec3& color, const float energy) {
+    ecs::Entity entity = create_name_entity(name);
+    create<TransformComponent>(entity);
+    LightComponent& light = create<LightComponent>(entity);
+    // light.type = LIGHT_TYPE_OMNI;
+    light.color = color;
+    light.energy = energy;
 
     return entity;
 }
 
-ecs::Entity Scene::Entity_CreateSphere(const std::string& name, float radius, const mat4& transform) {
-    ecs::Entity matID = Entity_CreateMaterial(name + ":mat");
-    return Entity_CreateSphere(name, matID, radius, transform);
+ecs::Entity Scene::create_sphere_entity(const std::string& name, float radius, const mat4& transform) {
+    ecs::Entity matID = create_material_entity(name + ":mat");
+    return create_sphere_entity(name, matID, radius, transform);
 }
 
-ecs::Entity Scene::Entity_CreateSphere(const std::string& name, ecs::Entity materialID, float radius,
-                                       const mat4& transform) {
+ecs::Entity Scene::create_sphere_entity(const std::string& name, ecs::Entity materialID, float radius,
+                                        const mat4& transform) {
     (void)name;
     (void)materialID;
     (void)radius;
     (void)transform;
-    ecs::Entity entity = Entity_CreateObject(name);
-    // TransformComponent& trans = *GetComponent<TransformComponent>(entity);
-    // ObjectComponent& obj = *GetComponent<ObjectComponent>(entity);
+    ecs::Entity entity = create_object_entity(name);
+    // TransformComponent& trans = *get_component<TransformComponent>(entity);
+    // ObjectComponent& obj = *get_component<ObjectComponent>(entity);
     // trans.MatrixTransform(transform);
 
     // ecs::Entity meshID = Entity_CreateMesh(name + ":mesh");
     // obj.meshID = meshID;
 
-    // MeshComponent& mesh = *GetComponent<MeshComponent>(meshID);
+    // MeshComponent& mesh = *get_component<MeshComponent>(meshID);
 
     // fill_sphere_data(mesh, radius);
 
@@ -156,26 +160,26 @@ ecs::Entity Scene::Entity_CreateSphere(const std::string& name, ecs::Entity mate
     return entity;
 }
 
-ecs::Entity Scene::Entity_CreateCube(const std::string& name, const vec3& scale, const mat4& transform) {
-    ecs::Entity matID = Entity_CreateMaterial(name + ":mat");
-    return Entity_CreateCube(name, matID, scale, transform);
+ecs::Entity Scene::create_cube_entity(const std::string& name, const vec3& scale, const mat4& transform) {
+    ecs::Entity matID = create_material_entity(name + ":mat");
+    return create_cube_entity(name, matID, scale, transform);
 }
 
-ecs::Entity Scene::Entity_CreateCube(const std::string& name, ecs::Entity materialID, const vec3& scale,
-                                     const mat4& transform) {
+ecs::Entity Scene::create_cube_entity(const std::string& name, ecs::Entity materialID, const vec3& scale,
+                                      const mat4& transform) {
     (void)name;
     (void)materialID;
     (void)scale;
     (void)transform;
-    ecs::Entity entity = Entity_CreateObject(name);
-    // TransformComponent& trans = *GetComponent<TransformComponent>(entity);
-    // ObjectComponent& obj = *GetComponent<ObjectComponent>(entity);
+    ecs::Entity entity = create_object_entity(name);
+    // TransformComponent& trans = *get_component<TransformComponent>(entity);
+    // ObjectComponent& obj = *get_component<ObjectComponent>(entity);
     // trans.MatrixTransform(transform);
 
     // ecs::Entity meshID = Entity_CreateMesh(name + ":mesh");
     // obj.meshID = meshID;
 
-    // MeshComponent& mesh = *GetComponent<MeshComponent>(meshID);
+    // MeshComponent& mesh = *get_component<MeshComponent>(meshID);
 
     // fill_cube_data(scale, mesh);
 
@@ -188,21 +192,21 @@ ecs::Entity Scene::Entity_CreateCube(const std::string& name, ecs::Entity materi
     return entity;
 }
 
-void Scene::Component_Attach(ecs::Entity child, ecs::Entity parent) {
+void Scene::attach_component(ecs::Entity child, ecs::Entity parent) {
     DEV_ASSERT(child != parent);
     DEV_ASSERT(parent.IsValid());
 
     // if child already has a parent, detach it
-    if (mHierarchyComponents.Contains(child)) {
+    if (mHierarchyComponents.contains(child)) {
         CRASH_NOW_MSG("Unlikely to happen at this point");
-        Component_Detach(child);
+        detach_component(child);
     }
 
-    HierarchyComponent& hier = mHierarchyComponents.Create(child);
+    HierarchyComponent& hier = mHierarchyComponents.create(child);
     hier.mParent = parent;
 }
 
-void Scene::Component_Detach(ecs::Entity entity) {
+void Scene::detach_component(ecs::Entity entity) {
     unused(entity);
     CRASH_NOW_MSG("TODO");
 }
@@ -215,8 +219,8 @@ void Scene::Component_DetachChildren(ecs::Entity parent) {
 // static constexpr uint32_t SMALL_SUBTASK_GROUPSIZE = 64;
 static constexpr uint32_t SMALL_SUBTASK_GROUPSIZE = 16;
 
-void Scene::RunAnimationUpdateSystem(Context& ctx) {
-    JS_PARALLEL_FOR(ctx, i, GetCount<AnimationComponent>(), 1, {
+void Scene::update_animation(jobsystem::Context& ctx) {
+    JS_PARALLEL_FOR(ctx, i, get_count<AnimationComponent>(), 1, {
         AnimationComponent& animation = mAnimationComponents[i];
         if (!animation.IsPlaying()) {
             continue;
@@ -267,7 +271,7 @@ void Scene::RunAnimationUpdateSystem(Context& ctx) {
             }
             t = SaturateF(t);
 
-            TransformComponent* targetTransform = mTransformComponents.GetComponent(channel.targetID);
+            TransformComponent* targetTransform = mTransformComponents.get_component(channel.targetID);
             DEV_ASSERT(targetTransform);
             switch (channel.path) {
                 case AnimationComponent::Channel::SCALE: {
@@ -306,32 +310,32 @@ void Scene::RunAnimationUpdateSystem(Context& ctx) {
         }
 
         if (animation.IsPlaying()) {
-            animation.timer += mDeltaTime * animation.speed;
+            animation.timer += m_delta_time * animation.speed;
         }
     });
 }
 
-void Scene::RunTransformUpdateSystem(Context& ctx) {
-    JS_PARALLEL_FOR(ctx, i, GetCount<TransformComponent>(), SMALL_SUBTASK_GROUPSIZE,
+void Scene::update_transformation(jobsystem::Context& ctx) {
+    JS_PARALLEL_FOR(ctx, i, get_count<TransformComponent>(), SMALL_SUBTASK_GROUPSIZE,
                     { mTransformComponents[i].UpdateTransform(); });
 }
 
-void Scene::RunHierarchyUpdateSystem(Context& ctx) {
-    JS_PARALLEL_FOR(ctx, i, GetCount<HierarchyComponent>(), SMALL_SUBTASK_GROUPSIZE, {
-        ecs::Entity child = mHierarchyComponents.GetEntity(i);
-        TransformComponent* childTrans = mTransformComponents.GetComponent(child);
+void Scene::update_hierarchy(jobsystem::Context& ctx) {
+    JS_PARALLEL_FOR(ctx, i, get_count<HierarchyComponent>(), SMALL_SUBTASK_GROUPSIZE, {
+        ecs::Entity child = mHierarchyComponents.get_entity(i);
+        TransformComponent* childTrans = mTransformComponents.get_component(child);
         if (childTrans) {
             const HierarchyComponent* hier = &mHierarchyComponents[i];
             ecs::Entity parent = hier->mParent;
             mat4 W = childTrans->GetLocalMatrix();
 
             while (parent.IsValid()) {
-                TransformComponent* parentTrans = mTransformComponents.GetComponent(parent);
+                TransformComponent* parentTrans = mTransformComponents.get_component(parent);
                 if (parentTrans) {
                     W = parentTrans->GetLocalMatrix() * W;
                 }
 
-                if ((hier = mHierarchyComponents.GetComponent(parent)) != nullptr) {
+                if ((hier = mHierarchyComponents.get_component(parent)) != nullptr) {
                     parent = hier->mParent;
                     DEV_ASSERT(parent.IsValid());
                 } else {
@@ -345,11 +349,11 @@ void Scene::RunHierarchyUpdateSystem(Context& ctx) {
     });
 }
 
-void Scene::RunArmatureUpdateSystem(Context& ctx) {
-    JS_PARALLEL_FOR(ctx, i, GetCount<ArmatureComponent>(), 1, {
-        ecs::Entity id = mArmatureComponents.GetEntity(i);
+void Scene::update_armature(jobsystem::Context& ctx) {
+    JS_PARALLEL_FOR(ctx, i, get_count<ArmatureComponent>(), 1, {
+        ecs::Entity id = mArmatureComponents.get_entity(i);
         ArmatureComponent& armature = mArmatureComponents[i];
-        TransformComponent* transform = mTransformComponents.GetComponent(id);
+        TransformComponent* transform = mTransformComponents.get_component(id);
         DEV_ASSERT(transform);
 
         // The transform world matrices are in world space, but skinning needs them in armature-local space,
@@ -371,7 +375,7 @@ void Scene::RunArmatureUpdateSystem(Context& ctx) {
 
         int idx = 0;
         for (ecs::Entity boneID : armature.boneCollection) {
-            const TransformComponent* boneTransform = mTransformComponents.GetComponent(boneID);
+            const TransformComponent* boneTransform = mTransformComponents.get_component(boneID);
             DEV_ASSERT(boneTransform);
 
             const mat4& B = armature.inverseBindMatrices[idx];
@@ -385,21 +389,17 @@ void Scene::RunArmatureUpdateSystem(Context& ctx) {
     });
 }
 
-void Scene::RunObjectUpdateSystem() { CRASH_NOW(); }
-
 void Scene::RunCameraUpdateSystem() {
-    for (int i = 0; i < GetCount<CameraComponent>(); ++i) {
-        ecs::Entity cam = GetEntity<CameraComponent>(i);
+    for (int i = 0; i < get_count<CameraComponent>(); ++i) {
+        ecs::Entity cam = get_entity<CameraComponent>(i);
         CameraComponent& cameraComponent = mCameraComponents[i];
         cameraComponent.UpdateCamera();
     }
 }
 
-void Scene::RunLightUpdateSystem() {}
-
-void Scene::Serialize(Archive& archive) {
-    mGenerator.Serialize(archive);
-    mRoot.Serialize(archive);
+void Scene::serialize(Archive& archive) {
+    // mGenerator.Serialize(archive);
+    m_root.Serialize(archive);
 
     mTagComponents.Serialize(archive);
     mTransformComponents.Serialize(archive);
@@ -417,11 +417,11 @@ void Scene::Serialize(Archive& archive) {
 Scene::RayIntersectionResult Scene::Intersects(Ray& ray) {
     RayIntersectionResult result;
 
-    for (int objIdx = 0; objIdx < GetCount<ObjectComponent>(); ++objIdx) {
-        ecs::Entity entity = GetEntity<ObjectComponent>(objIdx);
-        ObjectComponent& object = GetComponentArray<ObjectComponent>()[objIdx];
-        MeshComponent* mesh = GetComponent<MeshComponent>(object.meshID);
-        TransformComponent* transform = GetComponent<TransformComponent>(entity);
+    for (int objIdx = 0; objIdx < get_count<ObjectComponent>(); ++objIdx) {
+        ecs::Entity entity = get_entity<ObjectComponent>(objIdx);
+        ObjectComponent& object = get_component_array<ObjectComponent>()[objIdx];
+        MeshComponent* mesh = get_component<MeshComponent>(object.meshID);
+        TransformComponent* transform = get_component<TransformComponent>(entity);
         DEV_ASSERT(mesh && transform);
 
         if (!transform || !mesh) {
@@ -453,3 +453,5 @@ Scene::RayIntersectionResult Scene::Intersects(Ray& ray) {
 
     return result;
 }
+
+}  // namespace vct
