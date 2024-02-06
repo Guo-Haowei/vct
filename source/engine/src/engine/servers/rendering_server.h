@@ -1,18 +1,21 @@
 #pragma once
-#include "GpuTexture.h"
-#include "gl_utils.h"
-#include "passes.h"
-#include "r_cbuffers.h"
-
-#include "Framework/scene_listener.h"
+#include "core/objects/singleton.h"
+#include "rendering/GpuTexture.h"
+#include "rendering/gl_utils.h"
+#include "rendering/passes.h"
+#include "rendering/r_cbuffers.h"
+#include "scene/scene_listener.h"
 
 namespace vct {
 
-class MainRenderer : public SceneListener {
+class RenderingServer : public Singleton<RenderingServer>, public SceneListener {
 public:
-    MainRenderer() : SceneListener("renderer") {}
+    RenderingServer() : SceneListener("renderer") {}
 
-    virtual void begin_scene() override;
+    bool initialize();
+    void finalize();
+
+    virtual void begin_scene(Scene& scene) override;
 
     void createGpuResources();
     void render();

@@ -1,5 +1,5 @@
 #pragma once
-#include "Scene/Scene.h"
+#include "scene/scene.h"
 
 struct aiMesh;
 struct aiNode;

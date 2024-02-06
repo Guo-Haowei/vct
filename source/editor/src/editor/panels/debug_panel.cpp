@@ -1,7 +1,7 @@
 #include "debug_panel.h"
 
 #include "Engine/Core/camera.h"
-#include "Engine/Scene/Scene.h"
+#include "scene/scene.h"
 #include "servers/rendering/r_defines.h"
 
 /////////////////////

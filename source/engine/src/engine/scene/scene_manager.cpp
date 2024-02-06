@@ -1,4 +1,4 @@
-#include "SceneManager.h"
+#include "scene_manager.h"
 
 #include "Scene/AssimpSceneLoader.h"
 #include "core/camera.h"

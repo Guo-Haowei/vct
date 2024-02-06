@@ -1,7 +1,7 @@
 #include "hierarchy_panel.h"
 
-#include "Engine/Scene/Scene.h"
 #include "imgui/imgui_internal.h"
+#include "scene/scene.h"
 
 class HierarchyCreator {
 public:

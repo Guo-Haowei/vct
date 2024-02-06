@@ -8,8 +8,8 @@
 // @TODO: refactor
 #include "Core/camera.h"
 #include "Framework/ProgramManager.h"
-#include "Framework/SceneManager.h"
 #include "r_cbuffers.h"
+#include "scene/scene_manager.h"
 using namespace vct;
 using namespace vct::rg;
 

@@ -2,10 +2,10 @@
 
 #include "Core/geometry.h"
 #include "Framework/ProgramManager.h"
-#include "Framework/SceneManager.h"
 #include "GpuTexture.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"
+#include "scene/scene_manager.h"
 
 struct VertexPoint3D {
     vec3 position;

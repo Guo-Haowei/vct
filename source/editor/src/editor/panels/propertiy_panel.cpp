@@ -1,8 +1,8 @@
 #include "propertiy_panel.h"
 
-#include "Engine/Scene/Scene.h"
 #include "ImGuizmo/ImGuizmo.h"
 #include "imgui/imgui_internal.h"
+#include "scene/scene.h"
 
 static constexpr float DEFAULT_COLUMN_WIDTH = 100.0f;
 
