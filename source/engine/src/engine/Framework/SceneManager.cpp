@@ -1,9 +1,9 @@
 #include "SceneManager.h"
 
 #include "Scene/AssimpSceneLoader.h"
+#include "core/camera.h"
 #include "imgui/imgui.h"
 #include "servers/rendering/r_cbuffers.h"
-#include "servers/rendering/r_sun_shadow.h"
 ///
 #include "core/dynamic_variable/common_dvars.h"
 #include "servers/display_server.h"
@@ -64,6 +64,23 @@ static bool Com_LoadScene() {
 }
 
 Scene& Com_GetScene() { return g_scene; }
+
+// @TODO: fix
+static mat4 R_HackLightSpaceMatrix(const vec3& lightDir) {
+    const Scene& scene = Com_GetScene();
+    const vec3 center = scene.bound.center();
+    const vec3 extents = scene.bound.size();
+    const float size = 0.5f * glm::max(extents.x, glm::max(extents.y, extents.z));
+    const mat4 V = glm::lookAt(center + glm::normalize(lightDir) * size, center, vec3(0, 1, 0));
+    const mat4 P = glm::ortho(-size, size, -size, size, 0.0f, 2.0f * size);
+    return P * V;
+}
+
+static void R_LightSpaceMatrix(const Camera& camera, const vec3& lightDir, mat4 lightPVs[NUM_CASCADES]) {
+    unused(camera);
+    lightPVs[0] = lightPVs[1] = lightPVs[2] = R_HackLightSpaceMatrix(lightDir);
+    return;
+}
 
 static void Com_UpdateWorld() {
     Scene& scene = Com_GetScene();

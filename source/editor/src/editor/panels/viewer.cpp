@@ -10,7 +10,8 @@
 // @TODO: refactor
 #include "core/math/ray.h"
 #include "servers/display_server.h"
-extern uint32_t gFinalImage;
+
+extern uint32_t g_final_image;
 
 static void camera_control(Camera& camera);
 
@@ -73,7 +74,7 @@ void Viewer::RenderInternal(Scene& scene) {
     ImVec2 topLeft = GImGui->CurrentWindow->ContentRegionRect.Min;
     ImVec2 bottomRight(topLeft.x + contentSize.x, topLeft.y + contentSize.y);
 
-    ImGui::GetWindowDrawList()->AddImage((ImTextureID)gFinalImage, topLeft, bottomRight, ImVec2(0, 1), ImVec2(1, 0));
+    ImGui::GetWindowDrawList()->AddImage((ImTextureID)g_final_image, topLeft, bottomRight, ImVec2(0, 1), ImVec2(1, 0));
 
     if (mpSelected->IsValid()) {
         TransformComponent* transform = scene.GetComponent<TransformComponent>(*mpSelected);

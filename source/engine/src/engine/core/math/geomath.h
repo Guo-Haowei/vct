@@ -50,15 +50,15 @@ constexpr inline uint32_t next_power_of_two(uint32_t x) {
     return ++x;
 }
 
+template<typename T>
+constexpr inline T lerp(const T& a, const T& b, const T& f) {
+    return a + f * (b - a);
+}
+
 // @TODO: refactor
 template<typename T>
 T Square(const T& a) {
     return a * a;
-}
-
-template<typename T>
-inline T Lerp(const T& a, const T& b, const T& f) {
-    return a + f * (b - a);
 }
 
 static inline void Decompose(const mat4& matrix, vec3& scale, vec4& rotation, vec3& translation) {

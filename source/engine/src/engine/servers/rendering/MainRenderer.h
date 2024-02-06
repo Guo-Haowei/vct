@@ -1,8 +1,8 @@
 #pragma once
 #include "GpuTexture.h"
 #include "gl_utils.h"
+#include "passes.h"
 #include "r_cbuffers.h"
-#include "r_rendertarget.h"
 
 namespace vct {
 
