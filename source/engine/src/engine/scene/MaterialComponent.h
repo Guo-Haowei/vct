@@ -6,8 +6,6 @@ class Archive;
 }
 using namespace vct;
 
-struct Image;
-
 struct MaterialComponent {
     enum ETextureSlot {
         Base,
@@ -18,7 +16,7 @@ struct MaterialComponent {
 
     struct TextureMap {
         std::string name;
-        const Image* image = nullptr;
+        //const Image* image = nullptr;
         // mutable GPUTexture texture;
     };
     TextureMap mTextures[ETextureSlot::Count];

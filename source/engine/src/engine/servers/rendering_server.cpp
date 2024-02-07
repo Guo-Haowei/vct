@@ -383,7 +383,7 @@ void RenderingServer::render() {
 
         // @TODO: make it a pass
         g_viewer_rt.bind();
-        glClearColor(1.f, 1.f, 1.f, 1.f);
+        glClearColor(.1f, .1f, .1f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderFrameBufferTextures(frameW, frameH);
         R_DrawEditor();

@@ -19,6 +19,7 @@ Scene& SceneManager::get_scene() {
 
 void SceneManager::request_scene(std::string_view path) {
     std::thread t([](std::string_view scene_path) {
+        // @TODO: move this to loader thread
         Scene* new_scene = new Scene;
         SceneLoader loader(*new_scene);
 
