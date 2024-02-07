@@ -1,10 +1,7 @@
 #pragma once
 #include "GpuTexture.h"
 
-#include <string>
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "assets/asset_loader.h"
 
 using std::string;
 
@@ -49,15 +46,11 @@ void GpuTexture::create3DEmpty(const Texture3DCreateInfo& info) {
     glTexStorage3D(m_type, info.mipLevel, m_format, info.size, info.size, info.size);
 }
 
-void GpuTexture::Create2DImageFromFile(const std::string& path) {
+void GpuTexture::create_texture2d_from_image(const std::string& path) {
+    auto image = vct::asset_loader::find_image(path);
+    DEV_ASSERT(image);
+
     m_type = GL_TEXTURE_2D;
-    int width, height, channel;
-    unsigned char* image = stbi_load(path.c_str(), &width, &height, &channel, 4);
-
-    if (!image) {
-        LOG_ERROR("stb: failed to load image '{}'", path);
-    }
-
     glGenTextures(1, &mHandle);
     glBindTexture(m_type, mHandle);
     glTexParameteri(m_type, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -65,17 +58,17 @@ void GpuTexture::Create2DImageFromFile(const std::string& path) {
     glTexParameteri(m_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(m_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    GLenum format = GL_RGBA;
-    // switch ( channel )
-    // {
-    //     case 4: format = GL_RGBA; break;
-    //     case 3: format = GL_RGB; break;
-    //     case 2: format = GL_RG; break;
-    //     case 1: format = GL_RED; break;
-    //     default: CRASH_NOW();
-    // }
+    glTexImage2D(
+        m_type,
+        0,
+        format_to_gl_internal_format(image->format),
+        image->width,
+        image->height,
+        0,
+        format_to_gl_format(image->format),
+        format_to_gl_data_type(image->format),
+        image->buffer.data());
 
-    glTexImage2D(m_type, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, image);
     glGenerateMipmap(m_type);
     glBindTexture(m_type, 0);
 }

@@ -1,16 +1,21 @@
 #pragma once
+#include "image.h"
 
 namespace vct {
-
-enum AssetType {
-    ASSET_TYPE_TEXT,
-    ASSET_TYPE_SHADER,
-};
-
-struct LoadTask {
-    std::string asset_path;
-};
-
-void loader_main();
-
+class Scene;
 }  // namespace vct
+
+namespace vct::asset_loader {
+
+using LoadSuccessFunc = void (*)(void*);
+
+bool initialize();
+void finalize();
+
+void request_scene(const std::string& scene_path, LoadSuccessFunc on_success);
+
+std::shared_ptr<Image> find_image(const std::string& image_path);
+
+void worker_main();
+
+}  // namespace vct::asset_loader

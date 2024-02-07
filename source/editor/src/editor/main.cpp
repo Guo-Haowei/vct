@@ -1,5 +1,6 @@
 #include "EditorLayer.h"
 #include "Framework/UIManager.h"
+#include "assets/asset_loader.h"
 #include "core/os/os.h"
 #include "core/os/threads.h"
 #include "core/systems/job_system.h"
@@ -90,6 +91,7 @@ int main(int argc, const char** argv) {
 
     thread::initialize();
     jobsystem::initialize();
+    asset_loader::initialize();
 
     SceneManager::singleton().initialize();
     UIManager::initialize();
@@ -99,6 +101,8 @@ int main(int argc, const char** argv) {
     // @TODO: move main loop here
     Editor editor;
     editor.Run(argc, argv);
+
+    // @TODO: move it to request shutdown
     thread::request_shutdown();
 
     // finalize
@@ -107,6 +111,7 @@ int main(int argc, const char** argv) {
     UIManager::finalize();
     SceneManager::singleton().finalize();
 
+    asset_loader::finalize();
     jobsystem::finalize();
     thread::finailize();
 

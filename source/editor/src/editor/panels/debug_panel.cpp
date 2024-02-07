@@ -43,7 +43,7 @@ static const char* DrawTextureToStr(int mode) {
     return str;
 }
 
-void DebugPanel::RenderInternal(Scene& scene) {
+void DebugPanel::RenderInternal(Scene&) {
     const Camera& camera = gCamera;
     bool dirty = false;
 

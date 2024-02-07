@@ -1,7 +1,7 @@
 #pragma once
 #include "ComponentManager.h"
-#include "SceneComponents.h"
 #include "entity.h"
+#include "scene_components.h"
 ////////////////////
 #include "core/math/ray.h"
 #include "core/objects/noncopyable.h"

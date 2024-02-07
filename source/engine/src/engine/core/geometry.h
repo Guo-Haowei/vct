@@ -1,9 +1,9 @@
 #pragma once
-#include "Scene/MeshComponent.h"
+#include "scene/scene_components.h"
 
-namespace geometry {
+namespace vct {
 
 MeshComponent MakeBox(float size = 0.5f);
 MeshComponent MakeBoxWireFrame(float size = 0.5f);
 
-}  // namespace geometry
+}  // namespace vct

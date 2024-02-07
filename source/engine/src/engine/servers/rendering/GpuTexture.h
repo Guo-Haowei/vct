@@ -23,7 +23,7 @@ struct Texture3DCreateInfo {
 
 class GpuTexture {
 public:
-    void Create2DImageFromFile(const std::string& path);
+    void create_texture2d_from_image(const std::string& path);
 
     void create2DEmpty(const Texture2DCreateInfo& info);
     void create3DEmpty(const Texture3DCreateInfo& info);

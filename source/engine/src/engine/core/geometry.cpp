@@ -1,6 +1,6 @@
 #include "geometry.h"
 
-namespace geometry {
+namespace vct {
 
 /**
  *        E__________________ H
@@ -133,4 +133,4 @@ void boxWithNormal(std::vector<vec3>& outPoints, std::vector<vec3>& outNomrals, 
     };
 }
 
-}  // namespace geometry
+}  // namespace vct

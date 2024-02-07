@@ -53,7 +53,7 @@ void finalize() {
 }
 
 void Context::dispatch(uint32_t job_count, uint32_t group_size, const std::function<void(JobArgs)>& task) {
-    DEV_ASSERT(thread::is_main_thread());
+    // DEV_ASSERT(thread::is_main_thread());
 
     if (job_count == 0 || group_size == 0) {
         return;

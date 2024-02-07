@@ -12,18 +12,18 @@ namespace vct::thread {
 
 struct ThreadObject {
     const char* name;
-    ThreadMainFunc threadMainFunc;
+    ThreadMainFunc thread_func;
     uint32_t id;
     std::thread thread;
 };
 
-static thread_local uint32_t g_threadID;
+static thread_local uint32_t g_thread_id;
 static struct
 {
-    std::atomic_bool shutdownRequested;
+    std::atomic_bool shutdown_requested;
     std::array<ThreadObject, THREAD_MAX> threads = {
         ThreadObject{ "main" },
-        ThreadObject{ "asset loader", loader_main },
+        ThreadObject{ "asset loader", asset_loader::worker_main },
         ThreadObject{ "js worker 0", jobsystem::worker_main },
         ThreadObject{ "js worker 1", jobsystem::worker_main },
         ThreadObject{ "js worker 2", jobsystem::worker_main },
@@ -36,7 +36,7 @@ static struct
 } s_glob;
 
 auto initialize() -> void {
-    g_threadID = THREAD_MAIN;
+    g_thread_id = THREAD_MAIN;
 
     for (uint32_t id = THREAD_MAIN + 1; id < THREAD_MAX; ++id) {
         ThreadObject& thread = s_glob.threads[id];
@@ -44,9 +44,12 @@ auto initialize() -> void {
         thread.thread = std::thread(
             [](ThreadObject* object) {
                 // set thread id
-                g_threadID = object->id;
-                // execute main function
-                object->threadMainFunc();
+                g_thread_id = object->id;
+
+                // @TODO: wait for everything to be initialized before running
+                LOG_VERBOSE("[threads] thread '{}'(id: {}) starts.", object->name, object->id);
+                object->thread_func();
+                LOG_VERBOSE("[threads] thread '{}'(id: {}) ends.", object->name, object->id);
             },
             &thread);
 
@@ -60,8 +63,6 @@ auto initialize() -> void {
         std::wstring wname(name.begin(), name.end());
         HRESULT hr = SetThreadDescription(handle, wname.c_str());
         DEV_ASSERT(!FAILED(hr));
-
-        LOG_VERBOSE("[threads] thread '{}'(id: {}) created.", thread.name, thread.id);
     }
 }
 
@@ -69,24 +70,23 @@ void finailize() {
     for (uint32_t id = THREAD_MAIN + 1; id < THREAD_MAX; ++id) {
         auto& thread = s_glob.threads[id];
         thread.thread.join();
-        LOG_VERBOSE("[threads] thread '{}'(id: {}) joined.", thread.name, thread.id);
     }
 }
 
 bool is_shutdown_requested() {
-    return s_glob.shutdownRequested;
+    return s_glob.shutdown_requested;
 }
 
 void request_shutdown() {
-    s_glob.shutdownRequested = true;
+    s_glob.shutdown_requested = true;
 }
 
 bool is_main_thread() {
-    return g_threadID == THREAD_MAIN;
+    return g_thread_id == THREAD_MAIN;
 }
 
 uint32_t get_thread_id() {
-    return g_threadID;
+    return g_thread_id;
 }
 
 }  // namespace vct::thread
