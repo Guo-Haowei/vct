@@ -1,12 +1,10 @@
-#include "AssimpSceneLoader.h"
+#include "scene_loader_assimp.h"
 
 #include <assimp/pbrmaterial.h>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
 #include <assimp/Importer.hpp>
-
-#include "core/dynamic_variable/common_dvars.h"
 
 namespace vct {
 
@@ -67,6 +65,8 @@ void SceneLoader::LoadGLTF(std::string_view path, bool flipUVs) {
         aabb.apply_matrix(M);
         mScene.m_bound.union_box(aabb);
     }
+
+    // @TODO: request images as well
 }
 
 void SceneLoader::ProcessMaterial(aiMaterial& material) {

@@ -4,7 +4,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
-#include "assets/asset_loader.h"
+#include "assets/asset_manager.h"
 #include "core/io/print.h"
 #include "core/systems/job_system.h"
 
@@ -12,15 +12,15 @@ namespace vct::thread {
 
 struct ThreadObject {
     const char* name;
-    ThreadMainFunc threadMainFunc;
+    ThreadMainFunc thread_func;
     uint32_t id;
     std::thread thread;
 };
 
-static thread_local uint32_t g_threadID;
+static thread_local uint32_t g_thread_id;
 static struct
 {
-    std::atomic_bool shutdownRequested;
+    std::atomic_bool shutdown_requested;
     std::array<ThreadObject, THREAD_MAX> threads = {
         ThreadObject{ "main" },
         ThreadObject{ "asset loader", loader_main },
@@ -36,7 +36,7 @@ static struct
 } s_glob;
 
 auto initialize() -> void {
-    g_threadID = THREAD_MAIN;
+    g_thread_id = THREAD_MAIN;
 
     for (uint32_t id = THREAD_MAIN + 1; id < THREAD_MAX; ++id) {
         ThreadObject& thread = s_glob.threads[id];
@@ -44,9 +44,9 @@ auto initialize() -> void {
         thread.thread = std::thread(
             [](ThreadObject* object) {
                 // set thread id
-                g_threadID = object->id;
+                g_thread_id = object->id;
                 // execute main function
-                object->threadMainFunc();
+                object->thread_func();
             },
             &thread);
 
@@ -74,19 +74,19 @@ void finailize() {
 }
 
 bool is_shutdown_requested() {
-    return s_glob.shutdownRequested;
+    return s_glob.shutdown_requested;
 }
 
 void request_shutdown() {
-    s_glob.shutdownRequested = true;
+    s_glob.shutdown_requested = true;
 }
 
 bool is_main_thread() {
-    return g_threadID == THREAD_MAIN;
+    return g_thread_id == THREAD_MAIN;
 }
 
 uint32_t get_thread_id() {
-    return g_threadID;
+    return g_thread_id;
 }
 
 }  // namespace vct::thread

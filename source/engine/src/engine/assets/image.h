@@ -21,12 +21,22 @@ enum PixelFormat {
     FORMAT_D32_FLOAT,
 };
 
-struct Image {
-    // format
-    std::vector<uint8_t> data;
-    int width;
-    int height;
-    int num_channels;
+class Image {
+public:
+    // @TODO: make this private
+    Image(PixelFormat format, int width, int height, int num_channels, std::vector<uint8_t>& buffer)
+        : format(format),
+          width(width),
+          height(height),
+          num_channels(num_channels),
+          buffer(std::move(buffer)) {
+    }
+
+    PixelFormat format;
+    const int width;
+    const int height;
+    const int num_channels;
+    std::vector<uint8_t> buffer;
 };
 
 }  // namespace vct

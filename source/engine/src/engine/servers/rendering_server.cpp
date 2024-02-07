@@ -115,7 +115,7 @@ void RenderingServer::begin_scene(Scene& scene) {
             const std::string& textureMap = mat.mTextures[MaterialComponent::Base].name;
             matData->albedoColor = mat.mBaseColor;
             if (!textureMap.empty()) {
-                matData->albedoMap.Create2DImageFromFile(textureMap);
+                matData->albedoMap.create_texture2d_from_image(textureMap);
                 g_constantCache.cache.AlbedoMaps[idx].data = gl::MakeTextureResident(matData->albedoMap.GetHandle());
             }
         }
@@ -125,7 +125,7 @@ void RenderingServer::begin_scene(Scene& scene) {
             matData->metallic = mat.mMetallic;
             matData->roughness = mat.mRoughness;
             if (!textureMap.empty()) {
-                matData->materialMap.Create2DImageFromFile(textureMap);
+                matData->materialMap.create_texture2d_from_image(textureMap);
                 g_constantCache.cache.PbrMaps[idx].data = gl::MakeTextureResident(matData->materialMap.GetHandle());
             }
         }
@@ -133,7 +133,7 @@ void RenderingServer::begin_scene(Scene& scene) {
         {
             const std::string& textureMap = mat.mTextures[MaterialComponent::Normal].name;
             if (!textureMap.empty()) {
-                matData->normalMap.Create2DImageFromFile(textureMap);
+                matData->normalMap.create_texture2d_from_image(textureMap);
                 g_constantCache.cache.NormalMaps[idx].data = gl::MakeTextureResident(matData->normalMap.GetHandle());
                 // LOG("material has bump {}", mat->normalTexture.c_str());
             }

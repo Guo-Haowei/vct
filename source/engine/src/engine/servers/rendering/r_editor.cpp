@@ -7,6 +7,8 @@
 #include "r_cbuffers.h"
 #include "scene/scene_manager.h"
 
+using namespace vct;
+
 struct VertexPoint3D {
     vec3 position;
     vec3 color;
@@ -36,7 +38,7 @@ static void CreateImageBuffer() {
 
 static void CreateBoxWireFrameData() {
     std::vector<VertexPoint3D> vertices;
-    const MeshComponent box = geometry::MakeBoxWireFrame();
+    const MeshComponent box = MakeBoxWireFrame();
     vertices.reserve(box.mPositions.size());
     for (const vec3& pos : box.mPositions) {
         vertices.emplace_back(VertexPoint3D{ pos, vec3(1) });

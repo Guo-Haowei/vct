@@ -1,8 +1,101 @@
-#include "MeshComponent.h"
+#pragma once
+#include "scene_components.h"
 
 #include "core/io/archive.h"
 
-using namespace vct;
+namespace vct {
+
+void HierarchyComponent::Serialize(Archive& archive) { mParent.Serialize(archive); }
+
+void ObjectComponent::Serialize(Archive& archive) { meshID.Serialize(archive); }
+
+void AnimationComponent::Serialize(Archive& archive) {
+    unused(archive);
+    CRASH_NOW_MSG("NOT IMPLMENTED");
+}
+
+void ArmatureComponent::Serialize(Archive& archive) {
+    unused(archive);
+    CRASH_NOW_MSG("NOT IMPLMENTED");
+}
+
+void RigidBodyPhysicsComponent::Serialize(Archive& archive) {
+    if (archive.is_write_mode()) {
+        archive << shape;
+        archive << param;
+        archive << mass;
+    } else {
+        archive >> shape;
+        archive >> param;
+        archive >> mass;
+    }
+}
+
+mat4 CameraComponent::CalculateViewMatrix() const { return glm::lookAt(eye, center, glm::normalize(vec3(0, 1, 0))); }
+
+void CameraComponent::UpdateCamera() {
+    const float aspect = width / height;
+    projMatrix = glm::perspective(fovy, aspect, zNear, zFar);
+
+    if (IsDirty()) {
+        viewMatrix = CalculateViewMatrix();
+        SetDirty(false);
+    }
+}
+
+void CameraComponent::Serialize(Archive& archive) {
+    if (archive.is_write_mode()) {
+        archive << flags;
+        archive << zNear;
+        archive << zFar;
+        archive << fovy;
+        archive << width;
+        archive << height;
+
+        archive << center;
+        archive << eye;
+    } else {
+        archive >> flags;
+        archive >> zNear;
+        archive >> zFar;
+        archive >> fovy;
+        archive >> width;
+        archive >> height;
+
+        archive >> center;
+        archive >> eye;
+
+        SetDirty();
+    }
+}
+
+void LightComponent::Serialize(Archive& archive) {
+    (void)archive;
+    // if (archive.is_write_mode())
+    // {
+    //     archive << type;
+    //     archive << color;
+    //     archive << energy;
+    // }
+    // else
+    // {
+    //     archive >> type;
+    //     archive >> color;
+    //     archive >> energy;
+    // }
+}
+
+void MaterialComponent::Serialize(Archive& archive) {
+    if (archive.is_write_mode()) {
+        archive << mMetallic;
+        archive << mRoughness;
+        archive << mBaseColor;
+    } else {
+        archive >> mMetallic;
+        archive >> mRoughness;
+        archive >> mBaseColor;
+    }
+}
 
 static uint32_t GetStride(MeshComponent::VertexAttribute::NAME name) {
     switch (name) {
@@ -141,3 +234,79 @@ void MeshComponent::Serialize(Archive& archive) {
 
     // mArmatureID.Serialize(archive);
 }
+
+void TagComponent::Serialize(Archive& archive) {
+    if (archive.is_write_mode()) {
+        archive << mTag;
+    } else {
+        archive >> mTag;
+    }
+}
+
+mat4 TransformComponent::GetLocalMatrix() const {
+    mat4 rotationMatrix = glm::toMat4(quat(mRotation.w, mRotation.x, mRotation.y, mRotation.z));
+    mat4 translationMatrix = glm::translate(mTranslation);
+    mat4 scaleMatrix = glm::scale(mScale);
+    return translationMatrix * rotationMatrix * scaleMatrix;
+}
+
+void TransformComponent::UpdateTransform() {
+    if (IsDirty()) {
+        SetDirty(false);
+        mWorldMatrix = GetLocalMatrix();
+    }
+}
+
+void TransformComponent::Scale(const vec3& scale) {
+    SetDirty();
+    mScale.x *= scale.x;
+    mScale.y *= scale.y;
+    mScale.z *= scale.z;
+}
+
+void TransformComponent::Translate(const vec3& translation) {
+    SetDirty();
+    mTranslation.x += translation.x;
+    mTranslation.y += translation.y;
+    mTranslation.z += translation.z;
+}
+
+void TransformComponent::Rotate(const vec3& euler) {
+    unused(euler);
+    CRASH_NOW_MSG("TODO");
+    SetDirty();
+}
+
+void TransformComponent::SetLocalTransform(const mat4& matrix) {
+    SetDirty();
+    Decompose(matrix, mScale, mRotation, mTranslation);
+}
+
+void TransformComponent::MatrixTransform(const mat4& matrix) {
+    SetDirty();
+    Decompose(matrix * GetLocalMatrix(), mScale, mRotation, mTranslation);
+}
+
+void TransformComponent::UpdateTransform_Parented(const TransformComponent& parent) {
+    CRASH_NOW();
+    mat4 worldMatrix = GetLocalMatrix();
+    const mat4& worldMatrixParent = parent.mWorldMatrix;
+    mWorldMatrix = worldMatrixParent * worldMatrix;
+}
+
+void TransformComponent::Serialize(Archive& archive) {
+    if (archive.is_write_mode()) {
+        archive << mFlags;
+        archive << mScale;
+        archive << mTranslation;
+        archive << mRotation;
+    } else {
+        archive >> mFlags;
+        archive >> mScale;
+        archive >> mTranslation;
+        archive >> mRotation;
+        SetDirty();
+    }
+}
+
+}  // namespace vct

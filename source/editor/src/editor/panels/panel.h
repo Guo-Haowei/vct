@@ -5,6 +5,8 @@
 #include "imgui/imgui.h"
 #include "scene/scene.h"
 
+using namespace vct;
+
 class Panel {
 public:
     Panel(const std::string& name) : mName(name) {}
