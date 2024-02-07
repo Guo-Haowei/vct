@@ -4,7 +4,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
-#include "assets/asset_manager.h"
+#include "assets/asset_loader.h"
 #include "core/io/print.h"
 #include "core/systems/job_system.h"
 
@@ -23,7 +23,7 @@ static struct
     std::atomic_bool shutdown_requested;
     std::array<ThreadObject, THREAD_MAX> threads = {
         ThreadObject{ "main" },
-        ThreadObject{ "asset loader", loader_main },
+        ThreadObject{ "asset loader", asset_loader::worker_main },
         ThreadObject{ "js worker 0", jobsystem::worker_main },
         ThreadObject{ "js worker 1", jobsystem::worker_main },
         ThreadObject{ "js worker 2", jobsystem::worker_main },
@@ -45,8 +45,11 @@ auto initialize() -> void {
             [](ThreadObject* object) {
                 // set thread id
                 g_thread_id = object->id;
-                // execute main function
+
+                // @TODO: wait for everything to be initialized before running
+                LOG_VERBOSE("[threads] thread '{}'(id: {}) starts.", object->name, object->id);
                 object->thread_func();
+                LOG_VERBOSE("[threads] thread '{}'(id: {}) ends.", object->name, object->id);
             },
             &thread);
 
@@ -60,8 +63,6 @@ auto initialize() -> void {
         std::wstring wname(name.begin(), name.end());
         HRESULT hr = SetThreadDescription(handle, wname.c_str());
         DEV_ASSERT(!FAILED(hr));
-
-        LOG_VERBOSE("[threads] thread '{}'(id: {}) created.", thread.name, thread.id);
     }
 }
 
@@ -69,7 +70,6 @@ void finailize() {
     for (uint32_t id = THREAD_MAIN + 1; id < THREAD_MAX; ++id) {
         auto& thread = s_glob.threads[id];
         thread.thread.join();
-        LOG_VERBOSE("[threads] thread '{}'(id: {}) joined.", thread.name, thread.id);
     }
 }
 

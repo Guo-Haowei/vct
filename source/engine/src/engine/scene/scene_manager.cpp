@@ -1,7 +1,6 @@
 #include "scene_manager.h"
 
-#include "assets/asset_manager.h"
-#include "assets/scene_loader_assimp.h"
+#include "assets/asset_loader.h"
 #include "core/camera.h"
 #include "imgui/imgui.h"
 #include "servers/rendering/r_cbuffers.h"
@@ -20,29 +19,11 @@ Scene& SceneManager::get_scene() {
 
 // @TODO: move this to loader thread
 void SceneManager::request_scene(std::string_view path) {
-    std::thread t([](std::string_view scene_path) {
-        Scene* new_scene = new Scene;
-        SceneLoader loader(*new_scene);
-
-        loader.LoadGLTF(scene_path);
-
-        LOG("Scene '{}' loaded", scene_path);
-
-        for (const MaterialComponent& material : new_scene->get_component_array<MaterialComponent>()) {
-            for (int i = 0; i < array_length(material.mTextures); ++i) {
-                const std::string& image_path = material.mTextures[i].name;
-                if (!image_path.empty()) {
-                    AssetManager::singleton().request_image_sync(image_path);
-                }
-            }
-        }
-
-        // @TODO:
+    asset_loader::request_scene(std::string(path), [](void* scene) {
+        DEV_ASSERT(scene);
+        Scene* new_scene = static_cast<Scene*>(scene);
         SceneManager::singleton().set_loading_scene(new_scene);
-    },
-                  path);
-
-    t.detach();
+    });
 }
 
 void SceneManager::on_scene_changed(Scene* new_scene) {
