@@ -8,6 +8,7 @@
 #include "panels/console_panel.h"
 #include "panels/debug_panel.h"
 #include "panels/hierarchy_panel.h"
+#include "panels/menu_bar.h"
 #include "panels/propertiy_panel.h"
 #include "panels/viewer.h"
 #include "scene/scene_manager.h"
@@ -63,47 +64,10 @@ void EditorLayer::DockSpace() {
     ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 
+    menu_bar();
+
     ImGui::End();
     return;
-#if 0
-    // ImGuiIO& io = ImGui::GetIO();
-    if (ImGui::BeginMenuBar())
-    {
-        if (ImGui::BeginMenu("Options"))
-        {
-            // Disabling fullscreen would allow the window to be moved to the front of other windows,
-            // which we can't undo at the moment without finer window depth/z control.
-            ImGui::MenuItem("Padding", NULL, &opt_padding);
-            ImGui::Separator();
-
-            if (ImGui::MenuItem("Flag: NoSplit", "", (dockspace_flags & ImGuiDockNodeFlags_NoSplit) != 0))
-            {
-                dockspace_flags ^= ImGuiDockNodeFlags_NoSplit;
-            }
-            if (ImGui::MenuItem("Flag: NoResize", "", (dockspace_flags & ImGuiDockNodeFlags_NoResize) != 0))
-            {
-                dockspace_flags ^= ImGuiDockNodeFlags_NoResize;
-            }
-            if (ImGui::MenuItem("Flag: NoDockingInCentralNode", "", (dockspace_flags & ImGuiDockNodeFlags_NoDockingInCentralNode) != 0))
-            {
-                dockspace_flags ^= ImGuiDockNodeFlags_NoDockingInCentralNode;
-            }
-            if (ImGui::MenuItem("Flag: AutoHideTabBar", "", (dockspace_flags & ImGuiDockNodeFlags_AutoHideTabBar) != 0))
-            {
-                dockspace_flags ^= ImGuiDockNodeFlags_AutoHideTabBar;
-            }
-            if (ImGui::MenuItem("Flag: PassthruCentralNode", "", (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode) != 0))
-            {
-                dockspace_flags ^= ImGuiDockNodeFlags_PassthruCentralNode;
-            }
-            ImGui::Separator();
-
-            ImGui::EndMenu();
-        }
-
-        ImGui::EndMenuBar();
-    }
-#endif
 }
 
 void EditorLayer::Update(float dt) {
