@@ -1,11 +1,11 @@
 #include "Application.h"
 
-#include "Core/Input.h"
 #include "ProgramManager.h"
 #include "imgui/imgui.h"
 // @TODO: refactor
 
 #include "core/dynamic_variable/common_dvars.h"
+#include "core/input/input.h"
 #include "core/systems/job_system.h"
 #include "scene/scene_manager.h"
 #include "servers/display_server.h"
@@ -59,7 +59,7 @@ int Application::Run(int, const char**) {
     while (!DisplayServer::singleton().should_close()) {
         DisplayServer::singleton().new_frame();
 
-        Input::BeginFrame();
+        input::begin_frame();
 
         // @TODO:
         SceneManager::singleton().update(dt);
@@ -80,7 +80,7 @@ int Application::Run(int, const char**) {
 
         ImGui::EndFrame();
 
-        Input::EndFrame();
+        input::end_frame();
     }
 
     // @TODO: fix

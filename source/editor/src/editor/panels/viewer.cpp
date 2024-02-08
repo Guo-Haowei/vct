@@ -1,11 +1,11 @@
 #include "viewer.h"
 
-#include "Engine/Core/Input.h"
 #include "ImGuizmo.h"
 #include "imgui/imgui_internal.h"
 
 // @TODO: refactor
 #include "core/dynamic_variable/common_dvars.h"
+#include "core/input/input.h"
 #include "core/math/ray.h"
 #include "scene/scene_manager.h"
 #include "servers/display_server.h"
@@ -44,10 +44,10 @@ void Viewer::RenderInternal(Scene& scene) {
     const mat4 projection_view_matrix = camera.get_projection_view_matrix();
 
     if (IsFocused()) {
-        if (Input::IsButtonPressed(EMouseButton::LEFT)) {
+        if (input::is_button_pressed(MOUSE_BUTTON_LEFT)) {
 
             auto [windowX, windowY] = DisplayServer::singleton().get_window_pos();
-            vec2 clicked = Input::GetCursor();
+            vec2 clicked = input::get_cursor();
             clicked.x = (clicked.x + windowX - canvasMinToScreen.x) / contentSize.x;
             clicked.y = (clicked.y + windowY - canvasMinToScreen.y) / contentSize.y;
 
@@ -68,7 +68,7 @@ void Viewer::RenderInternal(Scene& scene) {
                     SetSelected(intersectionResult.entity);
                 }
             }
-        } else if (Input::IsButtonPressed(EMouseButton::RIGHT)) {
+        } else if (input::is_button_pressed(MOUSE_BUTTON_RIGHT)) {
             SetSelected(ecs::Entity::INVALID);
         }
     }
