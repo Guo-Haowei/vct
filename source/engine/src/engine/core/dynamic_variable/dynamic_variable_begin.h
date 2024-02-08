@@ -2,16 +2,16 @@
 
 // clang-format off
 #if defined(DEFINE_DVAR)
-#define DVAR_BOOL(name, flags, value)		vct::DynamicVariable DVAR_##name { VARIANT_TYPE_INT,	flags }
-#define DVAR_INT(name, flags, value)		vct::DynamicVariable DVAR_##name { VARIANT_TYPE_INT,	flags }
-#define DVAR_FLOAT(name, flags, value)		vct::DynamicVariable DVAR_##name { VARIANT_TYPE_FLOAT,	flags }
-#define DVAR_STRING(name, flags, value)		vct::DynamicVariable DVAR_##name { VARIANT_TYPE_STRING,	flags }
-#define DVAR_VEC2(name, flags, x, y)		vct::DynamicVariable DVAR_##name { VARIANT_TYPE_VEC2,	flags }
-#define DVAR_VEC3(name, flags, x, y, z)		vct::DynamicVariable DVAR_##name { VARIANT_TYPE_VEC3,	flags }
-#define DVAR_VEC4(name, flags, x, y, z, w)	vct::DynamicVariable DVAR_##name { VARIANT_TYPE_VEC4,	flags }
-#define DVAR_IVEC2(name, flags, x, y)		vct::DynamicVariable DVAR_##name { VARIANT_TYPE_IVEC2,	flags }
-#define DVAR_IVEC3(name, flags, x, y, z)	vct::DynamicVariable DVAR_##name { VARIANT_TYPE_IVEC3,	flags }
-#define DVAR_IVEC4(name, flags, x, y, z, w)	vct::DynamicVariable DVAR_##name { VARIANT_TYPE_IVEC4,	flags }
+#define DVAR_BOOL(name, flags, value)		vct::DynamicVariable DVAR_##name { vct::VARIANT_TYPE_INT,	flags }
+#define DVAR_INT(name, flags, value)		vct::DynamicVariable DVAR_##name { vct::VARIANT_TYPE_INT,	flags }
+#define DVAR_FLOAT(name, flags, value)		vct::DynamicVariable DVAR_##name { vct::VARIANT_TYPE_FLOAT,	flags }
+#define DVAR_STRING(name, flags, value)		vct::DynamicVariable DVAR_##name { vct::VARIANT_TYPE_STRING,flags }
+#define DVAR_VEC2(name, flags, x, y)		vct::DynamicVariable DVAR_##name { vct::VARIANT_TYPE_VEC2,	flags }
+#define DVAR_VEC3(name, flags, x, y, z)		vct::DynamicVariable DVAR_##name { vct::VARIANT_TYPE_VEC3,	flags }
+#define DVAR_VEC4(name, flags, x, y, z, w)	vct::DynamicVariable DVAR_##name { vct::VARIANT_TYPE_VEC4,	flags }
+#define DVAR_IVEC2(name, flags, x, y)		vct::DynamicVariable DVAR_##name { vct::VARIANT_TYPE_IVEC2,	flags }
+#define DVAR_IVEC3(name, flags, x, y, z)	vct::DynamicVariable DVAR_##name { vct::VARIANT_TYPE_IVEC3,	flags }
+#define DVAR_IVEC4(name, flags, x, y, z, w)	vct::DynamicVariable DVAR_##name { vct::VARIANT_TYPE_IVEC4,	flags }
 #elif defined(REGISTER_DVAR)
 #define DVAR_BOOL(name, flags, value)		(DVAR_##name).register_int		(#name, !!(value))
 #define DVAR_INT(name, flags, value)		(DVAR_##name).register_int		(#name, value)

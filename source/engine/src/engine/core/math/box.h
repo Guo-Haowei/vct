@@ -48,8 +48,8 @@ public:
     }
 
     void intersect_box(const self_type& o) {
-        m_min = glm::min(m_min, o.m_min);
-        m_max = glm::max(m_max, o.m_max);
+        m_min = glm::max(m_min, o.m_min);
+        m_max = glm::min(m_max, o.m_max);
     }
 
     vec_type center() const { return 0.5f * (m_min + m_max); }
