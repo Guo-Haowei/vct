@@ -61,7 +61,7 @@ void SceneLoader::LoadGLTF(std::string_view path, bool flipUVs) {
         const MeshComponent& mesh = *mScene.get_component<MeshComponent>(obj.meshID);
 
         mat4 M = transform.get_world_matrix();
-        AABB aabb = mesh.mLocalBound;
+        AABB aabb = mesh.localBound;
         aabb.apply_matrix(M);
         mScene.m_bound.union_box(aabb);
     }
@@ -113,37 +113,36 @@ void SceneLoader::ProcessMesh(const aiMesh& mesh) {
 
     for (uint32_t i = 0; i < mesh.mNumVertices; ++i) {
         auto& position = mesh.mVertices[i];
-        meshComponent.mPositions.emplace_back(vec3(position.x, position.y, position.z));
+        meshComponent.positions.emplace_back(vec3(position.x, position.y, position.z));
         auto& normal = mesh.mNormals[i];
-        meshComponent.mNormals.emplace_back(vec3(normal.x, normal.y, normal.z));
+        meshComponent.normals.emplace_back(vec3(normal.x, normal.y, normal.z));
         auto& tangent = mesh.mTangents[i];
-        meshComponent.mTangents.emplace_back(vec3(tangent.x, tangent.y, tangent.z));
-        auto& bitangent = mesh.mBitangents[i];
-        meshComponent.mBitangents.emplace_back(vec3(bitangent.x, bitangent.y, bitangent.z));
+        meshComponent.tangents.emplace_back(vec3(tangent.x, tangent.y, tangent.z));
 
         if (hasUV) {
             auto& uv = mesh.mTextureCoords[0][i];
-            meshComponent.mTexcoords_0.emplace_back(vec2(uv.x, uv.y));
+            meshComponent.texcoords_0.emplace_back(vec2(uv.x, uv.y));
         } else {
-            meshComponent.mTexcoords_0.emplace_back(vec2(0));
+            meshComponent.texcoords_1.emplace_back(vec2(0));
         }
     }
 
     for (uint32_t i = 0; i < mesh.mNumFaces; ++i) {
         aiFace& face = mesh.mFaces[i];
-        meshComponent.mIndices.emplace_back(face.mIndices[0]);
-        meshComponent.mIndices.emplace_back(face.mIndices[1]);
-        meshComponent.mIndices.emplace_back(face.mIndices[2]);
+        meshComponent.indices.emplace_back(face.mIndices[0]);
+        meshComponent.indices.emplace_back(face.mIndices[1]);
+        meshComponent.indices.emplace_back(face.mIndices[2]);
     }
 
     DEV_ASSERT(mMaterials.size());
     MeshComponent::MeshSubset subset;
-    subset.indexCount = (uint32_t)meshComponent.mIndices.size();
+    subset.indexCount = (uint32_t)meshComponent.indices.size();
     subset.indexOffset = 0;
     subset.materialID = mMaterials.at(mesh.mMaterialIndex);
-    meshComponent.mSubsets.emplace_back(subset);
+    meshComponent.subsets.emplace_back(subset);
 
-    meshComponent.CreateBounds();
+    meshComponent.CreateRenderData();
+    // meshComponent.CreateBounds();
 
     mMeshes.push_back(meshID);
 }

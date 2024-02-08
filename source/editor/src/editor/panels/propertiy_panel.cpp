@@ -237,10 +237,10 @@ void PropertyPanel::RenderInternal(Scene& scene) {
         ImGui::Text("Mesh Component (%d)", object.meshID);
         if (mesh) {
             const char* meshNameStr = meshName ? meshName->GetTag().c_str() : "untitled";
-            ImGui::Text("mesh %s (%zu submesh)", meshNameStr, mesh->mSubsets.size());
-            ImGui::Text("%zu triangles", mesh->mIndices.size() / 3);
-            ImGui::Text("v:%zu, n:%zu, u:%zu, b:%zu", mesh->mPositions.size(), mesh->mNormals.size(),
-                        mesh->mTexcoords_0.size(), mesh->mWeights_0.size());
+            ImGui::Text("mesh %s (%zu submesh)", meshNameStr, mesh->subsets.size());
+            ImGui::Text("%zu triangles", mesh->indices.size() / 3);
+            ImGui::Text("v:%zu, n:%zu, u:%zu, b:%zu", mesh->positions.size(), mesh->normals.size(),
+                        mesh->texcoords_0.size(), mesh->weights_0.size());
             // @TODO: armature
         }
     });

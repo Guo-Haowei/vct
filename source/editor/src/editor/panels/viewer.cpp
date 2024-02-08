@@ -105,7 +105,7 @@ void Viewer::RenderInternal(Scene& scene) {
             if (objComponent) {
                 auto meshComponent = scene.get_component<MeshComponent>(objComponent->meshID);
                 DEV_ASSERT(meshComponent);
-                AABB aabb = meshComponent->mLocalBound;
+                AABB aabb = meshComponent->localBound;
                 aabb.apply_matrix(transform->get_world_matrix());
 
                 const mat4 M = glm::translate(mat4(1), aabb.center()) * glm::scale(mat4(1), aabb.size());

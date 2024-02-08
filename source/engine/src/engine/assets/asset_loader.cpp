@@ -2,6 +2,7 @@
 
 #include "assets/image_loader.h"
 #include "assets/scene_loader_assimp.h"
+#include "assets/scene_loader_tinygltf.h"
 #include "core/collections/thread_safe_ring_buffer.h"
 #include "core/os/threads.h"
 #include "scene/scene.h"
@@ -71,8 +72,12 @@ static std::shared_ptr<Image> request_image_sync(const std::string& image_path) 
 static void load_scene_internal(LoadTask& task) {
     Scene* scene = new Scene;
 
-    SceneLoader loader(*scene);
-    loader.LoadGLTF(task.asset_path);
+    if (1) {
+        ModelImporter_TinyGLTFImport(task.asset_path, *scene);
+    } else {
+        SceneLoader loader(*scene);
+        loader.LoadGLTF(task.asset_path);
+    }
 
     LOG("Scene '{}' loaded", task.asset_path);
 
