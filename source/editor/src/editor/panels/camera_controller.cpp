@@ -26,7 +26,7 @@ void CameraController::move_camera(CameraComponent& camera, float dt) {
         }
         if (p.y != 0.0f) {
             m_angle_xz += rotateSpeed * p.y;
-            m_angle_xz = glm::clamp(m_angle_xz, -80.0f, 80.0f);
+            m_angle_xz.clamp(-80.0f, 80.0f);
             dirty = true;
         }
 
@@ -72,12 +72,10 @@ void CameraController::move_camera(CameraComponent& camera, float dt) {
 }
 
 vec3 CameraController::calculate_eye(const vec3& center) {
-    const float rad_x = glm::radians(m_angle_x);
-    const float rad_xz = glm::radians(m_angle_xz);
-    const float y = m_distance * glm::sin(rad_xz);
-    const float xz = m_distance * glm::cos(rad_xz);
-    const float x = xz * glm::sin(rad_x);
-    const float z = xz * glm::cos(rad_x);
+    const float y = m_distance * m_angle_xz.sin();
+    const float xz = m_distance * m_angle_xz.cos();
+    const float x = xz * m_angle_x.sin();
+    const float z = xz * m_angle_x.cos();
     return center + vec3(x, y, z);
 }
 

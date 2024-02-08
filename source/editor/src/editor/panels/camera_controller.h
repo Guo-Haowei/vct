@@ -1,4 +1,5 @@
 #pragma once
+#include "core/math/degree.h"
 #include "scene/scene_components.h"
 
 namespace vct {
@@ -13,9 +14,9 @@ public:
 private:
     vec3 calculate_eye(const vec3& center);
 
-    // @TODO: degree
-    float m_angle_x = 90.0f;
-    float m_angle_xz = 0.0f;
+    Degree m_angle_x = 90.0f;
+    Degree m_angle_xz = 0.0f;
+
     float m_distance = 10.0f;
 
     vec3 m_direction;
