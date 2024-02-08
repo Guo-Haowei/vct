@@ -27,7 +27,7 @@ static void APIENTRY gl_debug_callback(GLenum, GLenum, unsigned int, GLenum, GLs
 
 bool RenderingServer::initialize() {
     if (gladLoadGL() == 0) {
-        LOG_FATAL("[glad] failed to load gl functions");
+        LOG_FATAL("[glad] failed to import gl functions");
         return false;
     }
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "scene/scene.h"
+#include "scene_loader.h"
 
 struct aiMesh;
 struct aiNode;
@@ -9,22 +9,20 @@ struct aiAnimation;
 
 namespace vct {
 
-class SceneLoader {
+class SceneLoaderAssimp : public SceneLoader {
 public:
-    SceneLoader(Scene& scene) : mScene(scene) {}
+    SceneLoaderAssimp(Scene& scene, const std::string& file_path) : SceneLoader(scene, file_path, "SceneLoaderAssimp") {}
 
-    void LoadGLTF(std::string_view path, bool flipUVs = true);
+protected:
+    virtual bool import_impl() override;
 
-private:
-    void ProcessMaterial(aiMaterial& material);
-    void ProcessMesh(const aiMesh& mesh);
-    ecs::Entity ProcessNode(const aiNode* node, ecs::Entity parent);
+    void process_material(aiMaterial& material);
+    void process_mesh(const aiMesh& mesh);
 
-private:
-    std::string mCurrentPath;
-    Scene& mScene;
-    std::vector<ecs::Entity> mMaterials;
-    std::vector<ecs::Entity> mMeshes;
+    ecs::Entity process_node(const aiNode* node, ecs::Entity parent);
+
+    std::vector<ecs::Entity> m_materials;
+    std::vector<ecs::Entity> m_meshes;
 };
 
 }  // namespace vct

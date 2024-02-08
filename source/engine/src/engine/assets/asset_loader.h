@@ -12,9 +12,10 @@ using LoadSuccessFunc = void (*)(void*);
 bool initialize();
 void finalize();
 
-void request_scene(const std::string& scene_path, LoadSuccessFunc on_success);
+void load_scene_async(const std::string& path, LoadSuccessFunc on_success);
 
-std::shared_ptr<Image> find_image(const std::string& image_path);
+std::shared_ptr<Image> load_image_sync(const std::string& path);
+std::shared_ptr<Image> find_image(const std::string& path);
 
 void worker_main();
 

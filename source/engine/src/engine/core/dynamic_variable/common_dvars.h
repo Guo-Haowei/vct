@@ -13,33 +13,36 @@ DVAR_BOOL(verbose, DVAR_FLAG_NONE, false);
 DVAR_STRING(recent_files, DVAR_FLAG_SERIALIZE | DVAR_FLAG_DESERIALIZE, "");
 DVAR_BOOL(delete_dvar_cache, DVAR_FLAG_NONE, false);
 
-// switches
+// gui
 DVAR_BOOL(grid_visibility, 0, true);
 
-// GFX
-DVAR_STRING(r_backend, DVAR_FLAG_NONE, "opengl");
-DVAR_BOOL(r_gpu_validation, DVAR_FLAG_NONE, false);
+// loader
+DVAR_BOOL(force_assimp_loader, 0, false);
 
-DVAR_INT(r_enableVXGI, DVAR_FLAG_NONE, 1);
-DVAR_INT(r_forceVXGI, DVAR_FLAG_NONE, 1);
-DVAR_INT(r_debugTexture, DVAR_FLAG_NONE, 0);
-DVAR_INT(r_noTexture, DVAR_FLAG_NONE, 0);
+// GFX
+DVAR_STRING(r_backend, 0, "opengl");
+DVAR_BOOL(r_gpu_validation, 0, false);
+
+DVAR_INT(r_enableVXGI, 0, 1);
+DVAR_INT(r_forceVXGI, 0, 1);
+DVAR_INT(r_debugTexture, 0, 0);
+DVAR_INT(r_noTexture, 0, 0);
 
 // voxel GI
-DVAR_INT(r_voxelSize, DVAR_FLAG_NONE, 64);
+DVAR_INT(r_voxelSize, 0, 64);
 
 // CSM
-DVAR_INT(r_debugCSM, DVAR_FLAG_NONE, 0);
-DVAR_INT(r_shadowRes, DVAR_FLAG_NONE, 1024 * 4);
-DVAR_INT(r_enableCSM, DVAR_FLAG_NONE, 1);
+DVAR_INT(r_debugCSM, 0, 0);
+DVAR_INT(r_shadowRes, 0, 1024 * 4);
+DVAR_INT(r_enableCSM, 0, 1);
 
 // SSAO
-DVAR_INT(r_enableSsao, DVAR_FLAG_NONE, 1);
-DVAR_INT(r_ssaoKernelSize, DVAR_FLAG_NONE, 32);
-DVAR_INT(r_ssaoNoiseSize, DVAR_FLAG_NONE, 4);
-DVAR_FLOAT(r_ssaoKernelRadius, DVAR_FLAG_NONE, 0.5f);
+DVAR_INT(r_enableSsao, 0, 1);
+DVAR_INT(r_ssaoKernelSize, 0, 32);
+DVAR_INT(r_ssaoNoiseSize, 0, 4);
+DVAR_FLOAT(r_ssaoKernelRadius, 0, 0.5f);
 
 // FXAA
-DVAR_INT(r_enableFXAA, DVAR_FLAG_NONE, 1);
+DVAR_INT(r_enableFXAA, 0, 1);
 
 #include "dynamic_variable_end.h"

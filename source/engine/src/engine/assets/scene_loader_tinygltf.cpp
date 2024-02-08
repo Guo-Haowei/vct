@@ -1,7 +1,9 @@
+#include "scene_loader_tinygltf.h"
+
 #include "scene/scene.h"
 
 #define TINYGLTF_IMPLEMENTATION
-// #define TINYGLTF_NO_STB_IMAGE
+#define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #define TINYGLTF_NOEXCEPTION
 
@@ -13,43 +15,39 @@
 
 namespace tinygltf {
 
-bool WriteImageData(const std::string*,
-                    const std::string*,
-                    const Image*,
-                    bool,
-                    const URICallbacks*,
-                    std::string*,
-                    void*) {
-    CRASH_NOW_MSG("TODO");
-    return false;
+bool dummy_load_image(Image*,
+                      const int,
+                      std::string*,
+                      std::string*,
+                      int,
+                      int,
+                      const unsigned char*,
+                      int,
+                      void*) {
+    return true;
+}
+
+bool dummy_write_image(const std::string*,
+                       const std::string*,
+                       const Image*,
+                       bool,
+                       const URICallbacks*,
+                       std::string*,
+                       void*) {
+    return true;
 }
 
 }  // namespace tinygltf
 
 namespace vct {
 
-class ModelImporter_TinyGLTF {
-public:
-    ModelImporter_TinyGLTF(Scene& scene) : m_scene(scene) {}
-
-    void Import(const std::string& file_path);
-
-private:
-    void LoadNode(int node_index, ecs::Entity parent);
-
-    std::unordered_map<int, ecs::Entity> m_entityMap;
-    tinygltf::Model m_model;
-    Scene& m_scene;
-    std::string m_searchPath;
-};
-
-void ModelImporter_TinyGLTF::LoadNode(int node_index, ecs::Entity parent) {
-    if (node_index < 0 || m_entityMap.count(node_index)) {
+void SceneLoaderTinyGLTF::process_node(int node_index, ecs::Entity parent) {
+    if (node_index < 0 || m_entity_map.count(node_index)) {
         return;
     }
 
     ecs::Entity entity;
-    auto& node = m_model.nodes[node_index];
+    auto& node = m_model->nodes[node_index];
 
     if (node.mesh >= 0) {
         DEV_ASSERT(node.mesh < (int)m_scene.get_count<MeshComponent>());
@@ -91,7 +89,7 @@ void ModelImporter_TinyGLTF::LoadNode(int node_index, ecs::Entity parent) {
         m_scene.create<TagComponent>(entity).GetTagRef() = "Transform::" + node.name;
     }
 
-    m_entityMap[node_index] = entity;
+    m_entity_map[node_index] = entity;
 
     TransformComponent& transform = *m_scene.get_component<TransformComponent>(entity);
     if (!node.matrix.empty()) {
@@ -138,45 +136,43 @@ void ModelImporter_TinyGLTF::LoadNode(int node_index, ecs::Entity parent) {
     }
 
     for (int child : node.children) {
-        LoadNode(child, entity);
+        process_node(child, entity);
     }
 }
 
-void ModelImporter_TinyGLTF::Import(const std::string& file_path) {
+bool SceneLoaderTinyGLTF::import_impl() {
     tinygltf::TinyGLTF loader;
     std::string err;
     std::string warn;
 
-    std::filesystem::path sysPath{ file_path };
-    std::string modelName = sysPath.filename().string();
-    m_searchPath = sysPath.remove_filename().string();
+    m_model = std::make_shared<tinygltf::Model>();
 
-    bool ret = loader.LoadASCIIFromFile(&m_model, &err, &warn, file_path);
-    // loader.SetImageLoader(tinygltf::LoadImageData, nullptr);
-    loader.SetImageWriter(tinygltf::WriteImageData, nullptr);
+    loader.SetImageLoader(tinygltf::dummy_load_image, nullptr);
+    loader.SetImageWriter(tinygltf::dummy_write_image, nullptr);
+    bool ret = loader.LoadASCIIFromFile(m_model.get(), &err, &warn, m_file_path);
 
     if (!warn.empty()) {
-        LOG_WARN("Warn: {}\n", warn);
-        return;
+        m_error = std::format("Warn: failed to import scene '{}'\n\tdetails: {}", m_file_path, warn);
+        return false;
     }
 
     if (!err.empty()) {
-        LOG_ERROR("Error: {}\n", err);
-        return;
+        m_error = std::format("Error: failed to import scene '{}'\n\tdetails: {}", m_file_path, err);
+        return false;
     }
 
     if (!ret) {
-        LOG_ERROR("Failed to parse glTF\n");
-        return;
+        m_error = std::format("Error: failed to import scene '{}'", m_file_path);
+        return false;
     }
 
     ecs::Entity root = ecs::Entity::create();
     m_scene.create<TransformComponent>(root);
-    m_scene.create<TagComponent>(root).GetTagRef() = std::filesystem::path(file_path).filename().string();
+    m_scene.create<TagComponent>(root).GetTagRef() = std::filesystem::path(m_file_path).filename().string();
     m_scene.m_root = root;
 
     // Create materials
-    for (const auto& x : m_model.materials) {
+    for (const auto& x : m_model->materials) {
         ecs::Entity materialEntity = m_scene.create_material_entity(x.name);
         MaterialComponent& material = *m_scene.get_component<MaterialComponent>(materialEntity);
 
@@ -196,37 +192,37 @@ void ModelImporter_TinyGLTF::Import(const std::string& file_path) {
         auto alphaMode = x.additionalValues.find("alphaMode");
 
         if (baseColorTexture != x.values.end()) {
-            auto& tex = m_model.textures[baseColorTexture->second.TextureIndex()];
+            auto& tex = m_model->textures[baseColorTexture->second.TextureIndex()];
             int img_source = tex.source;
             if (tex.extensions.count("KHR_texture_basisu")) {
                 img_source = tex.extensions["KHR_texture_basisu"].Get("source").Get<int>();
             }
-            auto& img = m_model.images[img_source];
-            material.mTextures[MaterialComponent::Base].name = m_searchPath + img.uri;
+            auto& img = m_model->images[img_source];
+            material.mTextures[MaterialComponent::Base].name = m_search_path + img.uri;
 
             // @TODO:
             // material.mTextures[MaterialComponent::Base].image = g_assetManager->LoadImageSync(searchName);
             // material.textures[MaterialComponent::BASE_COLOR_MAP].uvset = baseColorTexture->second.TextureTexCoord();
         }
         if (normalTexture != x.additionalValues.end()) {
-            auto& tex = m_model.textures[normalTexture->second.TextureIndex()];
+            auto& tex = m_model->textures[normalTexture->second.TextureIndex()];
             int img_source = tex.source;
             if (tex.extensions.count("KHR_texture_basisu")) {
                 img_source = tex.extensions["KHR_texture_basisu"].Get("source").Get<int>();
             }
-            auto& img = m_model.images[img_source];
-            material.mTextures[MaterialComponent::Normal].name = m_searchPath + img.uri;
+            auto& img = m_model->images[img_source];
+            material.mTextures[MaterialComponent::Normal].name = m_search_path + img.uri;
             // material.mTextures[MaterialComponent::Normal].image = g_assetManager->LoadImageSync(searchName);
             //  material.textures[MaterialComponent::NORMAL_MAP].uvset = normalTexture->second.TextureTexCoord();
         }
         if (metallicRoughnessTexture != x.values.end()) {
-            auto& tex = m_model.textures[metallicRoughnessTexture->second.TextureIndex()];
+            auto& tex = m_model->textures[metallicRoughnessTexture->second.TextureIndex()];
             int img_source = tex.source;
             if (tex.extensions.count("KHR_texture_basisu")) {
                 img_source = tex.extensions["KHR_texture_basisu"].Get("source").Get<int>();
             }
-            auto& img = m_model.images[img_source];
-            material.mTextures[MaterialComponent::MetallicRoughness].name = m_searchPath + img.uri;
+            auto& img = m_model->images[img_source];
+            material.mTextures[MaterialComponent::MetallicRoughness].name = m_search_path + img.uri;
             // material.mTextures[MaterialComponent::MetallicRoughness].resource = ;
         }
 #if 0
@@ -261,7 +257,7 @@ void ModelImporter_TinyGLTF::Import(const std::string& file_path) {
     }
 
     // Create meshes:
-    for (const auto& gltfMesh : m_model.meshes) {
+    for (const auto& gltfMesh : m_model->meshes) {
         ecs::Entity meshEntity = m_scene.create_mesh_entity(gltfMesh.name);
         // m_scene.Component_Attach(meshEntity, state.rootEntity);
         MeshComponent& mesh = *m_scene.get_component<MeshComponent>(meshEntity);
@@ -278,9 +274,9 @@ void ModelImporter_TinyGLTF::Import(const std::string& file_path) {
 
             if (prim.indices >= 0) {
                 // Fill indices:
-                const tinygltf::Accessor& accessor = m_model.accessors[prim.indices];
-                const tinygltf::BufferView& bufferView = m_model.bufferViews[accessor.bufferView];
-                const tinygltf::Buffer& buffer = m_model.buffers[bufferView.buffer];
+                const tinygltf::Accessor& accessor = m_model->accessors[prim.indices];
+                const tinygltf::BufferView& bufferView = m_model->bufferViews[accessor.bufferView];
+                const tinygltf::Buffer& buffer = m_model->buffers[bufferView.buffer];
 
                 int stride = accessor.ByteStride(bufferView);
                 size_t indexCount = accessor.count;
@@ -318,9 +314,9 @@ void ModelImporter_TinyGLTF::Import(const std::string& file_path) {
                 const std::string& attrName = attr.first;
                 int attrData = attr.second;
 
-                const tinygltf::Accessor& accessor = m_model.accessors[attrData];
-                const tinygltf::BufferView& bufferView = m_model.bufferViews[accessor.bufferView];
-                const tinygltf::Buffer& buffer = m_model.buffers[bufferView.buffer];
+                const tinygltf::Accessor& accessor = m_model->accessors[attrData];
+                const tinygltf::BufferView& bufferView = m_model->bufferViews[accessor.bufferView];
+                const tinygltf::Buffer& buffer = m_model->buffers[bufferView.buffer];
 
                 int stride = accessor.ByteStride(bufferView);
                 size_t vertexCount = accessor.count;
@@ -339,10 +335,10 @@ void ModelImporter_TinyGLTF::Import(const std::string& file_path) {
 
                     if (accessor.sparse.isSparse) {
                         auto& sparse = accessor.sparse;
-                        const tinygltf::BufferView& sparse_indices_view = m_model.bufferViews[sparse.indices.bufferView];
-                        const tinygltf::BufferView& sparse_values_view = m_model.bufferViews[sparse.values.bufferView];
-                        const tinygltf::Buffer& sparse_indices_buffer = m_model.buffers[sparse_indices_view.buffer];
-                        const tinygltf::Buffer& sparse_values_buffer = m_model.buffers[sparse_values_view.buffer];
+                        const tinygltf::BufferView& sparse_indices_view = m_model->bufferViews[sparse.indices.bufferView];
+                        const tinygltf::BufferView& sparse_values_view = m_model->bufferViews[sparse.values.bufferView];
+                        const tinygltf::Buffer& sparse_indices_buffer = m_model->buffers[sparse_indices_view.buffer];
+                        const tinygltf::Buffer& sparse_values_buffer = m_model->buffers[sparse_values_view.buffer];
                         const uint8_t* sparse_indices_data = sparse_indices_buffer.data.data() + sparse.indices.byteOffset + sparse_indices_view.byteOffset;
                         const uint8_t* sparse_values_data = sparse_values_buffer.data.data() + sparse.values.byteOffset + sparse_values_view.byteOffset;
                         switch (sparse.indices.componentType) {
@@ -372,10 +368,10 @@ void ModelImporter_TinyGLTF::Import(const std::string& file_path) {
 
                     if (accessor.sparse.isSparse) {
                         auto& sparse = accessor.sparse;
-                        const tinygltf::BufferView& sparse_indices_view = m_model.bufferViews[sparse.indices.bufferView];
-                        const tinygltf::BufferView& sparse_values_view = m_model.bufferViews[sparse.values.bufferView];
-                        const tinygltf::Buffer& sparse_indices_buffer = m_model.buffers[sparse_indices_view.buffer];
-                        const tinygltf::Buffer& sparse_values_buffer = m_model.buffers[sparse_values_view.buffer];
+                        const tinygltf::BufferView& sparse_indices_view = m_model->bufferViews[sparse.indices.bufferView];
+                        const tinygltf::BufferView& sparse_values_view = m_model->bufferViews[sparse.values.bufferView];
+                        const tinygltf::Buffer& sparse_indices_buffer = m_model->buffers[sparse_indices_view.buffer];
+                        const tinygltf::Buffer& sparse_values_buffer = m_model->buffers[sparse_values_view.buffer];
                         const uint8_t* sparse_indices_data = sparse_indices_buffer.data.data() + sparse.indices.byteOffset + sparse_indices_view.byteOffset;
                         const uint8_t* sparse_values_data = sparse_values_buffer.data.data() + sparse.values.byteOffset + sparse_values_view.byteOffset;
                         switch (sparse.indices.componentType) {
@@ -519,22 +515,20 @@ void ModelImporter_TinyGLTF::Import(const std::string& file_path) {
 
         // iterate through weights
         if (mesh.normals.empty()) {
-            CRASH_NOW("No normal detected");
+            CRASH_NOW_MSG("No normal detected");
         }
-
-        mesh.CreateRenderData();
     }
 
     // Create armatures
-    for (const auto& skin : m_model.skins) {
+    for (const auto& skin : m_model->skins) {
         ecs::Entity armatureID = ecs::Entity::create();
         m_scene.create<TagComponent>(armatureID).GetTagRef() = skin.name;
         m_scene.create<TransformComponent>(armatureID);
         ArmatureComponent& armature = m_scene.create<ArmatureComponent>(armatureID);
         if (skin.inverseBindMatrices >= 0) {
-            const tinygltf::Accessor& accessor = m_model.accessors[skin.inverseBindMatrices];
-            const tinygltf::BufferView& bufferView = m_model.bufferViews[accessor.bufferView];
-            const tinygltf::Buffer& buffer = m_model.buffers[bufferView.buffer];
+            const tinygltf::Accessor& accessor = m_model->accessors[skin.inverseBindMatrices];
+            const tinygltf::BufferView& bufferView = m_model->bufferViews[accessor.bufferView];
+            const tinygltf::Buffer& buffer = m_model->buffers[bufferView.buffer];
             armature.inverseBindMatrices.resize(accessor.count);
             memcpy(armature.inverseBindMatrices.data(), &buffer.data[accessor.byteOffset + bufferView.byteOffset], accessor.count * sizeof(mat4));
         } else {
@@ -543,15 +537,15 @@ void ModelImporter_TinyGLTF::Import(const std::string& file_path) {
     }
 
     // Create transform hierarchy, assign objects, meshes, armatures, cameras
-    DEV_ASSERT(m_model.scenes.size());
-    const tinygltf::Scene& gltfScene = m_model.scenes[glm::max(0, m_model.defaultScene)];
+    DEV_ASSERT(m_model->scenes.size());
+    const tinygltf::Scene& gltfScene = m_model->scenes[glm::max(0, m_model->defaultScene)];
     for (size_t i = 0; i < gltfScene.nodes.size(); ++i) {
-        LoadNode(gltfScene.nodes[i], root);
+        process_node(gltfScene.nodes[i], root);
     }
 
     // Create armature-bone mappings:
     int armatureIndex = 0;
-    for (const auto& skin : m_model.skins) {
+    for (const auto& skin : m_model->skins) {
         ecs::Entity armatureID = m_scene.get_entity<ArmatureComponent>(armatureIndex);
         ArmatureComponent& armature = m_scene.get_component_array<ArmatureComponent>()[armatureIndex++];
 
@@ -561,13 +555,13 @@ void ModelImporter_TinyGLTF::Import(const std::string& file_path) {
         // create bone collection
         for (size_t i = 0; i < jointCount; ++i) {
             int jointIndex = skin.joints[i];
-            ecs::Entity boneID = m_entityMap[jointIndex];
+            ecs::Entity boneID = m_entity_map[jointIndex];
             armature.boneCollection[i] = boneID;
         }
     }
 
     // Create animations:
-    for (const auto& anim : m_model.animations) {
+    for (const auto& anim : m_model->animations) {
         static int animCounter = 0;
         ecs::Entity entity = ecs::Entity::create();
         m_scene.create<TagComponent>(entity).GetTagRef() = anim.name.empty() ? std::string("Untitled") + std::to_string(++animCounter) : anim.name;
@@ -584,9 +578,9 @@ void ModelImporter_TinyGLTF::Import(const std::string& file_path) {
 
             // Animation Sampler input = keyframe times
             {
-                const tinygltf::Accessor& accessor = m_model.accessors[gltfSampler.input];
-                const tinygltf::BufferView& bufferView = m_model.bufferViews[accessor.bufferView];
-                const tinygltf::Buffer& buffer = m_model.buffers[bufferView.buffer];
+                const tinygltf::Accessor& accessor = m_model->accessors[gltfSampler.input];
+                const tinygltf::BufferView& bufferView = m_model->bufferViews[accessor.bufferView];
+                const tinygltf::Buffer& buffer = m_model->buffers[bufferView.buffer];
 
                 DEV_ASSERT(accessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT);
 
@@ -609,9 +603,9 @@ void ModelImporter_TinyGLTF::Import(const std::string& file_path) {
 
             // Animation Sampler output = keyframe data
             {
-                const tinygltf::Accessor& accessor = m_model.accessors[gltfSampler.output];
-                const tinygltf::BufferView& bufferView = m_model.bufferViews[accessor.bufferView];
-                const tinygltf::Buffer& buffer = m_model.buffers[bufferView.buffer];
+                const tinygltf::Accessor& accessor = m_model->accessors[gltfSampler.output];
+                const tinygltf::BufferView& bufferView = m_model->bufferViews[accessor.bufferView];
+                const tinygltf::Buffer& buffer = m_model->buffers[bufferView.buffer];
 
                 int stride = accessor.ByteStride(bufferView);
                 size_t count = accessor.count;
@@ -639,7 +633,7 @@ void ModelImporter_TinyGLTF::Import(const std::string& file_path) {
 
         for (size_t i = 0; i < anim.channels.size(); ++i) {
             const auto& channel = anim.channels[i];
-            animation.channels[i].targetID = m_entityMap[channel.target_node];
+            animation.channels[i].targetID = m_entity_map[channel.target_node];
             DEV_ASSERT(channel.sampler >= 0);
             animation.channels[i].samplerIndex = (uint32_t)channel.sampler;
 
@@ -659,35 +653,15 @@ void ModelImporter_TinyGLTF::Import(const std::string& file_path) {
     // Create lights:
     // Create cameras:
 
-    // @TODO: fix
     m_scene.m_root = root;
-    // scene bounding box
-    m_scene.update(0.0f);
-    m_scene.m_bound.make_invalid();
-
-    // @TODO: refactor
-    const uint32_t numObjects = (uint32_t)m_scene.get_count<ObjectComponent>();
-    for (uint32_t i = 0; i < numObjects; ++i) {
-        const ObjectComponent& obj = m_scene.get_component_array<ObjectComponent>()[i];
-        ecs::Entity entity = m_scene.get_entity<ObjectComponent>(i);
-        DEV_ASSERT(m_scene.contains<TransformComponent>(entity));
-        const TransformComponent& transform = *m_scene.get_component<TransformComponent>(entity);
-        DEV_ASSERT(m_scene.contains<MeshComponent>(obj.meshID));
-        const MeshComponent& mesh = *m_scene.get_component<MeshComponent>(obj.meshID);
-
-        mat4 M = transform.get_world_matrix();
-        AABB aabb = mesh.localBound;
-        aabb.apply_matrix(M);
-        m_scene.m_bound.union_box(aabb);
-    }
-
-    // @TODO: request images as well
-}
-
-void ModelImporter_TinyGLTFImport(const std::string& file_path,
-                                  Scene& scene) {
-    ModelImporter_TinyGLTF loader(scene);
-    loader.Import(file_path);
+    return true;
 }
 
 }  // namespace vct
+
+auto load_scene_tinygltf(const std::string& asset_path, void* data) -> std::expected<void, std::string> {
+    DEV_ASSERT(data);
+    auto scene = (reinterpret_cast<vct::Scene*>(data));
+    vct::SceneLoaderTinyGLTF loader(*scene, asset_path);
+    return loader.import();
+}

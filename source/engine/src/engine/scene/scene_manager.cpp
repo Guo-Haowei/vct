@@ -119,7 +119,7 @@ void SceneManager::update(float dt) {
 }
 
 void SceneManager::request_scene(std::string_view path) {
-    asset_loader::request_scene(std::string(path), [](void* scene) {
+    asset_loader::load_scene_async(std::string(path), [](void* scene) {
         DEV_ASSERT(scene);
         Scene* new_scene = static_cast<Scene*>(scene);
         SceneManager::singleton().set_loading_scene(new_scene);
