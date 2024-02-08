@@ -41,8 +41,7 @@ static struct
 bool initialize() {
     s_glob.loaders[".gltf"] = load_scene_tinygltf;
     s_glob.loaders[".obj"] = load_scene_assimp;
-    if (DVAR_GET_BOOL(force_assimp_loader))
-    {
+    if (DVAR_GET_BOOL(force_assimp_loader)) {
         s_glob.loaders[".gltf"] = load_scene_assimp;
     }
     return true;
