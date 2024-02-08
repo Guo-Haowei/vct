@@ -39,10 +39,6 @@ void SceneManager::on_scene_changed(Scene* new_scene) {
     camera.zNear = cascades[0];
     camera.zFar = cascades[3];
 
-    camera.yaw = glm::radians(180.0f);
-    camera.pitch = 0.0f;
-    camera.position = DVAR_GET_VEC3(cam_pos);
-
     const vec3 center = new_scene->m_bound.center();
     const vec3 size = new_scene->m_bound.size();
     const float worldSize = glm::max(size.x, glm::max(size.y, size.z));
@@ -140,6 +136,8 @@ bool SceneManager::initialize() {
         mat4 rx = glm::rotate(glm::radians(10.0f), glm::vec3(1, 0, 0));
         mat4 rz = glm::rotate(glm::radians(10.0f), glm::vec3(0, 0, 1));
         transform->SetLocalTransform(rx * rz);
+
+        on_scene_changed(m_scene);
     }
 
     std::string_view scene_path = DVAR_GET_STRING(scene);

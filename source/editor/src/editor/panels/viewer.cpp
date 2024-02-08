@@ -2,8 +2,7 @@
 
 #include "Engine/Core/Input.h"
 #include "Engine/Core/camera.h"
-#include "ImGuizmo/ImGuizmo.h"
-#include "gizmo.h"
+#include "ImGuizmo.h"
 #include "imgui/imgui_internal.h"
 
 // @TODO: refactor
@@ -76,19 +75,53 @@ void Viewer::RenderInternal(Scene& scene) {
 
     ImGui::GetWindowDrawList()->AddImage((ImTextureID)g_final_image, topLeft, bottomRight, ImVec2(0, 1), ImVec2(1, 0));
 
+    // draw gizmo
+
+    ImGuizmo::SetOrthographic(false);
+    ImGuizmo::BeginFrame();
+
+    ImGuizmo::SetDrawlist();
+    ImGuizmo::SetRect(topLeft.x, topLeft.y, contentSize.x, contentSize.y);
+
+    const mat4 view_matrix = gCamera.View();
+    const mat4 projection_matrix = gCamera.Proj();
+    const mat4 projection_view_matrix = projection_matrix * view_matrix;
+
+    // draw grid
+    mat4 identity(1);
+    ImGuizmo::draw_grid(projection_view_matrix, identity, 10.0f);
+
+    // @TODO: view cube
+    // ImGuizmo::DrawCubes(&view_matrix[0].x, &projection_matrix[0].x, &identity[0].x, 1);
+
+    // @TODO: fix
+    auto op = ImGuizmo::ROTATE;
+    // draw gizmo
     if (mpSelected->IsValid()) {
         TransformComponent* transform = scene.get_component<TransformComponent>(*mpSelected);
 
-        auto op = ImGuizmo::ROTATE;
         if (transform) {
+            auto objComponent = scene.get_component<ObjectComponent>(*mpSelected);
+            if (objComponent) {
+                auto meshComponent = scene.get_component<MeshComponent>(objComponent->meshID);
+                DEV_ASSERT(meshComponent);
+                AABB aabb = meshComponent->mLocalBound;
+                aabb.apply_matrix(transform->GetWorldMatrix());
+
+                const mat4 M = glm::translate(mat4(1), aabb.center()) * glm::scale(mat4(1), aabb.size());
+                ImGuizmo::draw_box_wireframe(projection_view_matrix, M);
+            }
+
             mat4 local = transform->GetLocalMatrix();
-            Box2 rect(canvasMinToScreen, canvasMinToScreen + contentSize);
-            gizmo_control(op, gCamera.View(), gCamera.Proj(), rect, local);
+
+            ImGuizmo::Manipulate(glm::value_ptr(view_matrix), glm::value_ptr(projection_matrix), op, ImGuizmo::WORLD, glm::value_ptr(local), nullptr, nullptr, nullptr, nullptr);
+
             transform->SetLocalTransform(local);
         }
     }
 }
 
+// @TODO: refactor
 static void camera_control(Camera& camera) {
     constexpr float VIEW_SPEED = 2.0f;
     float CAMERA_SPEED = 0.15f;

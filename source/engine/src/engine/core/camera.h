@@ -8,9 +8,9 @@ public:
     float fovy;
     float zNear;
     float zFar;
-    float yaw = -90.0f;
+    float yaw = glm::radians(180.0f);
     float pitch = 0.0f;
-    vec3 position{ 0 };
+    vec3 position{ -8, 2, 0 };
 
     void UpdatePV();
 
