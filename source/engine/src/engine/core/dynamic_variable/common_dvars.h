@@ -13,6 +13,9 @@ DVAR_BOOL(verbose, DVAR_FLAG_NONE, false);
 DVAR_STRING(recent_files, DVAR_FLAG_SERIALIZE | DVAR_FLAG_DESERIALIZE, "");
 DVAR_BOOL(delete_dvar_cache, DVAR_FLAG_NONE, false);
 
+// switches
+DVAR_BOOL(grid_visibility, 0, true);
+
 // GFX
 DVAR_STRING(r_backend, DVAR_FLAG_NONE, "opengl");
 DVAR_BOOL(r_gpu_validation, DVAR_FLAG_NONE, false);
@@ -21,10 +24,6 @@ DVAR_INT(r_enableVXGI, DVAR_FLAG_NONE, 1);
 DVAR_INT(r_forceVXGI, DVAR_FLAG_NONE, 1);
 DVAR_INT(r_debugTexture, DVAR_FLAG_NONE, 0);
 DVAR_INT(r_noTexture, DVAR_FLAG_NONE, 0);
-
-// camera
-DVAR_VEC4(cam_cascades, DVAR_FLAG_NONE, 0.1f, 8.0f, 18.0f, 50.0f);
-DVAR_FLOAT(cam_fov, DVAR_FLAG_NONE, 60.0f);
 
 // voxel GI
 DVAR_INT(r_voxelSize, DVAR_FLAG_NONE, 64);

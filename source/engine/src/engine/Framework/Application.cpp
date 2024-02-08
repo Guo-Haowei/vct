@@ -79,6 +79,8 @@ int Application::Run(int, const char**) {
         DisplayServer::singleton().present();
 
         ImGui::EndFrame();
+
+        Input::EndFrame();
     }
 
     // @TODO: fix

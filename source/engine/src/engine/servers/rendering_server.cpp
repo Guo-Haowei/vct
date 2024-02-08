@@ -303,7 +303,7 @@ void RenderingServer::renderToVoxelTexture() {
         DEV_ASSERT(scene.contains<MeshComponent>(obj.meshID));
         const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
 
-        const mat4& M = transform.GetWorldMatrix();
+        const mat4& M = transform.get_world_matrix();
         g_perBatchCache.cache.Model = M;
         g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
         g_perBatchCache.Update();

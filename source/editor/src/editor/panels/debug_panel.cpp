@@ -1,6 +1,5 @@
 #include "debug_panel.h"
 
-#include "Engine/Core/camera.h"
 #include "scene/scene.h"
 #include "servers/rendering/r_defines.h"
 
@@ -43,18 +42,17 @@ static const char* DrawTextureToStr(int mode) {
     return str;
 }
 
-void DebugPanel::RenderInternal(Scene&) {
-    const Camera& camera = gCamera;
-    bool dirty = false;
+void DebugPanel::RenderInternal(Scene& scene) {
+    CameraComponent& camera = scene.get_main_camera();
 
-    const vec3& eye = camera.position;
+    vec3 eye = camera.get_eye();
     ImGui::Text("eye: %.2f, %.2f, %.2f", eye.x, eye.y, eye.z);
     ImGui::Separator();
 
     ImGui::Text("Voxel GI");
     ImGui::Checkbox("Enable GI", (bool*)(DVAR_GET_POINTER(r_enableVXGI)));
     ImGui::Checkbox("No Texture", (bool*)(DVAR_GET_POINTER(r_noTexture)));
-    dirty |= ImGui::Checkbox("Force Voxel GI texture update", (bool*)(DVAR_GET_POINTER(r_forceVXGI)));
+    ImGui::Checkbox("Force Voxel GI texture update", (bool*)(DVAR_GET_POINTER(r_forceVXGI)));
     ImGui::Separator();
 
     ImGui::Text("CSM");
@@ -75,4 +73,7 @@ void DebugPanel::RenderInternal(Scene&) {
     ImGui::SliderInt("Display Texture", (int*)(DVAR_GET_POINTER(r_debugTexture)), DrawTexture::TEXTURE_FINAL_IMAGE,
                      DrawTexture::TEXTURE_MAX);
     ImGui::Text("%s", DrawTextureToStr(DVAR_GET_INT(r_debugTexture)));
+
+    ImGui::Separator();
+    ImGui::Checkbox("toggle grid visibility", (bool*)(DVAR_GET_POINTER(grid_visibility)));
 }

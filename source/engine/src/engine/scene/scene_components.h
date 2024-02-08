@@ -7,11 +7,124 @@ namespace vct {
 class Archive;
 class Scene;
 
+//--------------------------------------------------------------------------------------------------
+// TransformComponent
+//--------------------------------------------------------------------------------------------------
+class TransformComponent {
+public:
+    enum {
+        NONE = 0,
+        DIRTY = 1 << 0,
+    };
+
+    bool is_dirty() const { return m_flags & DIRTY; }
+    void set_dirty(bool dirty = true) { dirty ? m_flags |= DIRTY : m_flags &= ~DIRTY; }
+
+    const vec3& get_translation() const { return m_translation; }
+    void set_translation(const vec3& t) { m_translation = t; }
+
+    const vec4& get_rotation() const { return m_rotation; }
+    void set_rotation(const vec4& r) { m_rotation = r; }
+
+    const vec3& get_scale() const { return m_scale; }
+    void set_scale(const vec3& s) { m_scale = s; }
+
+    const mat4& get_world_matrix() const { return m_world_matrix; }
+
+    void set_world_matrix(const mat4& matrix) { m_world_matrix = matrix; }
+
+    mat4 get_local_matrix() const;
+
+    void update_transform();
+    void scale(const vec3& scale);
+    void translate(const vec3& translation);
+    void rotate(const vec3& euler);
+
+    void set_local_transform(const mat4& matrix);
+    void matrix_transform(const mat4& matrix);
+
+    void update_transform_parented(const TransformComponent& parent);
+
+    void serialize(Archive& archive);
+
+private:
+    uint32_t m_flags = DIRTY;
+
+    vec3 m_scale = vec3(1);              // local scale
+    vec3 m_translation = vec3(0);        // local translation
+    vec4 m_rotation = vec4(0, 0, 0, 1);  // local rotation
+
+    // Non-serialized attributes
+    mat4 m_world_matrix = mat4(1);
+};
+
+//--------------------------------------------------------------------------------------------------
+// CameraComponent
+//--------------------------------------------------------------------------------------------------
+class CameraComponent {
+public:
+    enum {
+        NONE = 0,
+        DIRTY = 1,
+    };
+
+    static constexpr float kDefaultNear = 0.1f;
+    static constexpr float kDefaultFar = 100.0f;
+    static constexpr float kDefaultFov = glm::radians(50.0f);
+
+    void update();
+
+    void set_dimension(float width, float height);
+
+    bool is_dirty() const { return m_flags & DIRTY; }
+    void set_dirty(bool dirty = true) { dirty ? m_flags |= DIRTY : m_flags &= ~DIRTY; }
+
+    float get_near() const { return m_near; }
+    float get_far() const { return m_far; }
+    const mat4& get_view_matrix() const { return m_view_matrix; }
+    const mat4& get_projection_matrix() const { return m_projection_matrix; }
+    const mat4& get_projection_view_matrix() const { return m_projection_view_matrix; }
+
+    const vec3& get_eye() const { return m_eye; }
+    const vec3& get_center() const { return m_center; }
+
+    void set_eye(const vec3& eye) {
+        set_dirty();
+        m_eye = eye;
+    }
+    void set_center(const vec3& center) {
+        set_dirty();
+        m_center = center;
+    }
+
+    void serialize(Archive& archive);
+
+private:
+    uint32_t m_flags = DIRTY;
+
+    float m_near = kDefaultNear;
+    float m_far = kDefaultFar;
+    float m_fovy = kDefaultFov;
+    float m_width = 0.0f;
+    float m_height = 0.0f;
+
+    vec3 m_eye;
+    vec3 m_center{ 0, 0, 0 };
+
+    // Non-serlialized
+    mat4 m_view_matrix;
+    mat4 m_projection_matrix;
+    mat4 m_projection_view_matrix;
+
+    friend class Scene;
+};
+
+// @TODO: refactor
 class HierarchyComponent {
 public:
     ecs::Entity GetParent() const { return mParent; }
 
-    void Serialize(Archive& archive);
+    void serialize(Archive& archive);
 
 private:
     ecs::Entity mParent;
@@ -32,7 +145,7 @@ struct ObjectComponent {
     /// mesh
     ecs::Entity meshID;
 
-    void Serialize(Archive& archive);
+    void serialize(Archive& archive);
 };
 
 struct ArmatureComponent {
@@ -47,7 +160,7 @@ struct ArmatureComponent {
     // Non-Serialized
     std::vector<mat4> boneTransforms;
 
-    void Serialize(Archive& archive);
+    void serialize(Archive& archive);
 };
 
 struct AnimationComponent {
@@ -100,7 +213,7 @@ struct AnimationComponent {
     std::vector<Channel> channels;
     std::vector<Sampler> samplers;
 
-    void Serialize(Archive& archive);
+    void serialize(Archive& archive);
 };
 
 struct RigidBodyPhysicsComponent {
@@ -122,40 +235,7 @@ struct RigidBodyPhysicsComponent {
     } param;
     float mass = 1.0f;
 
-    void Serialize(Archive& archive);
-};
-
-struct CameraComponent {
-    static constexpr float DEFAULT_ZNEAR = 0.1f;
-    static constexpr float DEFAULT_ZFAR = 100.0f;
-    static constexpr float DEFAULT_FOVY = glm::radians(50.0f);
-
-    enum {
-        None = 0,
-        Dirty = 1,
-    };
-
-    uint32_t flags = Dirty;
-
-    float zNear = DEFAULT_ZFAR;
-    float zFar = DEFAULT_ZFAR;
-    float fovy = DEFAULT_FOVY;
-    float width = 0.0f;
-    float height = 0.0f;
-    vec3 center = vec3(0);
-    vec3 eye = vec3(0, 0, 1);
-
-    // Non-serlialized
-    mat4 viewMatrix;
-    mat4 projMatrix;
-
-    inline bool IsDirty() const { return flags & Dirty; }
-    inline void SetDirty(bool dirty = true) { dirty ? flags |= Dirty : flags &= ~Dirty; }
-
-    mat4 CalculateViewMatrix() const;
-    void UpdateCamera();
-
-    void Serialize(Archive& archive);
+    void serialize(Archive& archive);
 };
 
 struct LightComponent {
@@ -163,7 +243,7 @@ struct LightComponent {
     vec3 color = vec3(1);
     float energy = 10.0f;
 
-    void Serialize(Archive& archive);
+    void serialize(Archive& archive);
 };
 
 struct MaterialComponent {
@@ -183,7 +263,7 @@ struct MaterialComponent {
     float mRoughness = 1.0f;
     vec4 mBaseColor = vec4(1);
 
-    void Serialize(Archive& archive);
+    void serialize(Archive& archive);
 
     // @TODO: refactor
     mutable void* gpuResource = nullptr;
@@ -220,7 +300,7 @@ struct MeshComponent {
         uint32_t indexCount = 0;
         vct::AABB localBound;
 
-        void Serialize(Archive& archive);
+        void serialize(Archive& archive);
     };
 
     struct GPUBuffers {
@@ -231,7 +311,7 @@ struct MeshComponent {
     void CreateRenderData();
     std::vector<char> GenerateCombinedBuffer() const;
 
-    void Serialize(Archive& archive);
+    void serialize(Archive& archive);
 
     std::vector<uint32_t> mIndices;
     std::vector<vec3> mPositions;
@@ -265,7 +345,7 @@ public:
 
     // bool operator==(const std::string& tag) const { return mTag == tag; }
 
-    void Serialize(Archive& archive);
+    void serialize(Archive& archive);
 
     void SetTag(const char* tag) { mTag = tag; }
     void SetTag(const std::string& tag) { mTag = tag; }
@@ -275,54 +355,6 @@ public:
 
 private:
     std::string mTag;
-};
-
-class TransformComponent {
-public:
-    enum {
-        NONE = 0,
-        DIRTY = 1 << 0,
-    };
-
-    inline bool IsDirty() const { return mFlags & DIRTY; }
-    inline void SetDirty(bool dirty = true) { dirty ? mFlags |= DIRTY : mFlags &= ~DIRTY; }
-
-    inline const vec3& GetPosition() const { return mTranslation; }
-    inline void SetPosition(const vec3& t) { mTranslation = t; }
-
-    inline const vec4& GetRotation() const { return mRotation; }
-    inline void SetRotation(const vec4& r) { mRotation = r; }
-
-    inline const vec3& GetScale() const { return mScale; }
-    inline void SetScale(const vec3& s) { mScale = s; }
-
-    inline const mat4& GetWorldMatrix() const { return mWorldMatrix; }
-
-    void SetWorldMatrix(const mat4& matrix) { mWorldMatrix = matrix; }
-
-    mat4 GetLocalMatrix() const;
-
-    void UpdateTransform();
-    void Scale(const vec3& scale);
-    void Translate(const vec3& translation);
-    void Rotate(const vec3& euler);
-
-    void SetLocalTransform(const mat4& matrix);
-    void MatrixTransform(const mat4& matrix);
-
-    void UpdateTransform_Parented(const TransformComponent& parent);
-
-    void Serialize(Archive& archive);
-
-private:
-    uint32_t mFlags = DIRTY;
-
-    vec3 mScale = vec3(1);              // local scale
-    vec3 mTranslation = vec3(0);        // local translation
-    vec4 mRotation = vec4(0, 0, 0, 1);  // local rotation
-
-    // Non-serialized attributes
-    mat4 mWorldMatrix = mat4(1);
 };
 
 }  // namespace vct

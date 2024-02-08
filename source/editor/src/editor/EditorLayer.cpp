@@ -20,6 +20,8 @@ EditorLayer::EditorLayer() : Layer("EditorLayer") {
     AddPanel(std::make_shared<HierarchyPanel>());
     AddPanel(std::make_shared<PropertyPanel>());
     AddPanel(std::make_shared<Viewer>());
+
+    s_controller.set_camera(SceneManager::get_scene().get_main_camera());
 }
 
 void EditorLayer::AddPanel(std::shared_ptr<Panel> panel) {

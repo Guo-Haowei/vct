@@ -24,7 +24,7 @@ public:
 
     constexpr uint32_t GetID() const { return mID; }
 
-    void Serialize(Archive& archive);
+    void serialize(Archive& archive);
 
     static Entity create();
 

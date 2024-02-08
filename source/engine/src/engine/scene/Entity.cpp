@@ -4,7 +4,7 @@ namespace vct::ecs {
 
 const Entity Entity::INVALID{};
 
-void Entity::Serialize(Archive& archive) {
+void Entity::serialize(Archive& archive) {
     if (archive.is_write_mode()) {
         archive << mID;
     } else {

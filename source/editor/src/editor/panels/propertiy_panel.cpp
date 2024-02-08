@@ -173,10 +173,11 @@ void PropertyPanel::RenderInternal(Scene& scene) {
 
     TransformComponent* transformComponent = scene.get_component<TransformComponent>(id);
     DrawComponent("Transform", transformComponent, [&](TransformComponent& transform) {
-        mat4 transformMatrix = transform.GetLocalMatrix();
+        mat4 transformMatrix = transform.get_local_matrix();
         vec3 translation;
         vec3 rotation;
         vec3 scale;
+        // @TODO: fix
         ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transformMatrix), glm::value_ptr(translation),
                                               glm::value_ptr(rotation), glm::value_ptr(scale));
 
@@ -201,7 +202,7 @@ void PropertyPanel::RenderInternal(Scene& scene) {
         if (dirty) {
             ImGuizmo::RecomposeMatrixFromComponents(glm::value_ptr(translation), glm::value_ptr(rotation),
                                                     glm::value_ptr(scale), glm::value_ptr(transformMatrix));
-            transform.SetLocalTransform(transformMatrix);
+            transform.set_local_transform(transformMatrix);
         }
     });
 
@@ -219,15 +220,15 @@ void PropertyPanel::RenderInternal(Scene& scene) {
         }
     });
 
-    CameraComponent* cameraComponent = scene.get_component<CameraComponent>(id);
-    DrawComponent("Camera", cameraComponent, [](CameraComponent& camera) {
-        const float width = 50.0f;
-        float fovy = glm::degrees(camera.fovy);
-        draw_drag_float("fovy", &fovy, 1.0f, 20.0f, 90.0f, width);
-        draw_drag_float("near", &camera.zNear, 0.1f, 0.1f, 10.0f, width);
-        draw_drag_float("far", &camera.zFar, 10.0f, 10.0f, 5000.0f, width);
-        camera.fovy = glm::radians(fovy);
-    });
+    // CameraComponent* cameraComponent = scene.get_component<CameraComponent>(id);
+    // DrawComponent("Camera", cameraComponent, [](CameraComponent& camera) {
+    //     const float width = 50.0f;
+    //     float fovy = glm::degrees(camera.m_fovy);
+    //     draw_drag_float("m_fovy", &fovy, 1.0f, 20.0f, 90.0f, width);
+    //     draw_drag_float("m_near", &camera.m_near, 0.1f, 0.1f, 10.0f, width);
+    //     draw_drag_float("m_far", &camera.m_far, 10.0f, 10.0f, 5000.0f, width);
+    //     camera.m_fovy = glm::radians(fovy);
+    // });
 
     ObjectComponent* objectComponent = scene.get_component<ObjectComponent>(id);
     DrawComponent("Object", objectComponent, [&](ObjectComponent& object) {

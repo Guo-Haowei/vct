@@ -1,26 +1,29 @@
 #include "viewer.h"
 
 #include "Engine/Core/Input.h"
-#include "Engine/Core/camera.h"
 #include "ImGuizmo.h"
 #include "imgui/imgui_internal.h"
 
 // @TODO: refactor
+#include "core/dynamic_variable/common_dvars.h"
 #include "core/math/ray.h"
 #include "scene/scene_manager.h"
 #include "servers/display_server.h"
 
 extern uint32_t g_final_image;
 
-static void camera_control(Camera& camera);
+CameraController s_controller;
 
-void Viewer::Update(float) {
+void Viewer::Update(float dt) {
     if (IsFocused()) {
-        camera_control(gCamera);
+        Scene& scene = SceneManager::get_scene();
+        s_controller.move_camera(scene.get_main_camera(), 0.016f);
     }
 }
 
 void Viewer::RenderInternal(Scene& scene) {
+    CameraComponent& camera = scene.get_main_camera();
+
     ImGuiWindow* window = ImGui::FindWindowByName(mName.c_str());
     DEV_ASSERT(window);
     const ImRect& contentRegionRect = window->ContentRegionRect;
@@ -38,6 +41,10 @@ void Viewer::RenderInternal(Scene& scene) {
         contentSize.x = contentSize.y * ratio;
     }
 
+    const mat4 view_matrix = camera.get_view_matrix();
+    const mat4 projection_matrix = camera.get_projection_matrix();
+    const mat4 projection_view_matrix = camera.get_projection_view_matrix();
+
     if (IsFocused()) {
         if (Input::IsButtonPressed(EMouseButton::MIDDLE)) {
 
@@ -50,13 +57,11 @@ void Viewer::RenderInternal(Scene& scene) {
                 clicked *= 2.0f;
                 clicked -= 1.0f;
 
-                const Camera& camera = gCamera;
-                const mat4& PV = camera.ProjView();
-                const mat4 invPV = glm::inverse(PV);
+                const mat4 invPV = glm::inverse(projection_view_matrix);
 
-                const vec3 rayStart = camera.position;
+                const vec3 rayStart = camera.get_eye();
                 const vec3 direction = glm::normalize(vec3(invPV * vec4(clicked.x, -clicked.y, 1.0f, 1.0f)));
-                const vec3 rayEnd = rayStart + direction * camera.zFar;
+                const vec3 rayEnd = rayStart + direction * camera.get_far();
                 Ray ray(rayStart, rayEnd);
 
                 const auto intersectionResult = scene.Intersects(ray);
@@ -70,10 +75,11 @@ void Viewer::RenderInternal(Scene& scene) {
         }
     }
 
-    ImVec2 topLeft = GImGui->CurrentWindow->ContentRegionRect.Min;
-    ImVec2 bottomRight(topLeft.x + contentSize.x, topLeft.y + contentSize.y);
+    ImVec2 top_left = GImGui->CurrentWindow->ContentRegionRect.Min;
+    ImVec2 bottom_right(top_left.x + contentSize.x, top_left.y + contentSize.y);
+    ImVec2 top_right = ImVec2(bottom_right.x, top_left.y);
 
-    ImGui::GetWindowDrawList()->AddImage((ImTextureID)g_final_image, topLeft, bottomRight, ImVec2(0, 1), ImVec2(1, 0));
+    ImGui::GetWindowDrawList()->AddImage((ImTextureID)g_final_image, top_left, bottom_right, ImVec2(0, 1), ImVec2(1, 0));
 
     // draw gizmo
 
@@ -81,15 +87,14 @@ void Viewer::RenderInternal(Scene& scene) {
     ImGuizmo::BeginFrame();
 
     ImGuizmo::SetDrawlist();
-    ImGuizmo::SetRect(topLeft.x, topLeft.y, contentSize.x, contentSize.y);
-
-    const mat4 view_matrix = gCamera.View();
-    const mat4 projection_matrix = gCamera.Proj();
-    const mat4 projection_view_matrix = projection_matrix * view_matrix;
+    ImGuizmo::SetRect(top_left.x, top_left.y, contentSize.x, contentSize.y);
 
     // draw grid
     mat4 identity(1);
-    ImGuizmo::draw_grid(projection_view_matrix, identity, 10.0f);
+
+    if (DVAR_GET_BOOL(grid_visibility)) {
+        ImGuizmo::draw_grid(projection_view_matrix, identity, 10.0f);
+    }
 
     // @TODO: view cube
     // ImGuizmo::DrawCubes(&view_matrix[0].x, &projection_matrix[0].x, &identity[0].x, 1);
@@ -106,50 +111,95 @@ void Viewer::RenderInternal(Scene& scene) {
                 auto meshComponent = scene.get_component<MeshComponent>(objComponent->meshID);
                 DEV_ASSERT(meshComponent);
                 AABB aabb = meshComponent->mLocalBound;
-                aabb.apply_matrix(transform->GetWorldMatrix());
+                aabb.apply_matrix(transform->get_world_matrix());
 
                 const mat4 M = glm::translate(mat4(1), aabb.center()) * glm::scale(mat4(1), aabb.size());
                 ImGuizmo::draw_box_wireframe(projection_view_matrix, M);
             }
 
-            mat4 local = transform->GetLocalMatrix();
+            mat4 local = transform->get_local_matrix();
 
             ImGuizmo::Manipulate(glm::value_ptr(view_matrix), glm::value_ptr(projection_matrix), op, ImGuizmo::WORLD, glm::value_ptr(local), nullptr, nullptr, nullptr, nullptr);
 
-            transform->SetLocalTransform(local);
+            transform->set_local_transform(local);
         }
+    }
+
+    // @TODO: manipulate view
+    const float size = 120.f;
+    ImGuizmo::ViewManipulate((float*)&view_matrix[0].x, 10.0f, ImVec2(top_right.x - size, top_right.y), ImVec2(size, size), IM_COL32(32, 32, 32, 96));
+}
+
+void CameraController::set_camera(CameraComponent& camera) {
+    m_angle_xz = 30.0f;
+    vec3 eye = calculate_eye(camera.get_eye());
+    camera.set_eye(eye);
+
+    m_direction = glm::normalize(eye - camera.get_center());
+}
+
+void CameraController::move_camera(CameraComponent& camera, float dt) {
+    // rotate
+    if (Input::IsButtonDown(EMouseButton::MIDDLE)) {
+        const float rotateSpeed = 20.0f * dt;
+        vec2 p = Input::MouseMove();
+        bool dirty = false;
+        if (p.x != 0.0f) {
+            m_angle_x -= rotateSpeed * p.x;
+            dirty = true;
+        }
+        if (p.y != 0.0f) {
+            m_angle_xz += rotateSpeed * p.y;
+            m_angle_xz = glm::clamp(m_angle_xz, -80.0f, 80.0f);
+            dirty = true;
+        }
+
+        if (dirty) {
+            camera.set_eye(calculate_eye(camera.get_center()));
+        }
+        return;
+    }
+
+    // pan
+    if (Input::IsButtonDown(EMouseButton::RIGHT)) {
+        vec2 p = Input::MouseMove();
+        if (glm::abs(p.x) >= 1.0f || glm::abs(p.y) >= 1.0f) {
+            const float panSpeed = 10.0f * dt;
+
+            mat4 model = glm::inverse(camera.get_view_matrix());
+            vec3 offset = glm::normalize(vec3(p.x, p.y, 0.0f));
+            vec3 new_center = camera.get_center();
+            new_center -= panSpeed * vec3(model * vec4(offset, 0.0f));
+            camera.set_center(new_center);
+            camera.set_eye(calculate_eye(camera.get_center()));
+            return;
+        }
+    }
+
+    // scroll
+    const float accel = 100.0f;
+    float scrolling = Input::Wheel().y;
+    if (scrolling != 0.0f) {
+        m_scrollSpeed += dt * accel;
+        m_scrollSpeed = glm::min(m_scrollSpeed, MAX_SCROLL_SPEED);
+    } else {
+        m_scrollSpeed -= 10.0f;
+        m_scrollSpeed = glm::max(m_scrollSpeed, 0.0f);
+    }
+
+    if (m_scrollSpeed != 0.0f) {
+        m_distance -= m_scrollSpeed * scrolling;
+        m_distance = glm::clamp(m_distance, 0.3f, 10000.0f);
+        camera.set_eye(calculate_eye(camera.get_center()));
     }
 }
 
-// @TODO: refactor
-static void camera_control(Camera& camera) {
-    constexpr float VIEW_SPEED = 2.0f;
-    float CAMERA_SPEED = 0.15f;
-
-    if (Input::IsKeyDown(EKeyCode::LEFT_SHIFT)) CAMERA_SPEED *= 3.f;
-
-    int x = Input::IsKeyDown(EKeyCode::D) - Input::IsKeyDown(EKeyCode::A);
-    int z = Input::IsKeyDown(EKeyCode::W) - Input::IsKeyDown(EKeyCode::S);
-    int y = Input::IsKeyDown(EKeyCode::E) - Input::IsKeyDown(EKeyCode::Q);
-
-    if (x != 0 || z != 0) {
-        vec3 w = camera.direction();
-        vec3 u = glm::cross(w, vec3(0, 1, 0));
-        vec3 translation = (CAMERA_SPEED * z) * w + (CAMERA_SPEED * x) * u;
-        camera.position += translation;
-    }
-
-    camera.position.y += (CAMERA_SPEED * y);
-
-    int yaw = Input::IsKeyDown(EKeyCode::RIGHT) - Input::IsKeyDown(EKeyCode::LEFT);
-    int pitch = Input::IsKeyDown(EKeyCode::UP) - Input::IsKeyDown(EKeyCode::DOWN);
-
-    if (yaw) {
-        camera.yaw += VIEW_SPEED * yaw;
-    }
-
-    if (pitch) {
-        camera.pitch += VIEW_SPEED * pitch;
-        camera.pitch = glm::clamp(camera.pitch, -80.0f, 80.0f);
-    }
+vec3 CameraController::calculate_eye(const vec3& center) {
+    const float rad_x = glm::radians(m_angle_x);
+    const float rad_xz = glm::radians(m_angle_xz);
+    const float y = m_distance * glm::sin(rad_xz);
+    const float xz = m_distance * glm::cos(rad_xz);
+    const float x = xz * glm::sin(rad_x);
+    const float z = xz * glm::cos(rad_x);
+    return center + vec3(x, y, z);
 }
