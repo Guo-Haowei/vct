@@ -27,7 +27,7 @@ static void APIENTRY gl_debug_callback(GLenum, GLenum, unsigned int, GLenum, GLs
 
 bool RenderingServer::initialize() {
     if (gladLoadGL() == 0) {
-        LOG_FATAL("[glad] failed to load gl functions");
+        LOG_FATAL("[glad] failed to import gl functions");
         return false;
     }
 
@@ -63,34 +63,31 @@ static std::shared_ptr<MeshData> CreateMeshData(const MeshComponent& mesh) {
     MeshData* ret = new MeshData;
 
     MeshData& outMesh = *ret;
-    const bool hasNormals = !mesh.mNormals.empty();
-    const bool hasUVs = !mesh.mTexcoords_0.empty();
-    const bool hasTangent = !mesh.mTangents.empty();
-    const bool hasBitangent = !mesh.mBitangents.empty();
+    const bool hasNormals = !mesh.normals.empty();
+    const bool hasUVs = !mesh.texcoords_0.empty();
+    const bool hasTangent = !mesh.tangents.empty();
 
     glGenVertexArrays(1, &outMesh.vao);
-    glGenBuffers(2 + hasNormals + hasUVs + hasTangent + hasBitangent, &outMesh.ebo);
+    glGenBuffers(2 + hasNormals + hasUVs + hasTangent, &outMesh.ebo);
     glBindVertexArray(outMesh.vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outMesh.ebo);
     gl::BindToSlot(outMesh.vbos[0], 0, 3);
-    gl::NamedBufferStorage(outMesh.vbos[0], mesh.mPositions);
+    gl::NamedBufferStorage(outMesh.vbos[0], mesh.positions);
     if (hasNormals) {
         gl::BindToSlot(outMesh.vbos[1], 1, 3);
-        gl::NamedBufferStorage(outMesh.vbos[1], mesh.mNormals);
+        gl::NamedBufferStorage(outMesh.vbos[1], mesh.normals);
     }
     if (hasUVs) {
         gl::BindToSlot(outMesh.vbos[2], 2, 2);
-        gl::NamedBufferStorage(outMesh.vbos[2], mesh.mTexcoords_0);
+        gl::NamedBufferStorage(outMesh.vbos[2], mesh.texcoords_0);
     }
     if (hasTangent) {
         gl::BindToSlot(outMesh.vbos[3], 3, 3);
-        gl::NamedBufferStorage(outMesh.vbos[3], mesh.mTangents);
-        gl::BindToSlot(outMesh.vbos[4], 4, 3);
-        gl::NamedBufferStorage(outMesh.vbos[4], mesh.mBitangents);
+        gl::NamedBufferStorage(outMesh.vbos[3], mesh.tangents);
     }
 
-    gl::NamedBufferStorage(outMesh.ebo, mesh.mIndices);
-    outMesh.count = static_cast<uint32_t>(mesh.mIndices.size());
+    gl::NamedBufferStorage(outMesh.ebo, mesh.indices);
+    outMesh.count = static_cast<uint32_t>(mesh.indices.size());
 
     glBindVertexArray(0);
     return std::shared_ptr<MeshData>(ret);
@@ -311,7 +308,7 @@ void RenderingServer::renderToVoxelTexture() {
         const MeshData* drawData = reinterpret_cast<MeshData*>(mesh.gpuResource);
         glBindVertexArray(drawData->vao);
 
-        for (const auto& subset : mesh.mSubsets) {
+        for (const auto& subset : mesh.subsets) {
             const MaterialComponent& material = *scene.get_component<MaterialComponent>(subset.materialID);
             const MaterialData* matData = reinterpret_cast<MaterialData*>(material.gpuResource);
 

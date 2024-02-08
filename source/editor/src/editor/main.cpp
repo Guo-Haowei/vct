@@ -1,6 +1,7 @@
 #include "EditorLayer.h"
 #include "Framework/UIManager.h"
 #include "assets/asset_loader.h"
+#include "core/dynamic_variable/common_dvars.h"
 #include "core/os/os.h"
 #include "core/os/threads.h"
 #include "core/systems/job_system.h"
@@ -8,9 +9,6 @@
 #include "scene/scene_manager.h"
 #include "servers/display_server_glfw.h"
 #include "servers/rendering_server.h"
-
-#define DEFINE_DVAR
-#include "core/dynamic_variable/common_dvars.h"
 
 static void register_common_dvars() {
 #define REGISTER_DVAR

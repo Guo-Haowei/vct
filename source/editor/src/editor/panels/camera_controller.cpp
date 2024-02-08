@@ -1,6 +1,6 @@
 #include "camera_controller.h"
 
-#include "core/Input.h"
+#include "core/input/input.h"
 
 vct::CameraController s_controller;
 
@@ -16,9 +16,9 @@ void CameraController::set_camera(CameraComponent& camera) {
 
 void CameraController::move_camera(CameraComponent& camera, float dt) {
     // rotate
-    if (Input::IsButtonDown(EMouseButton::MIDDLE)) {
+    if (input::is_button_down(MOUSE_BUTTON_MIDDLE)) {
         const float rotateSpeed = 20.0f * dt;
-        vec2 p = Input::MouseMove();
+        vec2 p = input::mouse_move();
         bool dirty = false;
         if (p.x != 0.0f) {
             m_angle_x -= rotateSpeed * p.x;
@@ -26,7 +26,7 @@ void CameraController::move_camera(CameraComponent& camera, float dt) {
         }
         if (p.y != 0.0f) {
             m_angle_xz += rotateSpeed * p.y;
-            m_angle_xz = glm::clamp(m_angle_xz, -80.0f, 80.0f);
+            m_angle_xz.clamp(-80.0f, 80.0f);
             dirty = true;
         }
 
@@ -37,8 +37,8 @@ void CameraController::move_camera(CameraComponent& camera, float dt) {
     }
 
     // pan
-    if (Input::IsButtonDown(EMouseButton::RIGHT)) {
-        vec2 p = Input::MouseMove();
+    if (input::is_button_down(MOUSE_BUTTON_RIGHT)) {
+        vec2 p = input::mouse_move();
         if (glm::abs(p.x) >= 1.0f || glm::abs(p.y) >= 1.0f) {
             const float panSpeed = 10.0f * dt;
 
@@ -53,30 +53,29 @@ void CameraController::move_camera(CameraComponent& camera, float dt) {
     }
 
     // scroll
+    // @TODO: push point forward
     const float accel = 100.0f;
-    float scrolling = Input::Wheel().y;
+    float scrolling = input::get_wheel().y;
     if (scrolling != 0.0f) {
-        m_scrollSpeed += dt * accel;
-        m_scrollSpeed = glm::min(m_scrollSpeed, MAX_SCROLL_SPEED);
+        m_scroll_speed += dt * accel;
+        m_scroll_speed = glm::min(m_scroll_speed, kMaxScrollSpeed);
     } else {
-        m_scrollSpeed -= 10.0f;
-        m_scrollSpeed = glm::max(m_scrollSpeed, 0.0f);
+        m_scroll_speed -= 10.0f;
+        m_scroll_speed = glm::max(m_scroll_speed, 0.0f);
     }
 
-    if (m_scrollSpeed != 0.0f) {
-        m_distance -= m_scrollSpeed * scrolling;
+    if (m_scroll_speed != 0.0f) {
+        m_distance -= m_scroll_speed * scrolling;
         m_distance = glm::clamp(m_distance, 0.3f, 10000.0f);
         camera.set_eye(calculate_eye(camera.get_center()));
     }
 }
 
 vec3 CameraController::calculate_eye(const vec3& center) {
-    const float rad_x = glm::radians(m_angle_x);
-    const float rad_xz = glm::radians(m_angle_xz);
-    const float y = m_distance * glm::sin(rad_xz);
-    const float xz = m_distance * glm::cos(rad_xz);
-    const float x = xz * glm::sin(rad_x);
-    const float z = xz * glm::cos(rad_x);
+    const float y = m_distance * m_angle_xz.sin();
+    const float xz = m_distance * m_angle_xz.cos();
+    const float x = xz * m_angle_x.sin();
+    const float z = xz * m_angle_x.cos();
     return center + vec3(x, y, z);
 }
 

@@ -8,7 +8,7 @@ class Archive;
 class Scene;
 
 //--------------------------------------------------------------------------------------------------
-// TransformComponent
+// Transform Component
 //--------------------------------------------------------------------------------------------------
 class TransformComponent {
 public:
@@ -59,7 +59,7 @@ private:
 };
 
 //--------------------------------------------------------------------------------------------------
-// CameraComponent
+// Camera Component
 //--------------------------------------------------------------------------------------------------
 class CameraComponent {
 public:
@@ -117,6 +117,74 @@ private:
     mat4 m_projection_view_matrix;
 
     friend class Scene;
+};
+
+//--------------------------------------------------------------------------------------------------
+// Mesh Component
+//--------------------------------------------------------------------------------------------------
+struct MeshComponent {
+    enum FLAGS {
+        NONE = 0,
+        RENDERABLE = 1 << 0,
+        DOUBLE_SIDED = 1 << 1,
+        DYNAMIC = 1 << 2,
+    };
+
+    uint32_t flags = RENDERABLE;
+
+    struct VertexAttribute {
+        enum NAME {
+            POSITION = 0,
+            NORMAL,
+            TEXCOORD_0,
+            TEXCOORD_1,
+            TANGENT,
+            JOINTS_0,
+            WEIGHTS_0,
+            COLOR_0,
+            COUNT,
+        } name;
+
+        uint32_t offsetInByte = 0;
+        uint32_t sizeInByte = 0;
+        uint32_t stride = 0;
+
+        bool is_valid() const { return sizeInByte != 0; }
+    };
+
+    std::vector<uint32_t> indices;
+    std::vector<vec3> positions;
+    std::vector<vec3> normals;
+    std::vector<vec3> tangents;
+    std::vector<vec2> texcoords_0;
+    std::vector<vec2> texcoords_1;
+    std::vector<ivec4> joints_0;
+    std::vector<vec4> weights_0;
+    std::vector<vec3> color_0;
+
+    struct MeshSubset {
+        ecs::Entity materialID;
+        uint32_t indexOffset = 0;
+        uint32_t indexCount = 0;
+        AABB localBound;
+    };
+    std::vector<MeshSubset> subsets;
+
+    ecs::Entity armatureID;
+
+    // Non-serialized
+    AABB localBound;
+
+    // @TODO: remove
+    mutable void* gpuResource = nullptr;
+
+    VertexAttribute attributes[VertexAttribute::COUNT];
+    size_t vertexBufferSize = 0;  // combine vertex buffer
+
+    void CreateRenderData();
+    // std::vector<char> GenerateCombinedBuffer() const;
+
+    void serialize(Archive& archive);
 };
 
 // @TODO: refactor
@@ -266,74 +334,6 @@ struct MaterialComponent {
     void serialize(Archive& archive);
 
     // @TODO: refactor
-    mutable void* gpuResource = nullptr;
-};
-
-struct MeshComponent {
-    enum : uint32_t {
-        None = 0,
-    };
-
-    struct VertexAttribute {
-        enum NAME {
-            POSITION = 0,
-            NORMAL,
-            TEXCOORD_0,
-            TEXCOORD_1,
-            TANGENT,
-            JOINTS_0,
-            WEIGHTS_0,
-            COLOR_0,
-            COUNT,
-        } name;
-
-        uint32_t offsetInByte = 0;
-        uint32_t sizeInByte = 0;
-        uint32_t stride = 0;
-
-        bool IsValid() const { return sizeInByte != 0; }
-    };
-
-    struct MeshSubset {
-        ecs::Entity materialID;
-        uint32_t indexOffset = 0;
-        uint32_t indexCount = 0;
-        vct::AABB localBound;
-
-        void serialize(Archive& archive);
-    };
-
-    struct GPUBuffers {
-        virtual ~GPUBuffers() = default;
-    };
-
-    void CreateBounds();
-    void CreateRenderData();
-    std::vector<char> GenerateCombinedBuffer() const;
-
-    void serialize(Archive& archive);
-
-    std::vector<uint32_t> mIndices;
-    std::vector<vec3> mPositions;
-    std::vector<vec3> mNormals;
-    std::vector<vec3> mTangents;
-    std::vector<vec3> mBitangents;
-    std::vector<vec2> mTexcoords_0;
-    std::vector<vec2> mTexcoords_1;
-    std::vector<ivec4> mJoints_0;
-    std::vector<vec4> mWeights_0;
-    std::vector<vec3> mColor_0;
-    std::vector<MeshSubset> mSubsets;
-
-    ecs::Entity mArmatureID;
-
-    // Non-serialized
-    vct::AABB mLocalBound;
-    VertexAttribute mAttributes[VertexAttribute::COUNT];
-    size_t mVertexBufferSize = 0;  // combine vertex buffer
-
-    // @TODO: refactor
-    uint32_t materialIdx = static_cast<uint32_t>(-1);
     mutable void* gpuResource = nullptr;
 };
 

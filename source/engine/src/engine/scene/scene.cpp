@@ -2,8 +2,7 @@
 
 #include <thread>
 
-#include "Core/Timer.h"
-// #include "Math/Primitives.h"
+// #include "Core/Timer.h"
 #include "core/dynamic_variable/common_dvars.h"
 #include "core/io/archive.h"
 #include "core/systems/job_system.h"
@@ -440,17 +439,17 @@ Scene::RayIntersectionResult Scene::Intersects(Ray& ray) {
         Ray inversedRay = ray.inverse(inversedModel);
         Ray inversedRayAABB = inversedRay;  // make a copy, we don't want dist to be modified by AABB
         // Perform aabb test
-        if (!inversedRayAABB.intersects(mesh->mLocalBound)) {
+        if (!inversedRayAABB.intersects(mesh->localBound)) {
             continue;
         }
 
         // @TODO: test submesh intersection
 
         // Test every single triange
-        for (size_t i = 0; i < mesh->mIndices.size(); i += 3) {
-            const vec3& A = mesh->mPositions[mesh->mIndices[i]];
-            const vec3& B = mesh->mPositions[mesh->mIndices[i + 1]];
-            const vec3& C = mesh->mPositions[mesh->mIndices[i + 2]];
+        for (size_t i = 0; i < mesh->indices.size(); i += 3) {
+            const vec3& A = mesh->positions[mesh->indices[i]];
+            const vec3& B = mesh->positions[mesh->indices[i + 1]];
+            const vec3& C = mesh->positions[mesh->indices[i + 2]];
             if (inversedRay.intersects(A, B, C)) {
                 ray.copy_dist(inversedRay);
                 result.entity = entity;

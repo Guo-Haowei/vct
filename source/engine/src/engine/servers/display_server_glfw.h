@@ -1,4 +1,5 @@
 #pragma once
+#include "core/input/input_code.h"
 #include "display_server.h"
 
 struct GLFWwindow;
@@ -19,6 +20,8 @@ public:
     virtual void finalize() override;
 
 private:
+    void initialize_key_mapping();
+
     static void cursor_pos_cb(GLFWwindow* window, double x, double y);
     static void mouse_button_cb(GLFWwindow* window, int button, int action, int mods);
     static void key_cb(GLFWwindow* window, int keycode, int scancode, int action, int mods);
@@ -28,6 +31,8 @@ private:
     struct {
         int x, y;
     } m_frame_size, m_window_pos;
+
+    inline static std::unordered_map<int, KeyCode> s_key_mapping;
 };
 
 }  // namespace vct

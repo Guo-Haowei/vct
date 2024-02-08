@@ -199,8 +199,3 @@ public:                                                                         
 };
 
 }  // namespace vct
-
-// @TODO: refactor
-void ModelImporter_AssimpImport(const std::string& file_path, vct::Scene& scene);
-
-void ModelImporter_TinyGLTFImport(const std::string& file_path, vct::Scene& scene);

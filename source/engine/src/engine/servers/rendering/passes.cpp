@@ -137,7 +137,7 @@ static void shadow_pass_func() {
             const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
 
             const mat4& M = transform.get_world_matrix();
-            AABB aabb = mesh.mLocalBound;
+            AABB aabb = mesh.localBound;
             aabb.apply_matrix(M);
             if (!frustum.intersects(aabb)) {
                 continue;
@@ -181,7 +181,7 @@ static void gbuffer_pass_func() {
         const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
 
         const mat4& M = transform.get_world_matrix();
-        AABB aabb = mesh.mLocalBound;
+        AABB aabb = mesh.localBound;
         aabb.apply_matrix(M);
         if (!frustum.intersects(aabb)) {
             continue;
@@ -194,7 +194,7 @@ static void gbuffer_pass_func() {
         const MeshData* drawData = reinterpret_cast<MeshData*>(mesh.gpuResource);
         glBindVertexArray(drawData->vao);
 
-        for (const auto& subset : mesh.mSubsets) {
+        for (const auto& subset : mesh.subsets) {
             aabb = subset.localBound;
             aabb.apply_matrix(M);
             if (!frustum.intersects(aabb)) {
