@@ -47,7 +47,7 @@ static std::string editor_command_help_option(std::string_view alias, std::strin
     return result;
 }
 
-static bool editor_command_help(void*, std::span<const char*>) {
+static bool editor_command_help(void*) {
     using vct::print_impl;
 
     vct::print_impl(vct::LOG_LEVEL_NORMAL, "Usage: editor.exe [options]\n");
@@ -86,8 +86,10 @@ int main(int argc, const char** argv) {
     OS::singleton().initialize();
 
     register_common_dvars();
-    DynamicVariable::deserialize();
     process_command_line(argc, argv);
+
+    // @TODO: better organization
+    DynamicVariable::deserialize();
 
     thread::initialize();
     jobsystem::initialize();

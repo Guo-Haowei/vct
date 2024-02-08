@@ -20,6 +20,7 @@ enum VariantType {
 enum DvarFlags {
     DVAR_FLAG_NONE = 0,
     DVAR_FLAG_SERIALIZE = 1,
+    DVAR_FLAG_DESERIALIZE = 2,
 };
 
 class DynamicVariable {
@@ -58,6 +59,9 @@ public:
     bool set_ivec3(int x, int y, int z);
     bool set_ivec4(int x, int y, int z, int w);
 
+    void set_flag(uint32_t flag) { m_flags |= flag; }
+    void unset_flag(uint32_t flag) { m_flags &= ~flag; }
+
     void print_value_change(std::string_view source);
 
     VariantType get_type() const { return m_type; }
@@ -70,7 +74,7 @@ public:
 
 private:
     const VariantType m_type;
-    const uint32_t m_flags;
+    uint32_t m_flags;
 
     union {
         int m_int;

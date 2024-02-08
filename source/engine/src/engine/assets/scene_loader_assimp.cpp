@@ -60,7 +60,7 @@ void SceneLoader::LoadGLTF(std::string_view path, bool flipUVs) {
         DEV_ASSERT(mScene.contains<MeshComponent>(obj.meshID));
         const MeshComponent& mesh = *mScene.get_component<MeshComponent>(obj.meshID);
 
-        mat4 M = transform.GetWorldMatrix();
+        mat4 M = transform.get_world_matrix();
         AABB aabb = mesh.mLocalBound;
         aabb.apply_matrix(M);
         mScene.m_bound.union_box(aabb);
@@ -180,7 +180,7 @@ ecs::Entity SceneLoader::ProcessNode(const aiNode* node, ecs::Entity parent) {
                                    local.a4, local.b4, local.c4, local.d4   // x3 y3 z3 w3
     );
     TransformComponent& transform = *mScene.get_component<TransformComponent>(entity);
-    transform.MatrixTransform(localTransformColumnMajor);
+    transform.matrix_transform(localTransformColumnMajor);
 
     if (parent.IsValid()) {
         mScene.attach_component(entity, parent);

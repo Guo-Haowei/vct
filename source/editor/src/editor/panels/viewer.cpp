@@ -1,27 +1,27 @@
 #include "viewer.h"
 
 #include "Engine/Core/Input.h"
-#include "Engine/Core/camera.h"
-#include "ImGuizmo/ImGuizmo.h"
-#include "gizmo.h"
+#include "ImGuizmo.h"
 #include "imgui/imgui_internal.h"
 
 // @TODO: refactor
+#include "core/dynamic_variable/common_dvars.h"
 #include "core/math/ray.h"
 #include "scene/scene_manager.h"
 #include "servers/display_server.h"
 
 extern uint32_t g_final_image;
 
-static void camera_control(Camera& camera);
-
-void Viewer::Update(float) {
+void Viewer::Update(float dt) {
     if (IsFocused()) {
-        camera_control(gCamera);
+        Scene& scene = SceneManager::get_scene();
+        s_controller.move_camera(scene.get_main_camera(), 0.016f);
     }
 }
 
 void Viewer::RenderInternal(Scene& scene) {
+    CameraComponent& camera = scene.get_main_camera();
+
     ImGuiWindow* window = ImGui::FindWindowByName(mName.c_str());
     DEV_ASSERT(window);
     const ImRect& contentRegionRect = window->ContentRegionRect;
@@ -39,8 +39,12 @@ void Viewer::RenderInternal(Scene& scene) {
         contentSize.x = contentSize.y * ratio;
     }
 
+    const mat4 view_matrix = camera.get_view_matrix();
+    const mat4 projection_matrix = camera.get_projection_matrix();
+    const mat4 projection_view_matrix = camera.get_projection_view_matrix();
+
     if (IsFocused()) {
-        if (Input::IsButtonPressed(EMouseButton::MIDDLE)) {
+        if (Input::IsButtonPressed(EMouseButton::LEFT)) {
 
             auto [windowX, windowY] = DisplayServer::singleton().get_window_pos();
             vec2 clicked = Input::GetCursor();
@@ -51,13 +55,11 @@ void Viewer::RenderInternal(Scene& scene) {
                 clicked *= 2.0f;
                 clicked -= 1.0f;
 
-                const Camera& camera = gCamera;
-                const mat4& PV = camera.ProjView();
-                const mat4 invPV = glm::inverse(PV);
+                const mat4 invPV = glm::inverse(projection_view_matrix);
 
-                const vec3 rayStart = camera.position;
+                const vec3 rayStart = camera.get_eye();
                 const vec3 direction = glm::normalize(vec3(invPV * vec4(clicked.x, -clicked.y, 1.0f, 1.0f)));
-                const vec3 rayEnd = rayStart + direction * camera.zFar;
+                const vec3 rayEnd = rayStart + direction * camera.get_far();
                 Ray ray(rayStart, rayEnd);
 
                 const auto intersectionResult = scene.Intersects(ray);
@@ -71,52 +73,54 @@ void Viewer::RenderInternal(Scene& scene) {
         }
     }
 
-    ImVec2 topLeft = GImGui->CurrentWindow->ContentRegionRect.Min;
-    ImVec2 bottomRight(topLeft.x + contentSize.x, topLeft.y + contentSize.y);
+    ImVec2 top_left = GImGui->CurrentWindow->ContentRegionRect.Min;
+    ImVec2 bottom_right(top_left.x + contentSize.x, top_left.y + contentSize.y);
+    ImVec2 top_right = ImVec2(bottom_right.x, top_left.y);
 
-    ImGui::GetWindowDrawList()->AddImage((ImTextureID)g_final_image, topLeft, bottomRight, ImVec2(0, 1), ImVec2(1, 0));
+    ImGui::GetWindowDrawList()->AddImage((ImTextureID)g_final_image, top_left, bottom_right, ImVec2(0, 1), ImVec2(1, 0));
 
+    // draw gizmo
+
+    ImGuizmo::SetOrthographic(false);
+    ImGuizmo::BeginFrame();
+
+    ImGuizmo::SetDrawlist();
+    ImGuizmo::SetRect(top_left.x, top_left.y, contentSize.x, contentSize.y);
+
+    // draw grid
+    mat4 identity(1);
+
+    if (DVAR_GET_BOOL(grid_visibility)) {
+        ImGuizmo::draw_grid(projection_view_matrix, identity, 10.0f);
+    }
+
+    // @TODO: fix
+    auto op = ImGuizmo::ROTATE;
+    // draw gizmo
     if (mpSelected->IsValid()) {
         TransformComponent* transform = scene.get_component<TransformComponent>(*mpSelected);
 
-        auto op = ImGuizmo::ROTATE;
         if (transform) {
-            mat4 local = transform->GetLocalMatrix();
-            Box2 rect(canvasMinToScreen, canvasMinToScreen + contentSize);
-            gizmo_control(op, gCamera.View(), gCamera.Proj(), rect, local);
-            transform->SetLocalTransform(local);
+            auto objComponent = scene.get_component<ObjectComponent>(*mpSelected);
+            if (objComponent) {
+                auto meshComponent = scene.get_component<MeshComponent>(objComponent->meshID);
+                DEV_ASSERT(meshComponent);
+                AABB aabb = meshComponent->mLocalBound;
+                aabb.apply_matrix(transform->get_world_matrix());
+
+                const mat4 M = glm::translate(mat4(1), aabb.center()) * glm::scale(mat4(1), aabb.size());
+                ImGuizmo::draw_box_wireframe(projection_view_matrix, M);
+            }
+
+            mat4 local = transform->get_local_matrix();
+
+            ImGuizmo::Manipulate(glm::value_ptr(view_matrix), glm::value_ptr(projection_matrix), op, ImGuizmo::WORLD, glm::value_ptr(local), nullptr, nullptr, nullptr, nullptr);
+
+            transform->set_local_transform(local);
         }
     }
-}
 
-static void camera_control(Camera& camera) {
-    constexpr float VIEW_SPEED = 2.0f;
-    float CAMERA_SPEED = 0.15f;
-
-    if (Input::IsKeyDown(EKeyCode::LEFT_SHIFT)) CAMERA_SPEED *= 3.f;
-
-    int x = Input::IsKeyDown(EKeyCode::D) - Input::IsKeyDown(EKeyCode::A);
-    int z = Input::IsKeyDown(EKeyCode::W) - Input::IsKeyDown(EKeyCode::S);
-    int y = Input::IsKeyDown(EKeyCode::E) - Input::IsKeyDown(EKeyCode::Q);
-
-    if (x != 0 || z != 0) {
-        vec3 w = camera.direction();
-        vec3 u = glm::cross(w, vec3(0, 1, 0));
-        vec3 translation = (CAMERA_SPEED * z) * w + (CAMERA_SPEED * x) * u;
-        camera.position += translation;
-    }
-
-    camera.position.y += (CAMERA_SPEED * y);
-
-    int yaw = Input::IsKeyDown(EKeyCode::RIGHT) - Input::IsKeyDown(EKeyCode::LEFT);
-    int pitch = Input::IsKeyDown(EKeyCode::UP) - Input::IsKeyDown(EKeyCode::DOWN);
-
-    if (yaw) {
-        camera.yaw += VIEW_SPEED * yaw;
-    }
-
-    if (pitch) {
-        camera.pitch += VIEW_SPEED * pitch;
-        camera.pitch = glm::clamp(camera.pitch, -80.0f, 80.0f);
-    }
+    // view cube
+    const float size = 120.f;
+    ImGuizmo::ViewManipulate((float*)&view_matrix[0].x, 10.0f, ImVec2(top_right.x - size, top_right.y), ImVec2(size, size), IM_COL32(64, 64, 64, 96));
 }

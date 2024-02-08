@@ -144,9 +144,9 @@ public:                                                                         
     ecs::Entity create_material_entity(const std::string& name);
 
     ecs::Entity create_camera_entity(const std::string& name, float width, float height,
-                                     float nearPlane = CameraComponent::DEFAULT_ZNEAR,
-                                     float farPlane = CameraComponent::DEFAULT_ZFAR,
-                                     float fovy = CameraComponent::DEFAULT_FOVY);
+                                     float nearPlane = CameraComponent::kDefaultNear,
+                                     float farPlane = CameraComponent::kDefaultFar,
+                                     float fovy = CameraComponent::kDefaultFov);
 
     ecs::Entity create_pointlight_entity(const std::string& name, const vec3& position, const vec3& color = vec3(1),
                                          const float energy = 10.0f);
@@ -180,7 +180,9 @@ public:                                                                         
     void update_armature(jobsystem::Context& ctx);
 
     // @TODO: fix
-    void RunCameraUpdateSystem();
+    void update_camera(jobsystem::Context& ctx);
+
+    CameraComponent& get_main_camera();
 
     struct RayIntersectionResult {
         ecs::Entity entity;

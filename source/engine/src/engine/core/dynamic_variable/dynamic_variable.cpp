@@ -2,6 +2,9 @@
 
 #include "core/io/archive.h"
 
+// @TODO: move to somewhere else
+#include "common_dvars.h"
+
 namespace vct {
 
 static constexpr const char* DVAR_CACHE_FILE = "dynamic_variables.cache";
@@ -221,11 +224,20 @@ void DynamicVariable::print_value_change(std::string_view source) {
         case VARIANT_TYPE_VEC2:
             value_string = std::format("{},{}", m_vec.x, m_vec.y);
             break;
+        case VARIANT_TYPE_IVEC2:
+            value_string = std::format("{},{}", m_ivec.x, m_ivec.y);
+            break;
         case VARIANT_TYPE_VEC3:
             value_string = std::format("{},{},{}", m_vec.x, m_vec.y, m_vec.z);
             break;
+        case VARIANT_TYPE_IVEC3:
+            value_string = std::format("{},{},{}", m_ivec.x, m_ivec.y, m_ivec.z);
+            break;
         case VARIANT_TYPE_VEC4:
             value_string = std::format("{},{},{},{}", m_vec.x, m_vec.y, m_vec.z, m_vec.w);
+            break;
+        case VARIANT_TYPE_IVEC4:
+            value_string = std::format("{},{},{},{}", m_ivec.x, m_ivec.y, m_ivec.z, m_ivec.w);
             break;
         default:
             break;
@@ -254,12 +266,15 @@ void DynamicVariable::register_dvar(std::string_view key, DynamicVariable* dvar)
     s_map.insert(std::make_pair(keyStr, dvar));
 }
 
+// @TODO: move it to somewhere else
 void DynamicVariable::serialize() {
     Archive writer;
     if (auto res = writer.open_write(DVAR_CACHE_FILE); !res) {
         LOG_ERROR("{}", res.error().get_message());
         return;
     }
+
+    LOG("[dvar] serializing dvars");
 
     std::vector<DynamicVariable*> dvars;
     dvars.reserve(s_map.size());
@@ -277,11 +292,17 @@ void DynamicVariable::serialize() {
         writer << dvar->m_debug_name;
         writer << dvar->m_string;
         writer.write(dvar->m_vec);
+        // @TODO: better infomation
         LOG_VERBOSE("dvar {} serialized.", dvar->m_debug_name);
     }
 }
 
 void DynamicVariable::deserialize() {
+    if (DVAR_GET_BOOL(delete_dvar_cache)) {
+        std::filesystem::remove(DVAR_CACHE_FILE);
+        return;
+    }
+
     Archive reader;
     if (auto res = reader.open_read(DVAR_CACHE_FILE); !res) {
         if (res.error().get_value() != ERR_FILE_NOT_FOUND) {
@@ -289,6 +310,8 @@ void DynamicVariable::deserialize() {
         }
         return;
     }
+
+    LOG("[dvar] deserializing dvars");
 
     size_t count = 0;
 
@@ -304,11 +327,13 @@ void DynamicVariable::deserialize() {
             return;
         }
 
-        DEV_ASSERT(dvar->m_flags & DVAR_FLAG_SERIALIZE);
         reader >> dvar->m_string;
         reader.read(dvar->m_vec);
 
-        dvar->print_value_change("cache");
+        if (dvar->m_flags & DVAR_FLAG_DESERIALIZE) {
+            // @TODO: better infomation
+            dvar->print_value_change("cache");
+        }
     }
 }
 

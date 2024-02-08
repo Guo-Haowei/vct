@@ -79,8 +79,11 @@ int Application::Run(int, const char**) {
         DisplayServer::singleton().present();
 
         ImGui::EndFrame();
+
+        Input::EndFrame();
     }
 
+    // @TODO: fix
     auto [w, h] = DisplayServer::singleton().get_frame_size();
     DVAR_SET_IVEC2(window_resolution, w, h);
     auto [x, y] = DisplayServer::singleton().get_window_pos();

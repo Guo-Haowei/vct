@@ -243,8 +243,6 @@ void RenderingServer::createGpuResources() {
         gl::MakeTextureResident(g_gbuffer_rt.get_color_attachment(2));
 
     g_constantCache.Update();
-
-    // on_scene_change();
 }
 
 // void MainRenderer::visualizeVoxels() {
@@ -305,7 +303,7 @@ void RenderingServer::renderToVoxelTexture() {
         DEV_ASSERT(scene.contains<MeshComponent>(obj.meshID));
         const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
 
-        const mat4& M = transform.GetWorldMatrix();
+        const mat4& M = transform.get_world_matrix();
         g_perBatchCache.cache.Model = M;
         g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
         g_perBatchCache.Update();
@@ -320,8 +318,7 @@ void RenderingServer::renderToVoxelTexture() {
             FillMaterialCB(matData, g_materialCache.cache);
             g_materialCache.Update();
 
-            glDrawElements(GL_TRIANGLES, subset.indexCount, GL_UNSIGNED_INT,
-                           (void*)(subset.indexOffset * sizeof(uint32_t)));
+            glDrawElements(GL_TRIANGLES, subset.indexCount, GL_UNSIGNED_INT, (void*)(subset.indexOffset * sizeof(uint32_t)));
         }
     }
 
@@ -386,7 +383,6 @@ void RenderingServer::render() {
         glClearColor(.1f, .1f, .1f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderFrameBufferTextures(frameW, frameH);
-        R_DrawEditor();
         g_viewer_rt.unbind();
     }
 }

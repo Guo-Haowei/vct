@@ -5,21 +5,138 @@
 
 namespace vct {
 
-void HierarchyComponent::Serialize(Archive& archive) { mParent.Serialize(archive); }
+//--------------------------------------------------------------------------------------------------
+// TransformComponent
+//--------------------------------------------------------------------------------------------------
+mat4 TransformComponent::get_local_matrix() const {
+    mat4 rotationMatrix = glm::toMat4(quat(m_rotation.w, m_rotation.x, m_rotation.y, m_rotation.z));
+    mat4 translationMatrix = glm::translate(m_translation);
+    mat4 scaleMatrix = glm::scale(m_scale);
+    return translationMatrix * rotationMatrix * scaleMatrix;
+}
 
-void ObjectComponent::Serialize(Archive& archive) { meshID.Serialize(archive); }
+void TransformComponent::update_transform() {
+    if (is_dirty()) {
+        set_dirty(false);
+        m_world_matrix = get_local_matrix();
+    }
+}
 
-void AnimationComponent::Serialize(Archive& archive) {
+void TransformComponent::scale(const vec3& scale) {
+    set_dirty();
+    m_scale.x *= scale.x;
+    m_scale.y *= scale.y;
+    m_scale.z *= scale.z;
+}
+
+void TransformComponent::translate(const vec3& translation) {
+    set_dirty();
+    m_translation.x += translation.x;
+    m_translation.y += translation.y;
+    m_translation.z += translation.z;
+}
+
+void TransformComponent::rotate(const vec3& euler) {
+    set_dirty();
+    glm::quat quaternion(m_rotation.w, m_rotation.x, m_rotation.y, m_rotation.z);
+    quaternion = glm::quat(euler) * quaternion;
+
+    m_rotation.x = quaternion.x;
+    m_rotation.y = quaternion.y;
+    m_rotation.z = quaternion.z;
+    m_rotation.w = quaternion.w;
+}
+
+void TransformComponent::set_local_transform(const mat4& matrix) {
+    set_dirty();
+    Decompose(matrix, m_scale, m_rotation, m_translation);
+}
+
+void TransformComponent::matrix_transform(const mat4& matrix) {
+    set_dirty();
+    Decompose(matrix * get_local_matrix(), m_scale, m_rotation, m_translation);
+}
+
+void TransformComponent::update_transform_parented(const TransformComponent& parent) {
+    CRASH_NOW();
+    mat4 worldMatrix = get_local_matrix();
+    const mat4& worldMatrixParent = parent.m_world_matrix;
+    m_world_matrix = worldMatrixParent * worldMatrix;
+}
+
+void TransformComponent::serialize(Archive& archive) {
+    if (archive.is_write_mode()) {
+        archive << m_flags;
+        archive << m_scale;
+        archive << m_translation;
+        archive << m_rotation;
+    } else {
+        archive >> m_flags;
+        archive >> m_scale;
+        archive >> m_translation;
+        archive >> m_rotation;
+        set_dirty();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+// CameraComponent
+//--------------------------------------------------------------------------------------------------
+void CameraComponent::update() {
+    // @TODO: check size
+    // if (is_dirty())
+    {
+        const float aspect = m_width / m_height;
+        m_view_matrix = glm::lookAt(m_eye, m_center, vec3(0, 1, 0));
+        m_projection_matrix = glm::perspective(m_fovy, aspect, m_near, m_far);
+        m_projection_view_matrix = m_projection_matrix * m_view_matrix;
+        set_dirty(false);
+    }
+}
+
+void CameraComponent::set_dimension(float width, float height) {
+    if (m_width != width || m_height != height) {
+        m_width = width;
+        m_height = height;
+        set_dirty();
+    }
+}
+
+void CameraComponent::serialize(Archive& archive) {
+    if (archive.is_write_mode()) {
+        archive << m_flags;
+        archive << m_near;
+        archive << m_far;
+        archive << m_fovy;
+        archive << m_width;
+        archive << m_height;
+    } else {
+        archive >> m_flags;
+        archive >> m_near;
+        archive >> m_far;
+        archive >> m_fovy;
+        archive >> m_width;
+        archive >> m_height;
+
+        set_dirty();
+    }
+}
+
+void HierarchyComponent::serialize(Archive& archive) { mParent.serialize(archive); }
+
+void ObjectComponent::serialize(Archive& archive) { meshID.serialize(archive); }
+
+void AnimationComponent::serialize(Archive& archive) {
     unused(archive);
     CRASH_NOW_MSG("NOT IMPLMENTED");
 }
 
-void ArmatureComponent::Serialize(Archive& archive) {
+void ArmatureComponent::serialize(Archive& archive) {
     unused(archive);
     CRASH_NOW_MSG("NOT IMPLMENTED");
 }
 
-void RigidBodyPhysicsComponent::Serialize(Archive& archive) {
+void RigidBodyPhysicsComponent::serialize(Archive& archive) {
     if (archive.is_write_mode()) {
         archive << shape;
         archive << param;
@@ -31,45 +148,7 @@ void RigidBodyPhysicsComponent::Serialize(Archive& archive) {
     }
 }
 
-mat4 CameraComponent::CalculateViewMatrix() const { return glm::lookAt(eye, center, glm::normalize(vec3(0, 1, 0))); }
-
-void CameraComponent::UpdateCamera() {
-    const float aspect = width / height;
-    projMatrix = glm::perspective(fovy, aspect, zNear, zFar);
-
-    if (IsDirty()) {
-        viewMatrix = CalculateViewMatrix();
-        SetDirty(false);
-    }
-}
-
-void CameraComponent::Serialize(Archive& archive) {
-    if (archive.is_write_mode()) {
-        archive << flags;
-        archive << zNear;
-        archive << zFar;
-        archive << fovy;
-        archive << width;
-        archive << height;
-
-        archive << center;
-        archive << eye;
-    } else {
-        archive >> flags;
-        archive >> zNear;
-        archive >> zFar;
-        archive >> fovy;
-        archive >> width;
-        archive >> height;
-
-        archive >> center;
-        archive >> eye;
-
-        SetDirty();
-    }
-}
-
-void LightComponent::Serialize(Archive& archive) {
+void LightComponent::serialize(Archive& archive) {
     (void)archive;
     // if (archive.is_write_mode())
     // {
@@ -85,7 +164,7 @@ void LightComponent::Serialize(Archive& archive) {
     // }
 }
 
-void MaterialComponent::Serialize(Archive& archive) {
+void MaterialComponent::serialize(Archive& archive) {
     if (archive.is_write_mode()) {
         archive << mMetallic;
         archive << mRoughness;
@@ -184,8 +263,8 @@ std::vector<char> MeshComponent::GenerateCombinedBuffer() const {
     return result;
 }
 
-void MeshComponent::MeshSubset::Serialize(Archive& archive) {
-    materialID.Serialize(archive);
+void MeshComponent::MeshSubset::serialize(Archive& archive) {
+    materialID.serialize(archive);
     if (archive.is_write_mode()) {
         archive << indexOffset;
         archive << indexCount;
@@ -197,7 +276,7 @@ void MeshComponent::MeshSubset::Serialize(Archive& archive) {
     }
 }
 
-void MeshComponent::Serialize(Archive& archive) {
+void MeshComponent::serialize(Archive& archive) {
 #define SERIALIZE_MESH(OP)   \
     archive OP mIndices;     \
     archive OP mPositions;   \
@@ -219,7 +298,7 @@ void MeshComponent::Serialize(Archive& archive) {
     //    size_t size = mSubsets.size();
     //    archive << size;
     //    for (auto& subset : mSubsets) {
-    //        subset.Serialize(archive);
+    //        subset.serialize(archive);
     //    }
     //} else {
     //    DESERIALIZE();
@@ -228,84 +307,18 @@ void MeshComponent::Serialize(Archive& archive) {
     //    archive >> size;
     //    mSubsets.resize(size);
     //    for (size_t i = 0; i < size; ++i) {
-    //        mSubsets[i].Serialize(archive);
+    //        mSubsets[i].serialize(archive);
     //    }
     //}
 
-    // mArmatureID.Serialize(archive);
+    // mArmatureID.serialize(archive);
 }
 
-void TagComponent::Serialize(Archive& archive) {
+void TagComponent::serialize(Archive& archive) {
     if (archive.is_write_mode()) {
         archive << mTag;
     } else {
         archive >> mTag;
-    }
-}
-
-mat4 TransformComponent::GetLocalMatrix() const {
-    mat4 rotationMatrix = glm::toMat4(quat(mRotation.w, mRotation.x, mRotation.y, mRotation.z));
-    mat4 translationMatrix = glm::translate(mTranslation);
-    mat4 scaleMatrix = glm::scale(mScale);
-    return translationMatrix * rotationMatrix * scaleMatrix;
-}
-
-void TransformComponent::UpdateTransform() {
-    if (IsDirty()) {
-        SetDirty(false);
-        mWorldMatrix = GetLocalMatrix();
-    }
-}
-
-void TransformComponent::Scale(const vec3& scale) {
-    SetDirty();
-    mScale.x *= scale.x;
-    mScale.y *= scale.y;
-    mScale.z *= scale.z;
-}
-
-void TransformComponent::Translate(const vec3& translation) {
-    SetDirty();
-    mTranslation.x += translation.x;
-    mTranslation.y += translation.y;
-    mTranslation.z += translation.z;
-}
-
-void TransformComponent::Rotate(const vec3& euler) {
-    unused(euler);
-    CRASH_NOW_MSG("TODO");
-    SetDirty();
-}
-
-void TransformComponent::SetLocalTransform(const mat4& matrix) {
-    SetDirty();
-    Decompose(matrix, mScale, mRotation, mTranslation);
-}
-
-void TransformComponent::MatrixTransform(const mat4& matrix) {
-    SetDirty();
-    Decompose(matrix * GetLocalMatrix(), mScale, mRotation, mTranslation);
-}
-
-void TransformComponent::UpdateTransform_Parented(const TransformComponent& parent) {
-    CRASH_NOW();
-    mat4 worldMatrix = GetLocalMatrix();
-    const mat4& worldMatrixParent = parent.mWorldMatrix;
-    mWorldMatrix = worldMatrixParent * worldMatrix;
-}
-
-void TransformComponent::Serialize(Archive& archive) {
-    if (archive.is_write_mode()) {
-        archive << mFlags;
-        archive << mScale;
-        archive << mTranslation;
-        archive << mRotation;
-    } else {
-        archive >> mFlags;
-        archive >> mScale;
-        archive >> mTranslation;
-        archive >> mRotation;
-        SetDirty();
     }
 }
 

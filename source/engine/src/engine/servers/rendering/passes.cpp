@@ -6,7 +6,6 @@
 #include "servers/display_server.h"
 
 // @TODO: refactor
-#include "Core/camera.h"
 #include "Framework/ProgramManager.h"
 #include "r_cbuffers.h"
 #include "scene/scene_manager.h"
@@ -137,7 +136,7 @@ static void shadow_pass_func() {
             DEV_ASSERT(scene.contains<MeshComponent>(obj.meshID));
             const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
 
-            const mat4& M = transform.GetWorldMatrix();
+            const mat4& M = transform.get_world_matrix();
             AABB aabb = mesh.mLocalBound;
             aabb.apply_matrix(M);
             if (!frustum.intersects(aabb)) {
@@ -168,7 +167,9 @@ static void gbuffer_pass_func() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    Frustum frustum(gCamera.ProjView());
+    CameraComponent& camera = scene.get_main_camera();
+
+    Frustum frustum(camera.get_projection_view_matrix());
 
     const uint32_t numObjects = (uint32_t)scene.get_count<ObjectComponent>();
     for (uint32_t i = 0; i < numObjects; ++i) {
@@ -179,7 +180,7 @@ static void gbuffer_pass_func() {
         DEV_ASSERT(scene.contains<MeshComponent>(obj.meshID));
         const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
 
-        const mat4& M = transform.GetWorldMatrix();
+        const mat4& M = transform.get_world_matrix();
         AABB aabb = mesh.mLocalBound;
         aabb.apply_matrix(M);
         if (!frustum.intersects(aabb)) {

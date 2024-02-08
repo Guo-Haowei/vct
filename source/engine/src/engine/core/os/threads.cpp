@@ -1,8 +1,10 @@
 #include "threads.h"
 
-#include <thread>
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+
+#include <latch>
+#include <thread>
 
 #include "assets/asset_loader.h"
 #include "core/io/print.h"
@@ -35,17 +37,20 @@ static struct
     };
 } s_glob;
 
-auto initialize() -> void {
+bool initialize() {
     g_thread_id = THREAD_MAIN;
+
+    std::latch latch{ THREAD_MAX - 1 };
 
     for (uint32_t id = THREAD_MAIN + 1; id < THREAD_MAX; ++id) {
         ThreadObject& thread = s_glob.threads[id];
         thread.id = id;
         thread.thread = std::thread(
-            [](ThreadObject* object) {
+            [&](ThreadObject* object) {
                 // set thread id
                 g_thread_id = object->id;
 
+                latch.count_down();
                 // @TODO: wait for everything to be initialized before running
                 LOG_VERBOSE("[threads] thread '{}'(id: {}) starts.", object->name, object->id);
                 object->thread_func();
@@ -64,6 +69,9 @@ auto initialize() -> void {
         HRESULT hr = SetThreadDescription(handle, wname.c_str());
         DEV_ASSERT(!FAILED(hr));
     }
+
+    latch.wait();
+    return true;
 }
 
 void finailize() {

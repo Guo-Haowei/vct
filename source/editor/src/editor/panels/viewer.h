@@ -1,4 +1,5 @@
 #pragma once
+#include "camera_controller.h"
 #include "panel.h"
 
 class Viewer : public Panel {

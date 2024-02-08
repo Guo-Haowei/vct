@@ -72,7 +72,7 @@ public:
 
     virtual void Merge(IComponentManager& other) override { Merge((ComponentManager<T>&)other); }
 
-    // virtual void Serialize(wi::Archive& archive, EntitySerializer& seri) = 0;
+    // virtual void serialize(wi::Archive& archive, EntitySerializer& seri) = 0;
     // virtual void Component_Serialize(Entity entity, wi::Archive& archive, EntitySerializer& seri) = 0;
     virtual void Remove(const Entity& entity) override {
         vct::unused(entity);
@@ -150,16 +150,16 @@ public:
 
     T& operator[](size_t idx) { return get_component(idx); }
 
-    void Serialize(Archive& archive) {
+    void serialize(Archive& archive) {
         size_t count;
         if (archive.is_write_mode()) {
             count = static_cast<uint32_t>(mComponentArray.size());
             archive << count;
             for (auto& component : mComponentArray) {
-                component.Serialize(archive);
+                component.serialize(archive);
             }
             for (auto& entity : mEntityArray) {
-                entity.Serialize(archive);
+                entity.serialize(archive);
             }
         } else {
             Clear();
@@ -167,10 +167,10 @@ public:
             mComponentArray.resize(count);
             mEntityArray.resize(count);
             for (size_t i = 0; i < count; ++i) {
-                mComponentArray[i].Serialize(archive);
+                mComponentArray[i].serialize(archive);
             }
             for (size_t i = 0; i < count; ++i) {
-                mEntityArray[i].Serialize(archive);
+                mEntityArray[i].serialize(archive);
                 mLookup[mEntityArray[i]] = i;
             }
         }

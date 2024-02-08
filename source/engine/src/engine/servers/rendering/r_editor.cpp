@@ -14,8 +14,6 @@ struct VertexPoint3D {
     vec3 color;
 };
 
-static MeshData g_boxWireFrame;
-static MeshData g_gridWireFrame;
 static MeshData g_imageBuffer;
 
 struct TextureVertex {
@@ -36,43 +34,11 @@ static void CreateImageBuffer() {
     glBindVertexArray(0);
 }
 
-static void CreateBoxWireFrameData() {
-    std::vector<VertexPoint3D> vertices;
-    const MeshComponent box = MakeBoxWireFrame();
-    vertices.reserve(box.mPositions.size());
-    for (const vec3& pos : box.mPositions) {
-        vertices.emplace_back(VertexPoint3D{ pos, vec3(1) });
-    }
-
-    MeshData& mesh = g_boxWireFrame;
-
-    glGenVertexArrays(1, &mesh.vao);
-    glGenBuffers(2, &mesh.ebo);
-    glBindVertexArray(mesh.vao);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.ebo);
-    glBindBuffer(GL_ARRAY_BUFFER, mesh.vbos[0]);
-
-    gl::NamedBufferStorage(mesh.vbos[0], vertices);
-    gl::NamedBufferStorage(mesh.ebo, box.mIndices);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexPoint3D), (void*)0);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexPoint3D), (void*)(sizeof(vec3)));
-    glEnableVertexAttribArray(1);
-
-    glBindVertexArray(0);
-
-    g_boxWireFrame.count = uint32_t(box.mIndices.size());
-}
-
 void R_CreateEditorResource() {
-    CreateBoxWireFrameData();
     CreateImageBuffer();
 }
 
 void R_DestroyEditorResource() {
-    glDeleteVertexArrays(1, &g_boxWireFrame.vao);
-    glDeleteBuffers(2, &g_boxWireFrame.ebo);
 }
 
 static inline void FillTextureIconBuffer(std::vector<TextureVertex>& iconBuffer, const vec2& offset, float aspect) {
@@ -93,42 +59,4 @@ static inline void FillTextureIconBuffer(std::vector<TextureVertex>& iconBuffer,
         vertex.pos += offset;
         iconBuffer.emplace_back(vertex);
     }
-}
-
-// draw grid, bounding box, ui
-void R_DrawEditor() {
-    glDisable(GL_DEPTH_TEST);
-    const Scene& scene = SceneManager::get_scene();
-    auto selected = scene.m_selected;
-    if (selected.IsValid()) {
-        auto transformComponent = scene.get_component<TransformComponent>(selected);
-        DEV_ASSERT(transformComponent);
-        auto objComponent = scene.get_component<ObjectComponent>(selected);
-        if (objComponent) {
-            DEV_ASSERT(objComponent);
-            auto meshComponent = scene.get_component<MeshComponent>(objComponent->meshID);
-            DEV_ASSERT(meshComponent);
-            AABB aabb = meshComponent->mLocalBound;
-            aabb.apply_matrix(transformComponent->GetWorldMatrix());
-
-            const mat4 M = glm::translate(mat4(1), aabb.center()) * glm::scale(mat4(1), aabb.size());
-
-            gProgramManager->GetShaderProgram(ProgramType::LINE3D).Bind();
-            glBindVertexArray(g_boxWireFrame.vao);
-            g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
-            g_perBatchCache.cache.Model = mat4(1);
-            g_perBatchCache.Update();
-            glDrawElements(GL_LINES, g_boxWireFrame.count, GL_UNSIGNED_INT, 0);
-        }
-    }
-
-    // AABB aabb(vec3(-1), vec3(1));
-    // const mat4 M = glm::translate(mat4(1), aabb.center()) * glm::scale(mat4(1), aabb.size());
-
-    // gProgramManager->GetShaderProgram(ProgramType::LINE3D).Bind();
-    // glBindVertexArray(g_boxWireFrame.vao);
-    // g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
-    // g_perBatchCache.cache.Model = mat4(1);
-    // g_perBatchCache.Update();
-    // glDrawElements(GL_LINES, g_boxWireFrame.count, GL_UNSIGNED_INT, 0);
 }

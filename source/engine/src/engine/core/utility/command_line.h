@@ -5,10 +5,11 @@ namespace vct {
 
 enum ParseError {
     OUT_OF_BOUND,
-    INVALID_COMMAND,
 };
 
-using CommandLineFunc = bool (*)(void* user_data, std::span<const char*> command_line);
+class CommandLineParser;
+
+using CommandLineFunc = bool (*)(void* user_data);
 
 struct CommandLineOption {
     std::string_view name;
@@ -29,19 +30,21 @@ public:
 
     auto process_command_line(const CommandLine& command_line) -> std::expected<void, std::string>;
 
-private:
     auto process_next_command() -> std::expected<void, std::string>;
 
-    auto peek() const -> std::expected<std::string_view, ParseError>;
-    auto consume() -> std::expected<std::string_view, ParseError>;
-    auto get_args(uint32_t count) -> std::expected<std::span<const char*>, ParseError>;
+private:
+    bool process_int(DynamicVariable* dvar);
+    bool process_dvar(DynamicVariable* dvar);
+
+    CommandLineOption* find_command(std::string_view option);
+
+    std::string_view peek();
+    std::string_view consume();
 
     CommandLineMap m_command_line_map;
     CommandLineAliasMap m_command_line_alias_map;
     size_t m_cursor;
     CommandLine m_command_line;
 };
-
-bool command_line_set_dvar_func(void* user_data, std::span<const char*> commands);
 
 }  // namespace vct

@@ -18,7 +18,7 @@ enum ThreadID : uint32_t {
     THREAD_MAX,
 };
 
-void initialize();
+bool initialize();
 
 void finailize();
 

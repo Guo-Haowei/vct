@@ -1,7 +1,6 @@
 #include "scene_manager.h"
 
 #include "assets/asset_loader.h"
-#include "core/camera.h"
 #include "imgui/imgui.h"
 #include "servers/rendering/r_cbuffers.h"
 ///
@@ -12,48 +11,43 @@ namespace vct {
 
 SceneManager* g_scene_manager = new SceneManager;
 
-Scene& SceneManager::get_scene() {
-    assert(singleton().m_scene);
-    return *singleton().m_scene;
+bool SceneManager::initialize() {
+    m_revision = 1;
+
+    // create an empty scene
+    {
+        m_scene = new Scene;
+        auto root = m_scene->create_transform_entity("world");
+        m_scene->m_root = root;
+
+        {
+            auto light = m_scene->create_omnilight_entity("omni light", vec3(1), 20.f);
+            auto transform = m_scene->get_component<TransformComponent>(light);
+            DEV_ASSERT(transform);
+            mat4 rx = glm::rotate(glm::radians(10.0f), glm::vec3(1, 0, 0));
+            mat4 rz = glm::rotate(glm::radians(10.0f), glm::vec3(0, 0, 1));
+            transform->set_local_transform(rx * rz);
+
+            m_scene->attach_component(light, root);
+        }
+
+        {
+            auto camera = m_scene->create_camera_entity("camera", 800.0f, 600.0f);
+            m_scene->attach_component(camera);
+        }
+
+        on_scene_changed(m_scene);
+    }
+
+    std::string_view scene_path = DVAR_GET_STRING(scene);
+    if (!scene_path.empty()) {
+        request_scene(scene_path);
+    }
+
+    return true;
 }
 
-// @TODO: move this to loader thread
-void SceneManager::request_scene(std::string_view path) {
-    asset_loader::request_scene(std::string(path), [](void* scene) {
-        DEV_ASSERT(scene);
-        Scene* new_scene = static_cast<Scene*>(scene);
-        SceneManager::singleton().set_loading_scene(new_scene);
-    });
-}
-
-void SceneManager::on_scene_changed(Scene* new_scene) {
-    const int voxelTextureSize = DVAR_GET_INT(r_voxelSize);
-    DEV_ASSERT(is_power_of_two(voxelTextureSize));
-    DEV_ASSERT(voxelTextureSize <= 256);
-
-    Camera& camera = gCamera;
-
-    const vec4 cascades = DVAR_GET_VEC4(cam_cascades);
-
-    camera.fovy = glm::radians(DVAR_GET_FLOAT(cam_fov));
-    camera.zNear = cascades[0];
-    camera.zFar = cascades[3];
-
-    camera.yaw = glm::radians(180.0f);
-    camera.pitch = 0.0f;
-    camera.position = DVAR_GET_VEC3(cam_pos);
-
-    const vec3 center = new_scene->m_bound.center();
-    const vec3 size = new_scene->m_bound.size();
-    const float worldSize = glm::max(size.x, glm::max(size.y, size.z));
-    const float texelSize = 1.0f / static_cast<float>(voxelTextureSize);
-    const float voxelSize = worldSize * texelSize;
-
-    g_perFrameCache.cache.WorldCenter = center;
-    g_perFrameCache.cache.WorldSizeHalf = 0.5f * worldSize;
-    g_perFrameCache.cache.TexelSize = texelSize;
-    g_perFrameCache.cache.VoxelSize = voxelSize;
-}
+void SceneManager::finalize() {}
 
 // @TODO: fix
 static mat4 R_HackLightSpaceMatrix(const vec3& lightDir) {
@@ -66,23 +60,25 @@ static mat4 R_HackLightSpaceMatrix(const vec3& lightDir) {
     return P * V;
 }
 
-static void R_LightSpaceMatrix(const Camera& camera, const vec3& lightDir, mat4 lightPVs[NUM_CASCADES]) {
-    unused(camera);
-    lightPVs[0] = lightPVs[1] = lightPVs[2] = R_HackLightSpaceMatrix(lightDir);
-    return;
-}
+void SceneManager::update(float dt) {
+    Scene* new_scene = m_loading_scene.load();
+    if (new_scene) {
+        m_scene->merge(*new_scene);
+        delete new_scene;
+        m_loading_scene.store(nullptr);
+        on_scene_changed(m_scene);
+        ++m_revision;
+    }
 
-static void Com_UpdateWorld() {
     Scene& scene = SceneManager::get_scene();
 
-    // update camera
     auto [frameW, frameH] = DisplayServer::singleton().get_frame_size();
-    const float aspect = (float)frameW / frameH;
-    DEV_ASSERT(aspect > 0.0f);
 
-    Camera& camera = gCamera;
-    camera.SetAspect(aspect);
-    camera.UpdatePV();
+    DEV_ASSERT(frameW > 0 && frameH > 0);
+    CameraComponent& camera = scene.get_main_camera();
+    camera.set_dimension((float)frameW, (float)frameH);
+
+    scene.update(dt);
 
     DEV_ASSERT(scene.get_count<LightComponent>());
     const LightComponent& light_component = scene.get_component_array<LightComponent>()[0];
@@ -90,24 +86,21 @@ static void Com_UpdateWorld() {
     const TransformComponent* light_transform = scene.get_component<TransformComponent>(light_entity);
     DEV_ASSERT(light_transform);
 
-    vec3 light_dir = light_transform->GetLocalMatrix() * vec4(0, 1, 0, 0);
+    vec3 light_dir = light_transform->get_local_matrix() * vec4(0, 1, 0, 0);
 
     // update lightspace matrices
-    mat4 lightPVs[NUM_CASCADES];
-    R_LightSpaceMatrix(camera, light_dir, lightPVs);
-
-    for (size_t idx = 0; idx < vct::array_length(lightPVs); ++idx) {
-        g_perFrameCache.cache.LightPVs[idx] = lightPVs[idx];
-    }
+    mat4 lightPV = R_HackLightSpaceMatrix(light_dir);
+    g_perFrameCache.cache.LightPVs[0] = g_perFrameCache.cache.LightPVs[1] = g_perFrameCache.cache.LightPVs[2] = lightPV;
 
     // update constants
     g_perFrameCache.cache.SunDir = light_dir;
     g_perFrameCache.cache.LightColor = light_component.color * light_component.energy;
-    g_perFrameCache.cache.CamPos = camera.position;
-    g_perFrameCache.cache.View = camera.View();
-    g_perFrameCache.cache.Proj = camera.Proj();
-    g_perFrameCache.cache.PV = camera.ProjView();
-    g_perFrameCache.cache.CascadedClipZ = DVAR_GET_VEC4(cam_cascades);
+
+    g_perFrameCache.cache.CamPos = camera.get_eye();
+    g_perFrameCache.cache.View = camera.get_view_matrix();
+    g_perFrameCache.cache.Proj = camera.get_projection_matrix();
+    g_perFrameCache.cache.PV = camera.get_projection_view_matrix();
+
     g_perFrameCache.cache.EnableGI = DVAR_GET_BOOL(r_enableVXGI);
     g_perFrameCache.cache.DebugCSM = DVAR_GET_BOOL(r_debugCSM);
     g_perFrameCache.cache.DebugTexture = DVAR_GET_INT(r_debugTexture);
@@ -125,48 +118,34 @@ static void Com_UpdateWorld() {
     g_perFrameCache.cache.EnableFXAA = DVAR_GET_BOOL(r_enableFXAA);
 }
 
-bool SceneManager::initialize() {
-    m_revision = 1;
-
-    // make a simple scene
-    {
-        m_scene = new Scene;
-        auto root = m_scene->create_transform_entity("world");
-        m_scene->m_root = root;
-        auto light = m_scene->create_omnilight_entity("omni light", vec3(1), 20.f);
-        m_scene->attach_component(light, root);
-        auto transform = m_scene->get_component<TransformComponent>(light);
-        DEV_ASSERT(transform);
-        mat4 rx = glm::rotate(glm::radians(10.0f), glm::vec3(1, 0, 0));
-        mat4 rz = glm::rotate(glm::radians(10.0f), glm::vec3(0, 0, 1));
-        transform->SetLocalTransform(rx * rz);
-    }
-
-    std::string_view scene_path = DVAR_GET_STRING(scene);
-
-    if (!scene_path.empty()) {
-        request_scene(scene_path);
-    }
-
-    return true;
+void SceneManager::request_scene(std::string_view path) {
+    asset_loader::request_scene(std::string(path), [](void* scene) {
+        DEV_ASSERT(scene);
+        Scene* new_scene = static_cast<Scene*>(scene);
+        SceneManager::singleton().set_loading_scene(new_scene);
+    });
 }
 
-void SceneManager::finalize() {}
+void SceneManager::on_scene_changed(Scene* new_scene) {
+    const int voxelTextureSize = DVAR_GET_INT(r_voxelSize);
+    DEV_ASSERT(is_power_of_two(voxelTextureSize));
+    DEV_ASSERT(voxelTextureSize <= 256);
 
-void SceneManager::update(float dt) {
-    Scene* new_scene = m_loading_scene.load();
-    if (new_scene) {
-        m_scene->merge(*new_scene);
-        delete new_scene;
-        m_loading_scene.store(nullptr);
-        // @TODO: bump revision
+    const vec3 center = new_scene->m_bound.center();
+    const vec3 size = new_scene->m_bound.size();
+    const float worldSize = glm::max(size.x, glm::max(size.y, size.z));
+    const float texelSize = 1.0f / static_cast<float>(voxelTextureSize);
+    const float voxelSize = worldSize * texelSize;
 
-        on_scene_changed(m_scene);
-        ++m_revision;
-    }
+    g_perFrameCache.cache.WorldCenter = center;
+    g_perFrameCache.cache.WorldSizeHalf = 0.5f * worldSize;
+    g_perFrameCache.cache.TexelSize = texelSize;
+    g_perFrameCache.cache.VoxelSize = voxelSize;
+}
 
-    Com_UpdateWorld();
-    SceneManager::get_scene().update(dt);
+Scene& SceneManager::get_scene() {
+    assert(singleton().m_scene);
+    return *singleton().m_scene;
 }
 
 }  // namespace vct
