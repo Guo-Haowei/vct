@@ -97,9 +97,9 @@ void SceneManager::update(float dt) {
     g_perFrameCache.cache.LightColor = light_component.color * light_component.energy;
 
     g_perFrameCache.cache.CamPos = camera.get_eye();
-    g_perFrameCache.cache.View = camera.get_view_matrix();
-    g_perFrameCache.cache.Proj = camera.get_projection_matrix();
-    g_perFrameCache.cache.PV = camera.get_projection_view_matrix();
+    g_perFrameCache.cache.c_view_matrix = camera.get_view_matrix();
+    g_perFrameCache.cache.c_projection_matrix = camera.get_projection_matrix();
+    g_perFrameCache.cache.c_projection_view_matrix = camera.get_projection_view_matrix();
 
     g_perFrameCache.cache.EnableGI = DVAR_GET_BOOL(r_enableVXGI);
     g_perFrameCache.cache.DebugCSM = DVAR_GET_BOOL(r_debugCSM);

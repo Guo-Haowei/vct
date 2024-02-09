@@ -19,7 +19,7 @@ static std::vector<std::shared_ptr<MaterialData>> g_materialdata;
 
 static GLuint g_noiseTexture;
 
-extern void FillMaterialCB(const MaterialData* mat, MaterialCB& cb);
+extern void FillMaterialCB(const MaterialData* mat, MaterialConstantBuffer& cb);
 
 namespace vct {
 
@@ -301,8 +301,8 @@ void RenderingServer::renderToVoxelTexture() {
         const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
 
         const mat4& M = transform.get_world_matrix();
-        g_perBatchCache.cache.Model = M;
-        g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
+        g_perBatchCache.cache.c_model_matrix = M;
+        g_perBatchCache.cache.c_projection_view_model_matrix = g_perFrameCache.cache.c_projection_view_matrix * M;
         g_perBatchCache.Update();
 
         const MeshData* drawData = reinterpret_cast<MeshData*>(mesh.gpuResource);

@@ -7,14 +7,12 @@ namespace vct {
 // @TODO: fix names
 enum class ProgramType {
     IMAGE2D,
-    LINE3D,
     SHADOW,
     GBUFFER,
     SSAO,
     VCT_DEFERRED,
     FXAA,
     Voxel,
-    Visualization,
     VoxelPost,
     DebugTexture,
     COUNT,

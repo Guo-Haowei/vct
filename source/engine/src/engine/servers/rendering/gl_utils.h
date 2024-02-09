@@ -55,7 +55,7 @@ struct ConstantBuffer {
         mHandle = 0;
     }
 
-    void CreateAndBind(int slot) { mHandle = CreateAndBindConstantBuffer(slot, sizeof(T)); }
+    void CreateAndBind() { mHandle = CreateAndBindConstantBuffer(cache.get_slot(), sizeof(T)); }
 
     void Update() { UpdateConstantBuffer(mHandle, &cache, sizeof(T)); }
 

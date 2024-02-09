@@ -6,6 +6,7 @@
 #include "core/dynamic_variable/common_dvars.h"
 #include "core/input/input.h"
 #include "core/systems/job_system.h"
+#include "core/utility/timer.h"
 #include "scene/scene_manager.h"
 #include "servers/display_server.h"
 #include "servers/rendering_server.h"
@@ -20,19 +21,27 @@ int Application::Run(int, const char**) {
         LOG("[Runtime] layer '{}' attached!", layer->GetName());
     }
 
-    float dt = 0.0f;
-
     LOG("\n********************************************************************************"
         "\nMain Loop"
         "\n********************************************************************************");
 
+    LOG_WARN("TODO: imgui true font");
+    LOG_WARN("TODO: refactor application");
+    LOG_WARN("TODO: animation");
+    LOG_WARN("TODO: cloth physics");
+    LOG_WARN("TODO: fix TODOs");
+
+    // @TODO: add frame count, elapsed time, etc
+    Timer timer;
     while (!DisplayServer::singleton().should_close()) {
         DisplayServer::singleton().new_frame();
 
         input::begin_frame();
 
-        // @TODO:
+        // @TODO: better elapsed time
+        const float dt = static_cast<float>(timer.get_duration().to_second());
         SceneManager::singleton().update(dt);
+        timer.start();
 
         ImGui::NewFrame();
         for (auto& layer : mLayers) {

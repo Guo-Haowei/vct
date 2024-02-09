@@ -1,9 +1,7 @@
 #include "cbuffer.glsl.h"
 
-layout(location = 0) in vec3 in_position;
-layout(location = 1) in vec3 in_normal;
-layout(location = 2) in vec2 in_uv;
-layout(location = 3) in vec3 in_tangent;
+#define INPUT_POS_NORMAL_UV_TANGENT
+#include "common/vsinput.glsl"
 
 out struct PS_INPUT {
     vec3 position;
@@ -12,14 +10,14 @@ out struct PS_INPUT {
 } ps_in;
 
 void main() {
-    vec4 world_position = Model * vec4(in_position, 1.0);
+    vec4 world_position = c_model_matrix * vec4(in_position, 1.0);
     ps_in.position = world_position.xyz;
-    mat3 rotation = mat3(Model);
+    mat3 rotation = mat3(c_model_matrix);
     vec3 T = normalize(rotation * in_tangent);
     vec3 N = normalize(rotation * in_normal);
     vec3 B = cross(N, T);
 
-    gl_Position = PV * world_position;
+    gl_Position = c_projection_view_matrix * world_position;
     ps_in.uv = in_uv;
     ps_in.TBN = mat3(T, B, N);
 }

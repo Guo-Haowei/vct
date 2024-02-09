@@ -28,7 +28,7 @@ void R_DrawQuad() {
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void FillMaterialCB(const MaterialData *mat, MaterialCB &cb) {
+void FillMaterialCB(const MaterialData *mat, MaterialConstantBuffer &cb) {
     cb.AlbedoColor = mat->albedoColor;
     cb.Metallic = mat->metallic;
     cb.Roughness = mat->roughness;

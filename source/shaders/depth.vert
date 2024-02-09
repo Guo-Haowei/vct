@@ -1,5 +1,8 @@
-layout(location = 0) in vec3 in_position;
-
 #include "cbuffer.glsl.h"
 
-void main() { gl_Position = PVM * vec4(in_position, 1.0); }
+#define INPUT_POS
+#include "common/vsinput.glsl"
+
+void main() {
+    gl_Position = c_projection_view_model_matrix * vec4(in_position, 1.0);
+}

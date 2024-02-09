@@ -58,7 +58,7 @@ bool initialize() {
         "shader://depth.frag",
         "shader://fullscreen.vert",
         "shader://fxaa.frag",
-        "shader://gbuffer.vert",
+        "shader://pos_normal_uv_tangent.vert",
         "shader://gbuffer.frag",
         "shader://pbr.glsl",
         "shader://shadow.glsl",
@@ -68,8 +68,6 @@ bool initialize() {
         "shader://debug/texture.frag",
         "shader://editor/image.vert",
         "shader://editor/image.frag",
-        "shader://editor/line3d.vert",
-        "shader://editor/line3d.frag",
     };
 
     for (int i = 0; i < array_length(shaders); ++i) {

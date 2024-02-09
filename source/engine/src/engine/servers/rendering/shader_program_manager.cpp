@@ -139,12 +139,6 @@ bool ShaderProgramManager::initialize() {
     s_shader_cache.resize(static_cast<int>(ProgramType::COUNT));
     {
         ProgramCreateInfo info;
-        info.vs = "shader://editor/line3d.vert";
-        info.ps = "shader://editor/line3d.frag";
-        s_shader_cache[std::to_underlying(ProgramType::LINE3D)] = create(info);
-    }
-    {
-        ProgramCreateInfo info;
         info.vs = "shader://editor/image.vert";
         info.ps = "shader://editor/image.frag";
         s_shader_cache[std::to_underlying(ProgramType::IMAGE2D)] = create(info);
@@ -157,7 +151,7 @@ bool ShaderProgramManager::initialize() {
     }
     {
         ProgramCreateInfo info;
-        info.vs = "shader://gbuffer.vert";
+        info.vs = "shader://pos_normal_uv_tangent.vert";
         info.ps = "shader://gbuffer.frag";
         s_shader_cache[std::to_underlying(ProgramType::GBUFFER)] = create(info);
     }
@@ -191,12 +185,6 @@ bool ShaderProgramManager::initialize() {
         info.gs = "shader://voxel/voxelization.geom";
         info.ps = "shader://voxel/voxelization.frag";
         s_shader_cache[std::to_underlying(ProgramType::Voxel)] = create(info);
-    }
-    {
-        ProgramCreateInfo info;
-        info.vs = "shader://voxel/visualization.vert";
-        info.ps = "shader://voxel/visualization.frag";
-        s_shader_cache[std::to_underlying(ProgramType::Visualization)] = create(info);
     }
     {
         ProgramCreateInfo info;

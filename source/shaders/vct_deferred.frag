@@ -131,7 +131,7 @@ void main() {
 
     float shadow = 0.0;
 #if ENABLE_CSM
-    // float clipSpaceZ = ( PV * worldPos ).z;
+    // float clipSpaceZ = ( c_projection_view_matrix * worldPos ).z;
     // for ( int idx = 0; idx < NUM_CASCADES; ++idx )
     // {
     //     if ( clipSpaceZ <= CascadedClipZ[idx + 1] )

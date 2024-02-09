@@ -107,7 +107,7 @@ void create_passes() {
 void destroy_passes() {
 }
 
-extern void FillMaterialCB(const MaterialData* mat, MaterialCB& cb);
+extern void FillMaterialCB(const MaterialData* mat, MaterialConstantBuffer& cb);
 
 static void shadow_pass_func() {
     const vct::Scene& scene = SceneManager::get_scene();
@@ -143,8 +143,8 @@ static void shadow_pass_func() {
                 continue;
             }
 
-            g_perBatchCache.cache.PVM = PV * M;
-            g_perBatchCache.cache.Model = M;
+            g_perBatchCache.cache.c_projection_view_model_matrix = PV * M;
+            g_perBatchCache.cache.c_model_matrix = M;
             g_perBatchCache.Update();
 
             const MeshData* drawData = reinterpret_cast<MeshData*>(mesh.gpuResource);
@@ -178,7 +178,11 @@ static void gbuffer_pass_func() {
         DEV_ASSERT(scene.contains<TransformComponent>(entity));
         const TransformComponent& transform = *scene.get_component<TransformComponent>(entity);
         DEV_ASSERT(scene.contains<MeshComponent>(obj.meshID));
+
         const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
+        if (mesh.armature_id.is_valid()) {
+            //__debugbreak();
+        }
 
         const mat4& M = transform.get_world_matrix();
         AABB aabb = mesh.local_bound;
@@ -187,8 +191,8 @@ static void gbuffer_pass_func() {
             continue;
         }
 
-        g_perBatchCache.cache.Model = M;
-        g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
+        g_perBatchCache.cache.c_model_matrix = M;
+        g_perBatchCache.cache.c_projection_view_model_matrix = g_perFrameCache.cache.c_projection_view_matrix * M;
         g_perBatchCache.Update();
 
         const MeshData* drawData = reinterpret_cast<MeshData*>(mesh.gpuResource);

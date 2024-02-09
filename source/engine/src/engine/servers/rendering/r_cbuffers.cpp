@@ -1,15 +1,15 @@
 #include "r_cbuffers.h"
 
-gl::ConstantBuffer<PerFrameCB> g_perFrameCache;
-gl::ConstantBuffer<PerBatchCB> g_perBatchCache;
-gl::ConstantBuffer<MaterialCB> g_materialCache;
-gl::ConstantBuffer<ConstantCB> g_constantCache;
+gl::ConstantBuffer<PerFrameConstantBuffer> g_perFrameCache;
+gl::ConstantBuffer<PerBatchConstantBuffer> g_perBatchCache;
+gl::ConstantBuffer<MaterialConstantBuffer> g_materialCache;
+gl::ConstantBuffer<PerSceneConstantBuffer> g_constantCache;
 
 void R_Alloc_Cbuffers() {
-    g_perFrameCache.CreateAndBind(0);
-    g_perBatchCache.CreateAndBind(1);
-    g_materialCache.CreateAndBind(2);
-    g_constantCache.CreateAndBind(3);
+    g_perFrameCache.CreateAndBind();
+    g_perBatchCache.CreateAndBind();
+    g_materialCache.CreateAndBind();
+    g_constantCache.CreateAndBind();
 }
 
 void R_Destroy_Cbuffers() {
