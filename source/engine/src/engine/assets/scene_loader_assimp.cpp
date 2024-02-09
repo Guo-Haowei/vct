@@ -43,7 +43,7 @@ bool SceneLoaderAssimp::import_impl() {
         process_mesh(*aiscene->mMeshes[i]);
     }
 
-    ecs::Entity root = process_node(aiscene->mRootNode, ecs::Entity::INVALID);
+    ecs::Entity root = process_node(aiscene->mRootNode, ecs::Entity::kInvalid);
     m_scene.get_component<TagComponent>(root)->SetTag(m_file_path);
 
     m_scene.m_root = root;
@@ -83,46 +83,46 @@ void SceneLoaderAssimp::process_material(aiMaterial& material) {
 
 void SceneLoaderAssimp::process_mesh(const aiMesh& mesh) {
     DEV_ASSERT(mesh.mNumVertices);
-    const std::string meshName(mesh.mName.C_Str());
-    const bool hasUV = mesh.mTextureCoords[0];
-    if (!hasUV) {
-        LOG_WARN("mesh {} does not have texture coordinates", meshName);
+    const std::string mesh_name(mesh.mName.C_Str());
+    const bool has_uv = mesh.mTextureCoords[0];
+    if (!has_uv) {
+        LOG_WARN("mesh {} does not have texture coordinates", mesh_name);
     }
 
-    ecs::Entity meshID = m_scene.create_mesh_entity("Mesh::" + meshName);
-    MeshComponent& meshComponent = *m_scene.get_component<MeshComponent>(meshID);
+    ecs::Entity mesh_id = m_scene.create_mesh_entity("Mesh::" + mesh_name);
+    MeshComponent& mesh_component = *m_scene.get_component<MeshComponent>(mesh_id);
 
     for (uint32_t i = 0; i < mesh.mNumVertices; ++i) {
         auto& position = mesh.mVertices[i];
-        meshComponent.positions.emplace_back(vec3(position.x, position.y, position.z));
+        mesh_component.positions.emplace_back(vec3(position.x, position.y, position.z));
         auto& normal = mesh.mNormals[i];
-        meshComponent.normals.emplace_back(vec3(normal.x, normal.y, normal.z));
+        mesh_component.normals.emplace_back(vec3(normal.x, normal.y, normal.z));
         auto& tangent = mesh.mTangents[i];
-        meshComponent.tangents.emplace_back(vec3(tangent.x, tangent.y, tangent.z));
+        mesh_component.tangents.emplace_back(vec3(tangent.x, tangent.y, tangent.z));
 
-        if (hasUV) {
+        if (has_uv) {
             auto& uv = mesh.mTextureCoords[0][i];
-            meshComponent.texcoords_0.emplace_back(vec2(uv.x, uv.y));
+            mesh_component.texcoords_0.emplace_back(vec2(uv.x, uv.y));
         } else {
-            meshComponent.texcoords_1.emplace_back(vec2(0));
+            mesh_component.texcoords_1.emplace_back(vec2(0));
         }
     }
 
     for (uint32_t i = 0; i < mesh.mNumFaces; ++i) {
         aiFace& face = mesh.mFaces[i];
-        meshComponent.indices.emplace_back(face.mIndices[0]);
-        meshComponent.indices.emplace_back(face.mIndices[1]);
-        meshComponent.indices.emplace_back(face.mIndices[2]);
+        mesh_component.indices.emplace_back(face.mIndices[0]);
+        mesh_component.indices.emplace_back(face.mIndices[1]);
+        mesh_component.indices.emplace_back(face.mIndices[2]);
     }
 
     DEV_ASSERT(m_materials.size());
     MeshComponent::MeshSubset subset;
-    subset.index_count = (uint32_t)meshComponent.indices.size();
+    subset.index_count = (uint32_t)mesh_component.indices.size();
     subset.index_offset = 0;
     subset.material_id = m_materials.at(mesh.mMaterialIndex);
-    meshComponent.subsets.emplace_back(subset);
+    mesh_component.subsets.emplace_back(subset);
 
-    m_meshes.push_back(meshID);
+    m_meshes.push_back(mesh_id);
 }
 
 ecs::Entity SceneLoaderAssimp::process_node(const aiNode* node, ecs::Entity parent) {
@@ -141,7 +141,7 @@ ecs::Entity SceneLoaderAssimp::process_node(const aiNode* node, ecs::Entity pare
         for (uint32_t i = 0; i < node->mNumMeshes; ++i) {
             ecs::Entity child = m_scene.create_object_entity("");
             auto tagComponent = m_scene.get_component<TagComponent>(child);
-            tagComponent->SetTag("SubGeometry_" + std::to_string(child.GetID()));
+            tagComponent->SetTag("SubGeometry_" + std::to_string(child.get_id()));
             ObjectComponent& objComponent = *m_scene.get_component<ObjectComponent>(child);
             objComponent.meshID = m_meshes[node->mMeshes[i]];
             m_scene.attach_component(child, entity);
@@ -159,7 +159,7 @@ ecs::Entity SceneLoaderAssimp::process_node(const aiNode* node, ecs::Entity pare
     TransformComponent& transform = *m_scene.get_component<TransformComponent>(entity);
     transform.matrix_transform(localTransformColumnMajor);
 
-    if (parent.IsValid()) {
+    if (parent.is_valid()) {
         m_scene.attach_component(entity, parent);
     }
 

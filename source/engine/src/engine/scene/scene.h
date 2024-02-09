@@ -1,10 +1,8 @@
 #pragma once
-#include "ComponentManager.h"
-#include "entity.h"
-#include "scene_components.h"
-////////////////////
 #include "core/math/ray.h"
 #include "core/objects/noncopyable.h"
+#include "core/systems/component_manager.h"
+#include "scene_components.h"
 
 namespace vct {
 
@@ -19,55 +17,55 @@ public:
     Scene() = default;
 
 #pragma region WORLD_COMPONENTS_REGISTERY
-#define REGISTER_COMPONENT(T, VER)                                                      \
-private:                                                                                \
-    ecs::ComponentManager<T>& m##T##s = m_component_lib.Register<T>("World::" #T, VER); \
-                                                                                        \
-public:                                                                                 \
-    template<>                                                                          \
-    inline const T* get_component<T>(const ecs::Entity& entity) const {                 \
-        return m##T##s.get_component(entity);                                           \
-    }                                                                                   \
-    template<>                                                                          \
-    inline T* get_component<T>(const ecs::Entity& entity) {                             \
-        return m##T##s.get_component(entity);                                           \
-    }                                                                                   \
-    template<>                                                                          \
-    inline const T& get_component<T>(size_t index) const {                              \
-        return m##T##s[index];                                                          \
-    }                                                                                   \
-    template<>                                                                          \
-    inline T& get_component<T>(size_t index) {                                          \
-        return m##T##s[index];                                                          \
-    }                                                                                   \
-    template<>                                                                          \
-    inline std::vector<T>& get_component_array() {                                      \
-        return m##T##s.get_component_array();                                           \
-    }                                                                                   \
-    template<>                                                                          \
-    inline const std::vector<T>& get_component_array() const {                          \
-        return m##T##s.get_component_array();                                           \
-    }                                                                                   \
-    template<>                                                                          \
-    inline bool contains<T>(const ecs::Entity& entity) const {                          \
-        return m##T##s.contains(entity);                                                \
-    }                                                                                   \
-    template<>                                                                          \
-    inline size_t get_index<T>(const ecs::Entity& entity) const {                       \
-        return m##T##s.get_index(entity);                                               \
-    }                                                                                   \
-    template<>                                                                          \
-    inline size_t get_count<T>() const {                                                \
-        return m##T##s.get_count();                                                     \
-    }                                                                                   \
-    template<>                                                                          \
-    inline ecs::Entity get_entity<T>(size_t index) const {                              \
-        return m##T##s.get_entity(index);                                               \
-    }                                                                                   \
-    template<>                                                                          \
-    T& create<T>(const ecs::Entity& entity) {                                           \
-        return m##T##s.create(entity);                                                  \
-    }                                                                                   \
+#define REGISTER_COMPONENT(T, VER)                                                              \
+private:                                                                                        \
+    ecs::ComponentManager<T>& m##T##s = m_component_lib.register_manager<T>("World::" #T, VER); \
+                                                                                                \
+public:                                                                                         \
+    template<>                                                                                  \
+    inline const T* get_component<T>(const ecs::Entity& entity) const {                         \
+        return m##T##s.get_component(entity);                                                   \
+    }                                                                                           \
+    template<>                                                                                  \
+    inline T* get_component<T>(const ecs::Entity& entity) {                                     \
+        return m##T##s.get_component(entity);                                                   \
+    }                                                                                           \
+    template<>                                                                                  \
+    inline const T& get_component<T>(size_t index) const {                                      \
+        return m##T##s[index];                                                                  \
+    }                                                                                           \
+    template<>                                                                                  \
+    inline T& get_component<T>(size_t index) {                                                  \
+        return m##T##s[index];                                                                  \
+    }                                                                                           \
+    template<>                                                                                  \
+    inline std::vector<T>& get_component_array() {                                              \
+        return m##T##s.get_component_array();                                                   \
+    }                                                                                           \
+    template<>                                                                                  \
+    inline const std::vector<T>& get_component_array() const {                                  \
+        return m##T##s.get_component_array();                                                   \
+    }                                                                                           \
+    template<>                                                                                  \
+    inline bool contains<T>(const ecs::Entity& entity) const {                                  \
+        return m##T##s.contains(entity);                                                        \
+    }                                                                                           \
+    template<>                                                                                  \
+    inline size_t get_index<T>(const ecs::Entity& entity) const {                               \
+        return m##T##s.get_index(entity);                                                       \
+    }                                                                                           \
+    template<>                                                                                  \
+    inline size_t get_count<T>() const {                                                        \
+        return m##T##s.get_count();                                                             \
+    }                                                                                           \
+    template<>                                                                                  \
+    inline ecs::Entity get_entity<T>(size_t index) const {                                      \
+        return m##T##s.get_entity(index);                                                       \
+    }                                                                                           \
+    template<>                                                                                  \
+    T& create<T>(const ecs::Entity& entity) {                                                   \
+        return m##T##s.create(entity);                                                          \
+    }                                                                                           \
     enum { __DUMMY_ENUM_TO_FORCE_SEMI_COLON_##T }
 
 #pragma endregion WORLD_COMPONENTS_REGISTERY
@@ -101,7 +99,7 @@ public:                                                                         
     }
     template<typename T>
     size_t get_index(const ecs::Entity&) const {
-        return ecs::Entity::INVALID_INDEX;
+        return ecs::Entity::kInvalidIndex;
     }
     template<typename T>
     size_t get_count() const {
@@ -109,7 +107,7 @@ public:                                                                         
     }
     template<typename T>
     ecs::Entity get_entity(size_t) const {
-        return ecs::Entity::INVALID;
+        return ecs::Entity::kInvalid;
     }
     template<typename T>
     T& create(const ecs::Entity&) {
@@ -195,7 +193,7 @@ public:                                                                         
 
     // @TODO: refactor
     AABB m_bound;
-    ecs::Entity m_selected = ecs::Entity::INVALID;
+    ecs::Entity m_selected;
 };
 
 }  // namespace vct

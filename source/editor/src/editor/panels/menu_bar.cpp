@@ -71,7 +71,7 @@ void menu_bar() {
             ImGui::Separator();
             if (ImGui::MenuItem("Cut", "CTRL+X")) {
             }
-            if (ImGui::MenuItem("Copy", "CTRL+C")) {
+            if (ImGui::MenuItem("copy", "CTRL+C")) {
             }
             if (ImGui::MenuItem("Paste", "CTRL+V")) {
             }

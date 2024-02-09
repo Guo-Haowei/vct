@@ -36,7 +36,7 @@ void HierarchyCreator::DrawNode(const Scene& scene, HierarchyNode* pHier, ImGuiT
     const TagComponent* tagComponent = scene.get_component<TagComponent>(id);
     const char* name = tagComponent ? tagComponent->GetTag().c_str() : "Untitled";
 
-    auto nodeTag = std::format("##{}", id.GetID());
+    auto nodeTag = std::format("##{}", id.get_id());
     auto tag = std::format("{}{}", name, nodeTag);
 
     flags |= ImGuiTreeNodeFlags_NoTreePushOnOpen;

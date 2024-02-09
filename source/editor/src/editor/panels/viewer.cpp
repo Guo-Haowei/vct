@@ -64,12 +64,12 @@ void Viewer::RenderInternal(Scene& scene) {
 
                 const auto intersectionResult = scene.Intersects(ray);
 
-                if (intersectionResult.entity.IsValid()) {
+                if (intersectionResult.entity.is_valid()) {
                     SetSelected(intersectionResult.entity);
                 }
             }
         } else if (input::is_button_pressed(MOUSE_BUTTON_RIGHT)) {
-            SetSelected(ecs::Entity::INVALID);
+            SetSelected(ecs::Entity::kInvalid);
         }
     }
 
@@ -97,7 +97,7 @@ void Viewer::RenderInternal(Scene& scene) {
     // @TODO: fix
     auto op = ImGuizmo::ROTATE;
     // draw gizmo
-    if (mpSelected->IsValid()) {
+    if (mpSelected->is_valid()) {
         TransformComponent* transform = scene.get_component<TransformComponent>(*mpSelected);
 
         if (transform) {

@@ -46,10 +46,10 @@ void Scene::update(float dt) {
 }
 
 void Scene::merge(Scene& other) {
-    for (auto& entry : m_component_lib.mEntries) {
-        entry.second.mManager->Merge(*other.m_component_lib.mEntries[entry.first].mManager);
+    for (auto& entry : m_component_lib.m_entries) {
+        entry.second.m_manager->merge(*other.m_component_lib.m_entries[entry.first].m_manager);
     }
-    if (other.m_root.IsValid()) {
+    if (other.m_root.is_valid()) {
         attach_component(other.m_root, m_root);
     }
 
@@ -202,7 +202,7 @@ Entity Scene::create_cube_entity(const std::string& name, Entity material_id, co
 
 void Scene::attach_component(Entity child, Entity parent) {
     DEV_ASSERT(child != parent);
-    DEV_ASSERT(parent.IsValid());
+    DEV_ASSERT(parent.is_valid());
 
     // if child already has a parent, detach it
     if (mHierarchyComponents.contains(child)) {
@@ -337,7 +337,7 @@ void Scene::update_hierarchy(Context& ctx) {
             Entity parent = hier->mParent;
             mat4 W = childTrans->get_local_matrix();
 
-            while (parent.IsValid()) {
+            while (parent.is_valid()) {
                 TransformComponent* parentTrans = mTransformComponents.get_component(parent);
                 if (parentTrans) {
                     W = parentTrans->get_local_matrix() * W;
@@ -345,9 +345,9 @@ void Scene::update_hierarchy(Context& ctx) {
 
                 if ((hier = mHierarchyComponents.get_component(parent)) != nullptr) {
                     parent = hier->mParent;
-                    DEV_ASSERT(parent.IsValid());
+                    DEV_ASSERT(parent.is_valid());
                 } else {
-                    parent = Entity::INVALID;
+                    parent.make_invalid();
                 }
             }
 

@@ -56,7 +56,7 @@ void SceneLoaderTinyGLTF::process_node(int node_index, ecs::Entity parent) {
             MeshComponent* mesh = &m_scene.get_component_array<MeshComponent>()[node.mesh];
             ecs::Entity meshID = m_scene.get_entity<MeshComponent>(node.mesh);
             DEV_ASSERT(!mesh->joints_0.empty());
-            if (mesh->armature_id.IsValid()) {
+            if (mesh->armature_id.is_valid()) {
                 // Reuse mesh with different skin is not possible currently, so we create a new one:
                 LOG_WARN("Re-use mesh for different skin!");
                 meshID = entity;
@@ -83,7 +83,7 @@ void SceneLoaderTinyGLTF::process_node(int node_index, ecs::Entity parent) {
     // light
 
     // transform
-    if (!entity.IsValid()) {
+    if (!entity.is_valid()) {
         entity = ecs::Entity::create();
         m_scene.create<TransformComponent>(entity);
         m_scene.create<TagComponent>(entity).GetTagRef() = "Transform::" + node.name;
@@ -131,7 +131,7 @@ void SceneLoaderTinyGLTF::process_node(int node_index, ecs::Entity parent) {
     }
     transform.update_transform();
 
-    if (parent.IsValid()) {
+    if (parent.is_valid()) {
         m_scene.attach_component(entity, parent);
     }
 
@@ -258,16 +258,16 @@ bool SceneLoaderTinyGLTF::import_impl() {
 
     // Create meshes:
     for (const auto& gltfMesh : m_model->meshes) {
-        ecs::Entity meshEntity = m_scene.create_mesh_entity(gltfMesh.name);
+        ecs::Entity meshEntity = m_scene.create_mesh_entity("Mesh::" + gltfMesh.name);
         // m_scene.Component_Attach(meshEntity, state.rootEntity);
         MeshComponent& mesh = *m_scene.get_component<MeshComponent>(meshEntity);
 
         for (const auto& prim : gltfMesh.primitives) {
-            mesh.subsets.push_back(MeshComponent::MeshSubset());
+            MeshComponent::MeshSubset subset;
             if (m_scene.get_count<MaterialComponent>() == 0) {
                 LOG_FATAL("No material! Consider use default");
             }
-            mesh.subsets.back().material_id = m_scene.get_entity<MaterialComponent>(glm::max(0, prim.material));
+            subset.material_id = m_scene.get_entity<MaterialComponent>(glm::max(0, prim.material));
 
             const size_t index_remap[] = { 0, 1, 2 };
             uint32_t vertexOffset = (uint32_t)mesh.normals.size();
@@ -282,8 +282,9 @@ bool SceneLoaderTinyGLTF::import_impl() {
                 size_t index_count = accessor.count;
                 size_t index_offset = mesh.indices.size();
                 mesh.indices.resize(index_offset + index_count);
-                mesh.subsets.back().index_offset = (uint32_t)index_offset;
-                mesh.subsets.back().index_count = (uint32_t)index_count;
+                subset.index_offset = (uint32_t)index_offset;
+                subset.index_count = (uint32_t)index_count;
+                mesh.subsets.emplace_back(subset);
 
                 const uint8_t* data = buffer.data.data() + accessor.byteOffset + bufferView.byteOffset;
 

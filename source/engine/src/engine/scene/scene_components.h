@@ -1,6 +1,6 @@
 #pragma once
-#include "Entity.h"
 #include "core/math/aabb.h"
+#include "core/systems/entity.h"
 
 namespace vct {
 
@@ -187,6 +187,9 @@ struct MeshComponent {
     void serialize(Archive& archive);
 };
 
+//--------------------------------------------------------------------------------------------------
+//
+//--------------------------------------------------------------------------------------------------
 // @TODO: refactor
 class HierarchyComponent {
 public:

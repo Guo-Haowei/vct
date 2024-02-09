@@ -31,7 +31,7 @@ static void DrawComponent(const std::string& name, T* component, UIFunction uiFu
 
         bool removeComponent = false;
         if (ImGui::BeginPopup("ComponentSettings")) {
-            if (ImGui::MenuItem("Remove component")) {
+            if (ImGui::MenuItem("remove component")) {
                 removeComponent = true;
             }
 
@@ -135,13 +135,13 @@ static bool draw_drag_float(const char* tag, float* p, float speed, float min, f
 void PropertyPanel::RenderInternal(Scene& scene) {
     ecs::Entity id = *mpSelected;
 
-    if (!id.IsValid()) {
+    if (!id.is_valid()) {
         return;
     }
 
     TagComponent* tagComponent = scene.get_component<TagComponent>(id);
     if (!tagComponent) {
-        LOG_WARN("Entity {} does not have name", id.GetID());
+        LOG_WARN("Entity {} does not have name", id.get_id());
         return;
     }
 
