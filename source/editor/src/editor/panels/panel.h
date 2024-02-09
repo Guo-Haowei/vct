@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-#include "Engine/Scene/Entity.h"
+#include "core/systems/entity.h"
 #include "imgui/imgui.h"
 #include "scene/scene.h"
 

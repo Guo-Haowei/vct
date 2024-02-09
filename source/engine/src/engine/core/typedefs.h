@@ -24,11 +24,11 @@ void unused(T &) {}
 template<typename FUNC>
 class ScopeDrop {
 public:
-    ScopeDrop(FUNC func) : mFunc(func) {}
-    ~ScopeDrop() { mFunc(); }
+    ScopeDrop(FUNC func) : m_func(func) {}
+    ~ScopeDrop() { m_func(); }
 
 private:
-    FUNC mFunc;
+    FUNC m_func;
 };
 
 template<typename FUNC>

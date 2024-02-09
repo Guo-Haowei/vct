@@ -5832,7 +5832,7 @@ static int stbi__psd_decode_rle(stbi__context *s, stbi_uc *p, int pixelCount)
       if (len == 128) {
          // No-op.
       } else if (len < 128) {
-         // Copy next len+1 bytes literally.
+         // copy next len+1 bytes literally.
          len++;
          if (len > nleft) return 0; // corrupt data
          count += len;

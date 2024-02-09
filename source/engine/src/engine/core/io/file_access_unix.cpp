@@ -5,7 +5,7 @@ namespace vct {
 
 FileAccessUnix::~FileAccessUnix() { close(); }
 
-ErrorCode FileAccessUnix::open_internal(const std::string& path, int mode_flags) {
+ErrorCode FileAccessUnix::open_internal(std::string_view path, int mode_flags) {
     ERR_FAIL_COND_V(m_file_handle, ERR_FILE_ALREADY_IN_USE);
 
     const char* mode = "";
@@ -20,7 +20,8 @@ ErrorCode FileAccessUnix::open_internal(const std::string& path, int mode_flags)
             return ERR_INVALID_PARAMETER;
     }
 
-    m_file_handle = fopen(path.c_str(), mode);
+    std::string path_string{ path };
+    m_file_handle = fopen(path_string.c_str(), mode);
 
     if (!m_file_handle) {
         switch (errno) {
@@ -44,8 +45,10 @@ void FileAccessUnix::close() {
 bool FileAccessUnix::is_open() const { return m_file_handle != nullptr; }
 
 size_t FileAccessUnix::get_length() const {
-    CRASH_NOW_MSG("TODO");
-    return 0;
+    fseek(m_file_handle, 0, SEEK_END);
+    size_t length = ftell(m_file_handle);
+    fseek(m_file_handle, 0, SEEK_SET);
+    return length;
 }
 
 bool FileAccessUnix::read_buffer(void* data, size_t size) const {

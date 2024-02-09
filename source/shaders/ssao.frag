@@ -18,10 +18,10 @@ void main() {
     const vec3 bitangent = cross(N, tangent);
 
     mat3 TBN = mat3(tangent, bitangent, N);
-    TBN = mat3(View) * TBN;
+    TBN = mat3(c_view_matrix) * TBN;
 
     vec4 origin = vec4(texture(GbufferPositionMetallicMap, uv).xyz, 1.0);
-    origin = View * origin;
+    origin = c_view_matrix * origin;
 
     occlusion = 0.0;
     for (int i = 0; i < SSAOKernelSize; ++i) {
@@ -31,14 +31,14 @@ void main() {
 
         // project sample position (to sample texture) (to get position on screen/texture)
         vec4 offset = vec4(samplePos, 1.0);
-        offset = Proj * offset;             // from view to clip-space
-        offset.xyz /= offset.w;             // perspective divide
-        offset.xy = offset.xy * 0.5 + 0.5;  // transform to range 0.0 - 1.0
+        offset = c_projection_matrix * offset;  // from view to clip-space
+        offset.xyz /= offset.w;                 // perspective divide
+        offset.xy = offset.xy * 0.5 + 0.5;      // transform to range 0.0 - 1.0
 
         // get sample depth
-        const vec4 sampleViewSpace =
-            View * vec4(texture(GbufferPositionMetallicMap, offset.xy).xyz, 1.0);  // get depth value of kernel sample
-        const float sampleDepth = sampleViewSpace.z;
+        const vec4 samplec_view_matrixSpace =
+            c_view_matrix * vec4(texture(GbufferPositionMetallicMap, offset.xy).xyz, 1.0);  // get depth value of kernel sample
+        const float sampleDepth = samplec_view_matrixSpace.z;
 
         // range check & accumulate
         float rangeCheck = smoothstep(0.0, 1.0, SSAOKernelRadius / abs(origin.z - sampleDepth));

@@ -14,7 +14,7 @@ public:
     virtual bool write_buffer(const void* data, size_t size) override;
 
 protected:
-    virtual ErrorCode open_internal(const std::string& path, int mode_flags) override;
+    virtual ErrorCode open_internal(std::string_view path, int mode_flags) override;
 
     FILE* m_file_handle{ nullptr };
 };

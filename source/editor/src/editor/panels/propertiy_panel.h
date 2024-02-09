@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Scene/Entity.h"
+#include "core/systems/entity.h"
 #include "panel.h"
 
 class PropertyPanel : public Panel {

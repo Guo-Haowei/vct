@@ -1,11 +1,11 @@
 #include "r_editor.h"
 
 #include "Core/geometry.h"
-#include "Framework/ProgramManager.h"
 #include "GpuTexture.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"
 #include "scene/scene_manager.h"
+#include "shader_program_manager.h"
 
 using namespace vct;
 

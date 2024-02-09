@@ -9,7 +9,7 @@
 static std::vector<std::string> quick_dirty_split(std::string str, std::string token) {
     std::vector<std::string> result;
     while (str.size()) {
-        int index = str.find(token);
+        size_t index = str.find(token);
         if (index != std::string::npos) {
             result.push_back(str.substr(0, index));
             str = str.substr(index + token.size());
@@ -71,7 +71,7 @@ void menu_bar() {
             ImGui::Separator();
             if (ImGui::MenuItem("Cut", "CTRL+X")) {
             }
-            if (ImGui::MenuItem("Copy", "CTRL+C")) {
+            if (ImGui::MenuItem("copy", "CTRL+C")) {
             }
             if (ImGui::MenuItem("Paste", "CTRL+V")) {
             }

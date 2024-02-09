@@ -4,22 +4,23 @@
 #include <random>
 
 #include "Core/geometry.h"
-#include "Framework/ProgramManager.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
 /////
 #include "core/dynamic_variable/common_dvars.h"
 #include "rendering/passes.h"
 #include "rendering/r_defines.h"
 #include "rendering/r_editor.h"
+#include "rendering/shader_program_manager.h"
 #include "scene/scene_manager.h"
 #include "servers/display_server.h"
+#include "vsinput.glsl.h"
 
 static std::vector<std::shared_ptr<MeshData>> g_meshdata;
 static std::vector<std::shared_ptr<MaterialData>> g_materialdata;
 
 static GLuint g_noiseTexture;
 
-extern void FillMaterialCB(const MaterialData* mat, MaterialCB& cb);
+extern void FillMaterialCB(const MaterialData* mat, MaterialConstantBuffer& cb);
 
 namespace vct {
 
@@ -62,32 +63,57 @@ void RenderingServer::finalize() {
 static std::shared_ptr<MeshData> CreateMeshData(const MeshComponent& mesh) {
     MeshData* ret = new MeshData;
 
-    MeshData& outMesh = *ret;
-    const bool hasNormals = !mesh.normals.empty();
-    const bool hasUVs = !mesh.texcoords_0.empty();
-    const bool hasTangent = !mesh.tangents.empty();
+    MeshData& out_mesh = *ret;
+    const bool has_normals = !mesh.normals.empty();
+    const bool has_uvs = !mesh.texcoords_0.empty();
+    const bool has_tangents = !mesh.tangents.empty();
+    const bool has_joints = !mesh.joints_0.empty();
+    const bool has_weights = !mesh.weights_0.empty();
 
-    glGenVertexArrays(1, &outMesh.vao);
-    glGenBuffers(2 + hasNormals + hasUVs + hasTangent, &outMesh.ebo);
-    glBindVertexArray(outMesh.vao);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outMesh.ebo);
-    gl::BindToSlot(outMesh.vbos[0], 0, 3);
-    gl::NamedBufferStorage(outMesh.vbos[0], mesh.positions);
-    if (hasNormals) {
-        gl::BindToSlot(outMesh.vbos[1], 1, 3);
-        gl::NamedBufferStorage(outMesh.vbos[1], mesh.normals);
+    int vbo_count = 1 + has_normals + has_uvs + has_tangents + has_joints + has_weights;
+    DEV_ASSERT(vbo_count <= array_length(out_mesh.vbos));
+
+    glGenVertexArrays(1, &out_mesh.vao);
+
+    // @TODO: fix this hack
+    glGenBuffers(1, &out_mesh.ebo);
+    glGenBuffers(6, out_mesh.vbos);
+
+    int slot = -1;
+    glBindVertexArray(out_mesh.vao);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, out_mesh.ebo);
+
+    slot = get_position_slot();
+    gl::BindToSlot(out_mesh.vbos[slot], slot, 3);
+    gl::NamedBufferStorage(out_mesh.vbos[slot], mesh.positions);
+
+    if (has_normals) {
+        slot = get_normal_slot();
+        gl::BindToSlot(out_mesh.vbos[slot], slot, 3);
+        gl::NamedBufferStorage(out_mesh.vbos[slot], mesh.normals);
     }
-    if (hasUVs) {
-        gl::BindToSlot(outMesh.vbos[2], 2, 2);
-        gl::NamedBufferStorage(outMesh.vbos[2], mesh.texcoords_0);
+    if (has_uvs) {
+        slot = get_uv_slot();
+        gl::BindToSlot(out_mesh.vbos[slot], slot, 2);
+        gl::NamedBufferStorage(out_mesh.vbos[slot], mesh.texcoords_0);
     }
-    if (hasTangent) {
-        gl::BindToSlot(outMesh.vbos[3], 3, 3);
-        gl::NamedBufferStorage(outMesh.vbos[3], mesh.tangents);
+    if (has_tangents) {
+        slot = get_tangent_slot();
+        gl::BindToSlot(out_mesh.vbos[slot], slot, 3);
+        gl::NamedBufferStorage(out_mesh.vbos[slot], mesh.tangents);
+    }
+    if (has_joints) {
+        slot = get_bone_id_slot();
+        gl::BindToSlot(out_mesh.vbos[slot], slot, 4);
+        gl::NamedBufferStorage(out_mesh.vbos[slot], mesh.joints_0);
+        DEV_ASSERT(!mesh.weights_0.empty());
+        slot = get_bone_weight_slot();
+        gl::BindToSlot(out_mesh.vbos[slot], slot, 4);
+        gl::NamedBufferStorage(out_mesh.vbos[slot], mesh.weights_0);
     }
 
-    gl::NamedBufferStorage(outMesh.ebo, mesh.indices);
-    outMesh.count = static_cast<uint32_t>(mesh.indices.size());
+    gl::NamedBufferStorage(out_mesh.ebo, mesh.indices);
+    out_mesh.count = static_cast<uint32_t>(mesh.indices.size());
 
     glBindVertexArray(0);
     return std::shared_ptr<MeshData>(ret);
@@ -246,15 +272,15 @@ void RenderingServer::createGpuResources() {
 //  glEnable(GL_CULL_FACE);
 //  glEnable(GL_DEPTH_TEST);
 
-// const auto& program = gProgramManager->GetShaderProgram(ProgramType::Visualization);
+// const auto& program = gProgramManager->get(ProgramType::Visualization);
 
 // glBindVertexArray(m_box->vao);
-// program.Bind();
+// program.bind();
 
 // const int size = DVAR_GET_INT(r_voxelSize);
 // glDrawElementsInstanced(GL_TRIANGLES, m_box->count, GL_UNSIGNED_INT, 0, size * size * size);
 
-// program.Unbind();
+// program.unbind();
 //}
 
 struct MaterialCache {
@@ -289,7 +315,7 @@ void RenderingServer::renderToVoxelTexture() {
 
     m_albedoVoxel.bindImageTexture(IMAGE_VOXEL_ALBEDO_SLOT);
     m_normalVoxel.bindImageTexture(IMAGE_VOXEL_NORMAL_SLOT);
-    gProgramManager->GetShaderProgram(ProgramType::Voxel).Bind();
+    ShaderProgramManager::get(ProgramType::Voxel).bind();
 
     const uint32_t numObjects = (uint32_t)scene.get_count<ObjectComponent>();
     for (uint32_t i = 0; i < numObjects; ++i) {
@@ -301,28 +327,28 @@ void RenderingServer::renderToVoxelTexture() {
         const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
 
         const mat4& M = transform.get_world_matrix();
-        g_perBatchCache.cache.Model = M;
-        g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
+        g_perBatchCache.cache.c_model_matrix = M;
+        g_perBatchCache.cache.c_projection_view_model_matrix = g_perFrameCache.cache.c_projection_view_matrix * M;
         g_perBatchCache.Update();
 
         const MeshData* drawData = reinterpret_cast<MeshData*>(mesh.gpuResource);
         glBindVertexArray(drawData->vao);
 
         for (const auto& subset : mesh.subsets) {
-            const MaterialComponent& material = *scene.get_component<MaterialComponent>(subset.materialID);
+            const MaterialComponent& material = *scene.get_component<MaterialComponent>(subset.material_id);
             const MaterialData* matData = reinterpret_cast<MaterialData*>(material.gpuResource);
 
             FillMaterialCB(matData, g_materialCache.cache);
             g_materialCache.Update();
 
-            glDrawElements(GL_TRIANGLES, subset.indexCount, GL_UNSIGNED_INT, (void*)(subset.indexOffset * sizeof(uint32_t)));
+            glDrawElements(GL_TRIANGLES, subset.index_count, GL_UNSIGNED_INT, (void*)(subset.index_offset * sizeof(uint32_t)));
         }
     }
 
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
     // post process
-    gProgramManager->GetShaderProgram(ProgramType::VoxelPost).Bind();
+    ShaderProgramManager::get(ProgramType::VoxelPost).bind();
 
     constexpr GLuint workGroupX = 512;
     constexpr GLuint workGroupY = 512;
@@ -338,15 +364,15 @@ void RenderingServer::renderToVoxelTexture() {
 }
 
 void RenderingServer::renderFrameBufferTextures(int width, int height) {
-    const auto& program = gProgramManager->GetShaderProgram(ProgramType::DebugTexture);
+    const auto& program = ShaderProgramManager::get(ProgramType::DebugTexture);
 
-    program.Bind();
+    program.bind();
     glDisable(GL_DEPTH_TEST);
     glViewport(0, 0, width, height);
 
     R_DrawQuad();
 
-    program.Unbind();
+    program.unbind();
 }
 
 void RenderingServer::render() {

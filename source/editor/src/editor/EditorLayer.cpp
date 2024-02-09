@@ -5,6 +5,7 @@
 /////////////////////
 #include "core/dynamic_variable/common_dvars.h"
 #include "core/input/input.h"
+#include "panels/animation_panel.h"
 #include "panels/console_panel.h"
 #include "panels/debug_panel.h"
 #include "panels/hierarchy_panel.h"
@@ -15,6 +16,7 @@
 #include "servers/display_server.h"
 
 EditorLayer::EditorLayer() : Layer("EditorLayer") {
+    AddPanel(std::make_shared<AnimationPanel>());
     AddPanel(std::make_shared<ConsolePanel>());
     AddPanel(std::make_shared<DebugPanel>());
     AddPanel(std::make_shared<HierarchyPanel>());

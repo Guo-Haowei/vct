@@ -13,9 +13,10 @@
 extern uint32_t g_final_image;
 
 void Viewer::Update(float dt) {
+    dt = 0.016f;
     if (IsFocused()) {
         Scene& scene = SceneManager::get_scene();
-        s_controller.move_camera(scene.get_main_camera(), 0.016f);
+        s_controller.move_camera(scene.get_main_camera(), dt);
     }
 }
 
@@ -64,12 +65,12 @@ void Viewer::RenderInternal(Scene& scene) {
 
                 const auto intersectionResult = scene.Intersects(ray);
 
-                if (intersectionResult.entity.IsValid()) {
+                if (intersectionResult.entity.is_valid()) {
                     SetSelected(intersectionResult.entity);
                 }
             }
         } else if (input::is_button_pressed(MOUSE_BUTTON_RIGHT)) {
-            SetSelected(ecs::Entity::INVALID);
+            SetSelected(ecs::Entity::kInvalid);
         }
     }
 
@@ -97,7 +98,7 @@ void Viewer::RenderInternal(Scene& scene) {
     // @TODO: fix
     auto op = ImGuizmo::ROTATE;
     // draw gizmo
-    if (mpSelected->IsValid()) {
+    if (mpSelected->is_valid()) {
         TransformComponent* transform = scene.get_component<TransformComponent>(*mpSelected);
 
         if (transform) {
@@ -105,7 +106,7 @@ void Viewer::RenderInternal(Scene& scene) {
             if (objComponent) {
                 auto meshComponent = scene.get_component<MeshComponent>(objComponent->meshID);
                 DEV_ASSERT(meshComponent);
-                AABB aabb = meshComponent->localBound;
+                AABB aabb = meshComponent->local_bound;
                 aabb.apply_matrix(transform->get_world_matrix());
 
                 const mat4 M = glm::translate(mat4(1), aabb.center()) * glm::scale(mat4(1), aabb.size());

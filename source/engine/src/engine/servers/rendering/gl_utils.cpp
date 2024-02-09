@@ -28,7 +28,7 @@ void R_DrawQuad() {
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void FillMaterialCB(const MaterialData *mat, MaterialCB &cb) {
+void FillMaterialCB(const MaterialData *mat, MaterialConstantBuffer &cb) {
     cb.AlbedoColor = mat->albedoColor;
     cb.Metallic = mat->metallic;
     cb.Roughness = mat->roughness;
@@ -44,22 +44,22 @@ namespace gl {
 //------------------------------------------------------------------------------
 // Constant Buffer
 //------------------------------------------------------------------------------
-GLuint CreateAndBindConstantBuffer(int slot, size_t sizeInByte) {
+GLuint CreateAndBindConstantBuffer(int slot, size_t size_in_byte) {
     GLuint handle = 0;
     glGenBuffers(1, &handle);
     glBindBuffer(GL_UNIFORM_BUFFER, handle);
-    glBufferData(GL_UNIFORM_BUFFER, sizeInByte, nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, size_in_byte, nullptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glBindBufferBase(GL_UNIFORM_BUFFER, slot, handle);
-    LOG_VERBOSE("[opengl] created buffer of size {} (slot {})", sizeInByte, slot);
+    LOG_VERBOSE("[opengl] created buffer of size {} (slot {})", size_in_byte, slot);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     return handle;
 }
 
-void UpdateConstantBuffer(GLuint handle, const void *ptr, size_t sizeInByte) {
-    // glMapBuffer( mHandle, 0 );
+void UpdateConstantBuffer(GLuint handle, const void *ptr, size_t size_in_byte) {
+    // glMapBuffer( m_handle, 0 );
     glBindBuffer(GL_UNIFORM_BUFFER, handle);
-    glBufferData(GL_UNIFORM_BUFFER, sizeInByte, ptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, size_in_byte, ptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 

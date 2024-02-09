@@ -1,6 +1,6 @@
 #pragma once
-#include "Entity.h"
 #include "core/math/aabb.h"
+#include "core/systems/entity.h"
 
 namespace vct {
 
@@ -8,11 +8,32 @@ class Archive;
 class Scene;
 
 //--------------------------------------------------------------------------------------------------
+// Tag Component
+//--------------------------------------------------------------------------------------------------
+class TagComponent {
+public:
+    TagComponent() = default;
+
+    TagComponent(const char* tag) { m_tag = tag; }
+
+    void set_tag(const char* tag) { m_tag = tag; }
+    void set_tag(const std::string& tag) { m_tag = tag; }
+
+    const std::string& get_tag() const { return m_tag; }
+    std::string& get_tag_ref() { return m_tag; }
+
+    void serialize(Archive& archive);
+
+private:
+    std::string m_tag;
+};
+
+//--------------------------------------------------------------------------------------------------
 // Transform Component
 //--------------------------------------------------------------------------------------------------
 class TransformComponent {
 public:
-    enum {
+    enum : uint32_t {
         NONE = 0,
         DIRTY = 1 << 0,
     };
@@ -63,7 +84,7 @@ private:
 //--------------------------------------------------------------------------------------------------
 class CameraComponent {
 public:
-    enum {
+    enum : uint32_t {
         NONE = 0,
         DIRTY = 1,
     };
@@ -123,7 +144,7 @@ private:
 // Mesh Component
 //--------------------------------------------------------------------------------------------------
 struct MeshComponent {
-    enum FLAGS {
+    enum : uint32_t {
         NONE = 0,
         RENDERABLE = 1 << 0,
         DOUBLE_SIDED = 1 << 1,
@@ -145,11 +166,11 @@ struct MeshComponent {
             COUNT,
         } name;
 
-        uint32_t offsetInByte = 0;
-        uint32_t sizeInByte = 0;
+        uint32_t offset_in_byte = 0;
+        uint32_t size_in_byte = 0;
         uint32_t stride = 0;
 
-        bool is_valid() const { return sizeInByte != 0; }
+        bool is_valid() const { return size_in_byte != 0; }
     };
 
     std::vector<uint32_t> indices;
@@ -163,30 +184,79 @@ struct MeshComponent {
     std::vector<vec3> color_0;
 
     struct MeshSubset {
-        ecs::Entity materialID;
-        uint32_t indexOffset = 0;
-        uint32_t indexCount = 0;
-        AABB localBound;
+        ecs::Entity material_id;
+        uint32_t index_offset = 0;
+        uint32_t index_count = 0;
+        AABB local_bound;
     };
     std::vector<MeshSubset> subsets;
 
-    ecs::Entity armatureID;
+    ecs::Entity armature_id;
 
     // Non-serialized
-    AABB localBound;
+    AABB local_bound;
 
     // @TODO: remove
     mutable void* gpuResource = nullptr;
 
     VertexAttribute attributes[VertexAttribute::COUNT];
-    size_t vertexBufferSize = 0;  // combine vertex buffer
+    size_t vertex_buffer_size = 0;  // combine vertex buffer
 
-    void CreateRenderData();
-    // std::vector<char> GenerateCombinedBuffer() const;
+    void create_render_data();
+    std::vector<char> generate_combined_buffer() const;
 
     void serialize(Archive& archive);
 };
 
+//--------------------------------------------------------------------------------------------------
+// Animation Component
+//--------------------------------------------------------------------------------------------------
+struct AnimationComponent {
+    enum : uint32_t {
+        NONE = 0,
+        PLAYING = 1 << 0,
+        LOOPED = 1 << 1,
+    };
+
+    struct Channel {
+        enum Path {
+            PATH_TRANSLATION,
+            PATH_ROTATION,
+            PATH_SCALE,
+
+            PATH_UNKNOWN,
+        };
+
+        Path path = PATH_UNKNOWN;
+        ecs::Entity target_id;
+        int sampler_index = -1;
+    };
+    struct Sampler {
+        std::vector<float> keyframe_times;
+        std::vector<float> keyframe_data;
+    };
+
+    bool is_playing() const { return flags & PLAYING; }
+    bool is_looped() const { return flags & LOOPED; }
+    float get_legnth() const { return end - start; }
+    float is_end() const { return timer > end; }
+
+    uint32_t flags = LOOPED;
+    float start = 0;
+    float end = 0;
+    float timer = 0;
+    float amount = 1;  // blend amount
+    float speed = 1;
+
+    std::vector<Channel> channels;
+    std::vector<Sampler> samplers;
+
+    void serialize(Archive& archive);
+};
+
+//--------------------------------------------------------------------------------------------------
+//
+//--------------------------------------------------------------------------------------------------
 // @TODO: refactor
 class HierarchyComponent {
 public:
@@ -227,59 +297,6 @@ struct ArmatureComponent {
 
     // Non-Serialized
     std::vector<mat4> boneTransforms;
-
-    void serialize(Archive& archive);
-};
-
-struct AnimationComponent {
-    enum : uint32_t {
-        NONE = 0,
-        PLAYING = 1 << 0,
-        LOOPED = 1 << 1,
-    };
-
-    inline bool IsPlaying() const { return flags & PLAYING; }
-    inline bool IsLooped() const { return flags & LOOPED; }
-    inline float GetLength() const { return end - start; }
-    inline float IsEnded() const { return timer > end; }
-
-    uint32_t flags = LOOPED;
-    float start = 0;
-    float end = 0;
-    float timer = 0;
-    float amount = 1;  // blend amount
-    float speed = 1;
-
-    struct Channel {
-        ecs::Entity targetID;
-        int samplerIndex = -1;
-
-        enum Path {
-            TRANSLATION,
-            ROTATION,
-            SCALE,
-
-            UNKNOWN,
-        } path = Path::UNKNOWN;
-
-        enum PathDataType {
-            Event,
-            Float,
-            Float2,
-            Float3,
-            Float4,
-            Weights,
-
-            Count,
-        };
-    };
-    struct Sampler {
-        std::vector<float> keyframeTimes;
-        std::vector<float> keyframeData;
-    };
-
-    std::vector<Channel> channels;
-    std::vector<Sampler> samplers;
 
     void serialize(Archive& archive);
 };
@@ -335,26 +352,6 @@ struct MaterialComponent {
 
     // @TODO: refactor
     mutable void* gpuResource = nullptr;
-};
-
-class TagComponent {
-public:
-    TagComponent() = default;
-
-    TagComponent(const char* tag) { mTag = tag; }
-
-    // bool operator==(const std::string& tag) const { return mTag == tag; }
-
-    void serialize(Archive& archive);
-
-    void SetTag(const char* tag) { mTag = tag; }
-    void SetTag(const std::string& tag) { mTag = tag; }
-
-    const std::string& GetTag() const { return mTag; }
-    std::string& GetTagRef() { return mTag; }
-
-private:
-    std::string mTag;
 };
 
 }  // namespace vct

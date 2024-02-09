@@ -1,14 +1,14 @@
-#include "Entity.h"
+#include "entity.h"
 
 namespace vct::ecs {
 
-const Entity Entity::INVALID{};
+const Entity Entity::kInvalid{};
 
 void Entity::serialize(Archive& archive) {
     if (archive.is_write_mode()) {
-        archive << mID;
+        archive << m_id;
     } else {
-        archive >> mID;
+        archive >> m_id;
     }
 }
 

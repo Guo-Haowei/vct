@@ -8,8 +8,8 @@ static constexpr float DEFAULT_COLUMN_WIDTH = 100.0f;
 
 static bool draw_vec3_control(const std::string& label, glm::vec3& values, float resetValue = 0.0f,
                               float columnWidth = DEFAULT_COLUMN_WIDTH);
-static bool draw_drag_float(const char* tag, float* p, float speed, float min, float max,
-                            float columnWidth = DEFAULT_COLUMN_WIDTH);
+// static bool draw_drag_float(const char* tag, float* p, float speed, float min, float max,
+//                             float columnWidth = DEFAULT_COLUMN_WIDTH);
 
 template<typename T, typename UIFunction>
 static void DrawComponent(const std::string& name, T* component, UIFunction uiFunction) {
@@ -31,7 +31,7 @@ static void DrawComponent(const std::string& name, T* component, UIFunction uiFu
 
         bool removeComponent = false;
         if (ImGui::BeginPopup("ComponentSettings")) {
-            if (ImGui::MenuItem("Remove component")) {
+            if (ImGui::MenuItem("remove component")) {
                 removeComponent = true;
             }
 
@@ -121,33 +121,33 @@ static bool draw_vec3_control(const std::string& label, glm::vec3& values, float
     return dirty;
 }
 
-static bool draw_drag_float(const char* tag, float* p, float speed, float min, float max, float columnWidth) {
-    ImGui::Columns(2);
-    ImGui::SetColumnWidth(0, columnWidth);
-    ImGui::Text(tag);
-    ImGui::NextColumn();
-    auto dragFloatTag = std::format("##{}", tag);
-    bool dirty = ImGui::DragFloat(dragFloatTag.c_str(), p, speed, min, max);
-    ImGui::Columns(1);
-    return dirty;
-}
+// static bool draw_drag_float(const char* tag, float* p, float speed, float min, float max, float columnWidth) {
+//     ImGui::Columns(2);
+//     ImGui::SetColumnWidth(0, columnWidth);
+//     ImGui::Text(tag);
+//     ImGui::NextColumn();
+//     auto dragFloatTag = std::format("##{}", tag);
+//     bool dirty = ImGui::DragFloat(dragFloatTag.c_str(), p, speed, min, max);
+//     ImGui::Columns(1);
+//     return dirty;
+// }
 
 void PropertyPanel::RenderInternal(Scene& scene) {
     ecs::Entity id = *mpSelected;
 
-    if (!id.IsValid()) {
+    if (!id.is_valid()) {
         return;
     }
 
     TagComponent* tagComponent = scene.get_component<TagComponent>(id);
     if (!tagComponent) {
-        LOG_WARN("Entity {} does not have name", id.GetID());
+        LOG_WARN("Entity {} does not have name", id.get_id());
         return;
     }
 
-    std::string tag = tagComponent->GetTag();
+    std::string tag = tagComponent->get_tag();
     if (ImGui::InputText("##Tag", tag.data(), tag.capacity(), ImGuiInputTextFlags_EnterReturnsTrue)) {
-        tagComponent->GetTagRef() = tag;
+        tagComponent->set_tag(tag);
     }
 
     ImGui::SameLine();
@@ -236,7 +236,7 @@ void PropertyPanel::RenderInternal(Scene& scene) {
         TagComponent* meshName = scene.get_component<TagComponent>(object.meshID);
         ImGui::Text("Mesh Component (%d)", object.meshID);
         if (mesh) {
-            const char* meshNameStr = meshName ? meshName->GetTag().c_str() : "untitled";
+            const char* meshNameStr = meshName ? meshName->get_tag().c_str() : "untitled";
             ImGui::Text("mesh %s (%zu submesh)", meshNameStr, mesh->subsets.size());
             ImGui::Text("%zu triangles", mesh->indices.size() / 3);
             ImGui::Text("v:%zu, n:%zu, u:%zu, b:%zu", mesh->positions.size(), mesh->normals.size(),

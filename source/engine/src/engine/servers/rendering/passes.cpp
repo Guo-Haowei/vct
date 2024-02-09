@@ -6,9 +6,9 @@
 #include "servers/display_server.h"
 
 // @TODO: refactor
-#include "Framework/ProgramManager.h"
 #include "r_cbuffers.h"
 #include "scene/scene_manager.h"
+#include "shader_program_manager.h"
 using namespace vct;
 using namespace vct::rg;
 
@@ -81,8 +81,8 @@ static RenderPassDesc s_viewer_pass_desc = {
 //         mColorAttachments[i].destroy();
 //     }
 //
-//     glDeleteFramebuffers(1, &mHandle);
-//     mHandle = 0;
+//     glDeleteFramebuffers(1, &m_handle);
+//     m_handle = 0;
 // }
 
 uint32_t g_final_image;
@@ -107,7 +107,7 @@ void create_passes() {
 void destroy_passes() {
 }
 
-extern void FillMaterialCB(const MaterialData* mat, MaterialCB& cb);
+extern void FillMaterialCB(const MaterialData* mat, MaterialConstantBuffer& cb);
 
 static void shadow_pass_func() {
     const vct::Scene& scene = SceneManager::get_scene();
@@ -116,14 +116,13 @@ static void shadow_pass_func() {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
     glClear(GL_DEPTH_BUFFER_BIT);
-    const auto& program = gProgramManager->GetShaderProgram(ProgramType::SHADOW);
-    program.Bind();
 
     const int res = DVAR_GET_INT(r_shadowRes);
     // render scene 3 times
 
     const uint32_t numObjects = (uint32_t)scene.get_count<ObjectComponent>();
-    for (int idx = 0; idx < NUM_CASCADES; ++idx) {
+    // @TODO: fix shadow cascade
+    for (int idx = 0; idx < 1; ++idx) {
         glViewport(idx * res, 0, res, res);
         const mat4& PV = g_perFrameCache.cache.LightPVs[idx];
         const Frustum frustum(PV);
@@ -137,14 +136,27 @@ static void shadow_pass_func() {
             const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
 
             const mat4& M = transform.get_world_matrix();
-            AABB aabb = mesh.localBound;
+            AABB aabb = mesh.local_bound;
             aabb.apply_matrix(M);
             if (!frustum.intersects(aabb)) {
                 continue;
             }
 
-            g_perBatchCache.cache.PVM = PV * M;
-            g_perBatchCache.cache.Model = M;
+            const bool has_bone = mesh.armature_id.is_valid();
+
+            if (has_bone) {
+                auto& armature = *scene.get_component<ArmatureComponent>(mesh.armature_id);
+                DEV_ASSERT(armature.boneTransforms.size() <= MAX_BONE_NUMBER);
+
+                memcpy(g_boneCache.cache.c_bones, armature.boneTransforms.data(), sizeof(mat4) * armature.boneTransforms.size());
+                g_boneCache.Update();
+            }
+
+            const auto& program = ShaderProgramManager::get(has_bone ? PROGRAM_DPETH_ANIMATED : PROGRAM_DPETH_STATIC);
+            program.bind();
+
+            g_perBatchCache.cache.c_projection_view_model_matrix = PV * M;
+            g_perBatchCache.cache.c_model_matrix = M;
             g_perBatchCache.Update();
 
             const MeshData* drawData = reinterpret_cast<MeshData*>(mesh.gpuResource);
@@ -154,13 +166,11 @@ static void shadow_pass_func() {
     }
 
     glCullFace(GL_BACK);
+    glUseProgram(0);
 }
 
 static void gbuffer_pass_func() {
     vct::Scene& scene = SceneManager::get_scene();
-    const auto& program = gProgramManager->GetShaderProgram(ProgramType::GBUFFER);
-
-    program.Bind();
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -171,6 +181,7 @@ static void gbuffer_pass_func() {
 
     Frustum frustum(camera.get_projection_view_matrix());
 
+    // @TODO: sort animated / non-animated
     const uint32_t numObjects = (uint32_t)scene.get_count<ObjectComponent>();
     for (uint32_t i = 0; i < numObjects; ++i) {
         const ObjectComponent& obj = scene.get_component_array<ObjectComponent>()[i];
@@ -178,72 +189,86 @@ static void gbuffer_pass_func() {
         DEV_ASSERT(scene.contains<TransformComponent>(entity));
         const TransformComponent& transform = *scene.get_component<TransformComponent>(entity);
         DEV_ASSERT(scene.contains<MeshComponent>(obj.meshID));
+
         const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
 
         const mat4& M = transform.get_world_matrix();
-        AABB aabb = mesh.localBound;
+        AABB aabb = mesh.local_bound;
         aabb.apply_matrix(M);
         if (!frustum.intersects(aabb)) {
             continue;
         }
 
-        g_perBatchCache.cache.Model = M;
-        g_perBatchCache.cache.PVM = g_perFrameCache.cache.PV * M;
+        bool has_bone = mesh.armature_id.is_valid();
+
+        if (has_bone) {
+            auto& armature = *scene.get_component<ArmatureComponent>(mesh.armature_id);
+            DEV_ASSERT(armature.boneTransforms.size() <= MAX_BONE_NUMBER);
+
+            memcpy(g_boneCache.cache.c_bones, armature.boneTransforms.data(), sizeof(mat4) * armature.boneTransforms.size());
+            g_boneCache.Update();
+        }
+
+        const auto& program = ShaderProgramManager::get(has_bone ? PROGRAM_GBUFFER_ANIMATED : PROGRAM_GBUFFER_STATIC);
+        program.bind();
+
+        g_perBatchCache.cache.c_model_matrix = M;
+        g_perBatchCache.cache.c_projection_view_model_matrix = g_perFrameCache.cache.c_projection_view_matrix * M;
         g_perBatchCache.Update();
 
         const MeshData* drawData = reinterpret_cast<MeshData*>(mesh.gpuResource);
         glBindVertexArray(drawData->vao);
 
         for (const auto& subset : mesh.subsets) {
-            aabb = subset.localBound;
+            aabb = subset.local_bound;
             aabb.apply_matrix(M);
             if (!frustum.intersects(aabb)) {
                 continue;
             }
 
-            const MaterialComponent& material = *scene.get_component<MaterialComponent>(subset.materialID);
+            const MaterialComponent& material = *scene.get_component<MaterialComponent>(subset.material_id);
             const MaterialData* matData = reinterpret_cast<MaterialData*>(material.gpuResource);
 
             FillMaterialCB(matData, g_materialCache.cache);
             g_materialCache.Update();
 
-            glDrawElements(GL_TRIANGLES, subset.indexCount, GL_UNSIGNED_INT,
-                           (void*)(subset.indexOffset * sizeof(uint32_t)));
+            glDrawElements(GL_TRIANGLES, subset.index_count, GL_UNSIGNED_INT,
+                           (void*)(subset.index_offset * sizeof(uint32_t)));
         }
     }
 
-    program.Unbind();
+    glUseProgram(0);
 }
 
 static void ssao_pass_func() {
-    const auto& shader = gProgramManager->GetShaderProgram(ProgramType::SSAO);
+    const auto& shader = ShaderProgramManager::get(ProgramType::SSAO);
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    shader.Bind();
+    shader.bind();
 
     R_DrawQuad();
 
-    shader.Unbind();
+    shader.unbind();
 }
 
 static void deferred_vct_pass() {
-    const auto& program = gProgramManager->GetShaderProgram(ProgramType::VCT_DEFERRED);
+    const auto& program = ShaderProgramManager::get(ProgramType::VCT_DEFERRED);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    program.Bind();
+    program.bind();
 
     R_DrawQuad();
 
-    program.Unbind();
+    program.unbind();
 }
 
 static void fxaa_pass() {
-    const auto& program = gProgramManager->GetShaderProgram(ProgramType::FXAA);
+    const auto& program = ShaderProgramManager::get(ProgramType::FXAA);
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    program.Bind();
+    program.bind();
     R_DrawQuad();
-    program.Unbind();
+    program.unbind();
 }

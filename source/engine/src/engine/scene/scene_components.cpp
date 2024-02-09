@@ -6,7 +6,18 @@
 namespace vct {
 
 //--------------------------------------------------------------------------------------------------
-// TransformComponent
+// Tag Component
+//--------------------------------------------------------------------------------------------------
+void TagComponent::serialize(Archive& archive) {
+    if (archive.is_write_mode()) {
+        archive << m_tag;
+    } else {
+        archive >> m_tag;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+// Transform Component
 //--------------------------------------------------------------------------------------------------
 mat4 TransformComponent::get_local_matrix() const {
     mat4 rotationMatrix = glm::toMat4(quat(m_rotation.w, m_rotation.x, m_rotation.y, m_rotation.z));
@@ -80,12 +91,10 @@ void TransformComponent::serialize(Archive& archive) {
 }
 
 //--------------------------------------------------------------------------------------------------
-// CameraComponent
+// Camera Component
 //--------------------------------------------------------------------------------------------------
 void CameraComponent::update() {
-    // @TODO: check size
-    // if (is_dirty())
-    {
+    if (is_dirty()) {
         const float aspect = m_width / m_height;
         m_view_matrix = glm::lookAt(m_eye, m_center, vec3(0, 1, 0));
         m_projection_matrix = glm::perspective(m_fovy, aspect, m_near, m_far);
@@ -146,81 +155,88 @@ static size_t get_stride(MeshComponent::VertexAttribute::NAME name) {
 }
 
 template<typename T>
-void VertexAttribHelper(MeshComponent::VertexAttribute& attrib, const std::vector<T>& buffer, size_t& in_out_offset) {
-    attrib.offsetInByte = (uint32_t)in_out_offset;
-    attrib.sizeInByte = (uint32_t)(align(sizeof(T) * buffer.size(), 16llu));
+void vertex_attrib(MeshComponent::VertexAttribute& attrib, const std::vector<T>& buffer, size_t& in_out_offset) {
+    attrib.offset_in_byte = (uint32_t)in_out_offset;
+    attrib.size_in_byte = (uint32_t)(align(sizeof(T) * buffer.size(), 16llu));
     attrib.stride = (uint32_t)get_stride(attrib.name);
-    in_out_offset += attrib.sizeInByte;
+    in_out_offset += attrib.size_in_byte;
 }
 
-void MeshComponent::CreateRenderData() {
+void MeshComponent::create_render_data() {
     DEV_ASSERT(texcoords_0.size());
     DEV_ASSERT(normals.size());
     // AABB
-    localBound.make_invalid();
+    local_bound.make_invalid();
     for (MeshSubset& subset : subsets) {
-        subset.localBound.make_invalid();
-        for (uint32_t i = 0; i < subset.indexCount; ++i) {
-            const vec3& point = positions[indices[i + subset.indexOffset]];
-            subset.localBound.expand_point(point);
+        subset.local_bound.make_invalid();
+        for (uint32_t i = 0; i < subset.index_count; ++i) {
+            const vec3& point = positions[indices[i + subset.index_offset]];
+            subset.local_bound.expand_point(point);
         }
-        subset.localBound.make_valid();
-        localBound.union_box(subset.localBound);
+        subset.local_bound.make_valid();
+        local_bound.union_box(subset.local_bound);
     }
     // Attributes
     for (int i = 0; i < VertexAttribute::COUNT; ++i) {
         attributes[i].name = static_cast<VertexAttribute::NAME>(i);
     }
 
-    vertexBufferSize = 0;
-    VertexAttribHelper(attributes[VertexAttribute::POSITION], positions, vertexBufferSize);
-    VertexAttribHelper(attributes[VertexAttribute::NORMAL], normals, vertexBufferSize);
-    VertexAttribHelper(attributes[VertexAttribute::TEXCOORD_0], texcoords_0, vertexBufferSize);
-    VertexAttribHelper(attributes[VertexAttribute::TEXCOORD_1], texcoords_1, vertexBufferSize);
-    VertexAttribHelper(attributes[VertexAttribute::TANGENT], tangents, vertexBufferSize);
-    VertexAttribHelper(attributes[VertexAttribute::JOINTS_0], joints_0, vertexBufferSize);
-    VertexAttribHelper(attributes[VertexAttribute::WEIGHTS_0], weights_0, vertexBufferSize);
-    VertexAttribHelper(attributes[VertexAttribute::COLOR_0], color_0, vertexBufferSize);
+    vertex_buffer_size = 0;
+    vertex_attrib(attributes[VertexAttribute::POSITION], positions, vertex_buffer_size);
+    vertex_attrib(attributes[VertexAttribute::NORMAL], normals, vertex_buffer_size);
+    vertex_attrib(attributes[VertexAttribute::TEXCOORD_0], texcoords_0, vertex_buffer_size);
+    vertex_attrib(attributes[VertexAttribute::TEXCOORD_1], texcoords_1, vertex_buffer_size);
+    vertex_attrib(attributes[VertexAttribute::TANGENT], tangents, vertex_buffer_size);
+    vertex_attrib(attributes[VertexAttribute::JOINTS_0], joints_0, vertex_buffer_size);
+    vertex_attrib(attributes[VertexAttribute::WEIGHTS_0], weights_0, vertex_buffer_size);
+    vertex_attrib(attributes[VertexAttribute::COLOR_0], color_0, vertex_buffer_size);
     return;
 }
 
 void MeshComponent::serialize(Archive& archive) {
+    CRASH_NOW();
     if (archive.is_write_mode()) {
     } else {
     }
 }
 
-// std::vector<char> MeshComponent::GenerateCombinedBuffer() const {
-//     std::vector<char> result;
-//     result.resize(vertexBufferSize);
-//
-//     auto SafeCopy = [&](const VertexAttribute& attrib, const void* data) {
-//         if (attrib.sizeInByte == 0) {
-//             return;
-//         }
-//
-//         memcpy(result.data() + attrib.offsetInByte, data, attrib.sizeInByte);
-//         return;
-//     };
-//     SafeCopy(attributes[VertexAttribute::POSITION], positions.data());
-//     SafeCopy(attributes[VertexAttribute::NORMAL], normals.data());
-//     SafeCopy(attributes[VertexAttribute::TEXCOORD_0], texcoords_0.data());
-//     SafeCopy(attributes[VertexAttribute::TEXCOORD_1], texcoords_1.data());
-//     SafeCopy(attributes[VertexAttribute::TANGENT], tangents.data());
-//     SafeCopy(attributes[VertexAttribute::JOINTS_0], joints_0.data());
-//     SafeCopy(attributes[VertexAttribute::WEIGHTS_0], weights_0.data());
-//     SafeCopy(attributes[VertexAttribute::COLOR_0], color_0.data());
-//     return result;
-// }
+std::vector<char> MeshComponent::generate_combined_buffer() const {
+    std::vector<char> result;
+    result.resize(vertex_buffer_size);
 
-void HierarchyComponent::serialize(Archive& archive) { mParent.serialize(archive); }
+    auto safe_copy = [&](const VertexAttribute& attrib, const void* data) {
+        if (attrib.size_in_byte == 0) {
+            return;
+        }
 
-void ObjectComponent::serialize(Archive& archive) { meshID.serialize(archive); }
+        memcpy(result.data() + attrib.offset_in_byte, data, attrib.size_in_byte);
+        return;
+    };
+    safe_copy(attributes[VertexAttribute::POSITION], positions.data());
+    safe_copy(attributes[VertexAttribute::NORMAL], normals.data());
+    safe_copy(attributes[VertexAttribute::TEXCOORD_0], texcoords_0.data());
+    safe_copy(attributes[VertexAttribute::TEXCOORD_1], texcoords_1.data());
+    safe_copy(attributes[VertexAttribute::TANGENT], tangents.data());
+    safe_copy(attributes[VertexAttribute::JOINTS_0], joints_0.data());
+    safe_copy(attributes[VertexAttribute::WEIGHTS_0], weights_0.data());
+    safe_copy(attributes[VertexAttribute::COLOR_0], color_0.data());
+    return result;
+}
 
+//--------------------------------------------------------------------------------------------------
+// Animation Component
+//--------------------------------------------------------------------------------------------------
 void AnimationComponent::serialize(Archive& archive) {
     unused(archive);
     CRASH_NOW_MSG("NOT IMPLMENTED");
 }
+
+//--------------------------------------------------------------------------------------------------
+//
+//--------------------------------------------------------------------------------------------------
+void HierarchyComponent::serialize(Archive& archive) { mParent.serialize(archive); }
+
+void ObjectComponent::serialize(Archive& archive) { meshID.serialize(archive); }
 
 void ArmatureComponent::serialize(Archive& archive) {
     unused(archive);
@@ -264,14 +280,6 @@ void MaterialComponent::serialize(Archive& archive) {
         archive >> mMetallic;
         archive >> mRoughness;
         archive >> mBaseColor;
-    }
-}
-
-void TagComponent::serialize(Archive& archive) {
-    if (archive.is_write_mode()) {
-        archive << mTag;
-    } else {
-        archive >> mTag;
     }
 }
 

@@ -1,68 +1,49 @@
 #include "Application.h"
 
-#include "ProgramManager.h"
 #include "imgui/imgui.h"
 // @TODO: refactor
 
 #include "core/dynamic_variable/common_dvars.h"
 #include "core/input/input.h"
 #include "core/systems/job_system.h"
+#include "core/utility/timer.h"
 #include "scene/scene_manager.h"
 #include "servers/display_server.h"
 #include "servers/rendering_server.h"
 
 using namespace vct;
 
-void Application::RegisterManager(ManagerBase* manager) {
-    mManagers.emplace_back(manager);
-    manager->mApplication = this;
-}
-
-bool Application::RegisterManagers() {
-    RegisterManager(gProgramManager);
-    return true;
-}
-
-bool Application::InitializeManagers() {
-    for (auto manager : mManagers) {
-        if (!manager->Initialize()) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-void Application::FinalizeManagers() {
-    for (auto it = mManagers.rbegin(); it != mManagers.rend(); ++it) {
-        (*it)->Finalize();
-    }
-}
-
 void Application::AddLayer(std::shared_ptr<Layer> layer) { mLayers.emplace_back(layer); }
 
 int Application::Run(int, const char**) {
-    bool ok = true;
-    ok = ok && RegisterManagers();
-    ok = ok && InitializeManagers();
-
-    if (!ok) {
-        return -1;
-    }
-
     for (auto& layer : mLayers) {
         layer->Attach();
         LOG("[Runtime] layer '{}' attached!", layer->GetName());
     }
 
-    float dt = 0.0f;
+    LOG("\n********************************************************************************"
+        "\nMain Loop"
+        "\n********************************************************************************");
+
+    LOG_WARN("TODO: save and load scene");
+    LOG_WARN("TODO: move shader to res folder");
+    LOG_WARN("TODO: imgui true font");
+    LOG_WARN("TODO: use RID as much as possible");
+    LOG_WARN("TODO: fix multiple objects play same animation");
+    LOG_WARN("TODO: cloth physics");
+    LOG_WARN("TODO: refactor application");
+
+    // @TODO: add frame count, elapsed time, etc
+    Timer timer;
     while (!DisplayServer::singleton().should_close()) {
         DisplayServer::singleton().new_frame();
 
         input::begin_frame();
 
-        // @TODO:
+        // @TODO: better elapsed time
+        const float dt = static_cast<float>(timer.get_duration().to_second());
         SceneManager::singleton().update(dt);
+        timer.start();
 
         ImGui::NewFrame();
         for (auto& layer : mLayers) {
@@ -83,12 +64,15 @@ int Application::Run(int, const char**) {
         input::end_frame();
     }
 
+    LOG("\n********************************************************************************"
+        "\nMain Loop"
+        "\n********************************************************************************");
+
     // @TODO: fix
     auto [w, h] = DisplayServer::singleton().get_frame_size();
     DVAR_SET_IVEC2(window_resolution, w, h);
     auto [x, y] = DisplayServer::singleton().get_window_pos();
     DVAR_SET_IVEC2(window_position, x, y);
 
-    FinalizeManagers();
     return 0;
 }
