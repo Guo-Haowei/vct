@@ -6,7 +6,18 @@
 namespace vct {
 
 //--------------------------------------------------------------------------------------------------
-// TransformComponent
+// Tag Component
+//--------------------------------------------------------------------------------------------------
+void TagComponent::serialize(Archive& archive) {
+    if (archive.is_write_mode()) {
+        archive << m_tag;
+    } else {
+        archive >> m_tag;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+// Transform Component
 //--------------------------------------------------------------------------------------------------
 mat4 TransformComponent::get_local_matrix() const {
     mat4 rotationMatrix = glm::toMat4(quat(m_rotation.w, m_rotation.x, m_rotation.y, m_rotation.z));
@@ -80,7 +91,7 @@ void TransformComponent::serialize(Archive& archive) {
 }
 
 //--------------------------------------------------------------------------------------------------
-// CameraComponent
+// Camera Component
 //--------------------------------------------------------------------------------------------------
 void CameraComponent::update() {
     if (is_dirty()) {
@@ -269,14 +280,6 @@ void MaterialComponent::serialize(Archive& archive) {
         archive >> mMetallic;
         archive >> mRoughness;
         archive >> mBaseColor;
-    }
-}
-
-void TagComponent::serialize(Archive& archive) {
-    if (archive.is_write_mode()) {
-        archive << mTag;
-    } else {
-        archive >> mTag;
     }
 }
 

@@ -34,7 +34,7 @@ void HierarchyCreator::DrawNode(const Scene& scene, HierarchyNode* pHier, ImGuiT
     DEV_ASSERT(pHier);
     ecs::Entity id = pHier->entity;
     const TagComponent* tagComponent = scene.get_component<TagComponent>(id);
-    const char* name = tagComponent ? tagComponent->GetTag().c_str() : "Untitled";
+    const char* name = tagComponent ? tagComponent->get_tag().c_str() : "Untitled";
 
     auto nodeTag = std::format("##{}", id.get_id());
     auto tag = std::format("{}{}", name, nodeTag);

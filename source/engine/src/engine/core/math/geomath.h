@@ -55,6 +55,9 @@ constexpr inline T lerp(const T& a, const T& b, const T& f) {
     return a + f * (b - a);
 }
 
+template<typename T>
+constexpr inline float saturate(T x) { return glm::min(T(1), glm::max(T(0), x)); }
+
 // @TODO: refactor
 template<typename T>
 T Square(const T& a) {
@@ -71,5 +74,3 @@ static inline void Decompose(const mat4& matrix, vec3& scale, vec4& rotation, ve
     rotation.z = quaternion.z;
     rotation.w = quaternion.w;
 }
-
-static inline float SaturateF(float x) { return glm::min(1.0f, glm::max(0.0f, x)); }

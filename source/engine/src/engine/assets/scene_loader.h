@@ -15,6 +15,7 @@ protected:
     virtual bool import_impl() = 0;
 
     Scene& m_scene;
+    std::string m_scene_name;
     std::string m_loader_name;
     std::string m_file_path;
     std::string m_search_path;

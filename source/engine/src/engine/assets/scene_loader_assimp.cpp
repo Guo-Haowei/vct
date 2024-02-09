@@ -44,7 +44,7 @@ bool SceneLoaderAssimp::import_impl() {
     }
 
     ecs::Entity root = process_node(aiscene->mRootNode, ecs::Entity::kInvalid);
-    m_scene.get_component<TagComponent>(root)->SetTag(m_file_path);
+    m_scene.get_component<TagComponent>(root)->set_tag(m_file_path);
 
     m_scene.m_root = root;
     return true;
@@ -141,7 +141,7 @@ ecs::Entity SceneLoaderAssimp::process_node(const aiNode* node, ecs::Entity pare
         for (uint32_t i = 0; i < node->mNumMeshes; ++i) {
             ecs::Entity child = m_scene.create_object_entity("");
             auto tagComponent = m_scene.get_component<TagComponent>(child);
-            tagComponent->SetTag("SubGeometry_" + std::to_string(child.get_id()));
+            tagComponent->set_tag("SubGeometry_" + std::to_string(child.get_id()));
             ObjectComponent& objComponent = *m_scene.get_component<ObjectComponent>(child);
             objComponent.meshID = m_meshes[node->mMeshes[i]];
             m_scene.attach_component(child, entity);

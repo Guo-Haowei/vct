@@ -8,7 +8,7 @@ SceneLoader::SceneLoader(Scene& scene, const std::string& file_path, const char*
     : m_scene(scene), m_file_path(file_path), m_loader_name(loader_name) {
 
     std::filesystem::path system_path{ file_path };
-    std::string modelName = system_path.filename().string();
+    m_scene_name = system_path.filename().string();
     m_search_path = system_path.remove_filename().string();
 }
 

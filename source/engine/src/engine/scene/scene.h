@@ -6,10 +6,6 @@
 
 namespace vct {
 
-namespace jobsystem {
-class Context;
-}
-
 class Scene : public NonCopyable {
 public:
     static constexpr const char* EXTENSION = ".scene";
@@ -172,14 +168,6 @@ public:                                                                         
     // @TODO: fix
     void Component_DetachChildren(ecs::Entity parent);
 
-    void update_animation(jobsystem::Context& ctx);
-    void update_transformation(jobsystem::Context& ctx);
-    void update_hierarchy(jobsystem::Context& ctx);
-    void update_armature(jobsystem::Context& ctx);
-
-    // @TODO: fix
-    void update_camera(jobsystem::Context& ctx);
-
     CameraComponent& get_main_camera();
 
     struct RayIntersectionResult {
@@ -194,6 +182,12 @@ public:                                                                         
     // @TODO: refactor
     AABB m_bound;
     ecs::Entity m_selected;
+
+private:
+    void update_transformation(uint32_t index);
+    void update_hierarchy(uint32_t index);
+    void update_animation(uint32_t index);
+    void update_armature(uint32_t index);
 };
 
 }  // namespace vct

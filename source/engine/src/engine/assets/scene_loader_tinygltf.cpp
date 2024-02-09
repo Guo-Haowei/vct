@@ -86,7 +86,7 @@ void SceneLoaderTinyGLTF::process_node(int node_index, ecs::Entity parent) {
     if (!entity.is_valid()) {
         entity = ecs::Entity::create();
         m_scene.create<TransformComponent>(entity);
-        m_scene.create<TagComponent>(entity).GetTagRef() = "Transform::" + node.name;
+        m_scene.create<TagComponent>(entity).set_tag("Transform::" + node.name);
     }
 
     m_entity_map[node_index] = entity;
@@ -168,7 +168,7 @@ bool SceneLoaderTinyGLTF::import_impl() {
 
     ecs::Entity root = ecs::Entity::create();
     m_scene.create<TransformComponent>(root);
-    m_scene.create<TagComponent>(root).GetTagRef() = std::filesystem::path(m_file_path).filename().string();
+    m_scene.create<TagComponent>(root).set_tag(std::filesystem::path(m_file_path).filename().string());
     m_scene.m_root = root;
 
     // Create materials
@@ -257,13 +257,14 @@ bool SceneLoaderTinyGLTF::import_impl() {
     }
 
     // Create meshes:
-    for (const auto& mesh : m_model->meshes) {
-        process_mesh(mesh);
+    for (int id = 0; id < (int)m_model->meshes.size(); ++id) {
+        const tinygltf::Mesh& mesh = m_model->meshes[id];
+        process_mesh(mesh, id);
     }
     // Create armatures
     for (const auto& skin : m_model->skins) {
         ecs::Entity armature_id = ecs::Entity::create();
-        m_scene.create<TagComponent>(armature_id).GetTagRef() = skin.name;
+        m_scene.create<TagComponent>(armature_id).set_tag(skin.name);
         m_scene.create<TransformComponent>(armature_id);
         ArmatureComponent& armature = m_scene.create<ArmatureComponent>(armature_id);
         if (skin.inverseBindMatrices >= 0) {
@@ -302,10 +303,10 @@ bool SceneLoaderTinyGLTF::import_impl() {
     }
 
     // Create animations:
-    for (const auto& anim : m_model->animations) {
-        process_animation(anim);
+    for (int id = 0; id < (int)m_model->animations.size(); ++id) {
+        const tinygltf::Animation& anim = m_model->animations[id];
+        process_animation(anim, id);
     }
-
     // Create lights:
     // Create cameras:
 
@@ -313,7 +314,7 @@ bool SceneLoaderTinyGLTF::import_impl() {
     return true;
 }
 
-void SceneLoaderTinyGLTF::process_mesh(const tinygltf::Mesh& gltf_mesh) {
+void SceneLoaderTinyGLTF::process_mesh(const tinygltf::Mesh& gltf_mesh, int) {
     ecs::Entity mesh_id = m_scene.create_mesh_entity("Mesh::" + gltf_mesh.name);
     // m_scene.Component_Attach(mesh_id, state.rootEntity);
     MeshComponent& mesh = *m_scene.get_component<MeshComponent>(mesh_id);
@@ -345,22 +346,22 @@ void SceneLoaderTinyGLTF::process_mesh(const tinygltf::Mesh& gltf_mesh) {
             const uint8_t* data = buffer.data.data() + accessor.byteOffset + bufferView.byteOffset;
 
             if (stride == 1) {
-                for (size_t i = 0; i < index_count; i += 3) {
-                    mesh.indices[index_offset + i + 0] = vertexOffset + data[i + 0];
-                    mesh.indices[index_offset + i + 1] = vertexOffset + data[i + 1];
-                    mesh.indices[index_offset + i + 2] = vertexOffset + data[i + 2];
+                for (size_t index = 0; index < index_count; index += 3) {
+                    mesh.indices[index_offset + index + 0] = vertexOffset + data[index + 0];
+                    mesh.indices[index_offset + index + 1] = vertexOffset + data[index + 1];
+                    mesh.indices[index_offset + index + 2] = vertexOffset + data[index + 2];
                 }
             } else if (stride == 2) {
-                for (size_t i = 0; i < index_count; i += 3) {
-                    mesh.indices[index_offset + i + 0] = vertexOffset + ((uint16_t*)data)[i + 0];
-                    mesh.indices[index_offset + i + 1] = vertexOffset + ((uint16_t*)data)[i + 1];
-                    mesh.indices[index_offset + i + 2] = vertexOffset + ((uint16_t*)data)[i + 2];
+                for (size_t index = 0; index < index_count; index += 3) {
+                    mesh.indices[index_offset + index + 0] = vertexOffset + ((uint16_t*)data)[index + 0];
+                    mesh.indices[index_offset + index + 1] = vertexOffset + ((uint16_t*)data)[index + 1];
+                    mesh.indices[index_offset + index + 2] = vertexOffset + ((uint16_t*)data)[index + 2];
                 }
             } else if (stride == 4) {
-                for (size_t i = 0; i < index_count; i += 3) {
-                    mesh.indices[index_offset + i + 0] = vertexOffset + ((uint32_t*)data)[i + 0];
-                    mesh.indices[index_offset + i + 1] = vertexOffset + ((uint32_t*)data)[i + 1];
-                    mesh.indices[index_offset + i + 2] = vertexOffset + ((uint32_t*)data)[i + 2];
+                for (size_t index = 0; index < index_count; index += 3) {
+                    mesh.indices[index_offset + index + 0] = vertexOffset + ((uint32_t*)data)[index + 0];
+                    mesh.indices[index_offset + index + 1] = vertexOffset + ((uint32_t*)data)[index + 1];
+                    mesh.indices[index_offset + index + 2] = vertexOffset + ((uint32_t*)data)[index + 2];
                 }
             } else {
                 CRASH_NOW_MSG("unsupported index stride!");
@@ -386,8 +387,8 @@ void SceneLoaderTinyGLTF::process_mesh(const tinygltf::Mesh& gltf_mesh) {
 
             if (attrName == "POSITION") {
                 mesh.positions.resize(vertexOffset + vertexCount);
-                for (size_t i = 0; i < vertexCount; ++i) {
-                    mesh.positions[vertexOffset + i] = *(const vec3*)(data + i * stride);
+                for (size_t index = 0; index < vertexCount; ++index) {
+                    mesh.positions[vertexOffset + index] = *(const vec3*)(data + index * stride);
                 }
 
                 if (accessor.sparse.isSparse) {
@@ -419,8 +420,8 @@ void SceneLoaderTinyGLTF::process_mesh(const tinygltf::Mesh& gltf_mesh) {
                 }
             } else if (attrName == "NORMAL") {
                 mesh.normals.resize(vertexOffset + vertexCount);
-                for (size_t i = 0; i < vertexCount; ++i) {
-                    mesh.normals[vertexOffset + i] = *(const vec3*)(data + i * stride);
+                for (size_t index = 0; index < vertexCount; ++index) {
+                    mesh.normals[vertexOffset + index] = *(const vec3*)(data + index * stride);
                 }
 
                 if (accessor.sparse.isSparse) {
@@ -452,33 +453,33 @@ void SceneLoaderTinyGLTF::process_mesh(const tinygltf::Mesh& gltf_mesh) {
                 }
             } else if (attrName == "TANGENT") {
                 mesh.tangents.resize(vertexOffset + vertexCount);
-                for (size_t i = 0; i < vertexCount; ++i) {
-                    mesh.tangents[vertexOffset + i] = *(const vec4*)(data + i * stride);
+                for (size_t index = 0; index < vertexCount; ++index) {
+                    mesh.tangents[vertexOffset + index] = *(const vec4*)(data + index * stride);
                 }
             } else if (attrName == "TEXCOORD_0") {
                 mesh.texcoords_0.resize(vertexOffset + vertexCount);
                 if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT) {
-                    for (size_t i = 0; i < vertexCount; ++i) {
-                        const vec2& tex = *(const vec2*)((size_t)data + i * stride);
+                    for (size_t index = 0; index < vertexCount; ++index) {
+                        const vec2& tex = *(const vec2*)((size_t)data + index * stride);
 
-                        mesh.texcoords_0[vertexOffset + i].x = tex.x;
-                        mesh.texcoords_0[vertexOffset + i].y = tex.y;
+                        mesh.texcoords_0[vertexOffset + index].x = tex.x;
+                        mesh.texcoords_0[vertexOffset + index].y = tex.y;
                     }
                 } else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE) {
-                    for (size_t i = 0; i < vertexCount; ++i) {
-                        const uint8_t& s = *(uint8_t*)((size_t)data + i * stride + 0);
-                        const uint8_t& t = *(uint8_t*)((size_t)data + i * stride + 1);
+                    for (size_t index = 0; index < vertexCount; ++index) {
+                        const uint8_t& s = *(uint8_t*)((size_t)data + index * stride + 0);
+                        const uint8_t& t = *(uint8_t*)((size_t)data + index * stride + 1);
 
-                        mesh.texcoords_0[vertexOffset + i].x = s / 255.0f;
-                        mesh.texcoords_0[vertexOffset + i].y = t / 255.0f;
+                        mesh.texcoords_0[vertexOffset + index].x = s / 255.0f;
+                        mesh.texcoords_0[vertexOffset + index].y = t / 255.0f;
                     }
                 } else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT) {
-                    for (size_t i = 0; i < vertexCount; ++i) {
-                        const uint16_t& s = *(uint16_t*)((size_t)data + i * stride + 0 * sizeof(uint16_t));
-                        const uint16_t& t = *(uint16_t*)((size_t)data + i * stride + 1 * sizeof(uint16_t));
+                    for (size_t index = 0; index < vertexCount; ++index) {
+                        const uint16_t& s = *(uint16_t*)((size_t)data + index * stride + 0 * sizeof(uint16_t));
+                        const uint16_t& t = *(uint16_t*)((size_t)data + index * stride + 1 * sizeof(uint16_t));
 
-                        mesh.texcoords_0[vertexOffset + i].x = s / 65535.0f;
-                        mesh.texcoords_0[vertexOffset + i].y = t / 65535.0f;
+                        mesh.texcoords_0[vertexOffset + index].x = s / 65535.0f;
+                        mesh.texcoords_0[vertexOffset + index].y = t / 65535.0f;
                     }
                 }
             } else if (attrName == "TEXCOORD_1") {
@@ -492,39 +493,39 @@ void SceneLoaderTinyGLTF::process_mesh(const tinygltf::Mesh& gltf_mesh) {
                         uint8_t ind[4];
                     };
 
-                    for (size_t i = 0; i < vertexCount; ++i) {
-                        const JointTmp& joint = *(const JointTmp*)(data + i * stride);
+                    for (size_t index = 0; index < vertexCount; ++index) {
+                        const JointTmp& joint = *(const JointTmp*)(data + index * stride);
 
-                        mesh.joints_0[vertexOffset + i].x = joint.ind[0];
-                        mesh.joints_0[vertexOffset + i].y = joint.ind[1];
-                        mesh.joints_0[vertexOffset + i].z = joint.ind[2];
-                        mesh.joints_0[vertexOffset + i].w = joint.ind[3];
+                        mesh.joints_0[vertexOffset + index].x = joint.ind[0];
+                        mesh.joints_0[vertexOffset + index].y = joint.ind[1];
+                        mesh.joints_0[vertexOffset + index].z = joint.ind[2];
+                        mesh.joints_0[vertexOffset + index].w = joint.ind[3];
                     }
                 } else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT) {
                     struct JointTmp {
                         uint16_t ind[4];
                     };
 
-                    for (size_t i = 0; i < vertexCount; ++i) {
-                        const JointTmp& joint = *(const JointTmp*)(data + i * stride);
+                    for (size_t index = 0; index < vertexCount; ++index) {
+                        const JointTmp& joint = *(const JointTmp*)(data + index * stride);
 
-                        mesh.joints_0[vertexOffset + i].x = joint.ind[0];
-                        mesh.joints_0[vertexOffset + i].y = joint.ind[1];
-                        mesh.joints_0[vertexOffset + i].z = joint.ind[2];
-                        mesh.joints_0[vertexOffset + i].w = joint.ind[3];
+                        mesh.joints_0[vertexOffset + index].x = joint.ind[0];
+                        mesh.joints_0[vertexOffset + index].y = joint.ind[1];
+                        mesh.joints_0[vertexOffset + index].z = joint.ind[2];
+                        mesh.joints_0[vertexOffset + index].w = joint.ind[3];
                     }
                 } else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT) {
                     struct JointTmp {
                         uint32_t ind[4];
                     };
 
-                    for (size_t i = 0; i < vertexCount; ++i) {
-                        const JointTmp& joint = *(const JointTmp*)(data + i * stride);
+                    for (size_t index = 0; index < vertexCount; ++index) {
+                        const JointTmp& joint = *(const JointTmp*)(data + index * stride);
 
-                        mesh.joints_0[vertexOffset + i].x = joint.ind[0];
-                        mesh.joints_0[vertexOffset + i].y = joint.ind[1];
-                        mesh.joints_0[vertexOffset + i].z = joint.ind[2];
-                        mesh.joints_0[vertexOffset + i].w = joint.ind[3];
+                        mesh.joints_0[vertexOffset + index].x = joint.ind[0];
+                        mesh.joints_0[vertexOffset + index].y = joint.ind[1];
+                        mesh.joints_0[vertexOffset + index].z = joint.ind[2];
+                        mesh.joints_0[vertexOffset + index].w = joint.ind[3];
                     }
                 } else {
                     DEV_ASSERT(0);
@@ -532,32 +533,32 @@ void SceneLoaderTinyGLTF::process_mesh(const tinygltf::Mesh& gltf_mesh) {
             } else if (attrName == "WEIGHTS_0") {
                 mesh.weights_0.resize(vertexOffset + vertexCount);
                 if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT) {
-                    for (size_t i = 0; i < vertexCount; ++i) {
-                        mesh.weights_0[vertexOffset + i] = *(vec4*)((size_t)data + i * stride);
+                    for (size_t index = 0; index < vertexCount; ++index) {
+                        mesh.weights_0[vertexOffset + index] = *(vec4*)((size_t)data + index * stride);
                     }
                 } else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE) {
-                    for (size_t i = 0; i < vertexCount; ++i) {
-                        const uint8_t& x = *(uint8_t*)((size_t)data + i * stride + 0);
-                        const uint8_t& y = *(uint8_t*)((size_t)data + i * stride + 1);
-                        const uint8_t& z = *(uint8_t*)((size_t)data + i * stride + 2);
-                        const uint8_t& w = *(uint8_t*)((size_t)data + i * stride + 3);
+                    for (size_t index = 0; index < vertexCount; ++index) {
+                        const uint8_t& x = *(uint8_t*)((size_t)data + index * stride + 0);
+                        const uint8_t& y = *(uint8_t*)((size_t)data + index * stride + 1);
+                        const uint8_t& z = *(uint8_t*)((size_t)data + index * stride + 2);
+                        const uint8_t& w = *(uint8_t*)((size_t)data + index * stride + 3);
 
-                        mesh.weights_0[vertexOffset + i].x = x / 255.0f;
-                        mesh.weights_0[vertexOffset + i].x = y / 255.0f;
-                        mesh.weights_0[vertexOffset + i].x = z / 255.0f;
-                        mesh.weights_0[vertexOffset + i].x = w / 255.0f;
+                        mesh.weights_0[vertexOffset + index].x = x / 255.0f;
+                        mesh.weights_0[vertexOffset + index].x = y / 255.0f;
+                        mesh.weights_0[vertexOffset + index].x = z / 255.0f;
+                        mesh.weights_0[vertexOffset + index].x = w / 255.0f;
                     }
                 } else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT) {
-                    for (size_t i = 0; i < vertexCount; ++i) {
-                        const uint16_t& x = *(uint8_t*)((size_t)data + i * stride + 0 * sizeof(uint16_t));
-                        const uint16_t& y = *(uint8_t*)((size_t)data + i * stride + 1 * sizeof(uint16_t));
-                        const uint16_t& z = *(uint8_t*)((size_t)data + i * stride + 2 * sizeof(uint16_t));
-                        const uint16_t& w = *(uint8_t*)((size_t)data + i * stride + 3 * sizeof(uint16_t));
+                    for (size_t index = 0; index < vertexCount; ++index) {
+                        const uint16_t& x = *(uint8_t*)((size_t)data + index * stride + 0 * sizeof(uint16_t));
+                        const uint16_t& y = *(uint8_t*)((size_t)data + index * stride + 1 * sizeof(uint16_t));
+                        const uint16_t& z = *(uint8_t*)((size_t)data + index * stride + 2 * sizeof(uint16_t));
+                        const uint16_t& w = *(uint8_t*)((size_t)data + index * stride + 3 * sizeof(uint16_t));
 
-                        mesh.weights_0[vertexOffset + i].x = x / 65535.0f;
-                        mesh.weights_0[vertexOffset + i].x = y / 65535.0f;
-                        mesh.weights_0[vertexOffset + i].x = z / 65535.0f;
-                        mesh.weights_0[vertexOffset + i].x = w / 65535.0f;
+                        mesh.weights_0[vertexOffset + index].x = x / 65535.0f;
+                        mesh.weights_0[vertexOffset + index].x = y / 65535.0f;
+                        mesh.weights_0[vertexOffset + index].x = z / 65535.0f;
+                        mesh.weights_0[vertexOffset + index].x = w / 65535.0f;
                     }
                 }
             } else if (attrName == "COLOR_0") {
@@ -576,20 +577,23 @@ void SceneLoaderTinyGLTF::process_mesh(const tinygltf::Mesh& gltf_mesh) {
     }
 }
 
-void SceneLoaderTinyGLTF::process_animation(const tinygltf::Animation& gltf_anim) {
-    static int animCounter = 0;
-    ecs::Entity entity = ecs::Entity::create();
-    m_scene.create<TagComponent>(entity).GetTagRef() = gltf_anim.name.empty() ? std::string("Untitled") + std::to_string(++animCounter) : gltf_anim.name;
+void SceneLoaderTinyGLTF::process_animation(const tinygltf::Animation& gltf_anim, int id) {
+    std::string tag = gltf_anim.name;
+    if (tag.empty()) {
+        tag = std::format("{}::animation_{}", m_scene_name, id);
+    }
+    auto entity = m_scene.create_name_entity(tag);
+
     // m_scene.Component_Attach(entity, m_scene.m_root);
     AnimationComponent& animation = m_scene.create<AnimationComponent>(entity);
     animation.samplers.resize(gltf_anim.samplers.size());
     animation.channels.resize(gltf_anim.channels.size());
     DEV_ASSERT(gltf_anim.samplers.size() == gltf_anim.channels.size());
 
-    for (size_t i = 0; i < gltf_anim.samplers.size(); ++i) {
-        const auto& gltfSampler = gltf_anim.samplers[i];
+    for (size_t index = 0; index < gltf_anim.samplers.size(); ++index) {
+        const auto& gltfSampler = gltf_anim.samplers[index];
         DEV_ASSERT(gltfSampler.interpolation == "LINEAR");
-        auto& sampler = animation.samplers[i];
+        auto& sampler = animation.samplers[index];
 
         // Animation Sampler input = keyframe times
         {
@@ -646,21 +650,21 @@ void SceneLoaderTinyGLTF::process_animation(const tinygltf::Animation& gltf_anim
         }
     }
 
-    for (size_t i = 0; i < gltf_anim.channels.size(); ++i) {
-        const auto& channel = gltf_anim.channels[i];
-        animation.channels[i].target_id = m_entity_map[channel.target_node];
+    for (size_t index = 0; index < gltf_anim.channels.size(); ++index) {
+        const auto& channel = gltf_anim.channels[index];
+        animation.channels[index].target_id = m_entity_map[channel.target_node];
         DEV_ASSERT(channel.sampler >= 0);
-        animation.channels[i].sampler_index = (uint32_t)channel.sampler;
+        animation.channels[index].sampler_index = (uint32_t)channel.sampler;
 
         if (channel.target_path == "scale") {
-            animation.channels[i].path = AnimationComponent::Channel::PATH_SCALE;
+            animation.channels[index].path = AnimationComponent::Channel::PATH_SCALE;
         } else if (channel.target_path == "rotation") {
-            animation.channels[i].path = AnimationComponent::Channel::PATH_ROTATION;
+            animation.channels[index].path = AnimationComponent::Channel::PATH_ROTATION;
         } else if (channel.target_path == "translation") {
-            animation.channels[i].path = AnimationComponent::Channel::PATH_TRANSLATION;
+            animation.channels[index].path = AnimationComponent::Channel::PATH_TRANSLATION;
         } else {
             LOG_WARN("Unkown target path {}", channel.target_path.c_str());
-            animation.channels[i].path = AnimationComponent::Channel::PATH_UNKNOWN;
+            animation.channels[index].path = AnimationComponent::Channel::PATH_UNKNOWN;
         }
     }
 }

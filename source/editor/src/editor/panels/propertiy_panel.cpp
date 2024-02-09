@@ -145,9 +145,9 @@ void PropertyPanel::RenderInternal(Scene& scene) {
         return;
     }
 
-    std::string tag = tagComponent->GetTag();
+    std::string tag = tagComponent->get_tag();
     if (ImGui::InputText("##Tag", tag.data(), tag.capacity(), ImGuiInputTextFlags_EnterReturnsTrue)) {
-        tagComponent->GetTagRef() = tag;
+        tagComponent->set_tag(tag);
     }
 
     ImGui::SameLine();
@@ -236,7 +236,7 @@ void PropertyPanel::RenderInternal(Scene& scene) {
         TagComponent* meshName = scene.get_component<TagComponent>(object.meshID);
         ImGui::Text("Mesh Component (%d)", object.meshID);
         if (mesh) {
-            const char* meshNameStr = meshName ? meshName->GetTag().c_str() : "untitled";
+            const char* meshNameStr = meshName ? meshName->get_tag().c_str() : "untitled";
             ImGui::Text("mesh %s (%zu submesh)", meshNameStr, mesh->subsets.size());
             ImGui::Text("%zu triangles", mesh->indices.size() / 3);
             ImGui::Text("v:%zu, n:%zu, u:%zu, b:%zu", mesh->positions.size(), mesh->normals.size(),

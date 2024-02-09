@@ -21,6 +21,11 @@ int Application::Run(int, const char**) {
     }
 
     float dt = 0.0f;
+
+    LOG("\n********************************************************************************"
+        "\nMain Loop"
+        "\n********************************************************************************");
+
     while (!DisplayServer::singleton().should_close()) {
         DisplayServer::singleton().new_frame();
 
@@ -47,6 +52,10 @@ int Application::Run(int, const char**) {
 
         input::end_frame();
     }
+
+    LOG("\n********************************************************************************"
+        "\nMain Loop"
+        "\n********************************************************************************");
 
     // @TODO: fix
     auto [w, h] = DisplayServer::singleton().get_frame_size();

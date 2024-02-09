@@ -17,8 +17,8 @@ public:
 
 protected:
     void process_node(int node_index, ecs::Entity parent);
-    void process_mesh(const tinygltf::Mesh& gltf_mesh);
-    void process_animation(const tinygltf::Animation& gltf_anim);
+    void process_mesh(const tinygltf::Mesh& gltf_mesh, int id);
+    void process_animation(const tinygltf::Animation& gltf_anim, int id);
 
     std::unordered_map<int, ecs::Entity> m_entity_map;
     std::shared_ptr<tinygltf::Model> m_model;

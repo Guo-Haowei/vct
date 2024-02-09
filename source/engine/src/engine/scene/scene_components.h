@@ -8,6 +8,27 @@ class Archive;
 class Scene;
 
 //--------------------------------------------------------------------------------------------------
+// Tag Component
+//--------------------------------------------------------------------------------------------------
+class TagComponent {
+public:
+    TagComponent() = default;
+
+    TagComponent(const char* tag) { m_tag = tag; }
+
+    void set_tag(const char* tag) { m_tag = tag; }
+    void set_tag(const std::string& tag) { m_tag = tag; }
+
+    const std::string& get_tag() const { return m_tag; }
+    std::string& get_tag_ref() { return m_tag; }
+
+    void serialize(Archive& archive);
+
+private:
+    std::string m_tag;
+};
+
+//--------------------------------------------------------------------------------------------------
 // Transform Component
 //--------------------------------------------------------------------------------------------------
 class TransformComponent {
@@ -331,26 +352,6 @@ struct MaterialComponent {
 
     // @TODO: refactor
     mutable void* gpuResource = nullptr;
-};
-
-class TagComponent {
-public:
-    TagComponent() = default;
-
-    TagComponent(const char* tag) { mTag = tag; }
-
-    // bool operator==(const std::string& tag) const { return mTag == tag; }
-
-    void serialize(Archive& archive);
-
-    void SetTag(const char* tag) { mTag = tag; }
-    void SetTag(const std::string& tag) { mTag = tag; }
-
-    const std::string& GetTag() const { return mTag; }
-    std::string& GetTagRef() { return mTag; }
-
-private:
-    std::string mTag;
 };
 
 }  // namespace vct
