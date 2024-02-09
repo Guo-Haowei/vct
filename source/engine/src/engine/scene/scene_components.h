@@ -12,7 +12,7 @@ class Scene;
 //--------------------------------------------------------------------------------------------------
 class TransformComponent {
 public:
-    enum {
+    enum : uint32_t {
         NONE = 0,
         DIRTY = 1 << 0,
     };
@@ -63,7 +63,7 @@ private:
 //--------------------------------------------------------------------------------------------------
 class CameraComponent {
 public:
-    enum {
+    enum : uint32_t {
         NONE = 0,
         DIRTY = 1,
     };
@@ -123,7 +123,7 @@ private:
 // Mesh Component
 //--------------------------------------------------------------------------------------------------
 struct MeshComponent {
-    enum {
+    enum : uint32_t {
         NONE = 0,
         RENDERABLE = 1 << 0,
         DOUBLE_SIDED = 1 << 1,
@@ -188,6 +188,52 @@ struct MeshComponent {
 };
 
 //--------------------------------------------------------------------------------------------------
+// Animation Component
+//--------------------------------------------------------------------------------------------------
+struct AnimationComponent {
+    enum : uint32_t {
+        NONE = 0,
+        PLAYING = 1 << 0,
+        LOOPED = 1 << 1,
+    };
+
+    struct Channel {
+        enum Path {
+            PATH_TRANSLATION,
+            PATH_ROTATION,
+            PATH_SCALE,
+
+            PATH_UNKNOWN,
+        };
+
+        Path path = PATH_UNKNOWN;
+        ecs::Entity target_id;
+        int sampler_index = -1;
+    };
+    struct Sampler {
+        std::vector<float> keyframe_times;
+        std::vector<float> keyframe_data;
+    };
+
+    bool is_playing() const { return flags & PLAYING; }
+    bool is_looped() const { return flags & LOOPED; }
+    float get_legnth() const { return end - start; }
+    float is_end() const { return timer > end; }
+
+    uint32_t flags = LOOPED;
+    float start = 0;
+    float end = 0;
+    float timer = 0;
+    float amount = 1;  // blend amount
+    float speed = 1;
+
+    std::vector<Channel> channels;
+    std::vector<Sampler> samplers;
+
+    void serialize(Archive& archive);
+};
+
+//--------------------------------------------------------------------------------------------------
 //
 //--------------------------------------------------------------------------------------------------
 // @TODO: refactor
@@ -230,59 +276,6 @@ struct ArmatureComponent {
 
     // Non-Serialized
     std::vector<mat4> boneTransforms;
-
-    void serialize(Archive& archive);
-};
-
-struct AnimationComponent {
-    enum : uint32_t {
-        NONE = 0,
-        PLAYING = 1 << 0,
-        LOOPED = 1 << 1,
-    };
-
-    inline bool IsPlaying() const { return flags & PLAYING; }
-    inline bool IsLooped() const { return flags & LOOPED; }
-    inline float GetLength() const { return end - start; }
-    inline float IsEnded() const { return timer > end; }
-
-    uint32_t flags = LOOPED;
-    float start = 0;
-    float end = 0;
-    float timer = 0;
-    float amount = 1;  // blend amount
-    float speed = 1;
-
-    struct Channel {
-        ecs::Entity targetID;
-        int samplerIndex = -1;
-
-        enum Path {
-            TRANSLATION,
-            ROTATION,
-            SCALE,
-
-            UNKNOWN,
-        } path = Path::UNKNOWN;
-
-        enum PathDataType {
-            Event,
-            Float,
-            Float2,
-            Float3,
-            Float4,
-            Weights,
-
-            Count,
-        };
-    };
-    struct Sampler {
-        std::vector<float> keyframeTimes;
-        std::vector<float> keyframeData;
-    };
-
-    std::vector<Channel> channels;
-    std::vector<Sampler> samplers;
 
     void serialize(Archive& archive);
 };

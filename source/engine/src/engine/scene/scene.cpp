@@ -205,12 +205,12 @@ void Scene::attach_component(Entity child, Entity parent) {
     DEV_ASSERT(parent.is_valid());
 
     // if child already has a parent, detach it
-    if (mHierarchyComponents.contains(child)) {
+    if (m_HierarchyComponents.contains(child)) {
         CRASH_NOW_MSG("Unlikely to happen at this point");
         detach_component(child);
     }
 
-    HierarchyComponent& hier = mHierarchyComponents.create(child);
+    HierarchyComponent& hier = m_HierarchyComponents.create(child);
     hier.mParent = parent;
 }
 
@@ -229,17 +229,17 @@ static constexpr uint32_t SMALL_SUBTASK_GROUPSIZE = 16;
 
 void Scene::update_animation(Context& ctx) {
     JS_PARALLEL_FOR(ctx, i, get_count<AnimationComponent>(), 1, {
-        AnimationComponent& animation = mAnimationComponents[i];
-        if (!animation.IsPlaying()) {
+        AnimationComponent& animation = m_AnimationComponents[i];
+        if (!animation.is_playing()) {
             continue;
         }
 
         for (const AnimationComponent::Channel& channel : animation.channels) {
-            if (channel.path == AnimationComponent::Channel::Path::UNKNOWN) {
+            if (channel.path == AnimationComponent::Channel::PATH_UNKNOWN) {
                 continue;
             }
-            DEV_ASSERT(channel.samplerIndex < (int)animation.samplers.size());
-            const AnimationComponent::Sampler& sampler = animation.samplers[channel.samplerIndex];
+            DEV_ASSERT(channel.sampler_index < (int)animation.samplers.size());
+            const AnimationComponent::Sampler& sampler = animation.samplers[channel.sampler_index];
 
             int keyLeft = 0;
             int keyRight = 0;
@@ -248,8 +248,8 @@ void Scene::update_animation(Context& ctx) {
             float timeLeft = std::numeric_limits<float>::min();
             float timeRight = std::numeric_limits<float>::max();
 
-            for (int k = 0; k < (int)sampler.keyframeTimes.size(); ++k) {
-                const float time = sampler.keyframeTimes[k];
+            for (int k = 0; k < (int)sampler.keyframe_times.size(); ++k) {
+                const float time = sampler.keyframe_times[k];
                 if (time < timeFirst) {
                     timeFirst = time;
                 }
@@ -270,8 +270,8 @@ void Scene::update_animation(Context& ctx) {
                 continue;
             }
 
-            const float left = sampler.keyframeTimes[keyLeft];
-            const float right = sampler.keyframeTimes[keyRight];
+            const float left = sampler.keyframe_times[keyLeft];
+            const float right = sampler.keyframe_times[keyRight];
 
             float t = 0;
             if (keyLeft != keyRight) {
@@ -279,28 +279,28 @@ void Scene::update_animation(Context& ctx) {
             }
             t = SaturateF(t);
 
-            TransformComponent* targetTransform = mTransformComponents.get_component(channel.targetID);
+            TransformComponent* targetTransform = m_TransformComponents.get_component(channel.target_id);
             DEV_ASSERT(targetTransform);
             switch (channel.path) {
-                case AnimationComponent::Channel::SCALE: {
-                    DEV_ASSERT(sampler.keyframeData.size() == sampler.keyframeTimes.size() * 3);
-                    const vec3* data = (const vec3*)sampler.keyframeData.data();
+                case AnimationComponent::Channel::PATH_SCALE: {
+                    DEV_ASSERT(sampler.keyframe_data.size() == sampler.keyframe_times.size() * 3);
+                    const vec3* data = (const vec3*)sampler.keyframe_data.data();
                     const vec3& vLeft = data[keyLeft];
                     const vec3& vRight = data[keyRight];
                     targetTransform->set_scale(glm::mix(vLeft, vRight, t));
                     break;
                 }
-                case AnimationComponent::Channel::TRANSLATION: {
-                    DEV_ASSERT(sampler.keyframeData.size() == sampler.keyframeTimes.size() * 3);
-                    const vec3* data = (const vec3*)sampler.keyframeData.data();
+                case AnimationComponent::Channel::PATH_TRANSLATION: {
+                    DEV_ASSERT(sampler.keyframe_data.size() == sampler.keyframe_times.size() * 3);
+                    const vec3* data = (const vec3*)sampler.keyframe_data.data();
                     const vec3& vLeft = data[keyLeft];
                     const vec3& vRight = data[keyRight];
                     targetTransform->set_translation(glm::mix(vLeft, vRight, t));
                     break;
                 }
-                case AnimationComponent::Channel::ROTATION: {
-                    DEV_ASSERT(sampler.keyframeData.size() == sampler.keyframeTimes.size() * 4);
-                    const vec4* data = (const vec4*)sampler.keyframeData.data();
+                case AnimationComponent::Channel::PATH_ROTATION: {
+                    DEV_ASSERT(sampler.keyframe_data.size() == sampler.keyframe_times.size() * 4);
+                    const vec4* data = (const vec4*)sampler.keyframe_data.data();
                     const vec4& vLeft = data[keyLeft];
                     const vec4& vRight = data[keyRight];
                     targetTransform->set_rotation(glm::mix(vLeft, vRight, t));
@@ -313,11 +313,11 @@ void Scene::update_animation(Context& ctx) {
             targetTransform->set_dirty();
         }
 
-        if (animation.IsLooped() && animation.timer > animation.end) {
+        if (animation.is_looped() && animation.timer > animation.end) {
             animation.timer = animation.start;
         }
 
-        if (animation.IsPlaying()) {
+        if (animation.is_playing()) {
             animation.timer += m_delta_time * animation.speed;
         }
     });
@@ -325,25 +325,25 @@ void Scene::update_animation(Context& ctx) {
 
 void Scene::update_transformation(Context& ctx) {
     JS_PARALLEL_FOR(ctx, i, get_count<TransformComponent>(), SMALL_SUBTASK_GROUPSIZE,
-                    { mTransformComponents[i].update_transform(); });
+                    { m_TransformComponents[i].update_transform(); });
 }
 
 void Scene::update_hierarchy(Context& ctx) {
     JS_PARALLEL_FOR(ctx, i, get_count<HierarchyComponent>(), SMALL_SUBTASK_GROUPSIZE, {
-        Entity child = mHierarchyComponents.get_entity(i);
-        TransformComponent* childTrans = mTransformComponents.get_component(child);
+        Entity child = m_HierarchyComponents.get_entity(i);
+        TransformComponent* childTrans = m_TransformComponents.get_component(child);
         if (childTrans) {
-            const HierarchyComponent* hier = &mHierarchyComponents[i];
+            const HierarchyComponent* hier = &m_HierarchyComponents[i];
             Entity parent = hier->mParent;
             mat4 W = childTrans->get_local_matrix();
 
             while (parent.is_valid()) {
-                TransformComponent* parentTrans = mTransformComponents.get_component(parent);
+                TransformComponent* parentTrans = m_TransformComponents.get_component(parent);
                 if (parentTrans) {
                     W = parentTrans->get_local_matrix() * W;
                 }
 
-                if ((hier = mHierarchyComponents.get_component(parent)) != nullptr) {
+                if ((hier = m_HierarchyComponents.get_component(parent)) != nullptr) {
                     parent = hier->mParent;
                     DEV_ASSERT(parent.is_valid());
                 } else {
@@ -359,9 +359,9 @@ void Scene::update_hierarchy(Context& ctx) {
 
 void Scene::update_armature(Context& ctx) {
     JS_PARALLEL_FOR(ctx, i, get_count<ArmatureComponent>(), 1, {
-        Entity id = mArmatureComponents.get_entity(i);
-        ArmatureComponent& armature = mArmatureComponents[i];
-        TransformComponent* transform = mTransformComponents.get_component(id);
+        Entity id = m_ArmatureComponents.get_entity(i);
+        ArmatureComponent& armature = m_ArmatureComponents[i];
+        TransformComponent* transform = m_TransformComponents.get_component(id);
         DEV_ASSERT(transform);
 
         // The transform world matrices are in world space, but skinning needs them in armature-local space,
@@ -383,7 +383,7 @@ void Scene::update_armature(Context& ctx) {
 
         int idx = 0;
         for (Entity boneID : armature.boneCollection) {
-            const TransformComponent* boneTransform = mTransformComponents.get_component(boneID);
+            const TransformComponent* boneTransform = m_TransformComponents.get_component(boneID);
             DEV_ASSERT(boneTransform);
 
             const mat4& B = armature.inverseBindMatrices[idx];
@@ -408,17 +408,17 @@ void Scene::serialize(Archive& archive) {
     // mGenerator.serialize(archive);
     m_root.serialize(archive);
 
-    mTagComponents.serialize(archive);
-    mTransformComponents.serialize(archive);
-    mHierarchyComponents.serialize(archive);
-    mMaterialComponents.serialize(archive);
-    mMeshComponents.serialize(archive);
-    mObjectComponents.serialize(archive);
-    mCameraComponents.serialize(archive);
-    mLightComponents.serialize(archive);
-    mArmatureComponents.serialize(archive);
-    mAnimationComponents.serialize(archive);
-    mRigidBodyPhysicsComponents.serialize(archive);
+    m_TagComponents.serialize(archive);
+    m_TransformComponents.serialize(archive);
+    m_HierarchyComponents.serialize(archive);
+    m_MaterialComponents.serialize(archive);
+    m_MeshComponents.serialize(archive);
+    m_ObjectComponents.serialize(archive);
+    m_CameraComponents.serialize(archive);
+    m_LightComponents.serialize(archive);
+    m_ArmatureComponents.serialize(archive);
+    m_AnimationComponents.serialize(archive);
+    m_RigidBodyPhysicsComponents.serialize(archive);
 }
 
 Scene::RayIntersectionResult Scene::Intersects(Ray& ray) {

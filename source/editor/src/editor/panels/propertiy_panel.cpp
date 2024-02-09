@@ -8,8 +8,8 @@ static constexpr float DEFAULT_COLUMN_WIDTH = 100.0f;
 
 static bool draw_vec3_control(const std::string& label, glm::vec3& values, float resetValue = 0.0f,
                               float columnWidth = DEFAULT_COLUMN_WIDTH);
-static bool draw_drag_float(const char* tag, float* p, float speed, float min, float max,
-                            float columnWidth = DEFAULT_COLUMN_WIDTH);
+// static bool draw_drag_float(const char* tag, float* p, float speed, float min, float max,
+//                             float columnWidth = DEFAULT_COLUMN_WIDTH);
 
 template<typename T, typename UIFunction>
 static void DrawComponent(const std::string& name, T* component, UIFunction uiFunction) {
@@ -121,16 +121,16 @@ static bool draw_vec3_control(const std::string& label, glm::vec3& values, float
     return dirty;
 }
 
-static bool draw_drag_float(const char* tag, float* p, float speed, float min, float max, float columnWidth) {
-    ImGui::Columns(2);
-    ImGui::SetColumnWidth(0, columnWidth);
-    ImGui::Text(tag);
-    ImGui::NextColumn();
-    auto dragFloatTag = std::format("##{}", tag);
-    bool dirty = ImGui::DragFloat(dragFloatTag.c_str(), p, speed, min, max);
-    ImGui::Columns(1);
-    return dirty;
-}
+// static bool draw_drag_float(const char* tag, float* p, float speed, float min, float max, float columnWidth) {
+//     ImGui::Columns(2);
+//     ImGui::SetColumnWidth(0, columnWidth);
+//     ImGui::Text(tag);
+//     ImGui::NextColumn();
+//     auto dragFloatTag = std::format("##{}", tag);
+//     bool dirty = ImGui::DragFloat(dragFloatTag.c_str(), p, speed, min, max);
+//     ImGui::Columns(1);
+//     return dirty;
+// }
 
 void PropertyPanel::RenderInternal(Scene& scene) {
     ecs::Entity id = *mpSelected;

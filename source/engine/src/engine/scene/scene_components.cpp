@@ -212,14 +212,20 @@ std::vector<char> MeshComponent::generate_combined_buffer() const {
     return result;
 }
 
-void HierarchyComponent::serialize(Archive& archive) { mParent.serialize(archive); }
-
-void ObjectComponent::serialize(Archive& archive) { meshID.serialize(archive); }
-
+//--------------------------------------------------------------------------------------------------
+// Animation Component
+//--------------------------------------------------------------------------------------------------
 void AnimationComponent::serialize(Archive& archive) {
     unused(archive);
     CRASH_NOW_MSG("NOT IMPLMENTED");
 }
+
+//--------------------------------------------------------------------------------------------------
+//
+//--------------------------------------------------------------------------------------------------
+void HierarchyComponent::serialize(Archive& archive) { mParent.serialize(archive); }
+
+void ObjectComponent::serialize(Archive& archive) { meshID.serialize(archive); }
 
 void ArmatureComponent::serialize(Archive& archive) {
     unused(archive);
