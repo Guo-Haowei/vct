@@ -17,7 +17,6 @@ public:
 };
 
 TEST(file_access, make_default) {
-    FileAccess::make_default<FileAccessFoo>(FileAccess::ACCESS_SHADER);
     FileAccess::make_default<FileAccessFoo>(FileAccess::ACCESS_RESOURCE);
     FileAccess::make_default<FileAccessFoo>(FileAccess::ACCESS_USERDATA);
     FileAccess::make_default<FileAccessFoo>(FileAccess::ACCESS_FILESYSTEM);

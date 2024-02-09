@@ -14,7 +14,7 @@ DVAR_STRING(recent_files, DVAR_FLAG_SERIALIZE | DVAR_FLAG_DESERIALIZE, "");
 DVAR_BOOL(delete_dvar_cache, DVAR_FLAG_NONE, false);
 
 // gui
-DVAR_BOOL(grid_visibility, 0, false);
+DVAR_BOOL(grid_visibility, 0, true);
 
 // loader
 DVAR_BOOL(force_assimp_loader, 0, false);

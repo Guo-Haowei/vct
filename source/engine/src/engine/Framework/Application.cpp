@@ -26,7 +26,6 @@ int Application::Run(int, const char**) {
         "\n********************************************************************************");
 
     LOG_WARN("TODO: save and load scene");
-    LOG_WARN("TODO: move shader to res folder");
     LOG_WARN("TODO: imgui true font");
     LOG_WARN("TODO: use RID as much as possible");
     LOG_WARN("TODO: fix multiple objects play same animation");

@@ -29,5 +29,5 @@ def format_folder(folder_name):
                 print(f'*** formatting file {file_path}')
                 subprocess.run(['clang-format', '-i', file_path])
 
-for dir in ['source']:
+for dir in ['source', 'resources/glsl']:
     format_folder(os.path.join(project_dir, dir))

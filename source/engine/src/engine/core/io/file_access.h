@@ -7,10 +7,9 @@ public:
     using CreateFunc = FileAccess* (*)(void);
 
     enum AccessType {
-        ACCESS_SHADER,
+        ACCESS_FILESYSTEM,
         ACCESS_RESOURCE,
         ACCESS_USERDATA,
-        ACCESS_FILESYSTEM,
         ACCESS_MAX,
     };
 

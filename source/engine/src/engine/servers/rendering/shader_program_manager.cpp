@@ -24,7 +24,7 @@ static std::string process_shader(const std::string &source) {
             DEV_ASSERT(quote1 && quote2 && (quote1 != quote2));
             std::string file_to_include(quote1 + 1, quote2);
 
-            file_to_include = "shader://" + file_to_include;
+            file_to_include = "@resource://glsl/" + file_to_include;
             auto text = asset_loader::find_file(file_to_include);
             DEV_ASSERT(text);
             std::string extra = text->buffer;
@@ -138,68 +138,68 @@ bool ShaderProgramManager::initialize() {
     s_shader_cache.resize(static_cast<int>(ProgramType::PROGRAM_MAX));
     {
         ProgramCreateInfo info;
-        info.vs = "shader://mesh_static.vert";
-        info.ps = "shader://gbuffer.frag";
+        info.vs = "@resource://glsl/mesh_static.vert";
+        info.ps = "@resource://glsl/gbuffer.frag";
         s_shader_cache[PROGRAM_GBUFFER_STATIC] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "shader://mesh_animated.vert";
-        info.ps = "shader://gbuffer.frag";
+        info.vs = "@resource://glsl/mesh_animated.vert";
+        info.ps = "@resource://glsl/gbuffer.frag";
         s_shader_cache[PROGRAM_GBUFFER_ANIMATED] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "shader://depth_static.vert";
-        info.ps = "shader://depth.frag";
+        info.vs = "@resource://glsl/depth_static.vert";
+        info.ps = "@resource://glsl/depth.frag";
         s_shader_cache[PROGRAM_DPETH_STATIC] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "shader://depth_animated.vert";
-        info.ps = "shader://depth.frag";
+        info.vs = "@resource://glsl/depth_animated.vert";
+        info.ps = "@resource://glsl/depth.frag";
         s_shader_cache[PROGRAM_DPETH_ANIMATED] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "shader://editor/image.vert";
-        info.ps = "shader://editor/image.frag";
+        info.vs = "@resource://glsl/editor/image.vert";
+        info.ps = "@resource://glsl/editor/image.frag";
         s_shader_cache[(ProgramType::IMAGE2D)] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "shader://fullscreen.vert";
-        info.ps = "shader://ssao.frag";
+        info.vs = "@resource://glsl/fullscreen.vert";
+        info.ps = "@resource://glsl/ssao.frag";
         s_shader_cache[(ProgramType::SSAO)] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "shader://fullscreen.vert";
-        info.ps = "shader://vct_deferred.frag";
+        info.vs = "@resource://glsl/fullscreen.vert";
+        info.ps = "@resource://glsl/vct_deferred.frag";
         s_shader_cache[(ProgramType::VCT_DEFERRED)] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "shader://fullscreen.vert";
-        info.ps = "shader://fxaa.frag";
+        info.vs = "@resource://glsl/fullscreen.vert";
+        info.ps = "@resource://glsl/fxaa.frag";
         s_shader_cache[(ProgramType::FXAA)] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "shader://fullscreen.vert";
-        info.ps = "shader://debug/texture.frag";
+        info.vs = "@resource://glsl/fullscreen.vert";
+        info.ps = "@resource://glsl/debug/texture.frag";
         s_shader_cache[(ProgramType::DebugTexture)] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "shader://voxel/voxelization.vert";
-        info.gs = "shader://voxel/voxelization.geom";
-        info.ps = "shader://voxel/voxelization.frag";
+        info.vs = "@resource://glsl/voxel/voxelization.vert";
+        info.gs = "@resource://glsl/voxel/voxelization.geom";
+        info.ps = "@resource://glsl/voxel/voxelization.frag";
         s_shader_cache[ProgramType::Voxel] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.cs = "shader://voxel/post.comp";
+        info.cs = "@resource://glsl/voxel/post.comp";
         s_shader_cache[ProgramType::VoxelPost] = create(info);
     }
 

@@ -17,9 +17,9 @@ target_include_directories(${LIB_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/thirdparty/glm
     ${PROJECT_SOURCE_DIR}/thirdparty/imgui
     ${PROJECT_SOURCE_DIR}/thirdparty
+    ${PROJECT_SOURCE_DIR}/resources/glsl
     ${CMAKE_CURRENT_SOURCE_DIR}/src/engine
     # @TODO: fix include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../shaders
 )
 
 target_compile_definitions(${LIB_NAME} PUBLIC

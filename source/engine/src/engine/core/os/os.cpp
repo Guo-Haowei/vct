@@ -5,7 +5,6 @@
 namespace vct {
 
 void OS::initialize() {
-    FileAccess::make_default<FileAccessUnix>(FileAccess::ACCESS_SHADER);
     FileAccess::make_default<FileAccessUnix>(FileAccess::ACCESS_RESOURCE);
     FileAccess::make_default<FileAccessUnix>(FileAccess::ACCESS_USERDATA);
     FileAccess::make_default<FileAccessUnix>(FileAccess::ACCESS_FILESYSTEM);
