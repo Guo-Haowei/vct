@@ -39,7 +39,7 @@ static struct
     std::mutex image_cache_lock;
 
     // file
-    std::map<std::string, std::shared_ptr<Text>> text_cache;
+    std::map<std::string, std::shared_ptr<File>> text_cache;
 } s_glob;
 
 bool initialize() {
@@ -51,7 +51,9 @@ bool initialize() {
 
     // @TODO: dir_access
     // force load all shaders
-    const std::string shaders[] = {
+    // @TODO: async
+    const std::string preload[] = {
+        "@resource://fonts/DroidSans.ttf",
         "@resource://glsl/vsinput.glsl.h",
         "@resource://glsl/cbuffer.glsl.h",
         "@resource://glsl/common.glsl",
@@ -77,10 +79,13 @@ bool initialize() {
         "@resource://glsl/voxel/post.comp",
     };
 
-    for (int i = 0; i < array_length(shaders); ++i) {
-        load_file_sync(shaders[i]);
-        LOG_VERBOSE("[asset_loader] shader '{}' loaded", shaders[i]);
+    Timer timer;
+    for (int i = 0; i < array_length(preload); ++i) {
+        if (load_file_sync(preload[i])) {
+            LOG_VERBOSE("[asset_loader] resource '{}' preloaded", preload[i]);
+        }
     }
+    LOG_VERBOSE("[asset_loader] preloaded {} assets in {}", array_length(preload), timer.get_duration_string());
 
     return true;
 }
@@ -121,7 +126,7 @@ std::shared_ptr<Image> load_image_sync(const std::string& path) {
     return ret;
 }
 
-std::shared_ptr<Text> find_file(const std::string& path) {
+std::shared_ptr<File> find_file(const std::string& path) {
     auto found = s_glob.text_cache.find(path);
     if (found != s_glob.text_cache.end()) {
         return found->second;
@@ -130,7 +135,7 @@ std::shared_ptr<Text> find_file(const std::string& path) {
     return nullptr;
 }
 
-std::shared_ptr<Text> load_file_sync(const std::string& path) {
+std::shared_ptr<File> load_file_sync(const std::string& path) {
     auto found = s_glob.text_cache.find(path);
     if (found != s_glob.text_cache.end()) {
         return found->second;
@@ -146,11 +151,10 @@ std::shared_ptr<Text> load_file_sync(const std::string& path) {
 
     const size_t size = file_access->get_length();
 
-    std::string buffer;
-    buffer.resize(size + 1);
+    std::vector<char> buffer;
+    buffer.resize(size);
     file_access->read_buffer(buffer.data(), size);
-    buffer[size] = 0;
-    auto text = std::make_shared<Text>();
+    auto text = std::make_shared<File>();
     text->buffer = std::move(buffer);
     s_glob.text_cache[path] = text;
     return text;

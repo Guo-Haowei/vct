@@ -3,7 +3,6 @@
 #include <sstream>
 #include <vector>
 
-#include "Core/Utility.h"
 #include "assets/asset_loader.h"
 #include "servers/rendering/GLPrerequisites.h"
 
@@ -25,9 +24,9 @@ static std::string process_shader(const std::string &source) {
             std::string file_to_include(quote1 + 1, quote2);
 
             file_to_include = "@resource://glsl/" + file_to_include;
-            auto text = asset_loader::find_file(file_to_include);
-            DEV_ASSERT(text);
-            std::string extra = text->buffer;
+            auto buffer = asset_loader::find_file(file_to_include);
+            DEV_ASSERT(buffer);
+            std::string extra(buffer->buffer.begin(), buffer->buffer.end());
             if (extra.empty()) {
                 LOG_ERROR("[filesystem] failed to read shader '{}'", file_to_include);
             }
@@ -43,10 +42,10 @@ static std::string process_shader(const std::string &source) {
 }
 
 static GLuint create_shader(std::string_view file, GLenum type) {
-    auto text = asset_loader::find_file(std::string(file));
-    DEV_ASSERT(text);
+    auto source_binary = asset_loader::find_file(std::string(file));
+    DEV_ASSERT(source_binary);
 
-    std::string source = text->buffer;
+    std::string source(source_binary->buffer.begin(), source_binary->buffer.end());
     if (source.empty()) {
         LOG_ERROR("[filesystem] failed to read shader '{}'", file);
         return 0;

@@ -1,9 +1,11 @@
 #include "UIManager.h"
 
-#include "Core/Utility.h"
+#include "assets/asset_loader.h"
 #include "imgui/imgui.h"
 
 UIManager* gUIManager = new UIManager;
+
+using namespace vct;
 
 static std::string gIniPath;
 
@@ -11,12 +13,19 @@ bool UIManager::initialize() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
-    fs::path path(ROOT_FOLDER);
+    std::filesystem::path path(ROOT_FOLDER);
     path = path.parent_path() / "Config/imgui.ini";
     gIniPath = path.string();
     LOG_VERBOSE("Set imgui ini file to {}", gIniPath);
 
     ImGuiIO& io = ImGui::GetIO();
+
+    auto asset = asset_loader::find_file("@resource://fonts/DroidSans.ttf");
+    DEV_ASSERT(asset);
+    ImFontConfig font_cfg;
+    font_cfg.FontDataOwnedByAtlas = false;
+    io.Fonts->AddFontFromMemoryTTF(asset->buffer.data(), (int)asset->buffer.size(), 16, &font_cfg);
+
     io.IniFilename = gIniPath.c_str();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;

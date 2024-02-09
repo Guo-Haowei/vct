@@ -3,11 +3,11 @@
 namespace vct {
 
 enum ColorCode : uint32_t {
-    COLOR_YELLOW = 0xFFFF00,
-    COLOR_RED = 0xFF0000,
+    COLOR_YELLOW = 0xE0E080,
+    COLOR_RED = 0xE08080,
     COLOR_PALEGREEN = 0x98FB98,
-    COLOR_SILVER = 0xC0C0C0,
-    COLOR_WHITE = 0xFFFFFF,
+    COLOR_SILVER = 0xA0A0A0,
+    COLOR_WHITE = 0xE0E0E0,
 };
 
 struct Color {
