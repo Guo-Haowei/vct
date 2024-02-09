@@ -139,11 +139,11 @@ Entity Scene::create_sphere_entity(const std::string& name, float radius, const 
     return create_sphere_entity(name, matID, radius, transform);
 }
 
-Entity Scene::create_sphere_entity(const std::string& name, Entity materialID, float radius,
+Entity Scene::create_sphere_entity(const std::string& name, Entity material_id, float radius,
                                    const mat4& transform) {
     CRASH_NOW();
     (void)name;
-    (void)materialID;
+    (void)material_id;
     (void)radius;
     (void)transform;
     Entity entity = create_object_entity(name);
@@ -172,11 +172,11 @@ Entity Scene::create_cube_entity(const std::string& name, const vec3& scale, con
     return create_cube_entity(name, matID, scale, transform);
 }
 
-Entity Scene::create_cube_entity(const std::string& name, Entity materialID, const vec3& scale,
+Entity Scene::create_cube_entity(const std::string& name, Entity material_id, const vec3& scale,
                                  const mat4& transform) {
     CRASH_NOW();
     (void)name;
-    (void)materialID;
+    (void)material_id;
     (void)scale;
     (void)transform;
     Entity entity = create_object_entity(name);
@@ -439,7 +439,7 @@ Scene::RayIntersectionResult Scene::Intersects(Ray& ray) {
         Ray inversedRay = ray.inverse(inversedModel);
         Ray inversedRayAABB = inversedRay;  // make a copy, we don't want dist to be modified by AABB
         // Perform aabb test
-        if (!inversedRayAABB.intersects(mesh->localBound)) {
+        if (!inversedRayAABB.intersects(mesh->local_bound)) {
             continue;
         }
 

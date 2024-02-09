@@ -31,7 +31,7 @@ auto SceneLoader::import() -> std::expected<void, std::string> {
     LOG_VERBOSE("[{}] generating bounding boxes", m_loader_name);
     // process meshes
     for (MeshComponent& mesh : m_scene.get_component_array<MeshComponent>()) {
-        mesh.CreateRenderData();
+        mesh.create_render_data();
     }
 
     // update bounding box
@@ -48,7 +48,7 @@ auto SceneLoader::import() -> std::expected<void, std::string> {
         const MeshComponent& mesh = *m_scene.get_component<MeshComponent>(obj.meshID);
 
         mat4 M = transform.get_world_matrix();
-        AABB aabb = mesh.localBound;
+        AABB aabb = mesh.local_bound;
         aabb.apply_matrix(M);
         m_scene.m_bound.union_box(aabb);
     }

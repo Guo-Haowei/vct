@@ -56,7 +56,7 @@ void SceneLoaderTinyGLTF::process_node(int node_index, ecs::Entity parent) {
             MeshComponent* mesh = &m_scene.get_component_array<MeshComponent>()[node.mesh];
             ecs::Entity meshID = m_scene.get_entity<MeshComponent>(node.mesh);
             DEV_ASSERT(!mesh->joints_0.empty());
-            if (mesh->armatureID.IsValid()) {
+            if (mesh->armature_id.IsValid()) {
                 // Reuse mesh with different skin is not possible currently, so we create a new one:
                 LOG_WARN("Re-use mesh for different skin!");
                 meshID = entity;
@@ -64,7 +64,7 @@ void SceneLoaderTinyGLTF::process_node(int node_index, ecs::Entity parent) {
                 newMesh = m_scene.get_component_array<MeshComponent>()[node.mesh];
                 mesh = &newMesh;
             }
-            mesh->armatureID = entity;
+            mesh->armature_id = entity;
 
             // the object component will use an identity transform but will be parented to the armature
             ecs::Entity objectID = m_scene.create_object_entity("Animated::" + node.name);
@@ -267,7 +267,7 @@ bool SceneLoaderTinyGLTF::import_impl() {
             if (m_scene.get_count<MaterialComponent>() == 0) {
                 LOG_FATAL("No material! Consider use default");
             }
-            mesh.subsets.back().materialID = m_scene.get_entity<MaterialComponent>(glm::max(0, prim.material));
+            mesh.subsets.back().material_id = m_scene.get_entity<MaterialComponent>(glm::max(0, prim.material));
 
             const size_t index_remap[] = { 0, 1, 2 };
             uint32_t vertexOffset = (uint32_t)mesh.normals.size();
@@ -279,31 +279,31 @@ bool SceneLoaderTinyGLTF::import_impl() {
                 const tinygltf::Buffer& buffer = m_model->buffers[bufferView.buffer];
 
                 int stride = accessor.ByteStride(bufferView);
-                size_t indexCount = accessor.count;
-                size_t indexOffset = mesh.indices.size();
-                mesh.indices.resize(indexOffset + indexCount);
-                mesh.subsets.back().indexOffset = (uint32_t)indexOffset;
-                mesh.subsets.back().indexCount = (uint32_t)indexCount;
+                size_t index_count = accessor.count;
+                size_t index_offset = mesh.indices.size();
+                mesh.indices.resize(index_offset + index_count);
+                mesh.subsets.back().index_offset = (uint32_t)index_offset;
+                mesh.subsets.back().index_count = (uint32_t)index_count;
 
                 const uint8_t* data = buffer.data.data() + accessor.byteOffset + bufferView.byteOffset;
 
                 if (stride == 1) {
-                    for (size_t i = 0; i < indexCount; i += 3) {
-                        mesh.indices[indexOffset + i + 0] = vertexOffset + data[i + 0];
-                        mesh.indices[indexOffset + i + 1] = vertexOffset + data[i + 1];
-                        mesh.indices[indexOffset + i + 2] = vertexOffset + data[i + 2];
+                    for (size_t i = 0; i < index_count; i += 3) {
+                        mesh.indices[index_offset + i + 0] = vertexOffset + data[i + 0];
+                        mesh.indices[index_offset + i + 1] = vertexOffset + data[i + 1];
+                        mesh.indices[index_offset + i + 2] = vertexOffset + data[i + 2];
                     }
                 } else if (stride == 2) {
-                    for (size_t i = 0; i < indexCount; i += 3) {
-                        mesh.indices[indexOffset + i + 0] = vertexOffset + ((uint16_t*)data)[i + 0];
-                        mesh.indices[indexOffset + i + 1] = vertexOffset + ((uint16_t*)data)[i + 1];
-                        mesh.indices[indexOffset + i + 2] = vertexOffset + ((uint16_t*)data)[i + 2];
+                    for (size_t i = 0; i < index_count; i += 3) {
+                        mesh.indices[index_offset + i + 0] = vertexOffset + ((uint16_t*)data)[i + 0];
+                        mesh.indices[index_offset + i + 1] = vertexOffset + ((uint16_t*)data)[i + 1];
+                        mesh.indices[index_offset + i + 2] = vertexOffset + ((uint16_t*)data)[i + 2];
                     }
                 } else if (stride == 4) {
-                    for (size_t i = 0; i < indexCount; i += 3) {
-                        mesh.indices[indexOffset + i + 0] = vertexOffset + ((uint32_t*)data)[i + 0];
-                        mesh.indices[indexOffset + i + 1] = vertexOffset + ((uint32_t*)data)[i + 1];
-                        mesh.indices[indexOffset + i + 2] = vertexOffset + ((uint32_t*)data)[i + 2];
+                    for (size_t i = 0; i < index_count; i += 3) {
+                        mesh.indices[index_offset + i + 0] = vertexOffset + ((uint32_t*)data)[i + 0];
+                        mesh.indices[index_offset + i + 1] = vertexOffset + ((uint32_t*)data)[i + 1];
+                        mesh.indices[index_offset + i + 2] = vertexOffset + ((uint32_t*)data)[i + 2];
                     }
                 } else {
                     CRASH_NOW_MSG("unsupported index stride!");
@@ -321,7 +321,7 @@ bool SceneLoaderTinyGLTF::import_impl() {
                 int stride = accessor.ByteStride(bufferView);
                 size_t vertexCount = accessor.count;
 
-                if (mesh.subsets.back().indexCount == 0) {
+                if (mesh.subsets.back().index_count == 0) {
                     CRASH_NOW_MSG("This is not common");
                 }
 
@@ -521,10 +521,10 @@ bool SceneLoaderTinyGLTF::import_impl() {
 
     // Create armatures
     for (const auto& skin : m_model->skins) {
-        ecs::Entity armatureID = ecs::Entity::create();
-        m_scene.create<TagComponent>(armatureID).GetTagRef() = skin.name;
-        m_scene.create<TransformComponent>(armatureID);
-        ArmatureComponent& armature = m_scene.create<ArmatureComponent>(armatureID);
+        ecs::Entity armature_id = ecs::Entity::create();
+        m_scene.create<TagComponent>(armature_id).GetTagRef() = skin.name;
+        m_scene.create<TransformComponent>(armature_id);
+        ArmatureComponent& armature = m_scene.create<ArmatureComponent>(armature_id);
         if (skin.inverseBindMatrices >= 0) {
             const tinygltf::Accessor& accessor = m_model->accessors[skin.inverseBindMatrices];
             const tinygltf::BufferView& bufferView = m_model->bufferViews[accessor.bufferView];
@@ -546,7 +546,7 @@ bool SceneLoaderTinyGLTF::import_impl() {
     // Create armature-bone mappings:
     int armatureIndex = 0;
     for (const auto& skin : m_model->skins) {
-        ecs::Entity armatureID = m_scene.get_entity<ArmatureComponent>(armatureIndex);
+        ecs::Entity armature_id = m_scene.get_entity<ArmatureComponent>(armatureIndex);
         ArmatureComponent& armature = m_scene.get_component_array<ArmatureComponent>()[armatureIndex++];
 
         const size_t jointCount = skin.joints.size();

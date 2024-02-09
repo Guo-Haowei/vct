@@ -51,8 +51,8 @@ bool SceneLoaderAssimp::import_impl() {
 }
 
 void SceneLoaderAssimp::process_material(aiMaterial& material) {
-    auto materialID = m_scene.create_material_entity(std::string("Material::") + material.GetName().C_Str());
-    MaterialComponent* materialComponent = m_scene.get_component<MaterialComponent>(materialID);
+    auto material_id = m_scene.create_material_entity(std::string("Material::") + material.GetName().C_Str());
+    MaterialComponent* materialComponent = m_scene.get_component<MaterialComponent>(material_id);
     DEV_ASSERT(materialComponent);
 
     auto getMaterialPath = [&](aiTextureType type, unsigned int index) -> std::string {
@@ -78,7 +78,7 @@ void SceneLoaderAssimp::process_material(aiMaterial& material) {
     materialComponent->mTextures[MaterialComponent::MetallicRoughness].name =
         getMaterialPath(AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE);
 
-    m_materials.emplace_back(materialID);
+    m_materials.emplace_back(material_id);
 }
 
 void SceneLoaderAssimp::process_mesh(const aiMesh& mesh) {
@@ -117,9 +117,9 @@ void SceneLoaderAssimp::process_mesh(const aiMesh& mesh) {
 
     DEV_ASSERT(m_materials.size());
     MeshComponent::MeshSubset subset;
-    subset.indexCount = (uint32_t)meshComponent.indices.size();
-    subset.indexOffset = 0;
-    subset.materialID = m_materials.at(mesh.mMaterialIndex);
+    subset.index_count = (uint32_t)meshComponent.indices.size();
+    subset.index_offset = 0;
+    subset.material_id = m_materials.at(mesh.mMaterialIndex);
     meshComponent.subsets.emplace_back(subset);
 
     m_meshes.push_back(meshID);

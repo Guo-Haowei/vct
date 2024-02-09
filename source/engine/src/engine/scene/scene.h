@@ -156,13 +156,13 @@ public:                                                                         
 
     ecs::Entity create_sphere_entity(const std::string& name, float radius = 0.5f, const mat4& transform = mat4(1.0f));
 
-    ecs::Entity create_sphere_entity(const std::string& name, ecs::Entity materialID, float radius = 0.5f,
+    ecs::Entity create_sphere_entity(const std::string& name, ecs::Entity material_id, float radius = 0.5f,
                                      const mat4& transform = mat4(1.0f));
 
     ecs::Entity create_cube_entity(const std::string& name, const vec3& scale = vec3(0.5f),
                                    const mat4& transform = mat4(1.0f));
 
-    ecs::Entity create_cube_entity(const std::string& name, ecs::Entity materialID, const vec3& scale = vec3(0.5f),
+    ecs::Entity create_cube_entity(const std::string& name, ecs::Entity material_id, const vec3& scale = vec3(0.5f),
                                    const mat4& transform = mat4(1.0f));
 
     void attach_component(ecs::Entity entity, ecs::Entity parent);

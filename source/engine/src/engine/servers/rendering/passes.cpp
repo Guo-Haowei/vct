@@ -137,7 +137,7 @@ static void shadow_pass_func() {
             const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
 
             const mat4& M = transform.get_world_matrix();
-            AABB aabb = mesh.localBound;
+            AABB aabb = mesh.local_bound;
             aabb.apply_matrix(M);
             if (!frustum.intersects(aabb)) {
                 continue;
@@ -181,7 +181,7 @@ static void gbuffer_pass_func() {
         const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
 
         const mat4& M = transform.get_world_matrix();
-        AABB aabb = mesh.localBound;
+        AABB aabb = mesh.local_bound;
         aabb.apply_matrix(M);
         if (!frustum.intersects(aabb)) {
             continue;
@@ -195,20 +195,20 @@ static void gbuffer_pass_func() {
         glBindVertexArray(drawData->vao);
 
         for (const auto& subset : mesh.subsets) {
-            aabb = subset.localBound;
+            aabb = subset.local_bound;
             aabb.apply_matrix(M);
             if (!frustum.intersects(aabb)) {
                 continue;
             }
 
-            const MaterialComponent& material = *scene.get_component<MaterialComponent>(subset.materialID);
+            const MaterialComponent& material = *scene.get_component<MaterialComponent>(subset.material_id);
             const MaterialData* matData = reinterpret_cast<MaterialData*>(material.gpuResource);
 
             FillMaterialCB(matData, g_materialCache.cache);
             g_materialCache.Update();
 
-            glDrawElements(GL_TRIANGLES, subset.indexCount, GL_UNSIGNED_INT,
-                           (void*)(subset.indexOffset * sizeof(uint32_t)));
+            glDrawElements(GL_TRIANGLES, subset.index_count, GL_UNSIGNED_INT,
+                           (void*)(subset.index_offset * sizeof(uint32_t)));
         }
     }
 

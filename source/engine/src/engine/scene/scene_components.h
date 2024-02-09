@@ -123,7 +123,7 @@ private:
 // Mesh Component
 //--------------------------------------------------------------------------------------------------
 struct MeshComponent {
-    enum FLAGS {
+    enum {
         NONE = 0,
         RENDERABLE = 1 << 0,
         DOUBLE_SIDED = 1 << 1,
@@ -145,11 +145,11 @@ struct MeshComponent {
             COUNT,
         } name;
 
-        uint32_t offsetInByte = 0;
-        uint32_t sizeInByte = 0;
+        uint32_t offset_in_byte = 0;
+        uint32_t size_in_byte = 0;
         uint32_t stride = 0;
 
-        bool is_valid() const { return sizeInByte != 0; }
+        bool is_valid() const { return size_in_byte != 0; }
     };
 
     std::vector<uint32_t> indices;
@@ -163,26 +163,26 @@ struct MeshComponent {
     std::vector<vec3> color_0;
 
     struct MeshSubset {
-        ecs::Entity materialID;
-        uint32_t indexOffset = 0;
-        uint32_t indexCount = 0;
-        AABB localBound;
+        ecs::Entity material_id;
+        uint32_t index_offset = 0;
+        uint32_t index_count = 0;
+        AABB local_bound;
     };
     std::vector<MeshSubset> subsets;
 
-    ecs::Entity armatureID;
+    ecs::Entity armature_id;
 
     // Non-serialized
-    AABB localBound;
+    AABB local_bound;
 
     // @TODO: remove
     mutable void* gpuResource = nullptr;
 
     VertexAttribute attributes[VertexAttribute::COUNT];
-    size_t vertexBufferSize = 0;  // combine vertex buffer
+    size_t vertex_buffer_size = 0;  // combine vertex buffer
 
-    void CreateRenderData();
-    // std::vector<char> GenerateCombinedBuffer() const;
+    void create_render_data();
+    std::vector<char> generate_combined_buffer() const;
 
     void serialize(Archive& archive);
 };

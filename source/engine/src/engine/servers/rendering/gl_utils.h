@@ -42,8 +42,8 @@ static inline void BindToSlot(GLuint buffer, int slot, int size) {
 // Constant Buffer
 //------------------------------------------------------------------------------
 
-GLuint CreateAndBindConstantBuffer(int slot, size_t sizeInByte);
-void UpdateConstantBuffer(GLuint handle, const void* ptr, size_t sizeInByte);
+GLuint CreateAndBindConstantBuffer(int slot, size_t size_in_byte);
+void UpdateConstantBuffer(GLuint handle, const void* ptr, size_t size_in_byte);
 
 template<typename T>
 struct ConstantBuffer {
