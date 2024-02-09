@@ -5,6 +5,7 @@
 #include "assets/scene_loader_tinygltf.h"
 #include "core/collections/thread_safe_ring_buffer.h"
 #include "core/dynamic_variable/common_dvars.h"
+#include "core/io/file_access.h"
 #include "core/os/threads.h"
 #include "core/utility/timer.h"
 #include "scene/scene.h"
@@ -36,6 +37,9 @@ static struct
     // image
     std::map<std::string, std::shared_ptr<Image>> image_cache;
     std::mutex image_cache_lock;
+
+    // file
+    std::map<std::string, std::shared_ptr<Text>> text_cache;
 } s_glob;
 
 bool initialize() {
@@ -44,6 +48,35 @@ bool initialize() {
     if (DVAR_GET_BOOL(force_assimp_loader)) {
         s_glob.loaders[".gltf"] = load_scene_assimp;
     }
+
+    // @TODO: dir_access
+    // force load all shaders
+    const std::string shaders[] = {
+        "shader://cbuffer.glsl.h",
+        "shader://common.glsl",
+        "shader://depth.vert",
+        "shader://depth.frag",
+        "shader://fullscreen.vert",
+        "shader://fxaa.frag",
+        "shader://gbuffer.vert",
+        "shader://gbuffer.frag",
+        "shader://pbr.glsl",
+        "shader://shadow.glsl",
+        "shader://ssao.frag",
+        "shader://textureCB.glsl",
+        "shader://vct_deferred.frag",
+        "shader://debug/texture.frag",
+        "shader://editor/image.vert",
+        "shader://editor/image.frag",
+        "shader://editor/line3d.vert",
+        "shader://editor/line3d.frag",
+    };
+
+    for (int i = 0; i < array_length(shaders); ++i) {
+        load_file_sync(shaders[i]);
+        LOG_VERBOSE("[asset_loader] shader '{}' loaded", shaders[i]);
+    }
+
     return true;
 }
 
@@ -81,6 +114,32 @@ std::shared_ptr<Image> load_image_sync(const std::string& path) {
     auto ret = load_image(path);
     s_glob.image_cache[path] = ret;
     return ret;
+}
+
+std::shared_ptr<Text> load_file_sync(const std::string& path) {
+    auto found = s_glob.text_cache.find(path);
+    if (found != s_glob.text_cache.end()) {
+        return found->second;
+    }
+
+    auto res = FileAccess::open(path, FileAccess::READ);
+    if (!res) {
+        LOG_ERROR("[FileAccess] Error: failed to open file '{}', reason: {}", path, res.error().get_message());
+        return nullptr;
+    }
+
+    std::shared_ptr<FileAccess> file_access = *res;
+
+    const size_t size = file_access->get_length();
+
+    std::string buffer;
+    buffer.resize(size + 1);
+    file_access->read_buffer(buffer.data(), size);
+    buffer[size] = 0;
+    auto text = std::make_shared<Text>();
+    text->buffer = std::move(buffer);
+    s_glob.text_cache[path] = text;
+    return text;
 }
 
 static void load_scene_internal(LoadTask& task) {

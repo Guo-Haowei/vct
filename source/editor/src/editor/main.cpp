@@ -8,6 +8,7 @@
 #include "core/utility/command_line.h"
 #include "scene/scene_manager.h"
 #include "servers/display_server_glfw.h"
+#include "servers/rendering/shader_program_manager.h"
 #include "servers/rendering_server.h"
 
 static void register_common_dvars() {
@@ -97,6 +98,7 @@ int main(int argc, const char** argv) {
     UIManager::initialize();
     DisplayServer::singleton().initialize();
     RenderingServer::singleton().initialize();
+    ShaderProgramManager::singleton().initialize();
 
     // @TODO: move main loop here
     Editor editor;
@@ -106,6 +108,7 @@ int main(int argc, const char** argv) {
     thread::request_shutdown();
 
     // finalize
+    ShaderProgramManager::singleton().finalize();
     RenderingServer::singleton().finalize();
     DisplayServer::singleton().finalize();
     UIManager::finalize();

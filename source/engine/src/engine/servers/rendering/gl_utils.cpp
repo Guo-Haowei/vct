@@ -57,7 +57,7 @@ GLuint CreateAndBindConstantBuffer(int slot, size_t size_in_byte) {
 }
 
 void UpdateConstantBuffer(GLuint handle, const void *ptr, size_t size_in_byte) {
-    // glMapBuffer( mHandle, 0 );
+    // glMapBuffer( m_handle, 0 );
     glBindBuffer(GL_UNIFORM_BUFFER, handle);
     glBufferData(GL_UNIFORM_BUFFER, size_in_byte, ptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);

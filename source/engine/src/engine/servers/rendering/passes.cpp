@@ -6,9 +6,9 @@
 #include "servers/display_server.h"
 
 // @TODO: refactor
-#include "Framework/ProgramManager.h"
 #include "r_cbuffers.h"
 #include "scene/scene_manager.h"
+#include "shader_program_manager.h"
 using namespace vct;
 using namespace vct::rg;
 
@@ -81,8 +81,8 @@ static RenderPassDesc s_viewer_pass_desc = {
 //         mColorAttachments[i].destroy();
 //     }
 //
-//     glDeleteFramebuffers(1, &mHandle);
-//     mHandle = 0;
+//     glDeleteFramebuffers(1, &m_handle);
+//     m_handle = 0;
 // }
 
 uint32_t g_final_image;
@@ -116,8 +116,8 @@ static void shadow_pass_func() {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
     glClear(GL_DEPTH_BUFFER_BIT);
-    const auto& program = gProgramManager->GetShaderProgram(ProgramType::SHADOW);
-    program.Bind();
+    const auto& program = ShaderProgramManager::get(ProgramType::SHADOW);
+    program.bind();
 
     const int res = DVAR_GET_INT(r_shadowRes);
     // render scene 3 times
@@ -158,9 +158,9 @@ static void shadow_pass_func() {
 
 static void gbuffer_pass_func() {
     vct::Scene& scene = SceneManager::get_scene();
-    const auto& program = gProgramManager->GetShaderProgram(ProgramType::GBUFFER);
+    const auto& program = ShaderProgramManager::get(ProgramType::GBUFFER);
 
-    program.Bind();
+    program.bind();
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -212,38 +212,38 @@ static void gbuffer_pass_func() {
         }
     }
 
-    program.Unbind();
+    program.unbind();
 }
 
 static void ssao_pass_func() {
-    const auto& shader = gProgramManager->GetShaderProgram(ProgramType::SSAO);
+    const auto& shader = ShaderProgramManager::get(ProgramType::SSAO);
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    shader.Bind();
+    shader.bind();
 
     R_DrawQuad();
 
-    shader.Unbind();
+    shader.unbind();
 }
 
 static void deferred_vct_pass() {
-    const auto& program = gProgramManager->GetShaderProgram(ProgramType::VCT_DEFERRED);
+    const auto& program = ShaderProgramManager::get(ProgramType::VCT_DEFERRED);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    program.Bind();
+    program.bind();
 
     R_DrawQuad();
 
-    program.Unbind();
+    program.unbind();
 }
 
 static void fxaa_pass() {
-    const auto& program = gProgramManager->GetShaderProgram(ProgramType::FXAA);
+    const auto& program = ShaderProgramManager::get(ProgramType::FXAA);
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    program.Bind();
+    program.bind();
     R_DrawQuad();
-    program.Unbind();
+    program.unbind();
 }

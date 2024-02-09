@@ -12,11 +12,5 @@ protected:
     void AddLayer(std::shared_ptr<Layer> layer);
 
 private:
-    void RegisterManager(ManagerBase* manager);
-    bool RegisterManagers();
-    bool InitializeManagers();
-    void FinalizeManagers();
-
-    std::vector<ManagerBase*> mManagers;
     std::vector<std::shared_ptr<Layer>> mLayers;
 };

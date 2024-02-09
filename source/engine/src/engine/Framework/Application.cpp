@@ -1,6 +1,5 @@
 #include "Application.h"
 
-#include "ProgramManager.h"
 #include "imgui/imgui.h"
 // @TODO: refactor
 
@@ -13,43 +12,9 @@
 
 using namespace vct;
 
-void Application::RegisterManager(ManagerBase* manager) {
-    mManagers.emplace_back(manager);
-    manager->mApplication = this;
-}
-
-bool Application::RegisterManagers() {
-    RegisterManager(gProgramManager);
-    return true;
-}
-
-bool Application::InitializeManagers() {
-    for (auto manager : mManagers) {
-        if (!manager->Initialize()) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-void Application::FinalizeManagers() {
-    for (auto it = mManagers.rbegin(); it != mManagers.rend(); ++it) {
-        (*it)->Finalize();
-    }
-}
-
 void Application::AddLayer(std::shared_ptr<Layer> layer) { mLayers.emplace_back(layer); }
 
 int Application::Run(int, const char**) {
-    bool ok = true;
-    ok = ok && RegisterManagers();
-    ok = ok && InitializeManagers();
-
-    if (!ok) {
-        return -1;
-    }
-
     for (auto& layer : mLayers) {
         layer->Attach();
         LOG("[Runtime] layer '{}' attached!", layer->GetName());
@@ -89,6 +54,5 @@ int Application::Run(int, const char**) {
     auto [x, y] = DisplayServer::singleton().get_window_pos();
     DVAR_SET_IVEC2(window_position, x, y);
 
-    FinalizeManagers();
     return 0;
 }

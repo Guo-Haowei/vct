@@ -50,7 +50,7 @@ bool DisplayServerGLFW::initialize() {
     //     data->mWidth = width;
     //     data->mHeight = height;
     //     Event e = Event::Resize(width, height);
-    //     data->mFunc(e);
+    //     data->m_func(e);
     // });
 
     glfwSetCursorPosCallback(m_window, cursor_pos_cb);

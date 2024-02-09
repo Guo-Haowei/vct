@@ -4,13 +4,13 @@
 #include <random>
 
 #include "Core/geometry.h"
-#include "Framework/ProgramManager.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
 /////
 #include "core/dynamic_variable/common_dvars.h"
 #include "rendering/passes.h"
 #include "rendering/r_defines.h"
 #include "rendering/r_editor.h"
+#include "rendering/shader_program_manager.h"
 #include "scene/scene_manager.h"
 #include "servers/display_server.h"
 
@@ -246,15 +246,15 @@ void RenderingServer::createGpuResources() {
 //  glEnable(GL_CULL_FACE);
 //  glEnable(GL_DEPTH_TEST);
 
-// const auto& program = gProgramManager->GetShaderProgram(ProgramType::Visualization);
+// const auto& program = gProgramManager->get(ProgramType::Visualization);
 
 // glBindVertexArray(m_box->vao);
-// program.Bind();
+// program.bind();
 
 // const int size = DVAR_GET_INT(r_voxelSize);
 // glDrawElementsInstanced(GL_TRIANGLES, m_box->count, GL_UNSIGNED_INT, 0, size * size * size);
 
-// program.Unbind();
+// program.unbind();
 //}
 
 struct MaterialCache {
@@ -289,7 +289,7 @@ void RenderingServer::renderToVoxelTexture() {
 
     m_albedoVoxel.bindImageTexture(IMAGE_VOXEL_ALBEDO_SLOT);
     m_normalVoxel.bindImageTexture(IMAGE_VOXEL_NORMAL_SLOT);
-    gProgramManager->GetShaderProgram(ProgramType::Voxel).Bind();
+    ShaderProgramManager::get(ProgramType::Voxel).bind();
 
     const uint32_t numObjects = (uint32_t)scene.get_count<ObjectComponent>();
     for (uint32_t i = 0; i < numObjects; ++i) {
@@ -322,7 +322,7 @@ void RenderingServer::renderToVoxelTexture() {
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
     // post process
-    gProgramManager->GetShaderProgram(ProgramType::VoxelPost).Bind();
+    ShaderProgramManager::get(ProgramType::VoxelPost).bind();
 
     constexpr GLuint workGroupX = 512;
     constexpr GLuint workGroupY = 512;
@@ -338,15 +338,15 @@ void RenderingServer::renderToVoxelTexture() {
 }
 
 void RenderingServer::renderFrameBufferTextures(int width, int height) {
-    const auto& program = gProgramManager->GetShaderProgram(ProgramType::DebugTexture);
+    const auto& program = ShaderProgramManager::get(ProgramType::DebugTexture);
 
-    program.Bind();
+    program.bind();
     glDisable(GL_DEPTH_TEST);
     glViewport(0, 0, width, height);
 
     R_DrawQuad();
 
-    program.Unbind();
+    program.unbind();
 }
 
 void RenderingServer::render() {

@@ -7,15 +7,17 @@ public:
     using CreateFunc = FileAccess* (*)(void);
 
     enum AccessType {
+        ACCESS_SHADER,
         ACCESS_RESOURCE,
         ACCESS_USERDATA,
         ACCESS_FILESYSTEM,
-        ACCESS_COUNT,
+        ACCESS_MAX,
     };
 
     enum ModeFlags {
-        READ = 0b01,
-        WRITE = 0b10,
+        NONE = 0,
+        READ = 1,
+        WRITE = 2,
     };
 
     virtual ~FileAccess() = default;
@@ -30,8 +32,9 @@ public:
     AccessType get_access_type() const { return m_access_type; }
 
     static auto create(AccessType access_type) -> std::shared_ptr<FileAccess>;
-    static auto create_for_path(const std::string& path) -> std::shared_ptr<FileAccess>;
-    static auto open(const std::string& path, int mode_flags)
+    static auto create_for_path(std::string_view path) -> std::shared_ptr<FileAccess>;
+    // @TODO: use string_view
+    static auto open(std::string_view path, int mode_flags)
         -> std::expected<std::shared_ptr<FileAccess>, Error<ErrorCode>>;
 
     template<typename T>
@@ -42,12 +45,13 @@ public:
 protected:
     FileAccess() = default;
 
-    virtual ErrorCode open_internal(const std::string& path, int mode_flags) = 0;
+    virtual ErrorCode open_internal(std::string_view path, int mode_flags) = 0;
     virtual void set_access_type(AccessType access_type) { m_access_type = access_type; }
+    virtual std::string fix_path(std::string_view path);
 
-    AccessType m_access_type = ACCESS_COUNT;
+    AccessType m_access_type = ACCESS_MAX;
 
-    static CreateFunc s_create_func[ACCESS_COUNT];
+    static CreateFunc s_create_func[ACCESS_MAX];
 
 private:
     template<typename T>

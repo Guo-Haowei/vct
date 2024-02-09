@@ -11,6 +11,7 @@ std::shared_ptr<Image> load_image(const std::string& path) {
     int num_channels = 0;
 
     uint8_t* data = stbi_load(path.c_str(), &width, &height, &num_channels, 0);
+    DEV_ASSERT(data);
 
     std::vector<uint8_t> buffer;
 
