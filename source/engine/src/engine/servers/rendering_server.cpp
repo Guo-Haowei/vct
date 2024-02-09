@@ -13,6 +13,7 @@
 #include "rendering/shader_program_manager.h"
 #include "scene/scene_manager.h"
 #include "servers/display_server.h"
+#include "vsinput.glsl.h"
 
 static std::vector<std::shared_ptr<MeshData>> g_meshdata;
 static std::vector<std::shared_ptr<MaterialData>> g_materialdata;
@@ -62,32 +63,57 @@ void RenderingServer::finalize() {
 static std::shared_ptr<MeshData> CreateMeshData(const MeshComponent& mesh) {
     MeshData* ret = new MeshData;
 
-    MeshData& outMesh = *ret;
-    const bool hasNormals = !mesh.normals.empty();
-    const bool hasUVs = !mesh.texcoords_0.empty();
-    const bool hasTangent = !mesh.tangents.empty();
+    MeshData& out_mesh = *ret;
+    const bool has_normals = !mesh.normals.empty();
+    const bool has_uvs = !mesh.texcoords_0.empty();
+    const bool has_tangents = !mesh.tangents.empty();
+    const bool has_joints = !mesh.joints_0.empty();
+    const bool has_weights = !mesh.weights_0.empty();
 
-    glGenVertexArrays(1, &outMesh.vao);
-    glGenBuffers(2 + hasNormals + hasUVs + hasTangent, &outMesh.ebo);
-    glBindVertexArray(outMesh.vao);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outMesh.ebo);
-    gl::BindToSlot(outMesh.vbos[0], 0, 3);
-    gl::NamedBufferStorage(outMesh.vbos[0], mesh.positions);
-    if (hasNormals) {
-        gl::BindToSlot(outMesh.vbos[1], 1, 3);
-        gl::NamedBufferStorage(outMesh.vbos[1], mesh.normals);
+    int vbo_count = 1 + has_normals + has_uvs + has_tangents + has_joints + has_weights;
+    DEV_ASSERT(vbo_count <= array_length(out_mesh.vbos));
+
+    glGenVertexArrays(1, &out_mesh.vao);
+
+    // @TODO: fix this hack
+    glGenBuffers(1, &out_mesh.ebo);
+    glGenBuffers(6, out_mesh.vbos);
+
+    int slot = -1;
+    glBindVertexArray(out_mesh.vao);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, out_mesh.ebo);
+
+    slot = get_position_slot();
+    gl::BindToSlot(out_mesh.vbos[slot], slot, 3);
+    gl::NamedBufferStorage(out_mesh.vbos[slot], mesh.positions);
+
+    if (has_normals) {
+        slot = get_normal_slot();
+        gl::BindToSlot(out_mesh.vbos[slot], slot, 3);
+        gl::NamedBufferStorage(out_mesh.vbos[slot], mesh.normals);
     }
-    if (hasUVs) {
-        gl::BindToSlot(outMesh.vbos[2], 2, 2);
-        gl::NamedBufferStorage(outMesh.vbos[2], mesh.texcoords_0);
+    if (has_uvs) {
+        slot = get_uv_slot();
+        gl::BindToSlot(out_mesh.vbos[slot], slot, 2);
+        gl::NamedBufferStorage(out_mesh.vbos[slot], mesh.texcoords_0);
     }
-    if (hasTangent) {
-        gl::BindToSlot(outMesh.vbos[3], 3, 3);
-        gl::NamedBufferStorage(outMesh.vbos[3], mesh.tangents);
+    if (has_tangents) {
+        slot = get_tangent_slot();
+        gl::BindToSlot(out_mesh.vbos[slot], slot, 3);
+        gl::NamedBufferStorage(out_mesh.vbos[slot], mesh.tangents);
+    }
+    if (has_joints) {
+        slot = get_bone_id_slot();
+        gl::BindToSlot(out_mesh.vbos[slot], slot, 4);
+        gl::NamedBufferStorage(out_mesh.vbos[slot], mesh.joints_0);
+        DEV_ASSERT(!mesh.weights_0.empty());
+        slot = get_bone_weight_slot();
+        gl::BindToSlot(out_mesh.vbos[slot], slot, 4);
+        gl::NamedBufferStorage(out_mesh.vbos[slot], mesh.weights_0);
     }
 
-    gl::NamedBufferStorage(outMesh.ebo, mesh.indices);
-    outMesh.count = static_cast<uint32_t>(mesh.indices.size());
+    gl::NamedBufferStorage(out_mesh.ebo, mesh.indices);
+    out_mesh.count = static_cast<uint32_t>(mesh.indices.size());
 
     glBindVertexArray(0);
     return std::shared_ptr<MeshData>(ret);

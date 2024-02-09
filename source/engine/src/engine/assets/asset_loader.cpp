@@ -52,13 +52,16 @@ bool initialize() {
     // @TODO: dir_access
     // force load all shaders
     const std::string shaders[] = {
+        "shader://vsinput.glsl.h",
         "shader://cbuffer.glsl.h",
         "shader://common.glsl",
-        "shader://depth.vert",
+        "shader://mesh_static.vert",
+        "shader://mesh_animated.vert",
+        "shader://depth_static.vert",
+        "shader://depth_animated.vert",
         "shader://depth.frag",
         "shader://fullscreen.vert",
         "shader://fxaa.frag",
-        "shader://pos_normal_uv_tangent.vert",
         "shader://gbuffer.frag",
         "shader://pbr.glsl",
         "shader://shadow.glsl",
@@ -68,6 +71,10 @@ bool initialize() {
         "shader://debug/texture.frag",
         "shader://editor/image.vert",
         "shader://editor/image.frag",
+        "shader://voxel/voxelization.vert",
+        "shader://voxel/voxelization.geom",
+        "shader://voxel/voxelization.frag",
+        "shader://voxel/post.comp",
     };
 
     for (int i = 0; i < array_length(shaders); ++i) {
@@ -112,6 +119,15 @@ std::shared_ptr<Image> load_image_sync(const std::string& path) {
     auto ret = load_image(path);
     s_glob.image_cache[path] = ret;
     return ret;
+}
+
+std::shared_ptr<Text> find_file(const std::string& path) {
+    auto found = s_glob.text_cache.find(path);
+    if (found != s_glob.text_cache.end()) {
+        return found->second;
+    }
+
+    return nullptr;
 }
 
 std::shared_ptr<Text> load_file_sync(const std::string& path) {

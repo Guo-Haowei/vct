@@ -24,9 +24,8 @@ bool SceneManager::initialize() {
             auto light = m_scene->create_omnilight_entity("omni light", vec3(1), 20.f);
             auto transform = m_scene->get_component<TransformComponent>(light);
             DEV_ASSERT(transform);
-            mat4 rx = glm::rotate(glm::radians(10.0f), glm::vec3(1, 0, 0));
-            mat4 rz = glm::rotate(glm::radians(10.0f), glm::vec3(0, 0, 1));
-            transform->set_local_transform(rx * rz);
+            mat4 r = glm::rotate(glm::radians(30.0f), glm::vec3(0, 0, 1));
+            transform->set_local_transform(r);
 
             m_scene->attach_component(light, root);
         }

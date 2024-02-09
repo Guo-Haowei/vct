@@ -5,7 +5,7 @@
 struct MeshData {
     GLuint vao = 0;
     GLuint ebo = 0;
-    GLuint vbos[5] = { 0, 0, 0, 0, 0 };
+    GLuint vbos[6] = { 0 };
     uint32_t count = 0;
 };
 
@@ -47,6 +47,7 @@ void UpdateConstantBuffer(GLuint handle, const void* ptr, size_t size_in_byte);
 
 template<typename T>
 struct ConstantBuffer {
+
     void Destroy() {
         if (mHandle != 0) {
             LOG_VERBOSE("[opengl] destroy cbuffer {}", mHandle);
@@ -55,7 +56,10 @@ struct ConstantBuffer {
         mHandle = 0;
     }
 
-    void CreateAndBind() { mHandle = CreateAndBindConstantBuffer(cache.get_slot(), sizeof(T)); }
+    void CreateAndBind() {
+        static_assert(sizeof(T) % 16 == 0);
+        mHandle = CreateAndBindConstantBuffer(cache.get_slot(), sizeof(T));
+    }
 
     void Update() { UpdateConstantBuffer(mHandle, &cache, sizeof(T)); }
 

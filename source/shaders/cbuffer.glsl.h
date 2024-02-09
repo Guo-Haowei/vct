@@ -1,15 +1,12 @@
-#ifndef NUM_CASCADES
-#define NUM_CASCADES 3
-#endif
-#ifndef MAX_MATERIALS
-#define MAX_MATERIALS 300
-#endif
-#ifndef MAX_LIGHT_ICON
-#define MAX_LIGHT_ICON 4
-#endif
-#ifndef NUM_SSAO_KERNEL
+#ifndef CBUFFER_INCLUDED
+#define CBUFFER_INCLUDED
+
+#define NUM_CASCADES    3
 #define NUM_SSAO_KERNEL 64
-#endif
+
+#define MAX_MATERIALS   300
+#define MAX_LIGHT_ICON  4
+#define MAX_BONE_NUMBER 128
 
 // constant buffer
 #ifdef __cplusplus
@@ -109,9 +106,8 @@ CONSTANT_BUFFER(PerSceneConstantBuffer, 3) {
     Sampler2DArray PbrMaps[MAX_MATERIALS];
 };
 
-#ifdef __cplusplus
-static_assert(sizeof(PerFrameConstantBuffer) % 16 == 0);
-static_assert(sizeof(PerBatchConstantBuffer) % 16 == 0);
-static_assert(sizeof(MaterialConstantBuffer) % 16 == 0);
-static_assert(sizeof(PerSceneConstantBuffer) % 16 == 0);
+CONSTANT_BUFFER(BoneConstantBuffer, 4) {
+    mat4 c_bones[MAX_BONE_NUMBER];
+};
+
 #endif

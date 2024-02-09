@@ -116,14 +116,13 @@ static void shadow_pass_func() {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
     glClear(GL_DEPTH_BUFFER_BIT);
-    const auto& program = ShaderProgramManager::get(ProgramType::SHADOW);
-    program.bind();
 
     const int res = DVAR_GET_INT(r_shadowRes);
     // render scene 3 times
 
     const uint32_t numObjects = (uint32_t)scene.get_count<ObjectComponent>();
-    for (int idx = 0; idx < NUM_CASCADES; ++idx) {
+    // @TODO: fix shadow cascade
+    for (int idx = 0; idx < 1; ++idx) {
         glViewport(idx * res, 0, res, res);
         const mat4& PV = g_perFrameCache.cache.LightPVs[idx];
         const Frustum frustum(PV);
@@ -143,6 +142,19 @@ static void shadow_pass_func() {
                 continue;
             }
 
+            const bool has_bone = mesh.armature_id.is_valid();
+
+            if (has_bone) {
+                auto& armature = *scene.get_component<ArmatureComponent>(mesh.armature_id);
+                DEV_ASSERT(armature.boneTransforms.size() <= MAX_BONE_NUMBER);
+
+                memcpy(g_boneCache.cache.c_bones, armature.boneTransforms.data(), sizeof(mat4) * armature.boneTransforms.size());
+                g_boneCache.Update();
+            }
+
+            const auto& program = ShaderProgramManager::get(has_bone ? PROGRAM_DPETH_ANIMATED : PROGRAM_DPETH_STATIC);
+            program.bind();
+
             g_perBatchCache.cache.c_projection_view_model_matrix = PV * M;
             g_perBatchCache.cache.c_model_matrix = M;
             g_perBatchCache.Update();
@@ -154,13 +166,11 @@ static void shadow_pass_func() {
     }
 
     glCullFace(GL_BACK);
+    glUseProgram(0);
 }
 
 static void gbuffer_pass_func() {
     vct::Scene& scene = SceneManager::get_scene();
-    const auto& program = ShaderProgramManager::get(ProgramType::GBUFFER);
-
-    program.bind();
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -171,6 +181,7 @@ static void gbuffer_pass_func() {
 
     Frustum frustum(camera.get_projection_view_matrix());
 
+    // @TODO: sort animated / non-animated
     const uint32_t numObjects = (uint32_t)scene.get_count<ObjectComponent>();
     for (uint32_t i = 0; i < numObjects; ++i) {
         const ObjectComponent& obj = scene.get_component_array<ObjectComponent>()[i];
@@ -180,9 +191,6 @@ static void gbuffer_pass_func() {
         DEV_ASSERT(scene.contains<MeshComponent>(obj.meshID));
 
         const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
-        if (mesh.armature_id.is_valid()) {
-            //__debugbreak();
-        }
 
         const mat4& M = transform.get_world_matrix();
         AABB aabb = mesh.local_bound;
@@ -190,6 +198,19 @@ static void gbuffer_pass_func() {
         if (!frustum.intersects(aabb)) {
             continue;
         }
+
+        bool has_bone = mesh.armature_id.is_valid();
+
+        if (has_bone) {
+            auto& armature = *scene.get_component<ArmatureComponent>(mesh.armature_id);
+            DEV_ASSERT(armature.boneTransforms.size() <= MAX_BONE_NUMBER);
+
+            memcpy(g_boneCache.cache.c_bones, armature.boneTransforms.data(), sizeof(mat4) * armature.boneTransforms.size());
+            g_boneCache.Update();
+        }
+
+        const auto& program = ShaderProgramManager::get(has_bone ? PROGRAM_GBUFFER_ANIMATED : PROGRAM_GBUFFER_STATIC);
+        program.bind();
 
         g_perBatchCache.cache.c_model_matrix = M;
         g_perBatchCache.cache.c_projection_view_model_matrix = g_perFrameCache.cache.c_projection_view_matrix * M;
@@ -216,7 +237,7 @@ static void gbuffer_pass_func() {
         }
     }
 
-    program.unbind();
+    glUseProgram(0);
 }
 
 static void ssao_pass_func() {

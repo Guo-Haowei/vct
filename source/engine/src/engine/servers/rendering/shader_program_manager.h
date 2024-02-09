@@ -4,18 +4,21 @@
 
 namespace vct {
 
-// @TODO: fix names
-enum class ProgramType {
+enum ProgramType {
+    PROGRAM_DPETH_STATIC,
+    PROGRAM_DPETH_ANIMATED,
+    PROGRAM_GBUFFER_STATIC,
+    PROGRAM_GBUFFER_ANIMATED,
+
+    // @TODO: fix names
     IMAGE2D,
-    SHADOW,
-    GBUFFER,
     SSAO,
     VCT_DEFERRED,
     FXAA,
     Voxel,
     VoxelPost,
     DebugTexture,
-    COUNT,
+    PROGRAM_MAX,
 };
 
 class ShaderProgramManager : public Singleton<ShaderProgramManager> {

@@ -25,10 +25,8 @@ static std::string process_shader(const std::string &source) {
             std::string file_to_include(quote1 + 1, quote2);
 
             file_to_include = "shader://" + file_to_include;
-            auto text = asset_loader::load_file_sync(file_to_include);
-            if (!text) {
-                CRASH_NOW();
-            }
+            auto text = asset_loader::find_file(file_to_include);
+            DEV_ASSERT(text);
             std::string extra = text->buffer;
             if (extra.empty()) {
                 LOG_ERROR("[filesystem] failed to read shader '{}'", file_to_include);
@@ -45,7 +43,8 @@ static std::string process_shader(const std::string &source) {
 }
 
 static GLuint create_shader(std::string_view file, GLenum type) {
-    auto text = asset_loader::load_file_sync(std::string(file));
+    auto text = asset_loader::find_file(std::string(file));
+    DEV_ASSERT(text);
 
     std::string source = text->buffer;
     if (source.empty()) {
@@ -136,60 +135,72 @@ ShaderProgram ShaderProgramManager::create(const ProgramCreateInfo &info) {
 }
 
 bool ShaderProgramManager::initialize() {
-    s_shader_cache.resize(static_cast<int>(ProgramType::COUNT));
+    s_shader_cache.resize(static_cast<int>(ProgramType::PROGRAM_MAX));
+    {
+        ProgramCreateInfo info;
+        info.vs = "shader://mesh_static.vert";
+        info.ps = "shader://gbuffer.frag";
+        s_shader_cache[PROGRAM_GBUFFER_STATIC] = create(info);
+    }
+    {
+        ProgramCreateInfo info;
+        info.vs = "shader://mesh_animated.vert";
+        info.ps = "shader://gbuffer.frag";
+        s_shader_cache[PROGRAM_GBUFFER_ANIMATED] = create(info);
+    }
+    {
+        ProgramCreateInfo info;
+        info.vs = "shader://depth_static.vert";
+        info.ps = "shader://depth.frag";
+        s_shader_cache[PROGRAM_DPETH_STATIC] = create(info);
+    }
+    {
+        ProgramCreateInfo info;
+        info.vs = "shader://depth_animated.vert";
+        info.ps = "shader://depth.frag";
+        s_shader_cache[PROGRAM_DPETH_ANIMATED] = create(info);
+    }
     {
         ProgramCreateInfo info;
         info.vs = "shader://editor/image.vert";
         info.ps = "shader://editor/image.frag";
-        s_shader_cache[std::to_underlying(ProgramType::IMAGE2D)] = create(info);
-    }
-    {
-        ProgramCreateInfo info;
-        info.vs = "shader://depth.vert";
-        info.ps = "shader://depth.frag";
-        s_shader_cache[std::to_underlying(ProgramType::SHADOW)] = create(info);
-    }
-    {
-        ProgramCreateInfo info;
-        info.vs = "shader://pos_normal_uv_tangent.vert";
-        info.ps = "shader://gbuffer.frag";
-        s_shader_cache[std::to_underlying(ProgramType::GBUFFER)] = create(info);
+        s_shader_cache[(ProgramType::IMAGE2D)] = create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "shader://fullscreen.vert";
         info.ps = "shader://ssao.frag";
-        s_shader_cache[std::to_underlying(ProgramType::SSAO)] = create(info);
+        s_shader_cache[(ProgramType::SSAO)] = create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "shader://fullscreen.vert";
         info.ps = "shader://vct_deferred.frag";
-        s_shader_cache[std::to_underlying(ProgramType::VCT_DEFERRED)] = create(info);
+        s_shader_cache[(ProgramType::VCT_DEFERRED)] = create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "shader://fullscreen.vert";
         info.ps = "shader://fxaa.frag";
-        s_shader_cache[std::to_underlying(ProgramType::FXAA)] = create(info);
+        s_shader_cache[(ProgramType::FXAA)] = create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "shader://fullscreen.vert";
         info.ps = "shader://debug/texture.frag";
-        s_shader_cache[std::to_underlying(ProgramType::DebugTexture)] = create(info);
+        s_shader_cache[(ProgramType::DebugTexture)] = create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "shader://voxel/voxelization.vert";
         info.gs = "shader://voxel/voxelization.geom";
         info.ps = "shader://voxel/voxelization.frag";
-        s_shader_cache[std::to_underlying(ProgramType::Voxel)] = create(info);
+        s_shader_cache[ProgramType::Voxel] = create(info);
     }
     {
         ProgramCreateInfo info;
         info.cs = "shader://voxel/post.comp";
-        s_shader_cache[std::to_underlying(ProgramType::VoxelPost)] = create(info);
+        s_shader_cache[ProgramType::VoxelPost] = create(info);
     }
 
     return true;
