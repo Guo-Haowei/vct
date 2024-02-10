@@ -13,7 +13,6 @@
 extern uint32_t g_final_image;
 
 void Viewer::Update(float dt) {
-    dt = 0.016f;
     if (IsFocused()) {
         Scene& scene = SceneManager::get_scene();
         s_controller.move_camera(scene.get_main_camera(), dt);

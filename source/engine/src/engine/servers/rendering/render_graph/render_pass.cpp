@@ -2,30 +2,44 @@
 
 #include "../GLPrerequisites.h"
 
-namespace vct::rg {
+namespace vct {
 
 void RenderPass::execute() {
     bind();
 
-    m_pass_desc->func();
+    if (m_func) {
+        m_func();
+    }
 
     unbind();
 }
 
-void RenderPass::create(const RenderPassDesc& pass_desc, int w, int h) {
-    m_pass_desc = &pass_desc;
-    m_width = w;
-    m_height = h;
+void RenderPass::create_internal(RenderPassDesc& desc) {
+    m_name = std::move(desc.name);
+    m_inputs = std::move(desc.inputs);
+    for (const auto& output : desc.color_attachments) {
+        m_outputs.emplace_back(output.name);
+    }
+    if (desc.depth_attachment) {
+        m_outputs.emplace_back(desc.depth_attachment->name);
+    }
+    m_func = desc.func;
+    m_width = desc.width;
+    m_height = desc.height;
 }
 
-void RenderPassGL::create(const RenderPassDesc& pass_desc, int w, int h) {
-    RenderPass::create(pass_desc, w, h);
+void RenderPassGL::create_internal(RenderPassDesc& desc) {
+    RenderPass::create_internal(desc);
+
+    if (desc.type == RENDER_PASS_COMPUTE) {
+        return;
+    }
 
     glGenFramebuffers(1, &m_fbo_handle);
     bind();
 
     // create color attachments
-    uint32_t color_attachment_count = static_cast<uint32_t>(pass_desc.color_attachments.size());
+    uint32_t color_attachment_count = static_cast<uint32_t>(desc.color_attachments.size());
     DEV_ASSERT(color_attachment_count <= m_color_attachments.capacity());
 
     m_color_attachments.resize(color_attachment_count);
@@ -34,20 +48,20 @@ void RenderPassGL::create(const RenderPassDesc& pass_desc, int w, int h) {
     attachments.reserve(color_attachment_count);
     glGenTextures(color_attachment_count, m_color_attachments.data());
     for (uint32_t i = 0; i < color_attachment_count; ++i) {
-        const auto& desc = pass_desc.color_attachments[i];
+        const auto& color_attachment = desc.color_attachments[i];
 
         // create texture
         GLuint color_attachment_id = m_color_attachments[i];
         glBindTexture(GL_TEXTURE_2D, color_attachment_id);
-        glTexImage2D(GL_TEXTURE_2D,                              // target
-                     0,                                          // level
-                     format_to_gl_internal_format(desc.format),  // internal format
-                     m_width,                                    // width
-                     m_height,                                   // height
-                     0,                                          // boarder
-                     format_to_gl_format(desc.format),           // format
-                     format_to_gl_data_type(desc.format),        // type
-                     nullptr                                     // pixels
+        glTexImage2D(GL_TEXTURE_2D,                                          // target
+                     0,                                                      // level
+                     format_to_gl_internal_format(color_attachment.format),  // internal format
+                     m_width,                                                // width
+                     m_height,                                               // height
+                     0,                                                      // boarder
+                     format_to_gl_format(color_attachment.format),           // format
+                     format_to_gl_data_type(color_attachment.format),        // type
+                     nullptr                                                 // pixels
         );
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -76,19 +90,19 @@ void RenderPassGL::create(const RenderPassDesc& pass_desc, int w, int h) {
     }
 
     // create depth attachments
-    if (pass_desc.depth_attachment.has_value()) {
-        const auto& desc = *pass_desc.depth_attachment;
+    if (desc.depth_attachment.has_value()) {
+        const auto& depth_attachment = *desc.depth_attachment;
         glGenTextures(1, &m_depth_attachment);
         glBindTexture(GL_TEXTURE_2D, m_depth_attachment);
-        glTexImage2D(GL_TEXTURE_2D,                              // target
-                     0,                                          // level
-                     format_to_gl_internal_format(desc.format),  // internal format
-                     m_width,                                    // width
-                     m_height,                                   // height
-                     0,                                          // boarder
-                     format_to_gl_format(desc.format),           // format
-                     format_to_gl_data_type(desc.format),        // type
-                     nullptr                                     // pixels
+        glTexImage2D(GL_TEXTURE_2D,                                          // target
+                     0,                                                      // level
+                     format_to_gl_internal_format(depth_attachment.format),  // internal format
+                     m_width,                                                // width
+                     m_height,                                               // height
+                     0,                                                      // boarder
+                     format_to_gl_format(depth_attachment.format),           // format
+                     format_to_gl_data_type(depth_attachment.format),        // type
+                     nullptr                                                 // pixels
         );
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -133,4 +147,4 @@ uint32_t RenderPassGL::get_depth_attachment() {
     return m_depth_attachment;
 }
 
-}  // namespace vct::rg
+}  // namespace vct

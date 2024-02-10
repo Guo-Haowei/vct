@@ -138,9 +138,9 @@ public:                                                                         
     ecs::Entity create_material_entity(const std::string& name);
 
     ecs::Entity create_camera_entity(const std::string& name, float width, float height,
-                                     float nearPlane = CameraComponent::kDefaultNear,
-                                     float farPlane = CameraComponent::kDefaultFar,
-                                     float fovy = CameraComponent::kDefaultFov);
+                                     float nearPlane = CameraComponent::DEFAULT_NEAR,
+                                     float farPlane = CameraComponent::DEFAULT_FAR,
+                                     Degree fovy = CameraComponent::DEFAULT_FOV);
 
     ecs::Entity create_pointlight_entity(const std::string& name, const vec3& position, const vec3& color = vec3(1),
                                          const float energy = 10.0f);

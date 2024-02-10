@@ -31,6 +31,8 @@ void EditorLayer::AddPanel(std::shared_ptr<Panel> panel) {
     panel->SetSelectedRef(&mSelected);
 }
 
+extern void dummy_graph_editor();
+
 void EditorLayer::DockSpace() {
     ImGui::GetMainViewport();
 
@@ -76,6 +78,7 @@ void EditorLayer::DockSpace() {
 
 void EditorLayer::Update(float dt) {
     DockSpace();
+    dummy_graph_editor();
     for (auto& it : mPanels) {
         it->Update(dt);
     }

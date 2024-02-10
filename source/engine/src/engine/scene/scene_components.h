@@ -1,6 +1,7 @@
 #pragma once
 #include "core/collections/rid.h"
 #include "core/math/aabb.h"
+#include "core/math/degree.h"
 #include "core/systems/entity.h"
 
 namespace vct {
@@ -90,9 +91,9 @@ public:
         DIRTY = 1,
     };
 
-    static constexpr float kDefaultNear = 0.1f;
-    static constexpr float kDefaultFar = 100.0f;
-    static constexpr float kDefaultFov = glm::radians(50.0f);
+    static constexpr float DEFAULT_NEAR = 1.0f;
+    static constexpr float DEFAULT_FAR = 100.0f;
+    static constexpr Degree DEFAULT_FOV{ 50.0f };
 
     void update();
 
@@ -124,9 +125,9 @@ public:
 private:
     uint32_t m_flags = DIRTY;
 
-    float m_near = kDefaultNear;
-    float m_far = kDefaultFar;
-    float m_fovy = kDefaultFov;
+    float m_near = DEFAULT_NEAR;
+    float m_far = DEFAULT_FAR;
+    Degree m_fovy{ DEFAULT_FOV };
     float m_width = 0.0f;
     float m_height = 0.0f;
 
