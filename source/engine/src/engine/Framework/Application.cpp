@@ -25,6 +25,7 @@ int Application::Run(int, const char**) {
         "\nMain Loop"
         "\n********************************************************************************");
 
+    LOG_ERROR("TODO: link object with animation");
     LOG_WARN("TODO: save and load scene");
     LOG_ERROR("TODO: use RID as much as possible");
     LOG_WARN("TODO: fix multiple objects play same animation");

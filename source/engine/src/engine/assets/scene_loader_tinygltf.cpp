@@ -577,10 +577,12 @@ void SceneLoaderTinyGLTF::process_mesh(const tinygltf::Mesh& gltf_mesh, int) {
     }
 }
 
-void SceneLoaderTinyGLTF::process_animation(const tinygltf::Animation& gltf_anim, int id) {
+void SceneLoaderTinyGLTF::process_animation(const tinygltf::Animation& gltf_anim, int) {
+    static int s_counter = 0;
+
     std::string tag = gltf_anim.name;
     if (tag.empty()) {
-        tag = std::format("{}::animation_{}", m_scene_name, id);
+        tag = std::format("{}::animation_{}", m_scene_name, ++s_counter);
     }
     auto entity = m_scene.create_name_entity(tag);
 
