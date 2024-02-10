@@ -157,7 +157,7 @@ static size_t get_stride(MeshComponent::VertexAttribute::NAME name) {
 template<typename T>
 void vertex_attrib(MeshComponent::VertexAttribute& attrib, const std::vector<T>& buffer, size_t& in_out_offset) {
     attrib.offset_in_byte = (uint32_t)in_out_offset;
-    attrib.size_in_byte = (uint32_t)(align(sizeof(T) * buffer.size(), 16llu));
+    attrib.size_in_byte = (uint32_t)(math::align(sizeof(T) * buffer.size(), 16llu));
     attrib.stride = (uint32_t)get_stride(attrib.name);
     in_out_offset += attrib.size_in_byte;
 }

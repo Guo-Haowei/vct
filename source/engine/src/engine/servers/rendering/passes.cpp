@@ -1,6 +1,7 @@
 #include "passes.h"
 
 #include "core/collections/fixed_stack.h"
+#include "core/collections/rid_owner.h"
 #include "core/dynamic_variable/common_dvars.h"
 #include "core/math/frustum.h"
 #include "servers/display_server.h"
@@ -12,20 +13,21 @@
 using namespace vct;
 using namespace vct::rg;
 
-vct::rg::RenderPassGL g_shadow_rt;
-vct::rg::RenderPassGL g_gbuffer_rt;
+vct::rg::RenderPassGL g_shadow_pass;
+vct::rg::RenderPassGL g_gbuffer_pass;
 
-vct::rg::RenderPassGL g_ssao_rt;
-vct::rg::RenderPassGL g_fxaa_rt;
+vct::rg::RenderPassGL g_ssao_pass;
+vct::rg::RenderPassGL g_fxaa_pass;
 
-vct::rg::RenderPassGL g_final_image_rt;
-vct::rg::RenderPassGL g_viewer_rt;
-
+vct::rg::RenderPassGL g_final_image_pass;
+vct::rg::RenderPassGL g_viewer_pass;
 static void gbuffer_pass_func();
 static void shadow_pass_func();
 static void ssao_pass_func();
 static void deferred_vct_pass();
 static void fxaa_pass();
+
+extern vct::RIDAllocator<MeshData> g_gpu_mesh;
 
 static RenderPassDesc s_shadow_pass_desc = {
     .name = "shadow_pass",
@@ -91,17 +93,17 @@ void create_passes() {
     auto [w, h] = DisplayServer::singleton().get_frame_size();
 
     const int res = DVAR_GET_INT(r_shadowRes);
-    DEV_ASSERT(is_power_of_two(res));
+    DEV_ASSERT(math::is_power_of_two(res));
 
-    g_ssao_rt.create(s_ssao_pass_desc, w, h);
-    g_gbuffer_rt.create(s_gbuffer_pass_desc, w, h);
-    g_shadow_rt.create(s_shadow_pass_desc, res, res);
+    g_ssao_pass.create(s_ssao_pass_desc, w, h);
+    g_gbuffer_pass.create(s_gbuffer_pass_desc, w, h);
+    g_shadow_pass.create(s_shadow_pass_desc, res, res);
 
-    g_fxaa_rt.create(s_fxaa_pass_desc, w, h);
-    g_final_image_rt.create(s_final_image_pass_desc, w, h);
-    g_viewer_rt.create(s_viewer_pass_desc, w, h);
+    g_fxaa_pass.create(s_fxaa_pass_desc, w, h);
+    g_final_image_pass.create(s_final_image_pass_desc, w, h);
+    g_viewer_pass.create(s_viewer_pass_desc, w, h);
 
-    g_final_image = g_viewer_rt.get_color_attachment(0);
+    g_final_image = g_viewer_pass.get_color_attachment(0);
 }
 
 void destroy_passes() {
@@ -159,7 +161,8 @@ static void shadow_pass_func() {
             g_perBatchCache.cache.c_model_matrix = M;
             g_perBatchCache.Update();
 
-            const MeshData* drawData = reinterpret_cast<MeshData*>(mesh.gpuResource);
+            const MeshData* drawData = g_gpu_mesh.get_or_null(mesh.gpu_resource);
+            DEV_ASSERT(drawData);
             glBindVertexArray(drawData->vao);
             glDrawElements(GL_TRIANGLES, drawData->count, GL_UNSIGNED_INT, 0);
         }
@@ -216,7 +219,8 @@ static void gbuffer_pass_func() {
         g_perBatchCache.cache.c_projection_view_model_matrix = g_perFrameCache.cache.c_projection_view_matrix * M;
         g_perBatchCache.Update();
 
-        const MeshData* drawData = reinterpret_cast<MeshData*>(mesh.gpuResource);
+        const MeshData* drawData = g_gpu_mesh.get_or_null(mesh.gpu_resource);
+        DEV_ASSERT(drawData);
         glBindVertexArray(drawData->vao);
 
         for (const auto& subset : mesh.subsets) {

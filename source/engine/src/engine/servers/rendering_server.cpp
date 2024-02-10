@@ -6,6 +6,7 @@
 #include "Core/geometry.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
 /////
+#include "core/collections/rid_owner.h"
 #include "core/dynamic_variable/common_dvars.h"
 #include "rendering/passes.h"
 #include "rendering/r_defines.h"
@@ -15,8 +16,10 @@
 #include "servers/display_server.h"
 #include "vsinput.glsl.h"
 
-static std::vector<std::shared_ptr<MeshData>> g_meshdata;
 static std::vector<std::shared_ptr<MaterialData>> g_materialdata;
+
+// @TODO: fix this
+vct::RIDAllocator<MeshData> g_gpu_mesh;
 
 static GLuint g_noiseTexture;
 
@@ -51,6 +54,8 @@ bool RenderingServer::initialize() {
     ImGui_ImplOpenGL3_CreateDeviceObjects();
 
     createGpuResources();
+
+    g_gpu_mesh.set_description("GPU-Mesh-Allocator");
     return true;
 }
 
@@ -60,10 +65,7 @@ void RenderingServer::finalize() {
     ImGui_ImplOpenGL3_Shutdown();
 }
 
-static std::shared_ptr<MeshData> CreateMeshData(const MeshComponent& mesh) {
-    MeshData* ret = new MeshData;
-
-    MeshData& out_mesh = *ret;
+static void create_mesh_data(const MeshComponent& mesh, MeshData& out_mesh) {
     const bool has_normals = !mesh.normals.empty();
     const bool has_uvs = !mesh.texcoords_0.empty();
     const bool has_tangents = !mesh.tangents.empty();
@@ -116,14 +118,14 @@ static std::shared_ptr<MeshData> CreateMeshData(const MeshComponent& mesh) {
     out_mesh.count = static_cast<uint32_t>(mesh.indices.size());
 
     glBindVertexArray(0);
-    return std::shared_ptr<MeshData>(ret);
 }
 
 void RenderingServer::begin_scene(Scene& scene) {
     // create mesh
     for (const auto& mesh : scene.get_component_array<MeshComponent>()) {
-        g_meshdata.emplace_back(CreateMeshData(mesh));
-        mesh.gpuResource = g_meshdata.back().get();
+        RID rid = g_gpu_mesh.make_rid();
+        mesh.gpu_resource = rid;
+        create_mesh_data(mesh, *g_gpu_mesh.get_or_null(rid));
     }
 
     // create material
@@ -232,7 +234,7 @@ void RenderingServer::createGpuResources() {
         info.size = voxelSize;
         info.minFilter = GL_LINEAR_MIPMAP_LINEAR;
         info.magFilter = GL_NEAREST;
-        info.mipLevel = log_two(voxelSize);
+        info.mipLevel = math::log_two(voxelSize);
         info.format = GL_RGBA16F;
 
         m_albedoVoxel.create3DEmpty(info);
@@ -246,24 +248,24 @@ void RenderingServer::createGpuResources() {
     g_constantCache.cache.VoxelNormalMap = gl::MakeTextureResident(m_normalVoxel.GetHandle());
 
     g_constantCache.cache.FXAA =
-        gl::MakeTextureResident(g_fxaa_rt.get_color_attachment(0));
+        gl::MakeTextureResident(g_fxaa_pass.get_color_attachment(0));
 
     g_constantCache.cache.ShadowMap =
-        gl::MakeTextureResident(g_shadow_rt.get_depth_attachment());
+        gl::MakeTextureResident(g_shadow_pass.get_depth_attachment());
 
     g_constantCache.cache.SSAOMap =
-        gl::MakeTextureResident(g_ssao_rt.get_color_attachment(0));
+        gl::MakeTextureResident(g_ssao_pass.get_color_attachment(0));
     g_constantCache.cache.FinalImage =
-        gl::MakeTextureResident(g_final_image_rt.get_color_attachment(0));
+        gl::MakeTextureResident(g_final_image_pass.get_color_attachment(0));
 
     g_constantCache.cache.GbufferDepthMap =
-        gl::MakeTextureResident(g_gbuffer_rt.get_depth_attachment());
+        gl::MakeTextureResident(g_gbuffer_pass.get_depth_attachment());
     g_constantCache.cache.GbufferPositionMetallicMap =
-        gl::MakeTextureResident(g_gbuffer_rt.get_color_attachment(0));
+        gl::MakeTextureResident(g_gbuffer_pass.get_color_attachment(0));
     g_constantCache.cache.GbufferNormalRoughnessMap =
-        gl::MakeTextureResident(g_gbuffer_rt.get_color_attachment(1));
+        gl::MakeTextureResident(g_gbuffer_pass.get_color_attachment(1));
     g_constantCache.cache.GbufferAlbedoMap =
-        gl::MakeTextureResident(g_gbuffer_rt.get_color_attachment(2));
+        gl::MakeTextureResident(g_gbuffer_pass.get_color_attachment(2));
 
     g_constantCache.Update();
 }
@@ -331,8 +333,9 @@ void RenderingServer::renderToVoxelTexture() {
         g_perBatchCache.cache.c_projection_view_model_matrix = g_perFrameCache.cache.c_projection_view_matrix * M;
         g_perBatchCache.Update();
 
-        const MeshData* drawData = reinterpret_cast<MeshData*>(mesh.gpuResource);
-        glBindVertexArray(drawData->vao);
+        const MeshData* draw_data = g_gpu_mesh.get_or_null(mesh.gpu_resource);
+        DEV_ASSERT(draw_data);
+        glBindVertexArray(draw_data->vao);
 
         for (const auto& subset : mesh.subsets) {
             const MaterialComponent& material = *scene.get_component<MaterialComponent>(subset.material_id);
@@ -382,7 +385,7 @@ void RenderingServer::render() {
 
     // clear window
 
-    g_shadow_rt.execute();
+    g_shadow_pass.execute();
 
     // @TODO: make it a pass
     {
@@ -396,17 +399,17 @@ void RenderingServer::render() {
         // skip rendering if minimized
         glViewport(0, 0, frameW, frameH);
 
-        g_gbuffer_rt.execute();
-        g_ssao_rt.execute();
-        g_final_image_rt.execute();
-        g_fxaa_rt.execute();
+        g_gbuffer_pass.execute();
+        g_ssao_pass.execute();
+        g_final_image_pass.execute();
+        g_fxaa_pass.execute();
 
         // @TODO: make it a pass
-        g_viewer_rt.bind();
+        g_viewer_pass.bind();
         glClearColor(.1f, .1f, .1f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderFrameBufferTextures(frameW, frameH);
-        g_viewer_rt.unbind();
+        g_viewer_pass.unbind();
     }
 }
 

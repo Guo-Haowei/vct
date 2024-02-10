@@ -23,7 +23,7 @@ static std::string process_shader(const std::string &source) {
             DEV_ASSERT(quote1 && quote2 && (quote1 != quote2));
             std::string file_to_include(quote1 + 1, quote2);
 
-            file_to_include = "@resource://glsl/" + file_to_include;
+            file_to_include = "@res://glsl/" + file_to_include;
             auto buffer = asset_loader::find_file(file_to_include);
             DEV_ASSERT(buffer);
             std::string extra(buffer->buffer.begin(), buffer->buffer.end());
@@ -137,68 +137,68 @@ bool ShaderProgramManager::initialize() {
     s_shader_cache.resize(static_cast<int>(ProgramType::PROGRAM_MAX));
     {
         ProgramCreateInfo info;
-        info.vs = "@resource://glsl/mesh_static.vert";
-        info.ps = "@resource://glsl/gbuffer.frag";
+        info.vs = "@res://glsl/mesh_static.vert";
+        info.ps = "@res://glsl/gbuffer.frag";
         s_shader_cache[PROGRAM_GBUFFER_STATIC] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "@resource://glsl/mesh_animated.vert";
-        info.ps = "@resource://glsl/gbuffer.frag";
+        info.vs = "@res://glsl/mesh_animated.vert";
+        info.ps = "@res://glsl/gbuffer.frag";
         s_shader_cache[PROGRAM_GBUFFER_ANIMATED] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "@resource://glsl/depth_static.vert";
-        info.ps = "@resource://glsl/depth.frag";
+        info.vs = "@res://glsl/depth_static.vert";
+        info.ps = "@res://glsl/depth.frag";
         s_shader_cache[PROGRAM_DPETH_STATIC] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "@resource://glsl/depth_animated.vert";
-        info.ps = "@resource://glsl/depth.frag";
+        info.vs = "@res://glsl/depth_animated.vert";
+        info.ps = "@res://glsl/depth.frag";
         s_shader_cache[PROGRAM_DPETH_ANIMATED] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "@resource://glsl/editor/image.vert";
-        info.ps = "@resource://glsl/editor/image.frag";
+        info.vs = "@res://glsl/editor/image.vert";
+        info.ps = "@res://glsl/editor/image.frag";
         s_shader_cache[(ProgramType::IMAGE2D)] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "@resource://glsl/fullscreen.vert";
-        info.ps = "@resource://glsl/ssao.frag";
+        info.vs = "@res://glsl/fullscreen.vert";
+        info.ps = "@res://glsl/ssao.frag";
         s_shader_cache[(ProgramType::SSAO)] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "@resource://glsl/fullscreen.vert";
-        info.ps = "@resource://glsl/vct_deferred.frag";
+        info.vs = "@res://glsl/fullscreen.vert";
+        info.ps = "@res://glsl/vct_deferred.frag";
         s_shader_cache[(ProgramType::VCT_DEFERRED)] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "@resource://glsl/fullscreen.vert";
-        info.ps = "@resource://glsl/fxaa.frag";
+        info.vs = "@res://glsl/fullscreen.vert";
+        info.ps = "@res://glsl/fxaa.frag";
         s_shader_cache[(ProgramType::FXAA)] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "@resource://glsl/fullscreen.vert";
-        info.ps = "@resource://glsl/debug/texture.frag";
+        info.vs = "@res://glsl/fullscreen.vert";
+        info.ps = "@res://glsl/debug/texture.frag";
         s_shader_cache[(ProgramType::DebugTexture)] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "@resource://glsl/voxel/voxelization.vert";
-        info.gs = "@resource://glsl/voxel/voxelization.geom";
-        info.ps = "@resource://glsl/voxel/voxelization.frag";
+        info.vs = "@res://glsl/voxel/voxelization.vert";
+        info.gs = "@res://glsl/voxel/voxelization.geom";
+        info.ps = "@res://glsl/voxel/voxelization.frag";
         s_shader_cache[ProgramType::Voxel] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.cs = "@resource://glsl/voxel/post.comp";
+        info.cs = "@res://glsl/voxel/post.comp";
         s_shader_cache[ProgramType::VoxelPost] = create(info);
     }
 

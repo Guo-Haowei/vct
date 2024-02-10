@@ -127,7 +127,7 @@ void SceneManager::request_scene(std::string_view path) {
 
 void SceneManager::on_scene_changed(Scene* new_scene) {
     const int voxelTextureSize = DVAR_GET_INT(r_voxelSize);
-    DEV_ASSERT(is_power_of_two(voxelTextureSize));
+    DEV_ASSERT(math::is_power_of_two(voxelTextureSize));
     DEV_ASSERT(voxelTextureSize <= 256);
 
     const vec3 center = new_scene->m_bound.center();

@@ -14,7 +14,7 @@ auto FileAccess::create(AccessType access_type) -> std::shared_ptr<FileAccess> {
 
 auto FileAccess::create_for_path(std::string_view path) -> std::shared_ptr<FileAccess> {
     // @TODO: sanitize path
-    if (path.starts_with("@resource://")) {
+    if (path.starts_with("@res://")) {
         return create(ACCESS_RESOURCE);
     }
 
@@ -45,8 +45,8 @@ std::string FileAccess::fix_path(std::string_view path) {
     std::string fixed_path{ path };
     switch (m_access_type) {
         case ACCESS_RESOURCE: {
-            if (path.starts_with("@resource://")) {
-                replace_first(fixed_path, "@resource:/", ROOT_FOLDER "resources");
+            if (path.starts_with("@res://")) {
+                replace_first(fixed_path, "@res:/", ROOT_FOLDER "resources");
                 return fixed_path;
             }
         } break;

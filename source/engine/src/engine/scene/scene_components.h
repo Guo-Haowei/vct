@@ -1,4 +1,5 @@
 #pragma once
+#include "core/collections/rid.h"
 #include "core/math/aabb.h"
 #include "core/systems/entity.h"
 
@@ -194,10 +195,8 @@ struct MeshComponent {
     ecs::Entity armature_id;
 
     // Non-serialized
+    mutable RID gpu_resource;
     AABB local_bound;
-
-    // @TODO: remove
-    mutable void* gpuResource = nullptr;
 
     VertexAttribute attributes[VertexAttribute::COUNT];
     size_t vertex_buffer_size = 0;  // combine vertex buffer
