@@ -6,6 +6,7 @@
 #include "Core/geometry.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
 /////
+#include "core/collections/rid_owner.h"
 #include "core/dynamic_variable/common_dvars.h"
 #include "rendering/passes.h"
 #include "rendering/r_defines.h"
@@ -15,12 +16,29 @@
 #include "servers/display_server.h"
 #include "vsinput.glsl.h"
 
-static std::vector<std::shared_ptr<MeshData>> g_meshdata;
+/// textures
+GpuTexture g_albedoVoxel;
+GpuTexture g_normalVoxel;
+
 static std::vector<std::shared_ptr<MaterialData>> g_materialdata;
+
+// @TODO: fix this
+vct::RIDAllocator<MeshData> g_gpu_mesh;
 
 static GLuint g_noiseTexture;
 
 extern void FillMaterialCB(const MaterialData* mat, MaterialConstantBuffer& cb);
+
+template<typename T>
+static void buffer_storage(GLuint buffer, const std::vector<T>& data) {
+    glNamedBufferStorage(buffer, sizeof(T) * data.size(), data.data(), 0);
+}
+
+static inline void BindToSlot(GLuint buffer, int slot, int size) {
+    glBindBuffer(GL_ARRAY_BUFFER, buffer);
+    glVertexAttribPointer(slot, size, GL_FLOAT, GL_FALSE, size * sizeof(float), 0);
+    glEnableVertexAttribArray(slot);
+}
 
 namespace vct {
 
@@ -51,6 +69,8 @@ bool RenderingServer::initialize() {
     ImGui_ImplOpenGL3_CreateDeviceObjects();
 
     createGpuResources();
+
+    g_gpu_mesh.set_description("GPU-Mesh-Allocator");
     return true;
 }
 
@@ -60,10 +80,7 @@ void RenderingServer::finalize() {
     ImGui_ImplOpenGL3_Shutdown();
 }
 
-static std::shared_ptr<MeshData> CreateMeshData(const MeshComponent& mesh) {
-    MeshData* ret = new MeshData;
-
-    MeshData& out_mesh = *ret;
+static void create_mesh_data(const MeshComponent& mesh, MeshData& out_mesh) {
     const bool has_normals = !mesh.normals.empty();
     const bool has_uvs = !mesh.texcoords_0.empty();
     const bool has_tangents = !mesh.tangents.empty();
@@ -84,46 +101,47 @@ static std::shared_ptr<MeshData> CreateMeshData(const MeshComponent& mesh) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, out_mesh.ebo);
 
     slot = get_position_slot();
-    gl::BindToSlot(out_mesh.vbos[slot], slot, 3);
-    gl::NamedBufferStorage(out_mesh.vbos[slot], mesh.positions);
+    // @TODO: refactor these
+    BindToSlot(out_mesh.vbos[slot], slot, 3);
+    buffer_storage(out_mesh.vbos[slot], mesh.positions);
 
     if (has_normals) {
         slot = get_normal_slot();
-        gl::BindToSlot(out_mesh.vbos[slot], slot, 3);
-        gl::NamedBufferStorage(out_mesh.vbos[slot], mesh.normals);
+        BindToSlot(out_mesh.vbos[slot], slot, 3);
+        buffer_storage(out_mesh.vbos[slot], mesh.normals);
     }
     if (has_uvs) {
         slot = get_uv_slot();
-        gl::BindToSlot(out_mesh.vbos[slot], slot, 2);
-        gl::NamedBufferStorage(out_mesh.vbos[slot], mesh.texcoords_0);
+        BindToSlot(out_mesh.vbos[slot], slot, 2);
+        buffer_storage(out_mesh.vbos[slot], mesh.texcoords_0);
     }
     if (has_tangents) {
         slot = get_tangent_slot();
-        gl::BindToSlot(out_mesh.vbos[slot], slot, 3);
-        gl::NamedBufferStorage(out_mesh.vbos[slot], mesh.tangents);
+        BindToSlot(out_mesh.vbos[slot], slot, 3);
+        buffer_storage(out_mesh.vbos[slot], mesh.tangents);
     }
     if (has_joints) {
         slot = get_bone_id_slot();
-        gl::BindToSlot(out_mesh.vbos[slot], slot, 4);
-        gl::NamedBufferStorage(out_mesh.vbos[slot], mesh.joints_0);
+        BindToSlot(out_mesh.vbos[slot], slot, 4);
+        buffer_storage(out_mesh.vbos[slot], mesh.joints_0);
         DEV_ASSERT(!mesh.weights_0.empty());
         slot = get_bone_weight_slot();
-        gl::BindToSlot(out_mesh.vbos[slot], slot, 4);
-        gl::NamedBufferStorage(out_mesh.vbos[slot], mesh.weights_0);
+        BindToSlot(out_mesh.vbos[slot], slot, 4);
+        buffer_storage(out_mesh.vbos[slot], mesh.weights_0);
     }
 
-    gl::NamedBufferStorage(out_mesh.ebo, mesh.indices);
+    buffer_storage(out_mesh.ebo, mesh.indices);
     out_mesh.count = static_cast<uint32_t>(mesh.indices.size());
 
     glBindVertexArray(0);
-    return std::shared_ptr<MeshData>(ret);
 }
 
 void RenderingServer::begin_scene(Scene& scene) {
     // create mesh
     for (const auto& mesh : scene.get_component_array<MeshComponent>()) {
-        g_meshdata.emplace_back(CreateMeshData(mesh));
-        mesh.gpuResource = g_meshdata.back().get();
+        RID rid = g_gpu_mesh.make_rid();
+        mesh.gpu_resource = rid;
+        create_mesh_data(mesh, *g_gpu_mesh.get_or_null(rid));
     }
 
     // create material
@@ -232,38 +250,38 @@ void RenderingServer::createGpuResources() {
         info.size = voxelSize;
         info.minFilter = GL_LINEAR_MIPMAP_LINEAR;
         info.magFilter = GL_NEAREST;
-        info.mipLevel = log_two(voxelSize);
+        info.mipLevel = math::log_two(voxelSize);
         info.format = GL_RGBA16F;
 
-        m_albedoVoxel.create3DEmpty(info);
-        m_normalVoxel.create3DEmpty(info);
+        g_albedoVoxel.create3DEmpty(info);
+        g_normalVoxel.create3DEmpty(info);
     }
 
     // create box quad
     R_CreateQuad();
 
-    g_constantCache.cache.VoxelAlbedoMap = gl::MakeTextureResident(m_albedoVoxel.GetHandle());
-    g_constantCache.cache.VoxelNormalMap = gl::MakeTextureResident(m_normalVoxel.GetHandle());
+    g_constantCache.cache.VoxelAlbedoMap = gl::MakeTextureResident(g_albedoVoxel.GetHandle());
+    g_constantCache.cache.VoxelNormalMap = gl::MakeTextureResident(g_normalVoxel.GetHandle());
 
     g_constantCache.cache.FXAA =
-        gl::MakeTextureResident(g_fxaa_rt.get_color_attachment(0));
+        gl::MakeTextureResident(g_fxaa_pass->get_color_attachment(0));
 
     g_constantCache.cache.ShadowMap =
-        gl::MakeTextureResident(g_shadow_rt.get_depth_attachment());
+        gl::MakeTextureResident(g_shadow_pass->get_depth_attachment());
 
     g_constantCache.cache.SSAOMap =
-        gl::MakeTextureResident(g_ssao_rt.get_color_attachment(0));
+        gl::MakeTextureResident(g_ssao_pass->get_color_attachment(0));
     g_constantCache.cache.FinalImage =
-        gl::MakeTextureResident(g_final_image_rt.get_color_attachment(0));
+        gl::MakeTextureResident(g_lighting_pass->get_color_attachment(0));
 
     g_constantCache.cache.GbufferDepthMap =
-        gl::MakeTextureResident(g_gbuffer_rt.get_depth_attachment());
+        gl::MakeTextureResident(g_gbuffer_pass->get_depth_attachment());
     g_constantCache.cache.GbufferPositionMetallicMap =
-        gl::MakeTextureResident(g_gbuffer_rt.get_color_attachment(0));
+        gl::MakeTextureResident(g_gbuffer_pass->get_color_attachment(0));
     g_constantCache.cache.GbufferNormalRoughnessMap =
-        gl::MakeTextureResident(g_gbuffer_rt.get_color_attachment(1));
+        gl::MakeTextureResident(g_gbuffer_pass->get_color_attachment(1));
     g_constantCache.cache.GbufferAlbedoMap =
-        gl::MakeTextureResident(g_gbuffer_rt.get_color_attachment(2));
+        gl::MakeTextureResident(g_gbuffer_pass->get_color_attachment(2));
 
     g_constantCache.Update();
 }
@@ -303,66 +321,6 @@ struct MaterialCache {
     }
 };
 
-void RenderingServer::renderToVoxelTexture() {
-    const Scene& scene = SceneManager::get_scene();
-    const int voxelSize = DVAR_GET_INT(r_voxelSize);
-
-    glDisable(GL_CULL_FACE);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
-    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-    glViewport(0, 0, voxelSize, voxelSize);
-
-    m_albedoVoxel.bindImageTexture(IMAGE_VOXEL_ALBEDO_SLOT);
-    m_normalVoxel.bindImageTexture(IMAGE_VOXEL_NORMAL_SLOT);
-    ShaderProgramManager::get(ProgramType::Voxel).bind();
-
-    const uint32_t numObjects = (uint32_t)scene.get_count<ObjectComponent>();
-    for (uint32_t i = 0; i < numObjects; ++i) {
-        const ObjectComponent& obj = scene.get_component_array<ObjectComponent>()[i];
-        ecs::Entity entity = scene.get_entity<ObjectComponent>(i);
-        DEV_ASSERT(scene.contains<TransformComponent>(entity));
-        const TransformComponent& transform = *scene.get_component<TransformComponent>(entity);
-        DEV_ASSERT(scene.contains<MeshComponent>(obj.meshID));
-        const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
-
-        const mat4& M = transform.get_world_matrix();
-        g_perBatchCache.cache.c_model_matrix = M;
-        g_perBatchCache.cache.c_projection_view_model_matrix = g_perFrameCache.cache.c_projection_view_matrix * M;
-        g_perBatchCache.Update();
-
-        const MeshData* drawData = reinterpret_cast<MeshData*>(mesh.gpuResource);
-        glBindVertexArray(drawData->vao);
-
-        for (const auto& subset : mesh.subsets) {
-            const MaterialComponent& material = *scene.get_component<MaterialComponent>(subset.material_id);
-            const MaterialData* matData = reinterpret_cast<MaterialData*>(material.gpuResource);
-
-            FillMaterialCB(matData, g_materialCache.cache);
-            g_materialCache.Update();
-
-            glDrawElements(GL_TRIANGLES, subset.index_count, GL_UNSIGNED_INT, (void*)(subset.index_offset * sizeof(uint32_t)));
-        }
-    }
-
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-
-    // post process
-    ShaderProgramManager::get(ProgramType::VoxelPost).bind();
-
-    constexpr GLuint workGroupX = 512;
-    constexpr GLuint workGroupY = 512;
-    const GLuint workGroupZ = (voxelSize * voxelSize * voxelSize) / (workGroupX * workGroupY);
-
-    glDispatchCompute(workGroupX, workGroupY, workGroupZ);
-    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-
-    m_albedoVoxel.bind();
-    m_albedoVoxel.genMipMap();
-    m_normalVoxel.bind();
-    m_normalVoxel.genMipMap();
-}
-
 void RenderingServer::renderFrameBufferTextures(int width, int height) {
     const auto& program = ShaderProgramManager::get(ProgramType::DebugTexture);
 
@@ -382,32 +340,23 @@ void RenderingServer::render() {
 
     // clear window
 
-    g_shadow_rt.execute();
+    g_render_graph.execute();
+    // g_shadow_pass.execute();
+
+    // g_voxelization_pass.execute();
+    // g_gbuffer_pass.execute();
+    // g_ssao_pass.execute();
+    // g_lighting_pass.execute();
+    // g_fxaa_pass.execute();
 
     // @TODO: make it a pass
-    {
-        m_albedoVoxel.clear();
-        m_normalVoxel.clear();
-        renderToVoxelTexture();
-    }
 
     auto [frameW, frameH] = DisplayServer::singleton().get_frame_size();
-    if (frameW * frameH > 0) {
-        // skip rendering if minimized
-        glViewport(0, 0, frameW, frameH);
-
-        g_gbuffer_rt.execute();
-        g_ssao_rt.execute();
-        g_final_image_rt.execute();
-        g_fxaa_rt.execute();
-
-        // @TODO: make it a pass
-        g_viewer_rt.bind();
-        glClearColor(.1f, .1f, .1f, 1.f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        renderFrameBufferTextures(frameW, frameH);
-        g_viewer_rt.unbind();
-    }
+    g_viewer_pass->bind();
+    glClearColor(.1f, .1f, .1f, 1.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    renderFrameBufferTextures(frameW, frameH);
+    g_viewer_pass->unbind();
 }
 
 void RenderingServer::destroyGpuResources() {

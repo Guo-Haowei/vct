@@ -5,7 +5,7 @@ namespace vct {
 
 class Degree {
 public:
-    Degree(float degree) : m_value(degree) {}
+    constexpr Degree(float degree) : m_value(degree) {}
 
     Degree& operator+=(float d) {
         m_value += d;

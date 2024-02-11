@@ -17,17 +17,16 @@ public:
 };
 
 TEST(file_access, make_default) {
-    FileAccess::make_default<FileAccessFoo>(FileAccess::ACCESS_SHADER);
     FileAccess::make_default<FileAccessFoo>(FileAccess::ACCESS_RESOURCE);
     FileAccess::make_default<FileAccessFoo>(FileAccess::ACCESS_USERDATA);
     FileAccess::make_default<FileAccessFoo>(FileAccess::ACCESS_FILESYSTEM);
 
     { auto file = FileAccess::open("a.txt", 10); }
-    EXPECT_EQ(s_buffer, "[open]f:a.txt,m:10,a:3;");
-    { auto file = FileAccess::open("res://abc.txt", 1); }
-    EXPECT_EQ(s_buffer, "[open]f:res://abc.txt,m:1,a:1;");
-    { auto file = FileAccess::open("user://cache", 7); }
-    EXPECT_EQ(s_buffer, "[open]f:user://cache,m:7,a:2;");
+    EXPECT_EQ(s_buffer, "[open]f:a.txt,m:10,a:0;");
+    { auto file = FileAccess::open("@res://abc.txt", 1); }
+    EXPECT_EQ(s_buffer, "[open]f:@res://abc.txt,m:1,a:1;");
+    { auto file = FileAccess::open("@user://cache", 7); }
+    EXPECT_EQ(s_buffer, "[open]f:@user://cache,m:7,a:2;");
 
     s_buffer.clear();
 }

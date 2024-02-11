@@ -1,14 +1,16 @@
 #pragma once
-#include "render_graph/render_pass.h"
+#include "render_graph/render_graph.h"
 
 void create_passes();
 void destroy_passes();
 
-extern vct::rg::RenderPassGL g_shadow_rt;
-extern vct::rg::RenderPassGL g_gbuffer_rt;
+extern vct::RenderGraph g_render_graph;
 
-extern vct::rg::RenderPassGL g_ssao_rt;
-extern vct::rg::RenderPassGL g_fxaa_rt;
+extern std::shared_ptr<vct::RenderPass> g_shadow_pass;
+extern std::shared_ptr<vct::RenderPass> g_gbuffer_pass;
+extern std::shared_ptr<vct::RenderPass> g_voxelization_pass;
 
-extern vct::rg::RenderPassGL g_final_image_rt;
-extern vct::rg::RenderPassGL g_viewer_rt;
+extern std::shared_ptr<vct::RenderPass> g_ssao_pass;
+extern std::shared_ptr<vct::RenderPass> g_fxaa_pass;
+extern std::shared_ptr<vct::RenderPass> g_lighting_pass;
+extern std::shared_ptr<vct::RenderPass> g_viewer_pass;

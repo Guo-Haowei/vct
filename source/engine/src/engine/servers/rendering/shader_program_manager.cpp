@@ -3,7 +3,6 @@
 #include <sstream>
 #include <vector>
 
-#include "Core/Utility.h"
 #include "assets/asset_loader.h"
 #include "servers/rendering/GLPrerequisites.h"
 
@@ -24,10 +23,10 @@ static std::string process_shader(const std::string &source) {
             DEV_ASSERT(quote1 && quote2 && (quote1 != quote2));
             std::string file_to_include(quote1 + 1, quote2);
 
-            file_to_include = "shader://" + file_to_include;
-            auto text = asset_loader::find_file(file_to_include);
-            DEV_ASSERT(text);
-            std::string extra = text->buffer;
+            file_to_include = "@res://glsl/" + file_to_include;
+            auto buffer = asset_loader::find_file(file_to_include);
+            DEV_ASSERT(buffer);
+            std::string extra(buffer->buffer.begin(), buffer->buffer.end());
             if (extra.empty()) {
                 LOG_ERROR("[filesystem] failed to read shader '{}'", file_to_include);
             }
@@ -43,10 +42,10 @@ static std::string process_shader(const std::string &source) {
 }
 
 static GLuint create_shader(std::string_view file, GLenum type) {
-    auto text = asset_loader::find_file(std::string(file));
-    DEV_ASSERT(text);
+    auto source_binary = asset_loader::find_file(std::string(file));
+    DEV_ASSERT(source_binary);
 
-    std::string source = text->buffer;
+    std::string source(source_binary->buffer.begin(), source_binary->buffer.end());
     if (source.empty()) {
         LOG_ERROR("[filesystem] failed to read shader '{}'", file);
         return 0;
@@ -138,68 +137,68 @@ bool ShaderProgramManager::initialize() {
     s_shader_cache.resize(static_cast<int>(ProgramType::PROGRAM_MAX));
     {
         ProgramCreateInfo info;
-        info.vs = "shader://mesh_static.vert";
-        info.ps = "shader://gbuffer.frag";
+        info.vs = "@res://glsl/mesh_static.vert";
+        info.ps = "@res://glsl/gbuffer.frag";
         s_shader_cache[PROGRAM_GBUFFER_STATIC] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "shader://mesh_animated.vert";
-        info.ps = "shader://gbuffer.frag";
+        info.vs = "@res://glsl/mesh_animated.vert";
+        info.ps = "@res://glsl/gbuffer.frag";
         s_shader_cache[PROGRAM_GBUFFER_ANIMATED] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "shader://depth_static.vert";
-        info.ps = "shader://depth.frag";
+        info.vs = "@res://glsl/depth_static.vert";
+        info.ps = "@res://glsl/depth.frag";
         s_shader_cache[PROGRAM_DPETH_STATIC] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "shader://depth_animated.vert";
-        info.ps = "shader://depth.frag";
+        info.vs = "@res://glsl/depth_animated.vert";
+        info.ps = "@res://glsl/depth.frag";
         s_shader_cache[PROGRAM_DPETH_ANIMATED] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "shader://editor/image.vert";
-        info.ps = "shader://editor/image.frag";
+        info.vs = "@res://glsl/editor/image.vert";
+        info.ps = "@res://glsl/editor/image.frag";
         s_shader_cache[(ProgramType::IMAGE2D)] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "shader://fullscreen.vert";
-        info.ps = "shader://ssao.frag";
+        info.vs = "@res://glsl/fullscreen.vert";
+        info.ps = "@res://glsl/ssao.frag";
         s_shader_cache[(ProgramType::SSAO)] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "shader://fullscreen.vert";
-        info.ps = "shader://vct_deferred.frag";
+        info.vs = "@res://glsl/fullscreen.vert";
+        info.ps = "@res://glsl/vct_deferred.frag";
         s_shader_cache[(ProgramType::VCT_DEFERRED)] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "shader://fullscreen.vert";
-        info.ps = "shader://fxaa.frag";
+        info.vs = "@res://glsl/fullscreen.vert";
+        info.ps = "@res://glsl/fxaa.frag";
         s_shader_cache[(ProgramType::FXAA)] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "shader://fullscreen.vert";
-        info.ps = "shader://debug/texture.frag";
+        info.vs = "@res://glsl/fullscreen.vert";
+        info.ps = "@res://glsl/debug/texture.frag";
         s_shader_cache[(ProgramType::DebugTexture)] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.vs = "shader://voxel/voxelization.vert";
-        info.gs = "shader://voxel/voxelization.geom";
-        info.ps = "shader://voxel/voxelization.frag";
+        info.vs = "@res://glsl/voxel/voxelization.vert";
+        info.gs = "@res://glsl/voxel/voxelization.geom";
+        info.ps = "@res://glsl/voxel/voxelization.frag";
         s_shader_cache[ProgramType::Voxel] = create(info);
     }
     {
         ProgramCreateInfo info;
-        info.cs = "shader://voxel/post.comp";
+        info.cs = "@res://glsl/voxel/post.comp";
         s_shader_cache[ProgramType::VoxelPost] = create(info);
     }
 

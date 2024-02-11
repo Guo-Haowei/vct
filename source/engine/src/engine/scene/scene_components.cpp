@@ -97,7 +97,7 @@ void CameraComponent::update() {
     if (is_dirty()) {
         const float aspect = m_width / m_height;
         m_view_matrix = glm::lookAt(m_eye, m_center, vec3(0, 1, 0));
-        m_projection_matrix = glm::perspective(m_fovy, aspect, m_near, m_far);
+        m_projection_matrix = glm::perspective(m_fovy.to_rad(), aspect, m_near, m_far);
         m_projection_view_matrix = m_projection_matrix * m_view_matrix;
         set_dirty(false);
     }
@@ -157,7 +157,7 @@ static size_t get_stride(MeshComponent::VertexAttribute::NAME name) {
 template<typename T>
 void vertex_attrib(MeshComponent::VertexAttribute& attrib, const std::vector<T>& buffer, size_t& in_out_offset) {
     attrib.offset_in_byte = (uint32_t)in_out_offset;
-    attrib.size_in_byte = (uint32_t)(align(sizeof(T) * buffer.size(), 16llu));
+    attrib.size_in_byte = (uint32_t)(math::align(sizeof(T) * buffer.size(), 16llu));
     attrib.stride = (uint32_t)get_stride(attrib.name);
     in_out_offset += attrib.size_in_byte;
 }

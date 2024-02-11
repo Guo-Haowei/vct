@@ -1,6 +1,7 @@
 #include "passes.h"
 
 #include "core/collections/fixed_stack.h"
+#include "core/collections/rid_owner.h"
 #include "core/dynamic_variable/common_dvars.h"
 #include "core/math/frustum.h"
 #include "servers/display_server.h"
@@ -10,70 +11,32 @@
 #include "scene/scene_manager.h"
 #include "shader_program_manager.h"
 using namespace vct;
-using namespace vct::rg;
 
-vct::rg::RenderPassGL g_shadow_rt;
-vct::rg::RenderPassGL g_gbuffer_rt;
+/// textures
+extern GpuTexture g_albedoVoxel;
+extern GpuTexture g_normalVoxel;
 
-vct::rg::RenderPassGL g_ssao_rt;
-vct::rg::RenderPassGL g_fxaa_rt;
+vct::RenderGraph g_render_graph;
 
-vct::rg::RenderPassGL g_final_image_rt;
-vct::rg::RenderPassGL g_viewer_rt;
+uint32_t g_final_image;
 
-static void gbuffer_pass_func();
+std::shared_ptr<vct::RenderPass> g_shadow_pass;
+std::shared_ptr<vct::RenderPass> g_gbuffer_pass;
+std::shared_ptr<vct::RenderPass> g_voxelization_pass;
+
+std::shared_ptr<vct::RenderPass> g_ssao_pass;
+std::shared_ptr<vct::RenderPass> g_fxaa_pass;
+std::shared_ptr<vct::RenderPass> g_lighting_pass;
+std::shared_ptr<vct::RenderPass> g_viewer_pass;
+
 static void shadow_pass_func();
+static void gbuffer_pass_func();
+static void voxelization_pass_func();
 static void ssao_pass_func();
 static void deferred_vct_pass();
 static void fxaa_pass();
 
-static RenderPassDesc s_shadow_pass_desc = {
-    .name = "shadow_pass",
-    .depth_attachment = RenderTargetDesc{ "depth_map", FORMAT_D32_FLOAT },
-    .func = shadow_pass_func,
-};
-
-static RenderPassDesc s_gbuffer_pass_desc = {
-    .name = "gbuffer_pass",
-    .color_attachments = {
-        RenderTargetDesc{ "position_map", FORMAT_R16G16B16A16_FLOAT },
-        RenderTargetDesc{ "normal_map", FORMAT_R16G16B16A16_FLOAT },
-        RenderTargetDesc{ "albedo_map", FORMAT_R8G8B8A8_UINT },
-    },
-    .depth_attachment = RenderTargetDesc{ "depth_map", FORMAT_D32_FLOAT },
-    .func = gbuffer_pass_func,
-};
-
-static RenderPassDesc s_ssao_pass_desc = {
-    .name = "ssao_pass",
-    .color_attachments = {
-        RenderTargetDesc{ "ssao_map", FORMAT_R32_FLOAT },
-    },
-    .func = ssao_pass_func,
-};
-
-static RenderPassDesc s_fxaa_pass_desc = {
-    .name = "fxaa_pass",
-    .color_attachments = {
-        RenderTargetDesc{ "fxaa_map", FORMAT_R8G8B8A8_UINT },
-    },
-    .func = fxaa_pass,
-};
-
-static RenderPassDesc s_final_image_pass_desc = {
-    .name = "final_image_pass",
-    .color_attachments = {
-        RenderTargetDesc{ "ssao_map", FORMAT_R8G8B8A8_UINT },
-    },
-    .func = deferred_vct_pass,
-};
-
-static RenderPassDesc s_viewer_pass_desc = {
-    .name = "viewer_pass",
-    .color_attachments = {
-        RenderTargetDesc{ "viewer_map", FORMAT_R8G8B8A8_UINT },
-    },
-};
+extern vct::RIDAllocator<MeshData> g_gpu_mesh;
 
 // void RenderTarget::Destroy() {
 //     mDepthAttachment.destroy();
@@ -84,24 +47,127 @@ static RenderPassDesc s_viewer_pass_desc = {
 //     glDeleteFramebuffers(1, &m_handle);
 //     m_handle = 0;
 // }
-
-uint32_t g_final_image;
+static RenderPassDesc s_viewer_pass_desc = {
+    .type = RENDER_PASS_SHADING,
+    .name = "viewer_pass",
+    .color_attachments = {},
+};
 
 void create_passes() {
     auto [w, h] = DisplayServer::singleton().get_frame_size();
 
     const int res = DVAR_GET_INT(r_shadowRes);
-    DEV_ASSERT(is_power_of_two(res));
+    DEV_ASSERT(math::is_power_of_two(res));
 
-    g_ssao_rt.create(s_ssao_pass_desc, w, h);
-    g_gbuffer_rt.create(s_gbuffer_pass_desc, w, h);
-    g_shadow_rt.create(s_shadow_pass_desc, res, res);
+#define SHADOW_PASS_NAME       "shadow_pass"
+#define VOXELIZATION_PASS_NAME "voxelization_pass"
+#define GBUFFER_PASS_NAME      "gbuffer_pass"
+#define LIGHTING_PASS_NAME     "lighting_pass"
+#define SSAO_PASS_NAME         "ssao_pass"
+#define FXAA_PASS_NAME         "fxaa_pass"
+#define FINAL_PASS_NAME        "final_pass"
 
-    g_fxaa_rt.create(s_fxaa_pass_desc, w, h);
-    g_final_image_rt.create(s_final_image_pass_desc, w, h);
-    g_viewer_rt.create(s_viewer_pass_desc, w, h);
+#define SHADOW_PASS_OUTPUT           SHADOW_PASS_NAME "_output"
+#define SSAO_PASS_OUTPUT             SSAO_PASS_NAME "_output"
+#define FXAA_PASS_OUTPUT             FXAA_PASS_NAME "_output"
+#define LIGHTING_PASS_OUTPUT         LIGHTING_PASS_NAME "_output"
+#define GBUFFER_PASS_OUTPUT_POSITION "gbuffer_output_position"
+#define GBUFFER_PASS_OUTPUT_NORMAL   "gbuffer_output_normal"
+#define GBUFFER_PASS_OUTPUT_ALBEDO   "gbuffer_output_albedo"
+#define GBUFFER_PASS_OUTPUT_DEPTH    "gbuffer_output_depth"
 
-    g_final_image = g_viewer_rt.get_color_attachment(0);
+    // @TODO: split resource
+    {  // shadow pass
+        RenderPassDesc desc;
+        desc.name = SHADOW_PASS_NAME;
+        desc.depth_attachment = RenderTargetDesc{ SHADOW_PASS_OUTPUT, FORMAT_D32_FLOAT };
+        desc.func = shadow_pass_func;
+        desc.width = res;
+        desc.height = res;
+
+        g_render_graph.add_pass(desc);
+        g_shadow_pass = g_render_graph.find_pass(SHADOW_PASS_NAME);
+    }
+    {  // gbuffer pass
+        RenderPassDesc desc;
+        desc.name = GBUFFER_PASS_NAME;
+        desc.dependencies = {};
+        desc.color_attachments = {
+            RenderTargetDesc{ GBUFFER_PASS_OUTPUT_POSITION, FORMAT_R16G16B16A16_FLOAT },
+            RenderTargetDesc{ GBUFFER_PASS_OUTPUT_NORMAL, FORMAT_R16G16B16A16_FLOAT },
+            RenderTargetDesc{ GBUFFER_PASS_OUTPUT_ALBEDO, FORMAT_R8G8B8A8_UINT },
+        };
+        desc.depth_attachment = RenderTargetDesc{ GBUFFER_PASS_OUTPUT_DEPTH, FORMAT_D32_FLOAT };
+        desc.func = gbuffer_pass_func;
+        desc.width = w;
+        desc.height = h;
+
+        g_render_graph.add_pass(desc);
+        g_gbuffer_pass = g_render_graph.find_pass(GBUFFER_PASS_NAME);
+    }
+    {  // voxel pass
+        RenderPassDesc desc;
+        desc.type = RENDER_PASS_COMPUTE;
+        desc.name = VOXELIZATION_PASS_NAME;
+        desc.dependencies = { SHADOW_PASS_NAME };
+        desc.func = voxelization_pass_func;
+
+        g_render_graph.add_pass(desc);
+        g_voxelization_pass = g_render_graph.find_pass(VOXELIZATION_PASS_NAME);
+    }
+    {  // ssao pass
+        RenderPassDesc desc;
+        desc.name = SSAO_PASS_NAME;
+        desc.dependencies = { GBUFFER_PASS_NAME };
+        desc.color_attachments = { RenderTargetDesc{ SSAO_PASS_OUTPUT, FORMAT_R32_FLOAT } };
+        desc.func = ssao_pass_func;
+        desc.width = w;
+        desc.height = h;
+
+        g_render_graph.add_pass(desc);
+        g_ssao_pass = g_render_graph.find_pass(SSAO_PASS_NAME);
+    }
+    {  // lighting pass
+        RenderPassDesc desc;
+        desc.name = LIGHTING_PASS_NAME;
+        desc.dependencies = { GBUFFER_PASS_NAME, SHADOW_PASS_NAME, SSAO_PASS_NAME, VOXELIZATION_PASS_NAME };
+        desc.color_attachments = { RenderTargetDesc{ LIGHTING_PASS_OUTPUT, FORMAT_R8G8B8A8_UINT } };
+        desc.func = deferred_vct_pass;
+        desc.width = w;
+        desc.height = h;
+
+        g_render_graph.add_pass(desc);
+        g_lighting_pass = g_render_graph.find_pass(LIGHTING_PASS_NAME);
+    }
+    {  // fxaa pass
+        RenderPassDesc desc;
+        desc.name = FXAA_PASS_NAME;
+        desc.dependencies = { LIGHTING_PASS_NAME };
+        desc.color_attachments = { RenderTargetDesc{ FXAA_PASS_OUTPUT, FORMAT_R8G8B8A8_UINT } };
+        desc.func = fxaa_pass;
+        desc.width = w;
+        desc.height = h;
+
+        g_render_graph.add_pass(desc);
+        g_fxaa_pass = g_render_graph.find_pass(FXAA_PASS_NAME);
+    }
+    {  // vier pass(final pass)
+        RenderPassDesc desc;
+        desc.name = FINAL_PASS_NAME;
+        desc.dependencies = { FXAA_PASS_NAME };
+        desc.color_attachments = { RenderTargetDesc{ "viewer_map", FORMAT_R8G8B8A8_UINT } };
+        // desc.func = ;
+        desc.width = w;
+        desc.height = h;
+
+        g_render_graph.add_pass(desc);
+        g_viewer_pass = g_render_graph.find_pass(FINAL_PASS_NAME);
+    }
+
+    g_final_image = g_viewer_pass->get_color_attachment(0);
+
+    // @TODO: allow recompile
+    g_render_graph.compile();
 }
 
 void destroy_passes() {
@@ -159,7 +225,8 @@ static void shadow_pass_func() {
             g_perBatchCache.cache.c_model_matrix = M;
             g_perBatchCache.Update();
 
-            const MeshData* drawData = reinterpret_cast<MeshData*>(mesh.gpuResource);
+            const MeshData* drawData = g_gpu_mesh.get_or_null(mesh.gpu_resource);
+            DEV_ASSERT(drawData);
             glBindVertexArray(drawData->vao);
             glDrawElements(GL_TRIANGLES, drawData->count, GL_UNSIGNED_INT, 0);
         }
@@ -169,7 +236,74 @@ static void shadow_pass_func() {
     glUseProgram(0);
 }
 
+static void voxelization_pass_func() {
+    g_albedoVoxel.clear();
+    g_normalVoxel.clear();
+
+    const Scene& scene = SceneManager::get_scene();
+    const int voxelSize = DVAR_GET_INT(r_voxelSize);
+
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    glViewport(0, 0, voxelSize, voxelSize);
+
+    g_albedoVoxel.bindImageTexture(IMAGE_VOXEL_ALBEDO_SLOT);
+    g_normalVoxel.bindImageTexture(IMAGE_VOXEL_NORMAL_SLOT);
+    ShaderProgramManager::get(ProgramType::Voxel).bind();
+
+    const uint32_t numObjects = (uint32_t)scene.get_count<ObjectComponent>();
+    for (uint32_t i = 0; i < numObjects; ++i) {
+        const ObjectComponent& obj = scene.get_component_array<ObjectComponent>()[i];
+        ecs::Entity entity = scene.get_entity<ObjectComponent>(i);
+        DEV_ASSERT(scene.contains<TransformComponent>(entity));
+        const TransformComponent& transform = *scene.get_component<TransformComponent>(entity);
+        DEV_ASSERT(scene.contains<MeshComponent>(obj.meshID));
+        const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
+
+        const mat4& M = transform.get_world_matrix();
+        g_perBatchCache.cache.c_model_matrix = M;
+        g_perBatchCache.cache.c_projection_view_model_matrix = g_perFrameCache.cache.c_projection_view_matrix * M;
+        g_perBatchCache.Update();
+
+        const MeshData* draw_data = g_gpu_mesh.get_or_null(mesh.gpu_resource);
+        DEV_ASSERT(draw_data);
+        glBindVertexArray(draw_data->vao);
+
+        for (const auto& subset : mesh.subsets) {
+            const MaterialComponent& material = *scene.get_component<MaterialComponent>(subset.material_id);
+            const MaterialData* matData = reinterpret_cast<MaterialData*>(material.gpuResource);
+
+            FillMaterialCB(matData, g_materialCache.cache);
+            g_materialCache.Update();
+
+            glDrawElements(GL_TRIANGLES, subset.index_count, GL_UNSIGNED_INT, (void*)(subset.index_offset * sizeof(uint32_t)));
+        }
+    }
+
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+    // post process
+    ShaderProgramManager::get(ProgramType::VoxelPost).bind();
+
+    constexpr GLuint workGroupX = 512;
+    constexpr GLuint workGroupY = 512;
+    const GLuint workGroupZ = (voxelSize * voxelSize * voxelSize) / (workGroupX * workGroupY);
+
+    glDispatchCompute(workGroupX, workGroupY, workGroupZ);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+
+    g_albedoVoxel.bind();
+    g_albedoVoxel.genMipMap();
+    g_normalVoxel.bind();
+    g_normalVoxel.genMipMap();
+}
+
 static void gbuffer_pass_func() {
+    auto [frameW, frameH] = DisplayServer::singleton().get_frame_size();
+    glViewport(0, 0, frameW, frameH);
+
     vct::Scene& scene = SceneManager::get_scene();
 
     glEnable(GL_DEPTH_TEST);
@@ -216,7 +350,8 @@ static void gbuffer_pass_func() {
         g_perBatchCache.cache.c_projection_view_model_matrix = g_perFrameCache.cache.c_projection_view_matrix * M;
         g_perBatchCache.Update();
 
-        const MeshData* drawData = reinterpret_cast<MeshData*>(mesh.gpuResource);
+        const MeshData* drawData = g_gpu_mesh.get_or_null(mesh.gpu_resource);
+        DEV_ASSERT(drawData);
         glBindVertexArray(drawData->vao);
 
         for (const auto& subset : mesh.subsets) {
@@ -241,6 +376,9 @@ static void gbuffer_pass_func() {
 }
 
 static void ssao_pass_func() {
+    auto [frameW, frameH] = DisplayServer::singleton().get_frame_size();
+    glViewport(0, 0, frameW, frameH);
+
     const auto& shader = ShaderProgramManager::get(ProgramType::SSAO);
 
     glClear(GL_COLOR_BUFFER_BIT);
@@ -253,6 +391,9 @@ static void ssao_pass_func() {
 }
 
 static void deferred_vct_pass() {
+    auto [frameW, frameH] = DisplayServer::singleton().get_frame_size();
+    glViewport(0, 0, frameW, frameH);
+
     const auto& program = ShaderProgramManager::get(ProgramType::VCT_DEFERRED);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -264,6 +405,9 @@ static void deferred_vct_pass() {
 }
 
 static void fxaa_pass() {
+    auto [frameW, frameH] = DisplayServer::singleton().get_frame_size();
+    glViewport(0, 0, frameW, frameH);
+
     const auto& program = ShaderProgramManager::get(ProgramType::FXAA);
 
     glClear(GL_COLOR_BUFFER_BIT);

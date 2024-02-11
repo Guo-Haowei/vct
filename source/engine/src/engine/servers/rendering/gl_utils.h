@@ -25,19 +25,6 @@ void R_DrawQuad();
 
 namespace gl {
 
-[[nodiscard]] bool Init();
-
-template<typename T>
-void NamedBufferStorage(GLuint buffer, const std::vector<T>& data) {
-    glNamedBufferStorage(buffer, sizeof(T) * data.size(), data.data(), 0);
-}
-
-static inline void BindToSlot(GLuint buffer, int slot, int size) {
-    glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glVertexAttribPointer(slot, size, GL_FLOAT, GL_FALSE, size * sizeof(float), 0);
-    glEnableVertexAttribArray(slot);
-}
-
 //------------------------------------------------------------------------------
 // Constant Buffer
 //------------------------------------------------------------------------------

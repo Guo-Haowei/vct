@@ -25,12 +25,11 @@ int Application::Run(int, const char**) {
         "\nMain Loop"
         "\n********************************************************************************");
 
+    LOG_ERROR("TODO: link object with animation");
     LOG_WARN("TODO: save and load scene");
-    LOG_WARN("TODO: move shader to res folder");
-    LOG_WARN("TODO: imgui true font");
-    LOG_WARN("TODO: use RID as much as possible");
+    LOG_ERROR("TODO: use RID as much as possible");
     LOG_WARN("TODO: fix multiple objects play same animation");
-    LOG_WARN("TODO: cloth physics");
+    LOG_ERROR("TODO: cloth physics");
     LOG_WARN("TODO: refactor application");
 
     // @TODO: add frame count, elapsed time, etc

@@ -105,7 +105,7 @@ Entity Scene::create_camera_entity(const std::string& name,
                                    float height,
                                    float near_plane,
                                    float far_plane,
-                                   float fovy) {
+                                   Degree fovy) {
     Entity entity = create_name_entity(name);
     CameraComponent& camera = create<CameraComponent>(entity);
     camera.m_width = width;

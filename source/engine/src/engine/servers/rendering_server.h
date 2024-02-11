@@ -20,7 +20,6 @@ public:
     void createGpuResources();
     void render();
     void renderFrameBufferTextures(int width, int height);
-    void renderToVoxelTexture();
     void destroyGpuResources();
 
     void gbufferPass();
@@ -28,10 +27,6 @@ public:
 
 private:
     /// vertex arrays
-
-    /// textures
-    GpuTexture m_albedoVoxel;
-    GpuTexture m_normalVoxel;
 
     GpuTexture m_lightIcons[MAX_LIGHT_ICON];
 };

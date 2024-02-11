@@ -48,3 +48,4 @@ function(target_set_warning_level TARGET)
 endfunction()
 
 add_subdirectory(source)
+add_subdirectory(resources/glsl)

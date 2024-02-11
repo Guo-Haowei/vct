@@ -2,8 +2,6 @@
 
 namespace vct {
 
-#define SHADER_DIR (ROOT_FOLDER "source/shaders")
-
 FileAccess::CreateFunc FileAccess::s_create_func[ACCESS_MAX];
 
 auto FileAccess::create(AccessType access_type) -> std::shared_ptr<FileAccess> {
@@ -16,16 +14,11 @@ auto FileAccess::create(AccessType access_type) -> std::shared_ptr<FileAccess> {
 
 auto FileAccess::create_for_path(std::string_view path) -> std::shared_ptr<FileAccess> {
     // @TODO: sanitize path
-
-    if (path.starts_with("shader://")) {
-        return create(ACCESS_SHADER);
-    }
-
-    if (path.starts_with("res://")) {
+    if (path.starts_with("@res://")) {
         return create(ACCESS_RESOURCE);
     }
 
-    if (path.starts_with("user://")) {
+    if (path.starts_with("@user://")) {
         return create(ACCESS_USERDATA);
     }
 
@@ -51,21 +44,16 @@ static void replace_first(std::string& string, std::string_view pattern, std::st
 std::string FileAccess::fix_path(std::string_view path) {
     std::string fixed_path{ path };
     switch (m_access_type) {
-        case ACCESS_SHADER: {
-            if (path.starts_with("shader://")) {
-                replace_first(fixed_path, "shader:/", SHADER_DIR);
-                return fixed_path;
-            }
-        } break;
         case ACCESS_RESOURCE: {
-            if (path.starts_with("res://")) {
-                replace_first(fixed_path, "res:/", "???");
+            if (path.starts_with("@res://")) {
+                replace_first(fixed_path, "@res:/", ROOT_FOLDER "resources");
                 return fixed_path;
             }
         } break;
         case ACCESS_USERDATA: {
-            if (path.starts_with("user://")) {
-                replace_first(fixed_path, "user:/", "???");
+            if (path.starts_with("@user://")) {
+                CRASH_NOW_MSG("NOT IMPLEMENT");
+                replace_first(fixed_path, "@user:/", "???");
                 return fixed_path;
             }
         } break;
