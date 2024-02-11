@@ -8,5 +8,5 @@ public:
     PropertyPanel() : Panel("Properties") {}
 
 protected:
-    virtual void RenderInternal(Scene& scene) override;
+    void RenderInternal(Scene& scene) override;
 };

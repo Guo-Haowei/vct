@@ -11,15 +11,11 @@ void AnimationPanel::RenderInternal(Scene& scene) {
             TagComponent* tag = scene.get_component<TagComponent>(id);
             ImGui::Text("Animation %s", tag->get_tag().c_str());
             if (!animation.is_playing()) {
-                std::string button_name = "play";
-                button_name += tag->get_tag();
-                if (ImGui::Button(button_name.c_str())) {
+                if (ImGui::Button("play")) {
                     animation.flags |= AnimationComponent::PLAYING;
                 }
             } else {
-                std::string button_name = "stop";
-                button_name += tag->get_tag();
-                if (ImGui::Button(button_name.c_str())) {
+                if (ImGui::Button("stop")) {
                     animation.flags &= ~AnimationComponent::PLAYING;
                 }
             }

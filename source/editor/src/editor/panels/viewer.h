@@ -6,8 +6,8 @@ class Viewer : public Panel {
 public:
     Viewer() : Panel("Viewer") {}
 
-    virtual void Update(float dt) override;
+    void Update(float dt) override;
 
 protected:
-    virtual void RenderInternal(Scene& scene) override;
+    void RenderInternal(Scene& scene) override;
 };

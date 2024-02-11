@@ -11,11 +11,13 @@
 #include "panels/hierarchy_panel.h"
 #include "panels/menu_bar.h"
 #include "panels/propertiy_panel.h"
+#include "panels/render_graph_editor.h"
 #include "panels/viewer.h"
 #include "scene/scene_manager.h"
 #include "servers/display_server.h"
 
 EditorLayer::EditorLayer() : Layer("EditorLayer") {
+    AddPanel(std::make_shared<RenderGraphEditor>());
     AddPanel(std::make_shared<AnimationPanel>());
     AddPanel(std::make_shared<ConsolePanel>());
     AddPanel(std::make_shared<DebugPanel>());
@@ -30,8 +32,6 @@ void EditorLayer::AddPanel(std::shared_ptr<Panel> panel) {
     mPanels.emplace_back(panel);
     panel->SetSelectedRef(&mSelected);
 }
-
-extern void dummy_graph_editor();
 
 void EditorLayer::DockSpace() {
     ImGui::GetMainViewport();
@@ -78,7 +78,6 @@ void EditorLayer::DockSpace() {
 
 void EditorLayer::Update(float dt) {
     DockSpace();
-    dummy_graph_editor();
     for (auto& it : mPanels) {
         it->Update(dt);
     }

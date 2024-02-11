@@ -13,7 +13,7 @@ public:
     SceneLoaderTinyGLTF(Scene& scene, const std::string& file_path)
         : SceneLoader(scene, file_path, "SceneLoaderTinyGLTF") {}
 
-    virtual bool import_impl() override;
+    bool import_impl() override;
 
 protected:
     void process_node(int node_index, ecs::Entity parent);

@@ -25,6 +25,9 @@ int Application::Run(int, const char**) {
         "\nMain Loop"
         "\n********************************************************************************");
 
+    LOG_ERROR("TODO: FXAA");
+    LOG_WARN("TODO: TAA");
+    LOG_ERROR("TODO: soft shadow");
     LOG_WARN("TODO: path tracer here");
     LOG_ERROR("TODO: migrate PBR code here");
     LOG_WARN("TODO: fix multiple objects play same animation");

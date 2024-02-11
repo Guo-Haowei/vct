@@ -38,7 +38,7 @@ public:
         }
     }
 
-    virtual void clear() override {
+    void clear() override {
         m_component_array.clear();
         m_entity_array.clear();
         m_lookup.clear();
@@ -51,7 +51,9 @@ public:
         m_lookup = other.m_lookup;
     }
 
-    void copy(const IComponentManager& other) override { copy((ComponentManager<T>&)other); }
+    void copy(const IComponentManager& other) override {
+        copy((ComponentManager<T>&)other);
+    }
 
     void merge(ComponentManager<T>& other) {
         const size_t reserved = get_count() + other.get_count();
@@ -70,18 +72,20 @@ public:
         other.clear();
     }
 
-    virtual void merge(IComponentManager& other) override { merge((ComponentManager<T>&)other); }
+    void merge(IComponentManager& other) override {
+        merge((ComponentManager<T>&)other);
+    }
 
     // virtual void serialize(wi::Archive& archive, EntitySerializer& seri) = 0;
     // virtual void Component_Serialize(Entity entity, wi::Archive& archive, EntitySerializer& seri) = 0;
-    virtual void remove(const Entity& entity) override {
+    void remove(const Entity& entity) override {
         vct::unused(entity);
         DEV_ASSERT(0);
     }
 
     // virtual void Remove_KeepSorted(Entity entity) = 0;
     // virtual void MoveItem(size_t index_from, size_t index_to) = 0;
-    virtual bool contains(const Entity& entity) const override {
+    bool contains(const Entity& entity) const override {
         if (m_lookup.empty()) {
             return false;
         }
@@ -107,7 +111,7 @@ public:
         return &m_component_array[it->second];
     }
 
-    virtual size_t get_index(const Entity& entity) const override {
+    size_t get_index(const Entity& entity) const override {
         if (m_lookup.empty()) {
             return Entity::kInvalidIndex;
         }
@@ -120,9 +124,9 @@ public:
         return it->second;
     }
 
-    inline virtual size_t get_count() const override { return m_component_array.size(); }
+    size_t get_count() const override { return m_component_array.size(); }
 
-    inline virtual Entity get_entity(size_t index) const override {
+    Entity get_entity(size_t index) const override {
         DEV_ASSERT(index < m_entity_array.size());
         return m_entity_array[index];
     }

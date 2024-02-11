@@ -44,7 +44,7 @@ void shadow_pass_func() {
     // @TODO: fix shadow cascade
     for (int idx = 0; idx < 1; ++idx) {
         glViewport(idx * res, 0, res, res);
-        const mat4& PV = g_perFrameCache.cache.LightPVs[idx];
+        const mat4& PV = g_perFrameCache.cache.c_light_matricies[idx];
         const Frustum frustum(PV);
 
         for (uint32_t i = 0; i < numObjects; ++i) {

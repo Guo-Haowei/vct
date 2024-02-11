@@ -7,9 +7,9 @@ class EditorLayer : public Layer {
 public:
     EditorLayer();
 
-    virtual void Attach() override {}
-    virtual void Update(float dt) override;
-    virtual void Render() override;
+    void Attach() override {}
+    void Update(float dt) override;
+    void Render() override;
 
 private:
     void DockSpace();

@@ -56,14 +56,14 @@ protected:
 
 class RenderPassGL : public RenderPass {
 public:
-    virtual void bind() override;
-    virtual void unbind() override;
+    void bind() override;
+    void unbind() override;
 
-    virtual uint32_t get_color_attachment(int index) override;
-    virtual uint32_t get_depth_attachment() override;
+    uint32_t get_color_attachment(int index) override;
+    uint32_t get_depth_attachment() override;
 
 protected:
-    virtual void create_internal(RenderPassDesc& pass_desc) override;
+    void create_internal(RenderPassDesc& pass_desc) override;
 
     FixedStack<uint32_t, 8> m_color_attachments;
     uint32_t m_depth_attachment = 0;

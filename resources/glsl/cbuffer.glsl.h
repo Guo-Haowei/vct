@@ -37,35 +37,34 @@ CONSTANT_BUFFER(PerFrameConstantBuffer, 0) {
     mat4 c_projection_matrix;
     mat4 c_projection_view_matrix;
 
-    // @TODO: refactor names
-    vec3 CamPos;
-    int DebugCSM;
+    vec3 c_camera_position;
+    int c_debug_csm;
 
-    vec3 SunDir;
-    int EnableGI;
+    vec3 c_sun_direction;
+    int c_enable_vxgi;
 
-    vec3 LightColor;
-    float VoxelSize;
+    vec3 c_light_color;
+    float c_voxel_size;
 
-    vec4 CascadedClipZ;
-    mat4 LightPVs[NUM_CASCADES];
+    vec4 c_cascade_clip_z;
+    mat4 c_light_matricies[NUM_CASCADES];
 
-    vec3 WorldCenter;
-    float WorldSizeHalf;
+    vec3 c_world_center;
+    float c_world_size_half;
 
-    int DebugTexture;
-    int NoTexture;
-    int ScreenWidth;
-    int ScreenHeight;
+    int c_debug_texture_id;
+    int c_no_texture;
+    int c_screen_width;
+    int c_screen_height;
 
-    int SSAOKernelSize;
-    float SSAOKernelRadius;
-    int SSAONoiseSize;
-    float TexelSize;
+    int c_ssao_kernel_size;
+    float c_ssao_kernel_radius;
+    int c_ssao_noise_size;
+    float c_texel_size;
 
     vec2 padding0;
-    int EnableSSAO;
-    int EnableFXAA;
+    int c_enable_ssao;
+    int c_enable_fxaa;
 };
 
 CONSTANT_BUFFER(PerBatchConstantBuffer, 1) {

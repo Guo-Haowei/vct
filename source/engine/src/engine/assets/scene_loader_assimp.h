@@ -14,7 +14,7 @@ public:
     SceneLoaderAssimp(Scene& scene, const std::string& file_path) : SceneLoader(scene, file_path, "SceneLoaderAssimp") {}
 
 protected:
-    virtual bool import_impl() override;
+    bool import_impl() override;
 
     void process_material(aiMaterial& material);
     void process_mesh(const aiMesh& mesh);

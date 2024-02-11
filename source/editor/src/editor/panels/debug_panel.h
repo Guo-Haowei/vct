@@ -6,5 +6,5 @@ public:
     DebugPanel() : Panel("Debug") {}
 
 protected:
-    virtual void RenderInternal(Scene& scene) override;
+    void RenderInternal(Scene& scene) override;
 };

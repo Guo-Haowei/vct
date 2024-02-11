@@ -37,11 +37,11 @@ void main() {
 
     vec3 N = normalize(pass_normal);
     // vec3 L = normalize(LightPos - world_position);
-    vec3 L = SunDir;
-    vec3 V = normalize(CamPos - world_position);
+    vec3 L = c_sun_direction;
+    vec3 V = normalize(c_camera_position - world_position);
     vec3 H = normalize(V + L);
 
-    vec3 radiance = LightColor;
+    vec3 radiance = c_light_color;
 
     float NdotL = max(dot(N, L), 0.0);
     float NdotH = max(dot(N, H), 0.0);
@@ -77,8 +77,8 @@ void main() {
     ///////////////////////////////////////////////////////////////////////////
 
     // write lighting information to texel
-    vec3 voxel = (pass_position - WorldCenter) / WorldSizeHalf;  // normalize it to [-1, 1]
-    voxel = 0.5 * voxel + vec3(0.5);                             // normalize to [0, 1]
+    vec3 voxel = (pass_position - c_world_center) / c_world_size_half;  // normalize it to [-1, 1]
+    voxel = 0.5 * voxel + vec3(0.5);                                    // normalize to [0, 1]
     ivec3 dim = imageSize(u_albedo_texture);
     ivec3 coord = ivec3(dim * voxel);
 

@@ -15,7 +15,7 @@ public:
 
 class StdLogger : public ILogger {
 public:
-    virtual void print(LogLevel level, std::string_view message) override;
+    void print(LogLevel level, std::string_view message) override;
 };
 
 class CompositeLogger : public ILogger, public Singleton<CompositeLogger> {
@@ -30,7 +30,7 @@ public:
         char buffer[PER_LOG_STRUCT_SIZE - sizeof(level)];
     };
 
-    virtual void print(LogLevel level, std::string_view message) override;
+    void print(LogLevel level, std::string_view message) override;
 
     void add_logger(std::shared_ptr<ILogger> logger);
     void add_channel(LogLevel log) { m_channels |= log; }

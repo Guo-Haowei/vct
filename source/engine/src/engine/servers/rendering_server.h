@@ -20,7 +20,7 @@ public:
     bool initialize();
     void finalize();
 
-    virtual void begin_scene(Scene& scene) override;
+    void begin_scene(Scene& scene) override;
 
     void createGpuResources();
     void render();

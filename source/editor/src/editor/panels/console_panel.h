@@ -6,7 +6,7 @@ public:
     ConsolePanel() : Panel("Console") {}
 
 protected:
-    virtual void RenderInternal(Scene& scene) override;
+    void RenderInternal(Scene& scene) override;
 
 private:
     bool mAutoScroll = true;

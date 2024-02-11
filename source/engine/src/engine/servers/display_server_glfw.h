@@ -8,16 +8,16 @@ namespace vct {
 
 class DisplayServerGLFW : public DisplayServer {
 public:
-    virtual bool should_close() override;
+    bool should_close() override;
 
-    virtual std::tuple<int, int> get_frame_size() override;
-    virtual std::tuple<int, int> get_window_pos() override;
+    std::tuple<int, int> get_frame_size() override;
+    std::tuple<int, int> get_window_pos() override;
 
-    virtual void new_frame() override;
-    virtual void present() override;
+    void new_frame() override;
+    void present() override;
 
-    virtual bool initialize() override;
-    virtual void finalize() override;
+    bool initialize() override;
+    void finalize() override;
 
 private:
     void initialize_key_mapping();

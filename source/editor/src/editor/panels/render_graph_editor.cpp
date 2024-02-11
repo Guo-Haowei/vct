@@ -1,3 +1,5 @@
+#include "render_graph_editor.h"
+
 #include "GraphEditor.h"
 #include "servers/rendering/render_graph/render_graph.h"
 
@@ -132,25 +134,19 @@ struct RenderGraphEditorDelegate : public GraphEditor::Delegate {
 };
 }  // namespace vct
 
-void dummy_graph_editor() {
+void RenderGraphEditor::RenderInternal(vct::Scene&) {
     // Graph Editor
     static GraphEditor::Options options;
     static vct::RenderGraphEditorDelegate delegate(g_render_graph);
     static GraphEditor::ViewState viewState;
     static GraphEditor::FitOnScreen fit = GraphEditor::Fit_None;
-    static bool showGraphEditor = true;
 
-    if (showGraphEditor) {
-        ImGui::Begin("Graph Editor", NULL, 0);
-        if (ImGui::Button("Fit all nodes")) {
-            fit = GraphEditor::Fit_AllNodes;
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Fit selected nodes")) {
-            fit = GraphEditor::Fit_SelectedNodes;
-        }
-        GraphEditor::Show(delegate, options, viewState, true, &fit);
-
-        ImGui::End();
+    if (ImGui::Button("Fit all nodes")) {
+        fit = GraphEditor::Fit_AllNodes;
     }
+    ImGui::SameLine();
+    if (ImGui::Button("Fit selected nodes")) {
+        fit = GraphEditor::Fit_SelectedNodes;
+    }
+    GraphEditor::Show(delegate, options, viewState, true, &fit);
 }

@@ -19,7 +19,7 @@ void main() {
     out_color = vec4(colorCenter, 1.0);
     return;
 #if 0
-    if ( EnableFXAA == 0 )
+    if ( c_enable_fxaa == 0 )
     {
         out_color = vec4( colorCenter, 1.0 );
         return;
@@ -27,7 +27,7 @@ void main() {
 
     // Luma at the current fragment
     const float lumaCenter       = rgb2luma( colorCenter );
-    const vec2 inverseScreenSize = vec2( 1.0 / float( ScreenWidth ), 1.0 / float( ScreenHeight ) );
+    const vec2 inverseScreenSize = vec2( 1.0 / float( c_screen_width ), 1.0 / float( c_screen_height ) );
 
     // Luma at the four direct neighbours of the current fragment.
     const float lumaDown  = rgb2luma( texture( c_fxaa_input_image, uv + inverseScreenSize * vec2( 0, -1 ) ).rgb );

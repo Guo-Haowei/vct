@@ -1,19 +1,11 @@
 #include "debug_panel.h"
 
+#include "core/dynamic_variable/common_dvars.h"
 #include "scene/scene.h"
 #include "servers/rendering/r_defines.h"
 #include "servers/rendering/rendering_dvars.h"
 
-/////////////////////
-#include "core/dynamic_variable/common_dvars.h"
-
-void DebugPanel::RenderInternal(Scene& scene) {
-    CameraComponent& camera = scene.get_main_camera();
-
-    vec3 eye = camera.get_eye();
-    ImGui::Text("eye: %.2f, %.2f, %.2f", eye.x, eye.y, eye.z);
-    ImGui::Separator();
-
+void DebugPanel::RenderInternal(Scene&) {
     ImGui::Text("Voxel GI");
     ImGui::Checkbox("Enable GI", (bool*)(DVAR_GET_POINTER(r_enable_vxgi)));
     ImGui::Checkbox("No Texture", (bool*)(DVAR_GET_POINTER(r_no_texture)));

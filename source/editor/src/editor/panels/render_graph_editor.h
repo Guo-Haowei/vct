@@ -1,9 +1,9 @@
 #pragma once
 #include "panel.h"
 
-class AnimationPanel : public Panel {
+class RenderGraphEditor : public Panel {
 public:
-    AnimationPanel() : Panel("Animation") {}
+    RenderGraphEditor() : Panel("Render Graph") {}
 
 protected:
     void RenderInternal(Scene& scene) override;
