@@ -6,6 +6,7 @@
 ///
 #include "core/dynamic_variable/common_dvars.h"
 #include "servers/display_server.h"
+#include "servers/rendering/rendering_dvars.h"
 
 namespace vct {
 
@@ -100,10 +101,10 @@ void SceneManager::update(float dt) {
     g_perFrameCache.cache.c_projection_matrix = camera.get_projection_matrix();
     g_perFrameCache.cache.c_projection_view_matrix = camera.get_projection_view_matrix();
 
-    g_perFrameCache.cache.EnableGI = DVAR_GET_BOOL(r_enableVXGI);
+    g_perFrameCache.cache.EnableGI = DVAR_GET_BOOL(r_enable_vxgi);
     g_perFrameCache.cache.DebugCSM = DVAR_GET_BOOL(r_debugCSM);
     g_perFrameCache.cache.DebugTexture = DVAR_GET_INT(r_debugTexture);
-    g_perFrameCache.cache.NoTexture = DVAR_GET_BOOL(r_noTexture);
+    g_perFrameCache.cache.NoTexture = DVAR_GET_BOOL(r_no_texture);
     g_perFrameCache.cache.ScreenWidth = frameW;
     g_perFrameCache.cache.ScreenHeight = frameH;
 
@@ -113,7 +114,7 @@ void SceneManager::update(float dt) {
     g_perFrameCache.cache.SSAONoiseSize = DVAR_GET_INT(r_ssaoNoiseSize);
     g_perFrameCache.cache.EnableSSAO = DVAR_GET_BOOL(r_enableSsao);
 
-    // FXAA
+    // c_fxaa_image
     g_perFrameCache.cache.EnableFXAA = DVAR_GET_BOOL(r_enableFXAA);
 }
 
@@ -126,7 +127,7 @@ void SceneManager::request_scene(std::string_view path) {
 }
 
 void SceneManager::on_scene_changed(Scene* new_scene) {
-    const int voxelTextureSize = DVAR_GET_INT(r_voxelSize);
+    const int voxelTextureSize = DVAR_GET_INT(r_voxel_size);
     DEV_ASSERT(math::is_power_of_two(voxelTextureSize));
     DEV_ASSERT(voxelTextureSize <= 256);
 

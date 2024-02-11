@@ -79,13 +79,13 @@ bool initialize() {
         "@res://glsl/voxel/post.comp",
     };
 
-    Timer timer;
-    for (int i = 0; i < array_length(preload); ++i) {
-        if (load_file_sync(preload[i])) {
-            LOG_VERBOSE("[asset_loader] resource '{}' preloaded", preload[i]);
-        }
-    }
-    LOG_VERBOSE("[asset_loader] preloaded {} assets in {}", array_length(preload), timer.get_duration_string());
+    // Timer timer;
+    // for (int i = 0; i < array_length(preload); ++i) {
+    //     if (load_file_sync(preload[i])) {
+    //         LOG_VERBOSE("[asset_loader] resource '{}' preloaded", preload[i]);
+    //     }
+    // }
+    // LOG_VERBOSE("[asset_loader] preloaded {} assets in {}", array_length(preload), timer.get_duration_string());
 
     return true;
 }

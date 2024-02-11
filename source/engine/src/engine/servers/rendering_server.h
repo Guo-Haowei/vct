@@ -2,7 +2,6 @@
 #include "core/objects/singleton.h"
 #include "rendering/GpuTexture.h"
 #include "rendering/gl_utils.h"
-#include "rendering/passes.h"
 #include "rendering/r_cbuffers.h"
 #include "scene/scene_listener.h"
 
@@ -19,15 +18,12 @@ public:
 
     void createGpuResources();
     void render();
-    void renderFrameBufferTextures(int width, int height);
     void destroyGpuResources();
 
     void gbufferPass();
     void vctPass();
 
 private:
-    /// vertex arrays
-
     GpuTexture m_lightIcons[MAX_LIGHT_ICON];
 };
 

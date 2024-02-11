@@ -8,6 +8,8 @@
 #include "core/utility/command_line.h"
 #include "scene/scene_manager.h"
 #include "servers/display_server_glfw.h"
+#include "servers/rendering/rendering_dvars.h"
+#include "servers/rendering/rendering_misc.h"
 #include "servers/rendering/shader_program_manager.h"
 #include "servers/rendering_server.h"
 
@@ -85,6 +87,7 @@ int main(int argc, const char** argv) {
     OS::singleton().initialize();
 
     register_common_dvars();
+    register_rendering_dvars();
     process_command_line(argc, argv);
 
     // @TODO: better organization

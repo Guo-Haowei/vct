@@ -2,6 +2,7 @@
 
 #include "scene/scene.h"
 #include "servers/rendering/r_defines.h"
+#include "servers/rendering/rendering_dvars.h"
 
 /////////////////////
 #include "core/dynamic_variable/common_dvars.h"
@@ -50,9 +51,8 @@ void DebugPanel::RenderInternal(Scene& scene) {
     ImGui::Separator();
 
     ImGui::Text("Voxel GI");
-    ImGui::Checkbox("Enable GI", (bool*)(DVAR_GET_POINTER(r_enableVXGI)));
-    ImGui::Checkbox("No Texture", (bool*)(DVAR_GET_POINTER(r_noTexture)));
-    ImGui::Checkbox("Force Voxel GI texture update", (bool*)(DVAR_GET_POINTER(r_forceVXGI)));
+    ImGui::Checkbox("Enable GI", (bool*)(DVAR_GET_POINTER(r_enable_vxgi)));
+    ImGui::Checkbox("No Texture", (bool*)(DVAR_GET_POINTER(r_no_texture)));
     ImGui::Separator();
 
     ImGui::Text("CSM");
@@ -65,8 +65,8 @@ void DebugPanel::RenderInternal(Scene& scene) {
     ImGui::SliderFloat("Kernal Radius", (float*)(DVAR_GET_POINTER(r_ssaoKernelRadius)), 0.1f, 5.0f);
     ImGui::Separator();
 
-    ImGui::Text("FXAA");
-    ImGui::Checkbox("Enable FXAA", (bool*)(DVAR_GET_POINTER(r_enableFXAA)));
+    ImGui::Text("c_fxaa_image");
+    ImGui::Checkbox("Enable c_fxaa_image", (bool*)(DVAR_GET_POINTER(r_enableFXAA)));
     ImGui::Separator();
 
     ImGui::Text("Display Texture");

@@ -10,11 +10,10 @@ Dvar.SetInt('wnd_frameless', 1);
 
 -- graphics
 Dvar.SetInt('r_shadowRes', 1024 * 8 * 2);
-Dvar.SetInt('r_voxelSize', 64);
+Dvar.SetInt('r_voxel_size', 64);
 
 -- camera
 Dvar.SetVec3('cam_pos', 12.54, 0.95, 0.86);
-Dvar.SetVec4('cam_cascades', 0.1, 8.0, 18.0, 50.0);
 Dvar.SetFloat('cam_fov', 60.0);
 
 -- light

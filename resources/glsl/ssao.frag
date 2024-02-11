@@ -12,15 +12,15 @@ void main() {
     noiseScale /= float(SSAONoiseSize);
 
     const vec2 uv = pass_uv;
-    const vec3 N = normalize(texture(GbufferNormalRoughnessMap, uv).xyz);
-    const vec3 rvec = texture(NoiseMap, noiseScale * uv).xyz;
+    const vec3 N = normalize(texture(c_gbuffer_normal_roughness_map, uv).xyz);
+    const vec3 rvec = texture(c_kernel_noise_map, noiseScale * uv).xyz;
     const vec3 tangent = normalize(rvec - N * dot(rvec, N));
     const vec3 bitangent = cross(N, tangent);
 
     mat3 TBN = mat3(tangent, bitangent, N);
     TBN = mat3(c_view_matrix) * TBN;
 
-    vec4 origin = vec4(texture(GbufferPositionMetallicMap, uv).xyz, 1.0);
+    vec4 origin = vec4(texture(c_gbuffer_position_metallic_map, uv).xyz, 1.0);
     origin = c_view_matrix * origin;
 
     occlusion = 0.0;
@@ -37,7 +37,7 @@ void main() {
 
         // get sample depth
         const vec4 samplec_view_matrixSpace =
-            c_view_matrix * vec4(texture(GbufferPositionMetallicMap, offset.xy).xyz, 1.0);  // get depth value of kernel sample
+            c_view_matrix * vec4(texture(c_gbuffer_position_metallic_map, offset.xy).xyz, 1.0);  // get depth value of kernel sample
         const float sampleDepth = samplec_view_matrixSpace.z;
 
         // range check & accumulate

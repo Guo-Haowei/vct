@@ -38,7 +38,7 @@ vec3 traceCone(vec3 from, vec3 direction, float aperture) {
         vec3 coords = (conePosition - WorldCenter) / WorldSizeHalf;
         coords = 0.5 * coords + 0.5;
 
-        vec4 voxel = textureLod(VoxelAlbedoMap, coords, mipLevel);
+        vec4 voxel = textureLod(c_voxel_map, coords, mipLevel);
         acc += (1.0 - acc.a) * voxel;
 
         dist += 0.5 * diameter;
@@ -82,19 +82,19 @@ vec3 indirectSpecular(vec3 position, vec3 direction, float roughness) {
 
 void main() {
     const vec2 uv = pass_uv;
-    float depth = texture(GbufferDepthMap, uv).r;
+    float depth = texture(c_gbuffer_depth_map, uv).r;
 
     if (depth > 0.999) discard;
 
     gl_FragDepth = depth;
 
-    const vec4 normal_roughness = texture(GbufferNormalRoughnessMap, uv);
-    const vec4 position_metallic = texture(GbufferPositionMetallicMap, uv);
+    const vec4 normal_roughness = texture(c_gbuffer_normal_roughness_map, uv);
+    const vec4 position_metallic = texture(c_gbuffer_position_metallic_map, uv);
     const vec4 worldPos = vec4(position_metallic.xyz, 1.0);
     float roughness = normal_roughness.w;
     float metallic = position_metallic.w;
 
-    vec4 albedo = texture(GbufferAlbedoMap, uv);
+    vec4 albedo = texture(c_gbuffer_albedo_map, uv);
     vec3 F0 = mix(vec3(0.04), albedo.rgb, metallic);
     vec3 Lo = vec3(0.0);
 
@@ -137,17 +137,17 @@ void main() {
     //     if ( clipSpaceZ <= CascadedClipZ[idx + 1] )
     //     {
     //         vec4 lightSpacePos = LightPVs[idx] * worldPos;
-    //         shadow             = Shadow( ShadowMap, lightSpacePos, NdotL, idx );
+    //         shadow             = Shadow( c_shadow_map, lightSpacePos, NdotL, idx );
     //         break;
     //     }
     // }
 #else
     vec4 lightSpacePos = LightPVs[0] * worldPos;
-    shadow = Shadow(ShadowMap, lightSpacePos, NdotL);
+    shadow = Shadow(c_shadow_map, lightSpacePos, NdotL);
 #endif
     Lo += (1.0 - shadow) * directLight;
 
-    const float ao = EnableSSAO == 0 ? 1.0 : texture(SSAOMap, uv).r;
+    const float ao = EnableSSAO == 0 ? 1.0 : texture(c_ssao_map, uv).r;
 
     if (EnableGI == 1)
     // indirect light
