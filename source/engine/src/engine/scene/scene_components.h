@@ -209,6 +209,34 @@ struct MeshComponent {
 };
 
 //--------------------------------------------------------------------------------------------------
+// Material Component
+//--------------------------------------------------------------------------------------------------
+struct MaterialComponent {
+    // @TODO: refactor
+    enum ETextureSlot {
+        Base,
+        Normal,
+        MetallicRoughness,
+        Count,
+    };
+
+    struct TextureMap {
+        std::string name;
+    };
+    TextureMap mTextures[ETextureSlot::Count];
+
+    // @TODO: refactor
+    float mMetallic = 0.0f;
+    float mRoughness = 1.0f;
+    vec4 mBaseColor = vec4(1);
+
+    // Non-serialized
+    mutable RID gpu_resource;
+
+    void serialize(Archive& archive);
+};
+
+//--------------------------------------------------------------------------------------------------
 // Animation Component
 //--------------------------------------------------------------------------------------------------
 struct AnimationComponent {
@@ -329,29 +357,6 @@ struct LightComponent {
     float energy = 10.0f;
 
     void serialize(Archive& archive);
-};
-
-struct MaterialComponent {
-    enum ETextureSlot {
-        Base,
-        Normal,
-        MetallicRoughness,
-        Count,
-    };
-
-    struct TextureMap {
-        std::string name;
-    };
-    TextureMap mTextures[ETextureSlot::Count];
-
-    float mMetallic = 0.0f;
-    float mRoughness = 1.0f;
-    vec4 mBaseColor = vec4(1);
-
-    void serialize(Archive& archive);
-
-    // @TODO: refactor
-    mutable void* gpuResource = nullptr;
 };
 
 }  // namespace vct

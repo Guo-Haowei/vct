@@ -36,7 +36,8 @@ static void ssao_pass_func();
 static void deferred_vct_pass();
 static void fxaa_pass();
 
-extern vct::RIDAllocator<MeshData> g_gpu_mesh;
+extern vct::RIDAllocator<MeshData> g_meshes;
+extern vct::RIDAllocator<MaterialData> g_materials;
 
 // void RenderTarget::Destroy() {
 //     mDepthAttachment.destroy();
@@ -225,7 +226,7 @@ static void shadow_pass_func() {
             g_perBatchCache.cache.c_model_matrix = M;
             g_perBatchCache.Update();
 
-            const MeshData* drawData = g_gpu_mesh.get_or_null(mesh.gpu_resource);
+            const MeshData* drawData = g_meshes.get_or_null(mesh.gpu_resource);
             DEV_ASSERT(drawData);
             glBindVertexArray(drawData->vao);
             glDrawElements(GL_TRIANGLES, drawData->count, GL_UNSIGNED_INT, 0);
@@ -267,15 +268,16 @@ static void voxelization_pass_func() {
         g_perBatchCache.cache.c_projection_view_model_matrix = g_perFrameCache.cache.c_projection_view_matrix * M;
         g_perBatchCache.Update();
 
-        const MeshData* draw_data = g_gpu_mesh.get_or_null(mesh.gpu_resource);
+        const MeshData* draw_data = g_meshes.get_or_null(mesh.gpu_resource);
         DEV_ASSERT(draw_data);
         glBindVertexArray(draw_data->vao);
 
         for (const auto& subset : mesh.subsets) {
             const MaterialComponent& material = *scene.get_component<MaterialComponent>(subset.material_id);
-            const MaterialData* matData = reinterpret_cast<MaterialData*>(material.gpuResource);
+            const MaterialData* mat_data = g_materials.get_or_null(material.gpu_resource);
+            DEV_ASSERT(mat_data);
 
-            FillMaterialCB(matData, g_materialCache.cache);
+            FillMaterialCB(mat_data, g_materialCache.cache);
             g_materialCache.Update();
 
             glDrawElements(GL_TRIANGLES, subset.index_count, GL_UNSIGNED_INT, (void*)(subset.index_offset * sizeof(uint32_t)));
@@ -350,7 +352,7 @@ static void gbuffer_pass_func() {
         g_perBatchCache.cache.c_projection_view_model_matrix = g_perFrameCache.cache.c_projection_view_matrix * M;
         g_perBatchCache.Update();
 
-        const MeshData* drawData = g_gpu_mesh.get_or_null(mesh.gpu_resource);
+        const MeshData* drawData = g_meshes.get_or_null(mesh.gpu_resource);
         DEV_ASSERT(drawData);
         glBindVertexArray(drawData->vao);
 
@@ -362,9 +364,10 @@ static void gbuffer_pass_func() {
             }
 
             const MaterialComponent& material = *scene.get_component<MaterialComponent>(subset.material_id);
-            const MaterialData* matData = reinterpret_cast<MaterialData*>(material.gpuResource);
+            const MaterialData* mat_data = g_materials.get_or_null(material.gpu_resource);
+            DEV_ASSERT(mat_data);
 
-            FillMaterialCB(matData, g_materialCache.cache);
+            FillMaterialCB(mat_data, g_materialCache.cache);
             g_materialCache.Update();
 
             glDrawElements(GL_TRIANGLES, subset.index_count, GL_UNSIGNED_INT,

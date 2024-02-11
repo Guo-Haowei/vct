@@ -224,6 +224,21 @@ std::vector<char> MeshComponent::generate_combined_buffer() const {
 }
 
 //--------------------------------------------------------------------------------------------------
+// Material Component
+//--------------------------------------------------------------------------------------------------
+void MaterialComponent::serialize(Archive& archive) {
+    if (archive.is_write_mode()) {
+        archive << mMetallic;
+        archive << mRoughness;
+        archive << mBaseColor;
+    } else {
+        archive >> mMetallic;
+        archive >> mRoughness;
+        archive >> mBaseColor;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
 // Animation Component
 //--------------------------------------------------------------------------------------------------
 void AnimationComponent::serialize(Archive& archive) {
@@ -269,18 +284,6 @@ void LightComponent::serialize(Archive& archive) {
     //     archive >> color;
     //     archive >> energy;
     // }
-}
-
-void MaterialComponent::serialize(Archive& archive) {
-    if (archive.is_write_mode()) {
-        archive << mMetallic;
-        archive << mRoughness;
-        archive << mBaseColor;
-    } else {
-        archive >> mMetallic;
-        archive >> mRoughness;
-        archive >> mBaseColor;
-    }
 }
 
 }  // namespace vct

@@ -25,10 +25,11 @@ int Application::Run(int, const char**) {
         "\nMain Loop"
         "\n********************************************************************************");
 
+    LOG_WARN("TODO: path tracer here");
+    LOG_ERROR("TODO: migrate PBR code here");
+    LOG_WARN("TODO: fix multiple objects play same animation");
     LOG_ERROR("TODO: link object with animation");
     LOG_WARN("TODO: save and load scene");
-    LOG_ERROR("TODO: use RID as much as possible");
-    LOG_WARN("TODO: fix multiple objects play same animation");
     LOG_ERROR("TODO: cloth physics");
     LOG_WARN("TODO: refactor application");
 

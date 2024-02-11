@@ -20,10 +20,9 @@
 GpuTexture g_albedoVoxel;
 GpuTexture g_normalVoxel;
 
-static std::vector<std::shared_ptr<MaterialData>> g_materialdata;
-
 // @TODO: fix this
-vct::RIDAllocator<MeshData> g_gpu_mesh;
+vct::RIDAllocator<MeshData> g_meshes;
+vct::RIDAllocator<MaterialData> g_materials;
 
 static GLuint g_noiseTexture;
 
@@ -70,7 +69,7 @@ bool RenderingServer::initialize() {
 
     createGpuResources();
 
-    g_gpu_mesh.set_description("GPU-Mesh-Allocator");
+    g_meshes.set_description("GPU-Mesh-Allocator");
     return true;
 }
 
@@ -139,51 +138,51 @@ static void create_mesh_data(const MeshComponent& mesh, MeshData& out_mesh) {
 void RenderingServer::begin_scene(Scene& scene) {
     // create mesh
     for (const auto& mesh : scene.get_component_array<MeshComponent>()) {
-        RID rid = g_gpu_mesh.make_rid();
+        RID rid = g_meshes.make_rid();
         mesh.gpu_resource = rid;
-        create_mesh_data(mesh, *g_gpu_mesh.get_or_null(rid));
+        create_mesh_data(mesh, *g_meshes.get_or_null(rid));
     }
 
     // create material
     DEV_ASSERT(scene.get_count<MaterialComponent>() < array_length(g_constantCache.cache.AlbedoMaps));
 
     for (int idx = 0; idx < scene.get_count<MaterialComponent>(); ++idx) {
-        const auto& mat = scene.get_component_array<MaterialComponent>()[idx];
+        const MaterialComponent& material_component = scene.get_component_array<MaterialComponent>()[idx];
 
-        auto matData = std::make_shared<MaterialData>();
+        RID rid = g_materials.make_rid();
+        material_component.gpu_resource = rid;
+        MaterialData* material = g_materials.get_or_null(rid);
+        DEV_ASSERT(material);
 
         {
-            const std::string& textureMap = mat.mTextures[MaterialComponent::Base].name;
-            matData->albedoColor = mat.mBaseColor;
+            const std::string& textureMap = material_component.mTextures[MaterialComponent::Base].name;
+            material->albedoColor = material_component.mBaseColor;
             if (!textureMap.empty()) {
-                matData->albedoMap.create_texture2d_from_image(textureMap);
-                g_constantCache.cache.AlbedoMaps[idx].data = gl::MakeTextureResident(matData->albedoMap.GetHandle());
+                material->albedoMap.create_texture2d_from_image(textureMap);
+                g_constantCache.cache.AlbedoMaps[idx].data = gl::MakeTextureResident(material->albedoMap.GetHandle());
             }
         }
 
         {
-            const std::string& textureMap = mat.mTextures[MaterialComponent::MetallicRoughness].name;
-            matData->metallic = mat.mMetallic;
-            matData->roughness = mat.mRoughness;
+            const std::string& textureMap = material_component.mTextures[MaterialComponent::MetallicRoughness].name;
+            material->metallic = material_component.mMetallic;
+            material->roughness = material_component.mRoughness;
             if (!textureMap.empty()) {
-                matData->materialMap.create_texture2d_from_image(textureMap);
-                g_constantCache.cache.PbrMaps[idx].data = gl::MakeTextureResident(matData->materialMap.GetHandle());
+                material->materialMap.create_texture2d_from_image(textureMap);
+                g_constantCache.cache.PbrMaps[idx].data = gl::MakeTextureResident(material->materialMap.GetHandle());
             }
         }
 
         {
-            const std::string& textureMap = mat.mTextures[MaterialComponent::Normal].name;
+            const std::string& textureMap = material_component.mTextures[MaterialComponent::Normal].name;
             if (!textureMap.empty()) {
-                matData->normalMap.create_texture2d_from_image(textureMap);
-                g_constantCache.cache.NormalMaps[idx].data = gl::MakeTextureResident(matData->normalMap.GetHandle());
+                material->normalMap.create_texture2d_from_image(textureMap);
+                g_constantCache.cache.NormalMaps[idx].data = gl::MakeTextureResident(material->normalMap.GetHandle());
                 // LOG("material has bump {}", mat->normalTexture.c_str());
             }
         }
 
-        matData->textureMapIdx = idx;
-
-        g_materialdata.emplace_back(matData);
-        mat.gpuResource = g_materialdata.back().get();
+        material->textureMapIdx = idx;
     }
 
     g_constantCache.Update();
