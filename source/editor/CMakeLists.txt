@@ -15,11 +15,10 @@ target_include_directories(${TARGET_NAME} PRIVATE
 
 target_link_libraries(${TARGET_NAME} PRIVATE engine)
 
-target_compile_options(${TARGET_NAME} PRIVATE /W4)
-
 set_target_properties(${TARGET_NAME}
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
 
 target_precompile_headers(${TARGET_NAME} PRIVATE src/editor/pch.h)
+target_set_warning_level(${TARGET_NAME})

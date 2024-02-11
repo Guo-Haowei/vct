@@ -2,7 +2,6 @@
 #include "core/objects/singleton.h"
 #include "rendering/GpuTexture.h"
 #include "rendering/gl_utils.h"
-#include "rendering/passes.h"
 #include "rendering/r_cbuffers.h"
 #include "scene/scene_listener.h"
 
@@ -10,6 +9,12 @@ namespace vct {
 
 class RenderingServer : public Singleton<RenderingServer>, public SceneListener {
 public:
+    enum {
+        RENDER_GRAPH_NONE,
+        RENDER_GRAPH_VXGI,
+        RENDER_GRAPH_VXGI_DEBUG,
+    };
+
     RenderingServer() : SceneListener("renderer") {}
 
     bool initialize();
@@ -19,16 +24,13 @@ public:
 
     void createGpuResources();
     void render();
-    void renderFrameBufferTextures(int width, int height);
     void destroyGpuResources();
 
-    void gbufferPass();
-    void vctPass();
+    uint32_t get_final_image() const;
 
 private:
-    /// vertex arrays
-
     GpuTexture m_lightIcons[MAX_LIGHT_ICON];
+    int m_method = RENDER_GRAPH_NONE;
 };
 
 }  // namespace vct

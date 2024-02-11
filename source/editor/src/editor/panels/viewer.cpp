@@ -9,8 +9,7 @@
 #include "core/math/ray.h"
 #include "scene/scene_manager.h"
 #include "servers/display_server.h"
-
-extern uint32_t g_final_image;
+#include "servers/rendering_server.h"
 
 void Viewer::Update(float dt) {
     if (IsFocused()) {
@@ -77,7 +76,8 @@ void Viewer::RenderInternal(Scene& scene) {
     ImVec2 bottom_right(top_left.x + contentSize.x, top_left.y + contentSize.y);
     ImVec2 top_right = ImVec2(bottom_right.x, top_left.y);
 
-    ImGui::GetWindowDrawList()->AddImage((ImTextureID)g_final_image, top_left, bottom_right, ImVec2(0, 1), ImVec2(1, 0));
+    uint64_t final_image = RenderingServer::singleton().get_final_image();
+    ImGui::GetWindowDrawList()->AddImage((ImTextureID)final_image, top_left, bottom_right, ImVec2(0, 1), ImVec2(1, 0));
 
     // draw gizmo
 

@@ -20,7 +20,7 @@ bool UIManager::initialize() {
 
     ImGuiIO& io = ImGui::GetIO();
 
-    auto asset = asset_loader::find_file("@res://fonts/DroidSans.ttf");
+    auto asset = asset_loader::load_file_sync("@res://fonts/DroidSans.ttf");
     DEV_ASSERT(asset);
     ImFontConfig font_cfg;
     font_cfg.FontDataOwnedByAtlas = false;

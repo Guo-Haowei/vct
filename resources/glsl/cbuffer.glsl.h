@@ -88,18 +88,18 @@ CONSTANT_BUFFER(MaterialConstantBuffer, 2) {
 
 CONSTANT_BUFFER(PerSceneConstantBuffer, 3) {
     vec4 SSAOKernels[NUM_SSAO_KERNEL];
-    sampler2D ShadowMap;
-    sampler3D VoxelAlbedoMap;
-    sampler3D VoxelNormalMap;
-    sampler3D VoxelEmissiveMap;
-    sampler2D GbufferAlbedoMap;
-    sampler2D GbufferPositionMetallicMap;
-    sampler2D GbufferNormalRoughnessMap;
-    sampler2D GbufferDepthMap;
-    sampler2D SSAOMap;
-    sampler2D NoiseMap;
-    sampler2D FinalImage;
-    sampler2D FXAA;
+    sampler2D c_shadow_map;
+    sampler3D c_voxel_map;
+    sampler3D c_voxel_normal_map;
+    sampler3D c_voxel_emissive_map;
+    sampler2D c_gbuffer_albedo_map;
+    sampler2D c_gbuffer_position_metallic_map;
+    sampler2D c_gbuffer_normal_roughness_map;
+    sampler2D c_gbuffer_depth_map;
+    sampler2D c_ssao_map;
+    sampler2D c_kernel_noise_map;
+    sampler2D c_fxaa_image;
+    sampler2D c_fxaa_input_image;
     Sampler2DArray LightIconTextures[MAX_LIGHT_ICON];
     Sampler2DArray AlbedoMaps[MAX_MATERIALS];
     Sampler2DArray NormalMaps[MAX_MATERIALS];

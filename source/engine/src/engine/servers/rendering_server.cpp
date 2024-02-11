@@ -8,22 +8,25 @@
 /////
 #include "core/collections/rid_owner.h"
 #include "core/dynamic_variable/common_dvars.h"
-#include "rendering/passes.h"
 #include "rendering/r_defines.h"
 #include "rendering/r_editor.h"
 #include "rendering/shader_program_manager.h"
 #include "scene/scene_manager.h"
 #include "servers/display_server.h"
+#include "servers/rendering/rendering_dvars.h"
 #include "vsinput.glsl.h"
+
+// @TODO: refactor
+#include "rendering/render_graph/render_graph_vxgi.h"
 
 /// textures
 GpuTexture g_albedoVoxel;
 GpuTexture g_normalVoxel;
-
-static std::vector<std::shared_ptr<MaterialData>> g_materialdata;
+MeshData g_box;
 
 // @TODO: fix this
-vct::RIDAllocator<MeshData> g_gpu_mesh;
+vct::RIDAllocator<MeshData> g_meshes;
+vct::RIDAllocator<MaterialData> g_materials;
 
 static GLuint g_noiseTexture;
 
@@ -34,7 +37,7 @@ static void buffer_storage(GLuint buffer, const std::vector<T>& data) {
     glNamedBufferStorage(buffer, sizeof(T) * data.size(), data.data(), 0);
 }
 
-static inline void BindToSlot(GLuint buffer, int slot, int size) {
+static inline void bind_to_slot(GLuint buffer, int slot, int size) {
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glVertexAttribPointer(slot, size, GL_FLOAT, GL_FALSE, size * sizeof(float), 0);
     glEnableVertexAttribArray(slot);
@@ -70,7 +73,8 @@ bool RenderingServer::initialize() {
 
     createGpuResources();
 
-    g_gpu_mesh.set_description("GPU-Mesh-Allocator");
+    g_meshes.set_description("GPU-Mesh-Allocator");
+    g_materials.set_description("GPU-Material-Allocator");
     return true;
 }
 
@@ -102,31 +106,31 @@ static void create_mesh_data(const MeshComponent& mesh, MeshData& out_mesh) {
 
     slot = get_position_slot();
     // @TODO: refactor these
-    BindToSlot(out_mesh.vbos[slot], slot, 3);
+    bind_to_slot(out_mesh.vbos[slot], slot, 3);
     buffer_storage(out_mesh.vbos[slot], mesh.positions);
 
     if (has_normals) {
         slot = get_normal_slot();
-        BindToSlot(out_mesh.vbos[slot], slot, 3);
+        bind_to_slot(out_mesh.vbos[slot], slot, 3);
         buffer_storage(out_mesh.vbos[slot], mesh.normals);
     }
     if (has_uvs) {
         slot = get_uv_slot();
-        BindToSlot(out_mesh.vbos[slot], slot, 2);
+        bind_to_slot(out_mesh.vbos[slot], slot, 2);
         buffer_storage(out_mesh.vbos[slot], mesh.texcoords_0);
     }
     if (has_tangents) {
         slot = get_tangent_slot();
-        BindToSlot(out_mesh.vbos[slot], slot, 3);
+        bind_to_slot(out_mesh.vbos[slot], slot, 3);
         buffer_storage(out_mesh.vbos[slot], mesh.tangents);
     }
     if (has_joints) {
         slot = get_bone_id_slot();
-        BindToSlot(out_mesh.vbos[slot], slot, 4);
+        bind_to_slot(out_mesh.vbos[slot], slot, 4);
         buffer_storage(out_mesh.vbos[slot], mesh.joints_0);
         DEV_ASSERT(!mesh.weights_0.empty());
         slot = get_bone_weight_slot();
-        BindToSlot(out_mesh.vbos[slot], slot, 4);
+        bind_to_slot(out_mesh.vbos[slot], slot, 4);
         buffer_storage(out_mesh.vbos[slot], mesh.weights_0);
     }
 
@@ -139,57 +143,59 @@ static void create_mesh_data(const MeshComponent& mesh, MeshData& out_mesh) {
 void RenderingServer::begin_scene(Scene& scene) {
     // create mesh
     for (const auto& mesh : scene.get_component_array<MeshComponent>()) {
-        RID rid = g_gpu_mesh.make_rid();
+        RID rid = g_meshes.make_rid();
         mesh.gpu_resource = rid;
-        create_mesh_data(mesh, *g_gpu_mesh.get_or_null(rid));
+        create_mesh_data(mesh, *g_meshes.get_or_null(rid));
     }
 
     // create material
     DEV_ASSERT(scene.get_count<MaterialComponent>() < array_length(g_constantCache.cache.AlbedoMaps));
 
     for (int idx = 0; idx < scene.get_count<MaterialComponent>(); ++idx) {
-        const auto& mat = scene.get_component_array<MaterialComponent>()[idx];
+        const MaterialComponent& material_component = scene.get_component_array<MaterialComponent>()[idx];
 
-        auto matData = std::make_shared<MaterialData>();
+        RID rid = g_materials.make_rid();
+        material_component.gpu_resource = rid;
+        MaterialData* material = g_materials.get_or_null(rid);
+        DEV_ASSERT(material);
 
         {
-            const std::string& textureMap = mat.mTextures[MaterialComponent::Base].name;
-            matData->albedoColor = mat.mBaseColor;
+            const std::string& textureMap = material_component.mTextures[MaterialComponent::Base].name;
+            material->albedoColor = material_component.mBaseColor;
             if (!textureMap.empty()) {
-                matData->albedoMap.create_texture2d_from_image(textureMap);
-                g_constantCache.cache.AlbedoMaps[idx].data = gl::MakeTextureResident(matData->albedoMap.GetHandle());
+                material->albedoMap.create_texture2d_from_image(textureMap);
+                g_constantCache.cache.AlbedoMaps[idx].data = gl::MakeTextureResident(material->albedoMap.GetHandle());
             }
         }
 
         {
-            const std::string& textureMap = mat.mTextures[MaterialComponent::MetallicRoughness].name;
-            matData->metallic = mat.mMetallic;
-            matData->roughness = mat.mRoughness;
+            const std::string& textureMap = material_component.mTextures[MaterialComponent::MetallicRoughness].name;
+            material->metallic = material_component.mMetallic;
+            material->roughness = material_component.mRoughness;
             if (!textureMap.empty()) {
-                matData->materialMap.create_texture2d_from_image(textureMap);
-                g_constantCache.cache.PbrMaps[idx].data = gl::MakeTextureResident(matData->materialMap.GetHandle());
+                material->materialMap.create_texture2d_from_image(textureMap);
+                g_constantCache.cache.PbrMaps[idx].data = gl::MakeTextureResident(material->materialMap.GetHandle());
             }
         }
 
         {
-            const std::string& textureMap = mat.mTextures[MaterialComponent::Normal].name;
+            const std::string& textureMap = material_component.mTextures[MaterialComponent::Normal].name;
             if (!textureMap.empty()) {
-                matData->normalMap.create_texture2d_from_image(textureMap);
-                g_constantCache.cache.NormalMaps[idx].data = gl::MakeTextureResident(matData->normalMap.GetHandle());
+                material->normalMap.create_texture2d_from_image(textureMap);
+                g_constantCache.cache.NormalMaps[idx].data = gl::MakeTextureResident(material->normalMap.GetHandle());
                 // LOG("material has bump {}", mat->normalTexture.c_str());
             }
         }
 
-        matData->textureMapIdx = idx;
-
-        g_materialdata.emplace_back(matData);
-        mat.gpuResource = g_materialdata.back().get();
+        material->textureMapIdx = idx;
     }
 
     g_constantCache.Update();
 }
 
+// @TODO: refactor
 static void create_ssao_resource() {
+    // @TODO: save
     // generate sample kernel
     std::uniform_real_distribution<float> randomFloats(0.0f, 1.0f);  // generates random floats between 0.0 and 1.0
     std::default_random_engine generator;
@@ -229,7 +235,7 @@ static void create_ssao_resource() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    g_constantCache.cache.NoiseMap = gl::MakeTextureResident(noiseTexture);
+    g_constantCache.cache.c_kernel_noise_map = gl::MakeTextureResident(noiseTexture);
     g_noiseTexture = noiseTexture;
 }
 
@@ -239,9 +245,29 @@ void RenderingServer::createGpuResources() {
     R_Alloc_Cbuffers();
     R_CreateEditorResource();
 
-    create_passes();
+    // create a dummy box data
+    create_mesh_data(vct::MakeBox(), g_box);
 
-    const int voxelSize = DVAR_GET_INT(r_voxelSize);
+    std::string method(DVAR_GET_STRING(r_render_graph));
+    if (method == "vxgi") {
+        m_method = RENDER_GRAPH_VXGI;
+    } else if (method == "vxgi_debug") {
+        m_method = RENDER_GRAPH_VXGI_DEBUG;
+    }
+
+    switch (m_method) {
+        case vct::RenderingServer::RENDER_GRAPH_VXGI:
+            create_render_graph_vxgi(g_render_graph);
+            break;
+        case vct::RenderingServer::RENDER_GRAPH_VXGI_DEBUG:
+            create_render_graph_vxgi_debug(g_render_graph);
+            break;
+        default:
+            CRASH_NOW();
+            break;
+    }
+
+    const int voxelSize = DVAR_GET_INT(r_voxel_size);
 
     /// create voxel image
     {
@@ -260,46 +286,50 @@ void RenderingServer::createGpuResources() {
     // create box quad
     R_CreateQuad();
 
-    g_constantCache.cache.VoxelAlbedoMap = gl::MakeTextureResident(g_albedoVoxel.GetHandle());
-    g_constantCache.cache.VoxelNormalMap = gl::MakeTextureResident(g_normalVoxel.GetHandle());
+    auto& cache = g_constantCache.cache;
+    cache.c_voxel_map = gl::MakeTextureResident(g_albedoVoxel.GetHandle());
+    cache.c_voxel_normal_map = gl::MakeTextureResident(g_normalVoxel.GetHandle());
 
-    g_constantCache.cache.FXAA =
-        gl::MakeTextureResident(g_fxaa_pass->get_color_attachment(0));
+    // @TODO: refactor
+    std::shared_ptr<RenderPass> pass;
+    pass = g_render_graph.find_pass(SHADOW_PASS);
+    if (pass) {
+        cache.c_shadow_map = gl::MakeTextureResident(pass->get_depth_attachment());
+    }
+    pass = g_render_graph.find_pass(SSAO_PASS);
+    if (pass) {
+        cache.c_ssao_map = gl::MakeTextureResident(pass->get_color_attachment(0));
+    }
 
-    g_constantCache.cache.ShadowMap =
-        gl::MakeTextureResident(g_shadow_pass->get_depth_attachment());
+    switch (m_method) {
+        case vct::RenderingServer::RENDER_GRAPH_VXGI:
+            pass = g_render_graph.find_pass(LIGHTING_PASS);
+            break;
+        case vct::RenderingServer::RENDER_GRAPH_VXGI_DEBUG:
+            pass = g_render_graph.find_pass(VXGI_DEBUG_PASS);
+            break;
+        default:
+            CRASH_NOW();
+            break;
+    }
+    if (pass) {
+        cache.c_fxaa_input_image = gl::MakeTextureResident(pass->get_color_attachment(0));
+    }
+    pass = g_render_graph.find_pass(FXAA_PASS);
+    if (pass) {
+        cache.c_fxaa_image = gl::MakeTextureResident(pass->get_color_attachment(0));
+    }
 
-    g_constantCache.cache.SSAOMap =
-        gl::MakeTextureResident(g_ssao_pass->get_color_attachment(0));
-    g_constantCache.cache.FinalImage =
-        gl::MakeTextureResident(g_lighting_pass->get_color_attachment(0));
-
-    g_constantCache.cache.GbufferDepthMap =
-        gl::MakeTextureResident(g_gbuffer_pass->get_depth_attachment());
-    g_constantCache.cache.GbufferPositionMetallicMap =
-        gl::MakeTextureResident(g_gbuffer_pass->get_color_attachment(0));
-    g_constantCache.cache.GbufferNormalRoughnessMap =
-        gl::MakeTextureResident(g_gbuffer_pass->get_color_attachment(1));
-    g_constantCache.cache.GbufferAlbedoMap =
-        gl::MakeTextureResident(g_gbuffer_pass->get_color_attachment(2));
+    pass = g_render_graph.find_pass(GBUFFER_PASS);
+    if (pass) {
+        cache.c_gbuffer_depth_map = gl::MakeTextureResident(pass->get_depth_attachment());
+        cache.c_gbuffer_position_metallic_map = gl::MakeTextureResident(pass->get_color_attachment(0));
+        cache.c_gbuffer_normal_roughness_map = gl::MakeTextureResident(pass->get_color_attachment(1));
+        cache.c_gbuffer_albedo_map = gl::MakeTextureResident(pass->get_color_attachment(2));
+    }
 
     g_constantCache.Update();
 }
-
-// void MainRenderer::visualizeVoxels() {
-//  glEnable(GL_CULL_FACE);
-//  glEnable(GL_DEPTH_TEST);
-
-// const auto& program = gProgramManager->get(ProgramType::Visualization);
-
-// glBindVertexArray(m_box->vao);
-// program.bind();
-
-// const int size = DVAR_GET_INT(r_voxelSize);
-// glDrawElementsInstanced(GL_TRIANGLES, m_box->count, GL_UNSIGNED_INT, 0, size * size * size);
-
-// program.unbind();
-//}
 
 struct MaterialCache {
     vec4 albedo_color;  // if it doesn't have albedo color, then it's alpha is 0.0f
@@ -321,58 +351,33 @@ struct MaterialCache {
     }
 };
 
-void RenderingServer::renderFrameBufferTextures(int width, int height) {
-    const auto& program = ShaderProgramManager::get(ProgramType::DebugTexture);
-
-    program.bind();
-    glDisable(GL_DEPTH_TEST);
-    glViewport(0, 0, width, height);
-
-    R_DrawQuad();
-
-    program.unbind();
+uint32_t RenderingServer::get_final_image() const {
+    switch (m_method) {
+        case vct::RenderingServer::RENDER_GRAPH_VXGI:
+            return g_render_graph.find_pass(FINAL_PASS)->get_color_attachment(0);
+        case vct::RenderingServer::RENDER_GRAPH_VXGI_DEBUG:
+            return g_render_graph.find_pass(FXAA_PASS)->get_color_attachment(0);
+        default:
+            CRASH_NOW();
+            return 0;
+    }
 }
 
 void RenderingServer::render() {
     check_scene_update();
-
     g_perFrameCache.Update();
-
-    // clear window
-
     g_render_graph.execute();
-    // g_shadow_pass.execute();
-
-    // g_voxelization_pass.execute();
-    // g_gbuffer_pass.execute();
-    // g_ssao_pass.execute();
-    // g_lighting_pass.execute();
-    // g_fxaa_pass.execute();
-
-    // @TODO: make it a pass
-
-    auto [frameW, frameH] = DisplayServer::singleton().get_frame_size();
-    g_viewer_pass->bind();
-    glClearColor(.1f, .1f, .1f, 1.f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    renderFrameBufferTextures(frameW, frameH);
-    g_viewer_pass->unbind();
 }
 
 void RenderingServer::destroyGpuResources() {
-    destroy_passes();
-
     R_DestroyEditorResource();
     R_Destroy_Cbuffers();
 
     glDeleteTextures(1, &g_noiseTexture);
 }
 
-static void APIENTRY gl_debug_callback(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length,
-                                       const char* message, const void* userParam) {
-    vct::unused(length);
-    vct::unused(userParam);
-
+static void APIENTRY gl_debug_callback(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei,
+                                       const char* message, const void*) {
     switch (id) {
         case 131185:
             return;

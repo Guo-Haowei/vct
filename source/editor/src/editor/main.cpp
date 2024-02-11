@@ -2,12 +2,15 @@
 #include "Framework/UIManager.h"
 #include "assets/asset_loader.h"
 #include "core/dynamic_variable/common_dvars.h"
+#include "core/dynamic_variable/dynamic_variable_manager.h"
 #include "core/os/os.h"
 #include "core/os/threads.h"
 #include "core/systems/job_system.h"
 #include "core/utility/command_line.h"
 #include "scene/scene_manager.h"
 #include "servers/display_server_glfw.h"
+#include "servers/rendering/rendering_dvars.h"
+#include "servers/rendering/rendering_misc.h"
 #include "servers/rendering/shader_program_manager.h"
 #include "servers/rendering_server.h"
 
@@ -85,10 +88,11 @@ int main(int argc, const char** argv) {
     OS::singleton().initialize();
 
     register_common_dvars();
+    register_rendering_dvars();
     process_command_line(argc, argv);
 
     // @TODO: better organization
-    DynamicVariable::deserialize();
+    DynamicVariableManager::deserialize();
 
     thread::initialize();
     jobsystem::initialize();
@@ -118,7 +122,7 @@ int main(int argc, const char** argv) {
     jobsystem::finalize();
     thread::finailize();
 
-    DynamicVariable::serialize();
+    DynamicVariableManager::serialize();
 
     OS::singleton().finalize();
 

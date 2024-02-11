@@ -20,6 +20,9 @@ using LoadSuccessFunc = void (*)(void*);
 bool initialize();
 void finalize();
 
+// @TODO: allow load with different loader
+// LOADER_ASSIMP
+// LOADER_TINYGLTF
 void load_scene_async(const std::string& path, LoadSuccessFunc on_success);
 
 std::shared_ptr<File> load_file_sync(const std::string& path);
