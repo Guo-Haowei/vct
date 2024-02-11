@@ -55,18 +55,14 @@ void DebugPanel::RenderInternal(Scene& scene) {
     ImGui::Checkbox("No Texture", (bool*)(DVAR_GET_POINTER(r_no_texture)));
     ImGui::Separator();
 
-    ImGui::Text("CSM");
-    ImGui::Checkbox("Debug CSM", (bool*)(DVAR_GET_POINTER(r_debugCSM)));
-    ImGui::Separator();
-
     ImGui::Text("SSAO");
     ImGui::Checkbox("Enable SSAO", (bool*)(DVAR_GET_POINTER(r_enableSsao)));
     ImGui::Text("SSAO Kernal Radius");
     ImGui::SliderFloat("Kernal Radius", (float*)(DVAR_GET_POINTER(r_ssaoKernelRadius)), 0.1f, 5.0f);
     ImGui::Separator();
 
-    ImGui::Text("c_fxaa_image");
-    ImGui::Checkbox("Enable c_fxaa_image", (bool*)(DVAR_GET_POINTER(r_enableFXAA)));
+    ImGui::Text("FXAA");
+    ImGui::Checkbox("Enable FXAA", (bool*)(DVAR_GET_POINTER(r_enableFXAA)));
     ImGui::Separator();
 
     ImGui::Text("Display Texture");

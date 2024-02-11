@@ -102,7 +102,6 @@ void SceneManager::update(float dt) {
     g_perFrameCache.cache.c_projection_view_matrix = camera.get_projection_view_matrix();
 
     g_perFrameCache.cache.EnableGI = DVAR_GET_BOOL(r_enable_vxgi);
-    g_perFrameCache.cache.DebugCSM = DVAR_GET_BOOL(r_debugCSM);
     g_perFrameCache.cache.DebugTexture = DVAR_GET_INT(r_debugTexture);
     g_perFrameCache.cache.NoTexture = DVAR_GET_BOOL(r_no_texture);
     g_perFrameCache.cache.ScreenWidth = frameW;

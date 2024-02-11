@@ -25,8 +25,8 @@ enum DvarFlags {
 
 class DynamicVariable {
 public:
-    DynamicVariable(VariantType type, uint32_t flags)
-        : m_type(type), m_flags(flags), m_int(0) {}
+    DynamicVariable(VariantType type, uint32_t flags, const char* desc)
+        : m_type(type), m_desc(desc), m_flags(flags), m_int(0) {}
 
     void register_int(std::string_view key, int value);
     void register_float(std::string_view key, float value);
@@ -65,15 +65,14 @@ public:
     void print_value_change(std::string_view source);
 
     VariantType get_type() const { return m_type; }
+    const char* get_desc() const { return m_desc; }
 
     static DynamicVariable* find_dvar(const std::string& name);
     static void register_dvar(std::string_view key, DynamicVariable* dvar);
 
-    static void serialize();
-    static void deserialize();
-
 private:
     const VariantType m_type;
+    const char* m_desc;
     uint32_t m_flags;
 
     union {
@@ -90,6 +89,7 @@ private:
     std::string m_debug_name;
 
     inline static std::unordered_map<std::string, DynamicVariable*> s_map;
+    friend class DynamicVariableManager;
 };
 
 }  // namespace vct

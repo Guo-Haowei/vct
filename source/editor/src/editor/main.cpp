@@ -2,6 +2,7 @@
 #include "Framework/UIManager.h"
 #include "assets/asset_loader.h"
 #include "core/dynamic_variable/common_dvars.h"
+#include "core/dynamic_variable/dynamic_variable_manager.h"
 #include "core/os/os.h"
 #include "core/os/threads.h"
 #include "core/systems/job_system.h"
@@ -91,7 +92,7 @@ int main(int argc, const char** argv) {
     process_command_line(argc, argv);
 
     // @TODO: better organization
-    DynamicVariable::deserialize();
+    DynamicVariableManager::deserialize();
 
     thread::initialize();
     jobsystem::initialize();
@@ -121,7 +122,7 @@ int main(int argc, const char** argv) {
     jobsystem::finalize();
     thread::finailize();
 
-    DynamicVariable::serialize();
+    DynamicVariableManager::serialize();
 
     OS::singleton().finalize();
 

@@ -36,7 +36,7 @@ void shadow_pass_func() {
     glCullFace(GL_FRONT);
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    const int res = DVAR_GET_INT(r_shadowRes);
+    const int res = DVAR_GET_INT(r_shadow_res);
     // render scene 3 times
 
     const uint32_t numObjects = (uint32_t)scene.get_count<ObjectComponent>();
@@ -290,7 +290,7 @@ void final_pass_func() {
 void create_render_graph_deferred_vct(RenderGraph& graph) {
     auto [w, h] = DisplayServer::singleton().get_frame_size();
 
-    const int res = DVAR_GET_INT(r_shadowRes);
+    const int res = DVAR_GET_INT(r_shadow_res);
     DEV_ASSERT(math::is_power_of_two(res));
 
     // @TODO: split resource
