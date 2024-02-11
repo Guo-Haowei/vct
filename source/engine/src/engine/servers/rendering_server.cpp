@@ -17,7 +17,7 @@
 #include "vsinput.glsl.h"
 
 // @TODO: refactor
-#include "rendering/render_graph/render_graph_deferred_vct.h"
+#include "rendering/render_graph/render_graph_vxgi.h"
 
 /// textures
 GpuTexture g_albedoVoxel;
@@ -265,7 +265,7 @@ void RenderingServer::createGpuResources() {
     // create a dummy box data
     create_mesh_data(vct::MakeBox(), s_box);
 
-    create_render_graph_deferred_vct(g_render_graph);
+    create_render_graph_vxgi(g_render_graph);
 
     const int voxelSize = DVAR_GET_INT(r_voxel_size);
 
@@ -320,6 +320,10 @@ struct MaterialCache {
         return *this;
     }
 };
+
+uint32_t RenderingServer::get_final_image() const {
+    return g_render_graph.find_pass(FINAL_PASS_NAME)->get_color_attachment(0);
+}
 
 void RenderingServer::render() {
     check_scene_update();

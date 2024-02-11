@@ -1,4 +1,4 @@
-#include "render_graph_deferred_vct.h"
+#include "render_graph_vxgi.h"
 
 #include "core/collections/rid_owner.h"
 #include "core/math/frustum.h"
@@ -287,7 +287,7 @@ void final_pass_func() {
     program.unbind();
 }
 
-void create_render_graph_deferred_vct(RenderGraph& graph) {
+void create_render_graph_vxgi(RenderGraph& graph) {
     auto [w, h] = DisplayServer::singleton().get_frame_size();
 
     const int res = DVAR_GET_INT(r_shadow_res);
@@ -374,7 +374,61 @@ void create_render_graph_deferred_vct(RenderGraph& graph) {
         graph.add_pass(desc);
     }
 
-    g_final_image = graph.find_pass(FINAL_PASS_NAME)->get_color_attachment(0);
+    // @TODO: allow recompile
+    graph.compile();
+}
+
+void create_render_graph_vxgi_debug(RenderGraph& graph) {
+    auto [w, h] = DisplayServer::singleton().get_frame_size();
+
+    const int res = DVAR_GET_INT(r_shadow_res);
+    DEV_ASSERT(math::is_power_of_two(res));
+
+    // @TODO: split resource
+    {  // shadow pass
+        RenderPassDesc desc;
+        desc.name = SHADOW_PASS_NAME;
+        desc.depth_attachment = RenderTargetDesc{ SHADOW_PASS_OUTPUT, FORMAT_D32_FLOAT };
+        desc.func = shadow_pass_func;
+        desc.width = res;
+        desc.height = res;
+
+        graph.add_pass(desc);
+    }
+    {  // voxel pass
+        RenderPassDesc desc;
+        desc.type = RENDER_PASS_COMPUTE;
+        desc.name = VOXELIZATION_PASS_NAME;
+        desc.dependencies = { SHADOW_PASS_NAME };
+        desc.func = voxelization_pass_func;
+
+        graph.add_pass(desc);
+    }
+    {  // voxel visualization pass
+        RenderPassDesc desc;
+        desc.name = VOXEL_VISUALIZATION_PASS_NAME;
+        desc.dependencies = { VOXELIZATION_PASS_NAME };
+        desc.color_attachments = {
+            RenderTargetDesc{ VOXEL_VISUALIZATION_OUTPUT_COLOR, FORMAT_R8G8B8A8_UINT },
+        };
+        desc.depth_attachment = RenderTargetDesc{ VOXEL_VISUALIZATION_OUTPUT_DEPTH, FORMAT_D32_FLOAT };
+        desc.func = gbuffer_pass_func;
+        desc.width = w;
+        desc.height = h;
+
+        graph.add_pass(desc);
+    }
+    {  // vier pass(final pass)
+        RenderPassDesc desc;
+        desc.name = FINAL_PASS_NAME;
+        desc.dependencies = { VOXEL_VISUALIZATION_PASS_NAME };
+        desc.color_attachments = { RenderTargetDesc{ "viewer_map", FORMAT_R8G8B8A8_UINT } };
+        desc.width = w;
+        desc.height = h;
+        desc.func = final_pass_func;
+
+        graph.add_pass(desc);
+    }
 
     // @TODO: allow recompile
     graph.compile();

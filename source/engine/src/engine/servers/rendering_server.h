@@ -23,6 +23,8 @@ public:
     void gbufferPass();
     void vctPass();
 
+    uint32_t get_final_image() const;
+
 private:
     GpuTexture m_lightIcons[MAX_LIGHT_ICON];
 };
