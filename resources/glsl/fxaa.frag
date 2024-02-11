@@ -15,7 +15,7 @@ float rgb2luma(vec3 rgb) { return sqrt(dot(rgb, vec3(0.299, 0.587, 0.114))); }
 
 void main() {
     const vec2 uv = pass_uv;
-    const vec3 colorCenter = texture(c_final_image, uv).rgb;
+    const vec3 colorCenter = texture(c_fxaa_input_image, uv).rgb;
     out_color = vec4(colorCenter, 1.0);
     return;
 #if 0
@@ -30,10 +30,10 @@ void main() {
     const vec2 inverseScreenSize = vec2( 1.0 / float( ScreenWidth ), 1.0 / float( ScreenHeight ) );
 
     // Luma at the four direct neighbours of the current fragment.
-    const float lumaDown  = rgb2luma( texture( c_final_image, uv + inverseScreenSize * vec2( 0, -1 ) ).rgb );
-    const float lumaUp    = rgb2luma( texture( c_final_image, uv + inverseScreenSize * vec2( 0, 1 ) ).rgb );
-    const float lumaLeft  = rgb2luma( texture( c_final_image, uv + inverseScreenSize * vec2( -1, 0 ) ).rgb );
-    const float lumaRight = rgb2luma( texture( c_final_image, uv + inverseScreenSize * vec2( 1, 0 ) ).rgb );
+    const float lumaDown  = rgb2luma( texture( c_fxaa_input_image, uv + inverseScreenSize * vec2( 0, -1 ) ).rgb );
+    const float lumaUp    = rgb2luma( texture( c_fxaa_input_image, uv + inverseScreenSize * vec2( 0, 1 ) ).rgb );
+    const float lumaLeft  = rgb2luma( texture( c_fxaa_input_image, uv + inverseScreenSize * vec2( -1, 0 ) ).rgb );
+    const float lumaRight = rgb2luma( texture( c_fxaa_input_image, uv + inverseScreenSize * vec2( 1, 0 ) ).rgb );
 
     // Find the maximum and minimum luma around the current fragment.
     const float lumaMin = min( lumaCenter, min( min( lumaDown, lumaUp ), min( lumaLeft, lumaRight ) ) );
@@ -50,10 +50,10 @@ void main() {
     }
 
     // Query the 4 remaining corners lumas.
-    const float lumaDownLeft  = rgb2luma( texture( c_final_image, uv + inverseScreenSize * vec2( -1, -1 ) ).rgb );
-    const float lumaUpRight   = rgb2luma( texture( c_final_image, uv + inverseScreenSize * vec2( 1, 1 ) ).rgb );
-    const float lumaUpLeft    = rgb2luma( texture( c_final_image, uv + inverseScreenSize * vec2( -1, 1 ) ).rgb );
-    const float lumaDownRight = rgb2luma( texture( c_final_image, uv + inverseScreenSize * vec2( 1, -1 ) ).rgb );
+    const float lumaDownLeft  = rgb2luma( texture( c_fxaa_input_image, uv + inverseScreenSize * vec2( -1, -1 ) ).rgb );
+    const float lumaUpRight   = rgb2luma( texture( c_fxaa_input_image, uv + inverseScreenSize * vec2( 1, 1 ) ).rgb );
+    const float lumaUpLeft    = rgb2luma( texture( c_fxaa_input_image, uv + inverseScreenSize * vec2( -1, 1 ) ).rgb );
+    const float lumaDownRight = rgb2luma( texture( c_fxaa_input_image, uv + inverseScreenSize * vec2( 1, -1 ) ).rgb );
 
     // Combine the four edges lumas (using intermediary variables for future computations with the same values).
     const float lumaDownUp    = lumaDown + lumaUp;
@@ -120,8 +120,8 @@ void main() {
     vec2 uv2 = currentUv + offset;
 
     // Read the lumas at both current extremities of the exploration segment, and compute the delta wrt to the local average luma.
-    float lumaEnd1 = rgb2luma( texture( c_final_image, uv1 ).rgb );
-    float lumaEnd2 = rgb2luma( texture( c_final_image, uv2 ).rgb );
+    float lumaEnd1 = rgb2luma( texture( c_fxaa_input_image, uv1 ).rgb );
+    float lumaEnd2 = rgb2luma( texture( c_fxaa_input_image, uv2 ).rgb );
     lumaEnd1 -= lumaLocalAverage;
     lumaEnd2 -= lumaLocalAverage;
 
@@ -152,13 +152,13 @@ void main() {
             // If needed, read luma in 1st direction, compute delta.
             if ( !reached1 )
             {
-                lumaEnd1 = rgb2luma( texture( c_final_image, uv1 ).rgb );
+                lumaEnd1 = rgb2luma( texture( c_fxaa_input_image, uv1 ).rgb );
                 lumaEnd1 = lumaEnd1 - lumaLocalAverage;
             }
             // If needed, read luma in opposite direction, compute delta.
             if ( !reached2 )
             {
-                lumaEnd2 = rgb2luma( texture( c_final_image, uv2 ).rgb );
+                lumaEnd2 = rgb2luma( texture( c_fxaa_input_image, uv2 ).rgb );
                 lumaEnd2 = lumaEnd2 - lumaLocalAverage;
             }
             // If the luma deltas at the current extremities is larger than the local gradient, we have reached the side of the edge.
@@ -232,7 +232,7 @@ void main() {
     }
 
     // Read the color at the new UV coordinates, and use it.
-    vec3 finalColor = texture( c_final_image, finalUv ).rgb;
+    vec3 finalColor = texture( c_fxaa_input_image, finalUv ).rgb;
     out_color       = vec4( finalColor, 1.0 );
     out_color       = vec4( finalUv, 0.0, 1.0 );
 #endif

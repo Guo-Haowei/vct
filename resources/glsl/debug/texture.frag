@@ -36,7 +36,6 @@ void main() {
         }
         default:
             out_color = vec4(texture(c_fxaa_image, pass_uv).rgba);
-            // out_color = vec4( texture( c_final_image, pass_uv ).rgba );
             break;
     }
 }

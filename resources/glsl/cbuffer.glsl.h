@@ -99,7 +99,7 @@ CONSTANT_BUFFER(PerSceneConstantBuffer, 3) {
     sampler2D c_ssao_map;
     sampler2D c_kernel_noise_map;
     sampler2D c_fxaa_image;
-    sampler2D c_final_image;
+    sampler2D c_fxaa_input_image;
     Sampler2DArray LightIconTextures[MAX_LIGHT_ICON];
     Sampler2DArray AlbedoMaps[MAX_MATERIALS];
     Sampler2DArray NormalMaps[MAX_MATERIALS];

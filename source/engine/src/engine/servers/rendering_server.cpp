@@ -22,7 +22,7 @@
 /// textures
 GpuTexture g_albedoVoxel;
 GpuTexture g_normalVoxel;
-static MeshData s_box;
+MeshData g_box;
 
 // @TODO: fix this
 vct::RIDAllocator<MeshData> g_meshes;
@@ -41,24 +41,6 @@ static inline void bind_to_slot(GLuint buffer, int slot, int size) {
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glVertexAttribPointer(slot, size, GL_FLOAT, GL_FALSE, size * sizeof(float), 0);
     glEnableVertexAttribArray(slot);
-}
-
-void debug_voxels() {
-    // @TODO: fix viusulization
-    auto [width, height] = vct::DisplayServer::singleton().get_frame_size();
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
-    glViewport(0, 0, width, height);
-
-    const auto& program = vct::ShaderProgramManager::get(vct::PROGRAM_DEBUG_VOXEL);
-
-    glBindVertexArray(s_box.vao);
-    program.bind();
-
-    const int size = DVAR_GET_INT(r_voxel_size);
-    glDrawElementsInstanced(GL_TRIANGLES, s_box.count, GL_UNSIGNED_INT, 0, size * size * size);
-
-    program.unbind();
 }
 
 namespace vct {
@@ -92,6 +74,7 @@ bool RenderingServer::initialize() {
     createGpuResources();
 
     g_meshes.set_description("GPU-Mesh-Allocator");
+    g_materials.set_description("GPU-Material-Allocator");
     return true;
 }
 
@@ -263,9 +246,26 @@ void RenderingServer::createGpuResources() {
     R_CreateEditorResource();
 
     // create a dummy box data
-    create_mesh_data(vct::MakeBox(), s_box);
+    create_mesh_data(vct::MakeBox(), g_box);
 
-    create_render_graph_vxgi(g_render_graph);
+    std::string method(DVAR_GET_STRING(r_render_graph));
+    if (method == "vxgi") {
+        m_method = RENDER_GRAPH_VXGI;
+    } else if (method == "vxgi_debug") {
+        m_method = RENDER_GRAPH_VXGI_DEBUG;
+    }
+
+    switch (m_method) {
+        case vct::RenderingServer::RENDER_GRAPH_VXGI:
+            create_render_graph_vxgi(g_render_graph);
+            break;
+        case vct::RenderingServer::RENDER_GRAPH_VXGI_DEBUG:
+            create_render_graph_vxgi_debug(g_render_graph);
+            break;
+        default:
+            CRASH_NOW();
+            break;
+    }
 
     const int voxelSize = DVAR_GET_INT(r_voxel_size);
 
@@ -286,17 +286,47 @@ void RenderingServer::createGpuResources() {
     // create box quad
     R_CreateQuad();
 
-    g_constantCache.cache.c_voxel_map = gl::MakeTextureResident(g_albedoVoxel.GetHandle());
-    g_constantCache.cache.c_voxel_normal_map = gl::MakeTextureResident(g_normalVoxel.GetHandle());
-    g_constantCache.cache.c_fxaa_image = gl::MakeTextureResident(g_render_graph.find_pass(FXAA_PASS_NAME)->get_color_attachment(0));
-    g_constantCache.cache.c_shadow_map = gl::MakeTextureResident(g_render_graph.find_pass(SHADOW_PASS_NAME)->get_depth_attachment());
-    g_constantCache.cache.c_ssao_map = gl::MakeTextureResident(g_render_graph.find_pass(SSAO_PASS_NAME)->get_color_attachment(0));
-    g_constantCache.cache.c_final_image = gl::MakeTextureResident(g_render_graph.find_pass(LIGHTING_PASS_NAME)->get_color_attachment(0));
-    auto gbuffer_pass = g_render_graph.find_pass(GBUFFER_PASS_NAME);
-    g_constantCache.cache.c_gbuffer_depth_map = gl::MakeTextureResident(gbuffer_pass->get_depth_attachment());
-    g_constantCache.cache.c_gbuffer_position_metallic_map = gl::MakeTextureResident(gbuffer_pass->get_color_attachment(0));
-    g_constantCache.cache.c_gbuffer_normal_roughness_map = gl::MakeTextureResident(gbuffer_pass->get_color_attachment(1));
-    g_constantCache.cache.c_gbuffer_albedo_map = gl::MakeTextureResident(gbuffer_pass->get_color_attachment(2));
+    auto& cache = g_constantCache.cache;
+    cache.c_voxel_map = gl::MakeTextureResident(g_albedoVoxel.GetHandle());
+    cache.c_voxel_normal_map = gl::MakeTextureResident(g_normalVoxel.GetHandle());
+
+    // @TODO: refactor
+    std::shared_ptr<RenderPass> pass;
+    pass = g_render_graph.find_pass(SHADOW_PASS);
+    if (pass) {
+        cache.c_shadow_map = gl::MakeTextureResident(pass->get_depth_attachment());
+    }
+    pass = g_render_graph.find_pass(SSAO_PASS);
+    if (pass) {
+        cache.c_ssao_map = gl::MakeTextureResident(pass->get_color_attachment(0));
+    }
+
+    switch (m_method) {
+        case vct::RenderingServer::RENDER_GRAPH_VXGI:
+            pass = g_render_graph.find_pass(LIGHTING_PASS);
+            break;
+        case vct::RenderingServer::RENDER_GRAPH_VXGI_DEBUG:
+            pass = g_render_graph.find_pass(VXGI_DEBUG_PASS);
+            break;
+        default:
+            CRASH_NOW();
+            break;
+    }
+    if (pass) {
+        cache.c_fxaa_input_image = gl::MakeTextureResident(pass->get_color_attachment(0));
+    }
+    pass = g_render_graph.find_pass(FXAA_PASS);
+    if (pass) {
+        cache.c_fxaa_image = gl::MakeTextureResident(pass->get_color_attachment(0));
+    }
+
+    pass = g_render_graph.find_pass(GBUFFER_PASS);
+    if (pass) {
+        cache.c_gbuffer_depth_map = gl::MakeTextureResident(pass->get_depth_attachment());
+        cache.c_gbuffer_position_metallic_map = gl::MakeTextureResident(pass->get_color_attachment(0));
+        cache.c_gbuffer_normal_roughness_map = gl::MakeTextureResident(pass->get_color_attachment(1));
+        cache.c_gbuffer_albedo_map = gl::MakeTextureResident(pass->get_color_attachment(2));
+    }
 
     g_constantCache.Update();
 }
@@ -322,7 +352,15 @@ struct MaterialCache {
 };
 
 uint32_t RenderingServer::get_final_image() const {
-    return g_render_graph.find_pass(FINAL_PASS_NAME)->get_color_attachment(0);
+    switch (m_method) {
+        case vct::RenderingServer::RENDER_GRAPH_VXGI:
+            return g_render_graph.find_pass(FINAL_PASS)->get_color_attachment(0);
+        case vct::RenderingServer::RENDER_GRAPH_VXGI_DEBUG:
+            return g_render_graph.find_pass(FXAA_PASS)->get_color_attachment(0);
+        default:
+            CRASH_NOW();
+            return 0;
+    }
 }
 
 void RenderingServer::render() {
@@ -338,11 +376,8 @@ void RenderingServer::destroyGpuResources() {
     glDeleteTextures(1, &g_noiseTexture);
 }
 
-static void APIENTRY gl_debug_callback(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length,
-                                       const char* message, const void* userParam) {
-    vct::unused(length);
-    vct::unused(userParam);
-
+static void APIENTRY gl_debug_callback(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei,
+                                       const char* message, const void*) {
     switch (id) {
         case 131185:
             return;

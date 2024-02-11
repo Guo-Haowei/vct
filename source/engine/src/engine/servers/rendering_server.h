@@ -9,6 +9,12 @@ namespace vct {
 
 class RenderingServer : public Singleton<RenderingServer>, public SceneListener {
 public:
+    enum {
+        RENDER_GRAPH_NONE,
+        RENDER_GRAPH_VXGI,
+        RENDER_GRAPH_VXGI_DEBUG,
+    };
+
     RenderingServer() : SceneListener("renderer") {}
 
     bool initialize();
@@ -20,13 +26,11 @@ public:
     void render();
     void destroyGpuResources();
 
-    void gbufferPass();
-    void vctPass();
-
     uint32_t get_final_image() const;
 
 private:
     GpuTexture m_lightIcons[MAX_LIGHT_ICON];
+    int m_method = RENDER_GRAPH_NONE;
 };
 
 }  // namespace vct
