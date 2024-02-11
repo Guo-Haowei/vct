@@ -19,7 +19,7 @@ enum RenderPassType {
 struct RenderPassDesc {
     RenderPassType type = RENDER_PASS_SHADING;
     std::string name;
-    std::vector<std::string> inputs;
+    std::vector<std::string> dependencies;
     std::vector<RenderTargetDesc> color_attachments;
     std::optional<RenderTargetDesc> depth_attachment;
     RenderPassFunc func = nullptr;

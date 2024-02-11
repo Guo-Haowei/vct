@@ -16,7 +16,7 @@ void RenderPass::execute() {
 
 void RenderPass::create_internal(RenderPassDesc& desc) {
     m_name = std::move(desc.name);
-    m_inputs = std::move(desc.inputs);
+    m_inputs = std::move(desc.dependencies);
     for (const auto& output : desc.color_attachments) {
         m_outputs.emplace_back(output.name);
     }

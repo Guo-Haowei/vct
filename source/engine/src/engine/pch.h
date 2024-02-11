@@ -18,12 +18,15 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <queue>
+#include <set>
 #include <span>
 #include <string>
 #include <string_view>
 #include <thread>
 #include <type_traits>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "core/error/error_macros.h"

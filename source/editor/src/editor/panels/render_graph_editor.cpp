@@ -3,29 +3,47 @@
 
 extern vct::RenderGraph g_render_graph;
 
-template<typename T, std::size_t N>
-struct Array {
-    T data[N];
-    const size_t size() const { return N; }
-
-    const T operator[](size_t index) const { return data[index]; }
-    operator T*() {
-        T* p = new T[N];
-        memcpy(p, data, sizeof(data));
-        return p;
-    }
-};
-
-template<typename T, typename... U>
-Array(T, U...) -> Array<T, 1 + sizeof...(U)>;
+namespace vct {
 
 struct RenderGraphEditorDelegate : public GraphEditor::Delegate {
-    bool AllowedLink(GraphEditor::NodeIndex from, GraphEditor::NodeIndex to) override {
+
+    RenderGraphEditorDelegate(const RenderGraph& graph) {
+        float x_offset = 0.0f;
+        for (auto& level : graph.m_levels) {
+            float y_offset = 0.0f;
+            for (int id : level) {
+                const std::shared_ptr<vct::RenderPass>& pass = graph.m_render_passes[id];
+
+                mNodes.push_back(
+                    {
+                        pass->get_name().c_str(),
+                        0,
+                        x_offset,
+                        y_offset,
+                        false,
+                    });
+                y_offset += 300.f;
+            }
+            x_offset += 300.f;
+        }
+
+        for (const auto& pair : graph.m_links) {
+            GraphEditor::Link link{
+                .mInputNodeIndex = pair.first,
+                .mInputSlotIndex = 0,
+                .mOutputNodeIndex = pair.second,
+                .mOutputSlotIndex = 0,
+            };
+            mLinks.emplace_back(link);
+        }
+    }
+
+    bool AllowedLink(GraphEditor::NodeIndex, GraphEditor::NodeIndex) override {
         return true;
     }
 
-    void SelectNode(GraphEditor::NodeIndex nodeIndex, bool selected) override {
-        mNodes[nodeIndex].mSelected = selected;
+    void SelectNode(GraphEditor::NodeIndex, bool) override {
+        // mNodes[nodeIndex].mSelected = selected;
     }
 
     void MoveSelectedNodes(const ImVec2 delta) override {
@@ -38,7 +56,7 @@ struct RenderGraphEditorDelegate : public GraphEditor::Delegate {
         }
     }
 
-    virtual void RightClick(GraphEditor::NodeIndex nodeIndex, GraphEditor::SlotIndex slotIndexInput, GraphEditor::SlotIndex slotIndexOutput) override {
+    virtual void RightClick(GraphEditor::NodeIndex, GraphEditor::SlotIndex, GraphEditor::SlotIndex) override {
     }
 
     void AddLink(GraphEditor::NodeIndex inputNodeIndex, GraphEditor::SlotIndex inputSlotIndex, GraphEditor::NodeIndex outputNodeIndex, GraphEditor::SlotIndex outputSlotIndex) override {
@@ -50,9 +68,9 @@ struct RenderGraphEditorDelegate : public GraphEditor::Delegate {
     }
 
     void CustomDraw(ImDrawList* drawList, ImRect rectangle, GraphEditor::NodeIndex nodeIndex) override {
-        vct::unused(drawList);
-        vct::unused(rectangle);
-        vct::unused(nodeIndex);
+        unused(drawList);
+        unused(rectangle);
+        unused(nodeIndex);
         // drawList->AddLine(rectangle.Min, rectangle.Max, IM_COL32(0, 0, 0, 255));
         // drawList->AddText(rectangle.Min, IM_COL32(255, 128, 64, 255), "Add your stuff here");
     }
@@ -94,12 +112,12 @@ struct RenderGraphEditorDelegate : public GraphEditor::Delegate {
             IM_COL32(100, 100, 140, 255),
             IM_COL32(110, 110, 150, 255),
             1,
-            Array{ "Input" },
+            nullptr,
             nullptr,
             1,
-            Array{ "Output" },
             nullptr,
-        }
+            nullptr,
+        },
     };
 
     struct Node {
@@ -112,40 +130,15 @@ struct RenderGraphEditorDelegate : public GraphEditor::Delegate {
     std::vector<Node> mNodes;
     std::vector<GraphEditor::Link> mLinks;
 };
+}  // namespace vct
 
 void dummy_graph_editor() {
     // Graph Editor
     static GraphEditor::Options options;
-    static RenderGraphEditorDelegate delegate;
+    static vct::RenderGraphEditorDelegate delegate(g_render_graph);
     static GraphEditor::ViewState viewState;
     static GraphEditor::FitOnScreen fit = GraphEditor::Fit_None;
     static bool showGraphEditor = true;
-
-    if (delegate.mLinks.empty()) {
-        for (const auto& pair : g_render_graph.m_links) {
-            GraphEditor::Link link{
-                .mInputNodeIndex = pair.first,
-                .mInputSlotIndex = 0,
-                .mOutputNodeIndex = pair.second,
-                .mOutputSlotIndex = 0,
-            };
-            delegate.mLinks.emplace_back(link);
-        }
-
-        float offset = 0;
-        for (int node_index : g_render_graph.m_sorted_order) {
-            const std::shared_ptr<vct::RenderPass>& pass = g_render_graph.m_render_passes[node_index];
-            delegate.mNodes.push_back(
-                {
-                    pass->get_name().c_str(),
-                    0,
-                    (200 * offset),
-                    (200 * offset),
-                    false,
-                });
-            ++offset;
-        }
-    }
 
     if (showGraphEditor) {
         ImGui::Begin("Graph Editor", NULL, 0);

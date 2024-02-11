@@ -1,4 +1,5 @@
 #pragma once
+#include "core/collections/graph.h"
 #include "render_pass.h"
 
 namespace vct {
@@ -13,13 +14,15 @@ public:
 
     void execute();
 
-public:
+private:
     std::vector<std::shared_ptr<RenderPass>> m_render_passes;
     std::vector<int> m_sorted_order;
     std::vector<std::pair<int, int>> m_links;
+    std::vector<std::vector<int>> m_levels;
 
-private:
     std::map<std::string, int> m_render_pass_lookup;
+
+    friend struct RenderGraphEditorDelegate;
 };
 
 }  // namespace vct

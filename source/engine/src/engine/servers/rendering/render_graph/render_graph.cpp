@@ -22,92 +22,48 @@ std::shared_ptr<RenderPass> RenderGraph::find_pass(const std::string& name) {
 }
 
 void RenderGraph::compile() {
-    const int pass_count = (int)m_render_passes.size();
+    const int num_passes = (int)m_render_passes.size();
 
-    std::map<std::string, int> m_output_owner;
-    for (int pass_index = 0; pass_index < pass_count; ++pass_index) {
-        const std::shared_ptr<RenderPass>& pass = m_render_passes[pass_index];
-        for (const std::string& output : pass->m_outputs) {
-            DEV_ASSERT(m_output_owner.find(output) == m_output_owner.end());
-            m_output_owner[output] = pass_index;
-        }
-    }
+    Graph graph(num_passes);
 
-    const size_t alloc_size = sizeof(bool) * pass_count * pass_count;
-    bool* dependencies = (bool*)malloc(alloc_size);
-    memset(dependencies, 0, alloc_size);
-
-    for (int pass_index = 0; pass_index < pass_count; ++pass_index) {
+    for (int pass_index = 0; pass_index < num_passes; ++pass_index) {
         const std::shared_ptr<RenderPass>& pass = m_render_passes[pass_index];
         for (const std::string& input : pass->m_inputs) {
-            auto it = m_output_owner.find(input);
-            if (it == m_output_owner.end()) {
+            auto it = m_render_pass_lookup.find(input);
+            if (it == m_render_pass_lookup.end()) {
                 CRASH_NOW_MSG(std::format("dependency '{}' not found", input));
             } else {
-                dependencies[pass_index * pass_count + it->second] = true;
+                graph.add_edge(it->second, pass_index);
             }
         }
     }
 
-    // @TODO: check for circular dependency
-
-    std::vector<int> order;
-    for (int i = 0; i < pass_count; ++i) {
-        order.push_back(i);
+    if (graph.has_cycle()) {
+        CRASH_NOW_MSG("render graph has cycle");
     }
 
-    // @TODO: remove redundant dependencies
+    graph.remove_redundant();
 
-    // sort
-    while (true) {
-        // @TODO: refactor
-        bool all_sorted = true;
-        for (int index : order) {
-            if (index != -1) {
-                all_sorted = false;
-            }
+    m_levels = graph.build_level();
+    m_sorted_order.reserve(num_passes);
+    for (const auto& level : m_levels) {
+        for (int i : level) {
+            m_sorted_order.emplace_back(i);
         }
-        if (all_sorted) {
-            break;
-        }
+    }
 
-        for (int pass_index : order) {
-            if (pass_index == -1) {
-                continue;
-            }
-
-            bool has_dependency = false;
-            for (size_t dependency_index = 0; dependency_index < pass_count; ++dependency_index) {
-                bool sorted = std::find(m_sorted_order.begin(), m_sorted_order.end(), dependency_index) != m_sorted_order.end();
-                if (sorted) {
-                    continue;
-                }
-                if (dependencies[pass_index * pass_count + dependency_index]) {
-                    has_dependency = true;
-                    break;
+    for (int i = 1; i < (int)m_levels.size(); ++i) {
+        for (int from : m_levels[i - 1]) {
+            for (int to : m_levels[i]) {
+                if (graph.has_edge(from, to)) {
+                    const RenderPass* a = m_render_passes[from].get();
+                    const RenderPass* b = m_render_passes[to].get();
+                    LOG_VERBOSE("[render graph] dependency from '{}' to '{}'", a->get_name(), b->get_name());
+                    m_links.push_back({ from, to });
                 }
             }
-
-            if (has_dependency) {
-                continue;
-            }
-
-            order[pass_index] = -1;
-            m_sorted_order.push_back(pass_index);
-            break;
         }
     }
-
-    // links
-    for (int pass_index = 0; pass_index < pass_count; ++pass_index) {
-        for (int dependency_index = 0; dependency_index < pass_count; ++dependency_index) {
-            if (dependencies[pass_index * pass_count + dependency_index]) {
-                m_links.emplace_back(std::make_pair(dependency_index, pass_index));
-            }
-        }
-    }
-
-    free(dependencies);
 }
 
 void RenderGraph::execute() {

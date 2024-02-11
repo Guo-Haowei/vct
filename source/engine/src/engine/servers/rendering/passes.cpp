@@ -88,32 +88,10 @@ void create_passes() {
         g_render_graph.add_pass(desc);
         g_shadow_pass = g_render_graph.find_pass(SHADOW_PASS_NAME);
     }
-    {
-        RenderPassDesc desc;
-        desc.type = RENDER_PASS_COMPUTE;
-        desc.name = VOXELIZATION_PASS_NAME;
-        desc.inputs = { SHADOW_PASS_OUTPUT };
-        desc.func = voxelization_pass_func;
-
-        g_render_graph.add_pass(desc);
-        g_voxelization_pass = g_render_graph.find_pass(VOXELIZATION_PASS_NAME);
-    }
-    {  // ssao pass
-        RenderPassDesc desc;
-        desc.name = SSAO_PASS_NAME;
-        desc.inputs = { GBUFFER_PASS_OUTPUT_NORMAL };
-        desc.color_attachments = { RenderTargetDesc{ SSAO_PASS_OUTPUT, FORMAT_R32_FLOAT } };
-        desc.func = ssao_pass_func;
-        desc.width = w;
-        desc.height = h;
-
-        g_render_graph.add_pass(desc);
-        g_ssao_pass = g_render_graph.find_pass(SSAO_PASS_NAME);
-    }
     {  // gbuffer pass
         RenderPassDesc desc;
         desc.name = GBUFFER_PASS_NAME;
-        desc.inputs = {};
+        desc.dependencies = {};
         desc.color_attachments = {
             RenderTargetDesc{ GBUFFER_PASS_OUTPUT_POSITION, FORMAT_R16G16B16A16_FLOAT },
             RenderTargetDesc{ GBUFFER_PASS_OUTPUT_NORMAL, FORMAT_R16G16B16A16_FLOAT },
@@ -127,10 +105,32 @@ void create_passes() {
         g_render_graph.add_pass(desc);
         g_gbuffer_pass = g_render_graph.find_pass(GBUFFER_PASS_NAME);
     }
+    {  // voxel pass
+        RenderPassDesc desc;
+        desc.type = RENDER_PASS_COMPUTE;
+        desc.name = VOXELIZATION_PASS_NAME;
+        desc.dependencies = { SHADOW_PASS_NAME };
+        desc.func = voxelization_pass_func;
+
+        g_render_graph.add_pass(desc);
+        g_voxelization_pass = g_render_graph.find_pass(VOXELIZATION_PASS_NAME);
+    }
+    {  // ssao pass
+        RenderPassDesc desc;
+        desc.name = SSAO_PASS_NAME;
+        desc.dependencies = { GBUFFER_PASS_NAME };
+        desc.color_attachments = { RenderTargetDesc{ SSAO_PASS_OUTPUT, FORMAT_R32_FLOAT } };
+        desc.func = ssao_pass_func;
+        desc.width = w;
+        desc.height = h;
+
+        g_render_graph.add_pass(desc);
+        g_ssao_pass = g_render_graph.find_pass(SSAO_PASS_NAME);
+    }
     {  // lighting pass
         RenderPassDesc desc;
         desc.name = LIGHTING_PASS_NAME;
-        desc.inputs = { GBUFFER_PASS_OUTPUT_POSITION, SHADOW_PASS_OUTPUT, SSAO_PASS_OUTPUT };
+        desc.dependencies = { GBUFFER_PASS_NAME, SHADOW_PASS_NAME, SSAO_PASS_NAME, VOXELIZATION_PASS_NAME };
         desc.color_attachments = { RenderTargetDesc{ LIGHTING_PASS_OUTPUT, FORMAT_R8G8B8A8_UINT } };
         desc.func = deferred_vct_pass;
         desc.width = w;
@@ -142,7 +142,7 @@ void create_passes() {
     {  // fxaa pass
         RenderPassDesc desc;
         desc.name = FXAA_PASS_NAME;
-        desc.inputs = { LIGHTING_PASS_OUTPUT };
+        desc.dependencies = { LIGHTING_PASS_NAME };
         desc.color_attachments = { RenderTargetDesc{ FXAA_PASS_OUTPUT, FORMAT_R8G8B8A8_UINT } };
         desc.func = fxaa_pass;
         desc.width = w;
@@ -154,7 +154,7 @@ void create_passes() {
     {  // vier pass(final pass)
         RenderPassDesc desc;
         desc.name = FINAL_PASS_NAME;
-        desc.inputs = { FXAA_PASS_OUTPUT };
+        desc.dependencies = { FXAA_PASS_NAME };
         desc.color_attachments = { RenderTargetDesc{ "viewer_map", FORMAT_R8G8B8A8_UINT } };
         // desc.func = ;
         desc.width = w;
