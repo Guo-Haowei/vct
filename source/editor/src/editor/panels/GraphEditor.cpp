@@ -385,7 +385,7 @@ static bool HandleConnections(ImDrawList* drawList,
                         break;
                     }
                     bool alreadyExisting = false;
-                    for (size_t linkIndex = 0; linkIndex < linkCount; linkIndex++) {
+                    for (int linkIndex = 0; linkIndex < (int)linkCount; linkIndex++) {
                         const auto link = delegate.GetLink(linkIndex);
                         if (!memcmp(&link, &nl, sizeof(Link))) {
                             alreadyExisting = true;
@@ -468,8 +468,8 @@ static bool DrawNode(ImDrawList* drawList,
 
     // test nested IO
     drawList->ChannelsSetCurrent(1);  // Background
-    const size_t InputsCount = nodeTemplate.mInputCount;
-    const size_t OutputsCount = nodeTemplate.mOutputCount;
+    // const size_t InputsCount = nodeTemplate.mInputCount;
+    // const size_t OutputsCount = nodeTemplate.mOutputCount;
 
     /*
     for (int i = 0; i < 2; i++)
@@ -516,8 +516,8 @@ static bool DrawNode(ImDrawList* drawList,
         if ((nodeWidgetsActive || nodeMovingActive) && !inMinimap) {
             if (!node.mSelected) {
                 if (!io.KeyShift) {
-                    const auto nodeCount = delegate.GetNodeCount();
-                    for (size_t i = 0; i < nodeCount; i++) {
+                    const int nodeCount = (int)delegate.GetNodeCount();
+                    for (int i = 0; i < nodeCount; i++) {
                         delegate.SelectNode(i, false);
                     }
                 }

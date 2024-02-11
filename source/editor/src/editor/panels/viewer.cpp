@@ -77,7 +77,7 @@ void Viewer::RenderInternal(Scene& scene) {
     ImVec2 bottom_right(top_left.x + contentSize.x, top_left.y + contentSize.y);
     ImVec2 top_right = ImVec2(bottom_right.x, top_left.y);
 
-    ImGui::GetWindowDrawList()->AddImage((ImTextureID)g_final_image, top_left, bottom_right, ImVec2(0, 1), ImVec2(1, 0));
+    ImGui::GetWindowDrawList()->AddImage((ImTextureID)(uint64_t)g_final_image, top_left, bottom_right, ImVec2(0, 1), ImVec2(1, 0));
 
     // draw gizmo
 
