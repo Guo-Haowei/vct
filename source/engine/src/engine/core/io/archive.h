@@ -31,6 +31,23 @@ public:
         return *this;
     }
 
+    template<typename T>
+    Archive& operator<<(const std::vector<T>& value) {
+        uint64_t size = value.size();
+        write(size);
+        write(value.data(), sizeof(T) * size);
+        return *this;
+    }
+
+    template<typename T>
+    Archive& operator>>(std::vector<T>& value) {
+        uint64_t size = 0;
+        read(size);
+        value.resize(size);
+        read(value.data(), sizeof(T) * size);
+        return *this;
+    }
+
     template<typename T, class = typename std::enable_if<std::is_trivially_copyable<T>::value>::type>
     Archive& operator<<(const T& value) {
         write(&value, sizeof(T));

@@ -71,7 +71,7 @@ void Scene::merge(Scene& other) {
 
 Entity Scene::create_name_entity(const std::string& name) {
     Entity entity = Entity::create();
-    create<TagComponent>(entity).set_tag(name);
+    create<NameComponent>(entity).set_name(name);
     return entity;
 }
 
@@ -224,7 +224,7 @@ void Scene::attach_component(Entity child, Entity parent) {
     }
 
     HierarchyComponent& hier = m_HierarchyComponents.create(child);
-    hier.mParent = parent;
+    hier.m_parent_id = parent;
 }
 
 void Scene::detach_component(Entity entity) {
@@ -341,7 +341,7 @@ void Scene::update_hierarchy(uint32_t index) {
     TransformComponent* childTrans = get_component<TransformComponent>(child);
     if (childTrans) {
         const HierarchyComponent* hier = &m_HierarchyComponents[index];
-        Entity parent = hier->mParent;
+        Entity parent = hier->m_parent_id;
         mat4 W = childTrans->get_local_matrix();
 
         while (parent.is_valid()) {
@@ -351,7 +351,7 @@ void Scene::update_hierarchy(uint32_t index) {
             }
 
             if ((hier = get_component<HierarchyComponent>(parent)) != nullptr) {
-                parent = hier->mParent;
+                parent = hier->m_parent_id;
                 DEV_ASSERT(parent.is_valid());
             } else {
                 parent.make_invalid();
@@ -405,7 +405,7 @@ void Scene::serialize(Archive& archive) {
     // mGenerator.serialize(archive);
     m_root.serialize(archive);
 
-    m_TagComponents.serialize(archive);
+    m_NameComponents.serialize(archive);
     m_TransformComponents.serialize(archive);
     m_HierarchyComponents.serialize(archive);
     m_MaterialComponents.serialize(archive);
@@ -424,7 +424,7 @@ Scene::RayIntersectionResult Scene::Intersects(Ray& ray) {
     for (int objIdx = 0; objIdx < get_count<ObjectComponent>(); ++objIdx) {
         Entity entity = get_entity<ObjectComponent>(objIdx);
         ObjectComponent& object = get_component_array<ObjectComponent>()[objIdx];
-        MeshComponent* mesh = get_component<MeshComponent>(object.meshID);
+        MeshComponent* mesh = get_component<MeshComponent>(object.mesh_id);
         TransformComponent* transform = get_component<TransformComponent>(entity);
         DEV_ASSERT(mesh && transform);
 

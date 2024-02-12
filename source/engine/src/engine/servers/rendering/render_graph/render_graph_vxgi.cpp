@@ -52,8 +52,8 @@ void shadow_pass_func() {
             ecs::Entity entity = scene.get_entity<ObjectComponent>(i);
             DEV_ASSERT(scene.contains<TransformComponent>(entity));
             const TransformComponent& transform = *scene.get_component<TransformComponent>(entity);
-            DEV_ASSERT(scene.contains<MeshComponent>(obj.meshID));
-            const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
+            DEV_ASSERT(scene.contains<MeshComponent>(obj.mesh_id));
+            const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.mesh_id);
 
             const mat4& M = transform.get_world_matrix();
             AABB aabb = mesh.local_bound;
@@ -113,8 +113,8 @@ void voxelization_pass_func() {
         ecs::Entity entity = scene.get_entity<ObjectComponent>(i);
         DEV_ASSERT(scene.contains<TransformComponent>(entity));
         const TransformComponent& transform = *scene.get_component<TransformComponent>(entity);
-        DEV_ASSERT(scene.contains<MeshComponent>(obj.meshID));
-        const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
+        DEV_ASSERT(scene.contains<MeshComponent>(obj.mesh_id));
+        const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.mesh_id);
 
         const mat4& M = transform.get_world_matrix();
         g_perBatchCache.cache.c_model_matrix = M;
@@ -177,9 +177,9 @@ void gbuffer_pass_func() {
         ecs::Entity entity = scene.get_entity<ObjectComponent>(i);
         DEV_ASSERT(scene.contains<TransformComponent>(entity));
         const TransformComponent& transform = *scene.get_component<TransformComponent>(entity);
-        DEV_ASSERT(scene.contains<MeshComponent>(obj.meshID));
+        DEV_ASSERT(scene.contains<MeshComponent>(obj.mesh_id));
 
-        const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.meshID);
+        const MeshComponent& mesh = *scene.get_component<MeshComponent>(obj.mesh_id);
 
         const mat4& M = transform.get_world_matrix();
         AABB aabb = mesh.local_bound;

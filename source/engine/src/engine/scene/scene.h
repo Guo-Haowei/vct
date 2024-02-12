@@ -112,7 +112,7 @@ public:                                                                         
 
     ecs::ComponentLibrary m_component_lib;
 
-    REGISTER_COMPONENT(TagComponent, 0);
+    REGISTER_COMPONENT(NameComponent, 0);
     REGISTER_COMPONENT(TransformComponent, 0);
     REGISTER_COMPONENT(HierarchyComponent, 0);
     REGISTER_COMPONENT(MaterialComponent, 0);

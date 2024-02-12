@@ -20,8 +20,8 @@ auto SceneImporter::import() -> std::expected<void, std::string> {
     // process images
     LOG_VERBOSE("[{}] loading {} images...", m_loader_name, m_scene.get_count<MaterialComponent>());
     for (const MaterialComponent& material : m_scene.get_component_array<MaterialComponent>()) {
-        for (int i = 0; i < array_length(material.mTextures); ++i) {
-            const std::string& image_path = material.mTextures[i].name;
+        for (int i = 0; i < array_length(material.textures); ++i) {
+            const std::string& image_path = material.textures[i].name;
             if (!image_path.empty()) {
                 asset_loader::load_image_sync(image_path);
             }
@@ -44,8 +44,8 @@ auto SceneImporter::import() -> std::expected<void, std::string> {
         ecs::Entity entity = m_scene.get_entity<ObjectComponent>(i);
         DEV_ASSERT(m_scene.contains<TransformComponent>(entity));
         const TransformComponent& transform = *m_scene.get_component<TransformComponent>(entity);
-        DEV_ASSERT(m_scene.contains<MeshComponent>(obj.meshID));
-        const MeshComponent& mesh = *m_scene.get_component<MeshComponent>(obj.meshID);
+        DEV_ASSERT(m_scene.contains<MeshComponent>(obj.mesh_id));
+        const MeshComponent& mesh = *m_scene.get_component<MeshComponent>(obj.mesh_id);
 
         mat4 M = transform.get_world_matrix();
         AABB aabb = mesh.local_bound;

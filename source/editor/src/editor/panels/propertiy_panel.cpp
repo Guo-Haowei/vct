@@ -140,15 +140,15 @@ void PropertyPanel::update_internal(Scene& scene) {
         return;
     }
 
-    TagComponent* tagComponent = scene.get_component<TagComponent>(id);
+    NameComponent* tagComponent = scene.get_component<NameComponent>(id);
     if (!tagComponent) {
         LOG_WARN("Entity {} does not have name", id.get_id());
         return;
     }
 
-    std::string tag = tagComponent->get_tag();
+    std::string tag = tagComponent->get_name();
     if (ImGui::InputText("##Tag", tag.data(), tag.capacity(), ImGuiInputTextFlags_EnterReturnsTrue)) {
-        tagComponent->set_tag(tag);
+        tagComponent->set_name(tag);
     }
 
     ImGui::SameLine();
@@ -233,11 +233,11 @@ void PropertyPanel::update_internal(Scene& scene) {
 
     ObjectComponent* objectComponent = scene.get_component<ObjectComponent>(id);
     DrawComponent("Object", objectComponent, [&](ObjectComponent& object) {
-        MeshComponent* mesh = scene.get_component<MeshComponent>(object.meshID);
-        TagComponent* meshName = scene.get_component<TagComponent>(object.meshID);
-        ImGui::Text("Mesh Component (%d)", object.meshID);
+        MeshComponent* mesh = scene.get_component<MeshComponent>(object.mesh_id);
+        NameComponent* meshName = scene.get_component<NameComponent>(object.mesh_id);
+        ImGui::Text("Mesh Component (%d)", object.mesh_id);
         if (mesh) {
-            const char* meshNameStr = meshName ? meshName->get_tag().c_str() : "untitled";
+            const char* meshNameStr = meshName ? meshName->get_name().c_str() : "untitled";
             ImGui::Text("mesh %s (%zu submesh)", meshNameStr, mesh->subsets.size());
             ImGui::Text("%zu triangles", mesh->indices.size() / 3);
             ImGui::Text("v:%zu, n:%zu, u:%zu, b:%zu", mesh->positions.size(), mesh->normals.size(),

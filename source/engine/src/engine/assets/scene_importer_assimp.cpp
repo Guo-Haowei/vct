@@ -44,7 +44,7 @@ bool SceneImporterAssimp::import_impl() {
     }
 
     ecs::Entity root = process_node(aiscene->mRootNode, ecs::Entity::INVALID);
-    m_scene.get_component<TagComponent>(root)->set_tag(m_scene_name);
+    m_scene.get_component<NameComponent>(root)->set_name(m_scene_name);
 
     m_scene.m_root = root;
     return true;
@@ -67,15 +67,15 @@ void SceneImporterAssimp::process_material(aiMaterial& material) {
     if (path.empty()) {
         path = getMaterialPath(aiTextureType_DIFFUSE, 0);
     }
-    materialComponent->mTextures[MaterialComponent::Base].name = path;
+    materialComponent->textures[MaterialComponent::TEXTURE_BASE].name = path;
 
     path = getMaterialPath(aiTextureType_NORMALS, 0);
     if (path.empty()) {
         path = getMaterialPath(aiTextureType_HEIGHT, 0);
     }
-    materialComponent->mTextures[MaterialComponent::Normal].name = path;
+    materialComponent->textures[MaterialComponent::TEXTURE_NORMAL].name = path;
 
-    materialComponent->mTextures[MaterialComponent::MetallicRoughness].name =
+    materialComponent->textures[MaterialComponent::TEXTURE_METALLIC_ROUGHNESS].name =
         getMaterialPath(AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE);
 
     m_materials.emplace_back(material_id);
@@ -134,16 +134,16 @@ ecs::Entity SceneImporterAssimp::process_node(const aiNode* node, ecs::Entity pa
         entity = m_scene.create_object_entity("Geometry::" + key);
 
         ObjectComponent& objComponent = *m_scene.get_component<ObjectComponent>(entity);
-        objComponent.meshID = m_meshes[node->mMeshes[0]];
+        objComponent.mesh_id = m_meshes[node->mMeshes[0]];
     } else {  // else make it a transform/bone node
         entity = m_scene.create_transform_entity("Node::" + key);
 
         for (uint32_t i = 0; i < node->mNumMeshes; ++i) {
             ecs::Entity child = m_scene.create_object_entity("");
-            auto tagComponent = m_scene.get_component<TagComponent>(child);
-            tagComponent->set_tag("SubGeometry_" + std::to_string(child.get_id()));
+            auto tagComponent = m_scene.get_component<NameComponent>(child);
+            tagComponent->set_name("SubGeometry_" + std::to_string(child.get_id()));
             ObjectComponent& objComponent = *m_scene.get_component<ObjectComponent>(child);
-            objComponent.meshID = m_meshes[node->mMeshes[i]];
+            objComponent.mesh_id = m_meshes[node->mMeshes[i]];
             m_scene.attach_component(child, entity);
         }
     }

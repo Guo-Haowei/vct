@@ -10,24 +10,24 @@ class Archive;
 class Scene;
 
 //--------------------------------------------------------------------------------------------------
-// Tag Component
+// Name Component
 //--------------------------------------------------------------------------------------------------
-class TagComponent {
+class NameComponent {
 public:
-    TagComponent() = default;
+    NameComponent() = default;
 
-    TagComponent(const char* tag) { m_tag = tag; }
+    NameComponent(const char* tag) { m_name = tag; }
 
-    void set_tag(const char* tag) { m_tag = tag; }
-    void set_tag(const std::string& tag) { m_tag = tag; }
+    void set_name(const char* tag) { m_name = tag; }
+    void set_name(const std::string& tag) { m_name = tag; }
 
-    const std::string& get_tag() const { return m_tag; }
-    std::string& get_tag_ref() { return m_tag; }
+    const std::string& get_name() const { return m_name; }
+    std::string& get_name_ref() { return m_name; }
 
     void serialize(Archive& archive);
 
 private:
-    std::string m_tag;
+    std::string m_name;
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -79,6 +79,21 @@ private:
 
     // Non-serialized attributes
     mat4 m_world_matrix = mat4(1);
+};
+
+//--------------------------------------------------------------------------------------------------
+// Hierarchy Component
+//--------------------------------------------------------------------------------------------------
+class HierarchyComponent {
+public:
+    ecs::Entity GetParent() const { return m_parent_id; }
+
+    void serialize(Archive& archive);
+
+private:
+    ecs::Entity m_parent_id;
+
+    friend class Scene;
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -213,25 +228,62 @@ struct MeshComponent {
 //--------------------------------------------------------------------------------------------------
 struct MaterialComponent {
     // @TODO: refactor
-    enum ETextureSlot {
-        Base,
-        Normal,
-        MetallicRoughness,
-        Count,
+    enum TextureSlot {
+        TEXTURE_BASE,
+        TEXTURE_NORMAL,
+        TEXTURE_METALLIC_ROUGHNESS,
+        TEXTURE_MAX,
     };
 
     struct TextureMap {
         std::string name;
     };
-    TextureMap mTextures[ETextureSlot::Count];
+    TextureMap textures[TEXTURE_MAX];
 
     // @TODO: refactor
-    float mMetallic = 0.0f;
-    float mRoughness = 1.0f;
-    vec4 mBaseColor = vec4(1);
+    float metallic = 0.0f;
+    float roughness = 1.0f;
+    vec4 base_color = vec4(1);
 
     // Non-serialized
     mutable RID gpu_resource;
+
+    void serialize(Archive& archive);
+};
+
+//--------------------------------------------------------------------------------------------------
+// Light Component
+//--------------------------------------------------------------------------------------------------
+struct LightComponent {
+    enum Type {
+        LIGHT_TYPE_NONE,
+        LIGHT_TYPE_POINT,
+        LIGHT_TYPE_OMNI,
+        LIGHT_TYPE_MAX,
+    };
+
+    vec3 color = vec3(1);
+    float energy = 10.0f;
+    Type type = LIGHT_TYPE_NONE;
+
+    void serialize(Archive& archive);
+};
+
+//--------------------------------------------------------------------------------------------------
+// Object Compoinent
+//--------------------------------------------------------------------------------------------------
+struct ObjectComponent {
+    enum FLAGS {
+        NONE = 0,
+        RENDERABLE = 1 << 0,
+        CAST_SHADOW = 1 << 1,
+        DYNAMIC = 1 << 2,
+    };
+
+    uint32_t flags = RENDERABLE | CAST_SHADOW;
+
+    /// mesh
+    ecs::Entity mesh_id;
 
     void serialize(Archive& archive);
 };
@@ -286,34 +338,6 @@ struct AnimationComponent {
 //
 //--------------------------------------------------------------------------------------------------
 // @TODO: refactor
-class HierarchyComponent {
-public:
-    ecs::Entity GetParent() const { return mParent; }
-
-    void serialize(Archive& archive);
-
-private:
-    ecs::Entity mParent;
-
-    friend class Scene;
-};
-
-struct ObjectComponent {
-    enum FLAGS {
-        NONE = 0,
-        RENDERABLE = 1 << 0,
-        CAST_SHADOW = 1 << 1,
-        DYNAMIC = 1 << 2,
-    };
-
-    uint32_t flags = RENDERABLE | CAST_SHADOW;
-
-    /// mesh
-    ecs::Entity meshID;
-
-    void serialize(Archive& archive);
-};
-
 struct ArmatureComponent {
     enum FLAGS {
         NONE = 0,
@@ -347,14 +371,6 @@ struct RigidBodyPhysicsComponent {
         SphereParam sphere;
     } param;
     float mass = 1.0f;
-
-    void serialize(Archive& archive);
-};
-
-struct LightComponent {
-    // LIGHT_TYPE type = LIGHT_TYPE_NONE;
-    vec3 color = vec3(1);
-    float energy = 10.0f;
 
     void serialize(Archive& archive);
 };

@@ -6,13 +6,13 @@
 namespace vct {
 
 //--------------------------------------------------------------------------------------------------
-// Tag Component
+// Name Component
 //--------------------------------------------------------------------------------------------------
-void TagComponent::serialize(Archive& archive) {
+void NameComponent::serialize(Archive& archive) {
     if (archive.is_write_mode()) {
-        archive << m_tag;
+        archive << m_name;
     } else {
-        archive >> m_tag;
+        archive >> m_name;
     }
 }
 
@@ -88,6 +88,13 @@ void TransformComponent::serialize(Archive& archive) {
         archive >> m_rotation;
         set_dirty();
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+// Hierachy Component
+//--------------------------------------------------------------------------------------------------
+void HierarchyComponent::serialize(Archive& archive) {
+    m_parent_id.serialize(archive);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -193,13 +200,6 @@ void MeshComponent::create_render_data() {
     return;
 }
 
-void MeshComponent::serialize(Archive& archive) {
-    CRASH_NOW();
-    if (archive.is_write_mode()) {
-    } else {
-    }
-}
-
 std::vector<char> MeshComponent::generate_combined_buffer() const {
     std::vector<char> result;
     result.resize(vertex_buffer_size);
@@ -223,39 +223,101 @@ std::vector<char> MeshComponent::generate_combined_buffer() const {
     return result;
 }
 
+void MeshComponent::serialize(Archive& archive) {
+    if (archive.is_write_mode()) {
+        archive << flags;
+        archive << indices;
+        archive << positions;
+        archive << normals;
+        archive << tangents;
+        archive << texcoords_0;
+        archive << texcoords_1;
+        archive << joints_0;
+        archive << weights_0;
+        archive << color_0;
+        archive << subsets;
+        archive << armature_id;
+    } else {
+        archive >> flags;
+        archive >> indices;
+        archive >> positions;
+        archive >> normals;
+        archive >> tangents;
+        archive >> texcoords_0;
+        archive >> texcoords_1;
+        archive >> joints_0;
+        archive >> weights_0;
+        archive >> color_0;
+        archive >> subsets;
+        archive >> armature_id;
+
+        create_render_data();
+    }
+}
+
 //--------------------------------------------------------------------------------------------------
 // Material Component
 //--------------------------------------------------------------------------------------------------
 void MaterialComponent::serialize(Archive& archive) {
     if (archive.is_write_mode()) {
-        archive << mMetallic;
-        archive << mRoughness;
-        archive << mBaseColor;
+        archive << metallic;
+        archive << roughness;
+        archive << base_color;
+        for (int i = 0; i < TEXTURE_MAX; ++i) {
+            archive << textures[i].name;
+        }
     } else {
-        archive >> mMetallic;
-        archive >> mRoughness;
-        archive >> mBaseColor;
+        archive >> metallic;
+        archive >> roughness;
+        archive >> base_color;
+        for (int i = 0; i < TEXTURE_MAX; ++i) {
+            archive >> textures[i].name;
+        }
     }
+
+    // @TODO: request image
+}
+
+//--------------------------------------------------------------------------------------------------
+// Light Component
+//--------------------------------------------------------------------------------------------------
+void LightComponent::serialize(Archive& archive) {
+    if (archive.is_write_mode()) {
+        archive << type;
+        archive << color;
+        archive << energy;
+    } else {
+        archive >> type;
+        archive >> color;
+        archive >> energy;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+// Object Component
+//--------------------------------------------------------------------------------------------------
+void ObjectComponent::serialize(Archive& archive) {
+    mesh_id.serialize(archive);
 }
 
 //--------------------------------------------------------------------------------------------------
 // Animation Component
 //--------------------------------------------------------------------------------------------------
 void AnimationComponent::serialize(Archive& archive) {
-    unused(archive);
     CRASH_NOW_MSG("NOT IMPLMENTED");
+    if (archive.is_write_mode()) {
+    } else {
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
 //
 //--------------------------------------------------------------------------------------------------
-void HierarchyComponent::serialize(Archive& archive) { mParent.serialize(archive); }
-
-void ObjectComponent::serialize(Archive& archive) { meshID.serialize(archive); }
-
 void ArmatureComponent::serialize(Archive& archive) {
-    unused(archive);
     CRASH_NOW_MSG("NOT IMPLMENTED");
+    if (archive.is_write_mode()) {
+    } else {
+    }
 }
 
 void RigidBodyPhysicsComponent::serialize(Archive& archive) {
@@ -268,22 +330,6 @@ void RigidBodyPhysicsComponent::serialize(Archive& archive) {
         archive >> param;
         archive >> mass;
     }
-}
-
-void LightComponent::serialize(Archive& archive) {
-    (void)archive;
-    // if (archive.is_write_mode())
-    // {
-    //     archive << type;
-    //     archive << color;
-    //     archive << energy;
-    // }
-    // else
-    // {
-    //     archive >> type;
-    //     archive >> color;
-    //     archive >> energy;
-    // }
 }
 
 }  // namespace vct

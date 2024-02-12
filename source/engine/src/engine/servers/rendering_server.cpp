@@ -160,8 +160,8 @@ void RenderingServer::begin_scene(Scene& scene) {
         DEV_ASSERT(material);
 
         {
-            const std::string& textureMap = material_component.mTextures[MaterialComponent::Base].name;
-            material->albedoColor = material_component.mBaseColor;
+            const std::string& textureMap = material_component.textures[MaterialComponent::TEXTURE_BASE].name;
+            material->albedoColor = material_component.base_color;
             if (!textureMap.empty()) {
                 material->albedoMap.create_texture2d_from_image(textureMap);
                 g_constantCache.cache.c_albedo_maps[idx].data = gl::MakeTextureResident(material->albedoMap.GetHandle());
@@ -169,9 +169,9 @@ void RenderingServer::begin_scene(Scene& scene) {
         }
 
         {
-            const std::string& textureMap = material_component.mTextures[MaterialComponent::MetallicRoughness].name;
-            material->metallic = material_component.mMetallic;
-            material->roughness = material_component.mRoughness;
+            const std::string& textureMap = material_component.textures[MaterialComponent::TEXTURE_METALLIC_ROUGHNESS].name;
+            material->metallic = material_component.metallic;
+            material->roughness = material_component.roughness;
             if (!textureMap.empty()) {
                 material->materialMap.create_texture2d_from_image(textureMap);
                 g_constantCache.cache.c_pbr_maps[idx].data = gl::MakeTextureResident(material->materialMap.GetHandle());
@@ -179,7 +179,7 @@ void RenderingServer::begin_scene(Scene& scene) {
         }
 
         {
-            const std::string& textureMap = material_component.mTextures[MaterialComponent::Normal].name;
+            const std::string& textureMap = material_component.textures[MaterialComponent::TEXTURE_NORMAL].name;
             if (!textureMap.empty()) {
                 material->normalMap.create_texture2d_from_image(textureMap);
                 g_constantCache.cache.c_normal_maps[idx].data = gl::MakeTextureResident(material->normalMap.GetHandle());

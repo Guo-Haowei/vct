@@ -124,7 +124,7 @@ void Viewer::update_gizmo(Scene& scene, CameraComponent& camera) {
         if (transform_component) {
             auto object_component = scene.get_component<ObjectComponent>(*m_selected);
             if (object_component) {
-                auto mesh_component = scene.get_component<MeshComponent>(object_component->meshID);
+                auto mesh_component = scene.get_component<MeshComponent>(object_component->mesh_id);
                 DEV_ASSERT(mesh_component);
                 AABB aabb = mesh_component->local_bound;
                 aabb.apply_matrix(transform_component->get_world_matrix());
