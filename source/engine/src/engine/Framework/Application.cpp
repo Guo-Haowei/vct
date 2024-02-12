@@ -25,6 +25,8 @@ int Application::Run(int, const char**) {
         "\nMain Loop"
         "\n********************************************************************************");
 
+    LOG_ERROR("TODO: physics");
+    LOG_WARN("TODO: load lua scene");
     LOG_ERROR("TODO: FXAA");
     LOG_WARN("TODO: TAA");
     LOG_ERROR("TODO: soft shadow");
