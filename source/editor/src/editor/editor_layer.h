@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Framework/Application.h"
+#include "core/framework/application.h"
 #include "panels/panel.h"
 #include "scene/scene.h"
 
@@ -14,11 +14,11 @@ public:
     void Render() override;
 
 private:
-    void DockSpace();
-    void AddPanel(std::shared_ptr<Panel> panel);
+    void dock_space();
+    void add_panel(std::shared_ptr<Panel> panel);
 
-    std::vector<std::shared_ptr<Panel>> mPanels;
-    ecs::Entity mSelected;
+    std::vector<std::shared_ptr<Panel>> m_panels;
+    ecs::Entity m_selected;
 };
 
 }  // namespace vct

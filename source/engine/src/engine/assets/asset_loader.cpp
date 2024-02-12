@@ -1,8 +1,8 @@
 #include "asset_loader.h"
 
 #include "assets/image_loader.h"
-#include "assets/scene_loader_assimp.h"
-#include "assets/scene_loader_tinygltf.h"
+#include "assets/scene_importer_assimp.h"
+#include "assets/scene_importer_tinygltf.h"
 #include "core/collections/thread_safe_ring_buffer.h"
 #include "core/dynamic_variable/common_dvars.h"
 #include "core/io/file_access.h"

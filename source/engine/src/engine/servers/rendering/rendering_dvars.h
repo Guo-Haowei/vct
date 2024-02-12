@@ -3,7 +3,7 @@
 // GFX
 DVAR_STRING(r_backend, 0, "Renderer backend", "opengl");
 DVAR_STRING(r_render_graph, 0, "Renderer graph", "vxgi");
-DVAR_BOOL(r_gpu_validation, 0, "Enable GPU validation", false);
+DVAR_BOOL(r_gpu_validation, 0, "Enable GPU validation", true);
 
 // voxel GI
 DVAR_INT(r_voxel_size, 0, "Voxel size", 64);

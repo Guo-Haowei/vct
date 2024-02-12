@@ -3,9 +3,9 @@
 
 namespace vct {
 
-class SceneLoader {
+class SceneImporter {
 public:
-    SceneLoader(Scene& scene, const std::string& file_path, const char* loader_name);
+    SceneImporter(Scene& scene, const std::string& file_path, const char* loader_name);
 
     auto import() -> std::expected<void, std::string>;
 

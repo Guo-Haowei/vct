@@ -1,4 +1,4 @@
-#include "EditorLayer.h"
+#include "editor_layer.h"
 
 #include "imgui/imgui_internal.h"
 #include "servers/rendering/r_cbuffers.h"
@@ -19,21 +19,21 @@
 namespace vct {
 
 EditorLayer::EditorLayer() : Layer("EditorLayer") {
-    AddPanel(std::make_shared<RenderGraphEditor>());
-    AddPanel(std::make_shared<AnimationPanel>());
-    AddPanel(std::make_shared<ConsolePanel>());
-    AddPanel(std::make_shared<DebugPanel>());
-    AddPanel(std::make_shared<HierarchyPanel>());
-    AddPanel(std::make_shared<PropertyPanel>());
-    AddPanel(std::make_shared<Viewer>());
+    add_panel(std::make_shared<RenderGraphEditor>());
+    add_panel(std::make_shared<AnimationPanel>());
+    add_panel(std::make_shared<ConsolePanel>());
+    add_panel(std::make_shared<DebugPanel>());
+    add_panel(std::make_shared<HierarchyPanel>());
+    add_panel(std::make_shared<PropertyPanel>());
+    add_panel(std::make_shared<Viewer>());
 }
 
-void EditorLayer::AddPanel(std::shared_ptr<Panel> panel) {
-    mPanels.emplace_back(panel);
-    panel->set_selected_ref(&mSelected);
+void EditorLayer::add_panel(std::shared_ptr<Panel> panel) {
+    m_panels.emplace_back(panel);
+    panel->set_selected_ref(&m_selected);
 }
 
-void EditorLayer::DockSpace() {
+void EditorLayer::dock_space() {
     ImGui::GetMainViewport();
 
     static bool opt_padding = false;
@@ -77,13 +77,13 @@ void EditorLayer::DockSpace() {
 }
 
 void EditorLayer::Update(float) {
-    DockSpace();
+    dock_space();
     Scene& scene = SceneManager::get_scene();
-    for (auto& it : mPanels) {
+    for (auto& it : m_panels) {
         it->update(scene);
     }
 
-    scene.m_selected = mSelected;
+    scene.m_selected = m_selected;
 }
 
 void EditorLayer::Render() {

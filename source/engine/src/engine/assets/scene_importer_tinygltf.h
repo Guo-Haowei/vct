@@ -1,4 +1,4 @@
-#include "scene_loader.h"
+#include "scene_importer.h"
 
 namespace tinygltf {
 class Model;
@@ -8,10 +8,10 @@ struct Mesh;
 
 namespace vct {
 
-class SceneLoaderTinyGLTF : public SceneLoader {
+class SceneImporterTinyGLTF : public SceneImporter {
 public:
-    SceneLoaderTinyGLTF(Scene& scene, const std::string& file_path)
-        : SceneLoader(scene, file_path, "SceneLoaderTinyGLTF") {}
+    SceneImporterTinyGLTF(Scene& scene, const std::string& file_path)
+        : SceneImporter(scene, file_path, "SceneLoaderTinyGLTF") {}
 
     bool import_impl() override;
 

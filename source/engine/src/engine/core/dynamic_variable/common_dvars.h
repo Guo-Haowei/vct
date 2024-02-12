@@ -8,11 +8,11 @@ DVAR_IVEC2(window_resolution, DVAR_FLAG_SERIALIZE | DVAR_FLAG_DESERIALIZE, "Requ
 DVAR_IVEC2(window_position, DVAR_FLAG_SERIALIZE | DVAR_FLAG_DESERIALIZE, "Request window position", 40, 40);
 
 // IO
-DVAR_BOOL(verbose, DVAR_FLAG_NONE, "Print verbose log", false);
+DVAR_BOOL(verbose, 0, "Print verbose log", true);
 
 // cache
 DVAR_STRING(recent_files, DVAR_FLAG_SERIALIZE | DVAR_FLAG_DESERIALIZE, "A list of recent opened scenes", "");
-DVAR_BOOL(delete_dvar_cache, DVAR_FLAG_NONE, "Delete serialized dvar file", false);
+DVAR_BOOL(delete_dvar_cache, 0, "Delete serialized dvar file", false);
 
 // gui
 DVAR_BOOL(grid_visibility, 0, "show editor grid", true);

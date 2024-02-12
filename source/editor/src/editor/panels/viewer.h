@@ -1,6 +1,6 @@
 #pragma once
-#include "camera_controller.h"
 #include "panel.h"
+#include "scene/camera_controller.h"
 
 namespace vct {
 
