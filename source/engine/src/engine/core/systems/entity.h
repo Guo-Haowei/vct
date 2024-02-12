@@ -7,6 +7,7 @@ class Entity {
 public:
     static constexpr size_t INVALID_INDEX = ~0llu;
     static constexpr uint32_t INVALID_ID = 0;
+    static constexpr uint32_t MAX_ID = ~0u;
 
     explicit constexpr Entity() : m_id(INVALID_ID) {}
 
@@ -27,11 +28,15 @@ public:
     void serialize(Archive& archive);
 
     static Entity create();
+    static uint32_t get_seed();
+    static void set_seed(uint32_t seed);
 
     static const Entity INVALID;
 
 private:
     uint32_t m_id;
+
+    inline static std::atomic<uint32_t> s_id = MAX_ID;
 };
 
 }  // namespace vct::ecs

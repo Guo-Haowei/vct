@@ -45,9 +45,15 @@ void HierarchyCreator::DrawNode(const Scene& scene, HierarchyNode* pHier, ImGuiT
     flags |= mPanel.get_selected() == id ? ImGuiTreeNodeFlags_Selected : 0;
     bool expanded = ImGui::TreeNodeEx(nodeTag.c_str(), flags);
     ImGui::SameLine();
-    if (ImGui::Selectable(tag.c_str())) {
-        mPanel.set_selected(id);
+    ImGui::Selectable(tag.c_str());
+    if (ImGui::IsItemHovered()) {
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+            mPanel.set_selected(id);
+        } else if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+            ImGui::OpenPopup("my dummy popup");
+        }
     }
+
     if (expanded) {
         float indentWidth = 8.f;
         ImGui::Indent(indentWidth);
@@ -98,6 +104,13 @@ bool HierarchyCreator::Build(const Scene& scene) {
 
 void HierarchyPanel::update_internal(Scene& scene) {
     HierarchyCreator creator(*this);
+
+    // right click popup
+    if (ImGui::BeginPopup("my dummy popup")) {
+        ImGui::MenuItem("Close");
+        ImGui::EndPopup();
+    }
+
     creator.Draw(scene);
 }
 

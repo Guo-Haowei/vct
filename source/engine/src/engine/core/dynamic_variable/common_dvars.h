@@ -1,7 +1,6 @@
 #include "dynamic_variable_begin.h"
 
-// @TODO: move to somewhere else
-DVAR_STRING(scene, DVAR_FLAG_NONE, "Request a scene to load when the app starts", "");
+DVAR_STRING(project, 0, "Open project at start", "");
 
 // window
 DVAR_IVEC2(window_resolution, DVAR_FLAG_SERIALIZE | DVAR_FLAG_DESERIALIZE, "Request window resolution", 800, 600);

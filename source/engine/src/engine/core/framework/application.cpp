@@ -84,7 +84,7 @@ int Application::run(int argc, const char** argv) {
     LOG_ERROR("TODO: migrate PBR code here");
     LOG_WARN("TODO: fix multiple objects play same animation");
     LOG_ERROR("TODO: link object with animation");
-    LOG_WARN("TODO: save and load scene");
+    LOG_WARN("TODO: render texels around camera");
     LOG_ERROR("TODO: cloth physics");
     LOG_WARN("TODO: refactor application");
 

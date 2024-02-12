@@ -124,7 +124,7 @@ public:                                                                         
     REGISTER_COMPONENT(AnimationComponent, 0);
     REGISTER_COMPONENT(RigidBodyPhysicsComponent, 0);
 
-    void serialize(Archive& archive);
+    bool serialize(Archive& archive);
 
     // Non-serialized attributes
     void update(float deltaTime);

@@ -40,7 +40,7 @@ public:
 
     int as_int() const;
     float as_float() const;
-    std::string_view as_string() const;
+    const std::string& as_string() const;
     vec2 as_vec2() const;
     vec3 as_vec3() const;
     vec4 as_vec4() const;
@@ -51,7 +51,7 @@ public:
 
     bool set_int(int value);
     bool set_float(float value);
-    bool set_string(std::string_view value);
+    bool set_string(const std::string& value);
     bool set_vec2(float x, float y);
     bool set_vec3(float x, float y, float z);
     bool set_vec4(float x, float y, float z, float w);

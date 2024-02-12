@@ -6,6 +6,9 @@
 #include "platform/windows/dialog.h"
 #include "scene/scene_manager.h"
 
+namespace vct {
+
+// @TODO: fix this
 static std::vector<std::string> quick_dirty_split(std::string str, std::string token) {
     std::vector<std::string> result;
     while (str.size()) {
@@ -22,43 +25,68 @@ static std::vector<std::string> quick_dirty_split(std::string str, std::string t
     return result;
 }
 
+static void import_scene() {
+    std::vector<const char*> filters = { ".gltf" };
+    auto path = open_file_dialog(filters);
+
+    if (path.empty()) {
+        return;
+    }
+
+    SceneManager::singleton().request_scene(path);
+
+    std::string files(DVAR_GET_STRING(recent_files));
+    if (!files.empty()) {
+        files.append(";");
+    }
+    files.append(path);
+
+    DVAR_SET_STRING(recent_files, files);
+}
+
+static void import_recent() {
+    std::string recent_files(DVAR_GET_STRING(recent_files));
+
+    auto files = quick_dirty_split(recent_files, ";");
+
+    for (const auto& file : files) {
+        if (ImGui::MenuItem(file.c_str())) {
+            SceneManager::singleton().request_scene(file);
+        }
+    }
+    ImGui::EndMenu();
+}
+
+static void save_scene() {
+    auto path = open_save_dialog("");
+
+    if (path.empty()) {
+        return;
+    }
+
+    Scene& scene = SceneManager::singleton().get_scene();
+
+    Archive archive;
+    if (!archive.open_write(path)) {
+        return;
+    }
+
+    scene.serialize(archive);
+}
+
 void menu_bar() {
     if (ImGui::BeginMenuBar()) {
         if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem("New")) {
+            if (ImGui::MenuItem("Import", "Ctrl+O")) {
+                import_scene();
             }
-            if (ImGui::MenuItem("Open", "Ctrl+O")) {
-                // LoadScene();
-                std::vector<const char*> filters = { ".gltf" };
-                auto path = vct::open_file_dialog(filters);
-
-                if (!path.empty()) {
-                    vct::SceneManager::singleton().request_scene(path);
-
-                    std::string files(DVAR_GET_STRING(recent_files));
-                    if (!files.empty()) {
-                        files.append(";");
-                    }
-                    files.append(path);
-
-                    DVAR_SET_STRING(recent_files, files);
-                }
-            }
-            if (ImGui::BeginMenu("Open Recent")) {
-                std::string recent_files(DVAR_GET_STRING(recent_files));
-
-                auto files = quick_dirty_split(recent_files, ";");
-
-                for (const auto& file : files) {
-                    if (ImGui::MenuItem(file.c_str())) {
-                        vct::SceneManager::singleton().request_scene(file);
-                    }
-                }
-                ImGui::EndMenu();
+            if (ImGui::BeginMenu("Import Recent")) {
+                import_recent();
             }
             if (ImGui::MenuItem("Save", "Ctrl+S")) {
             }
             if (ImGui::MenuItem("Save As..")) {
+                save_scene();
             }
             ImGui::EndMenu();
         }
@@ -80,3 +108,5 @@ void menu_bar() {
         ImGui::EndMenuBar();
     }
 }
+
+}  // namespace vct

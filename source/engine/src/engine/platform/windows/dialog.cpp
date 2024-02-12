@@ -41,6 +41,30 @@ std::string open_file_dialog(const std::vector<const char*>& filters) {
         return std::string(szFile);
     }
 
-    return std::string();
+    return "";
 }
+
+std::string open_save_dialog(const std::string&) {
+    OPENFILENAMEA ofn;
+
+    char szFileName[MAX_PATH] = "untitled";
+
+    ZeroMemory(&ofn, sizeof(ofn));
+
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = NULL;
+    // ofn.lpstrFilter = "Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0";
+    ofn.lpstrFile = szFileName;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+    // @TODO: fix
+    ofn.lpstrDefExt = "scene";
+
+    if (GetSaveFileNameA(&ofn)) {
+        return std::string(ofn.lpstrFile);
+    }
+
+    return "";
+}
+
 }  // namespace vct

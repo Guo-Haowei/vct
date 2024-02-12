@@ -13,10 +13,17 @@ void Entity::serialize(Archive& archive) {
 }
 
 Entity Entity::create() {
-    static std::atomic<uint32_t> s_next = 1;
-    DEV_ASSERT(s_next.load() < ~uint32_t(0));
-    Entity entity(s_next.fetch_add(1));
+    CRASH_COND_MSG(s_id.load() == MAX_ID, "max number of entity allocated, did you forget to call set_seed()?");
+    Entity entity(s_id.fetch_add(1));
     return entity;
+}
+
+uint32_t Entity::get_seed() {
+    return s_id;
+}
+
+void Entity::set_seed(uint32_t seed) {
+    s_id = seed;
 }
 
 }  // namespace vct::ecs

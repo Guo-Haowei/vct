@@ -288,7 +288,7 @@ void Scene::update_animation(uint32_t index) {
         }
         t = saturate(t);
 
-        TransformComponent* targetTransform = m_TransformComponents.get_component(channel.target_id);
+        TransformComponent* targetTransform = get_component<TransformComponent>(channel.target_id);
         DEV_ASSERT(targetTransform);
         switch (channel.path) {
             case AnimationComponent::Channel::PATH_SCALE: {
@@ -366,7 +366,7 @@ void Scene::update_hierarchy(uint32_t index) {
 void Scene::update_armature(uint32_t index) {
     Entity id = m_ArmatureComponents.get_entity(index);
     ArmatureComponent& armature = m_ArmatureComponents[index];
-    TransformComponent* transform = m_TransformComponents.get_component(id);
+    TransformComponent* transform = get_component<TransformComponent>(id);
     DEV_ASSERT(transform);
 
     // The transform world matrices are in world space, but skinning needs them in armature-local space,
@@ -388,7 +388,7 @@ void Scene::update_armature(uint32_t index) {
 
     int idx = 0;
     for (Entity boneID : armature.boneCollection) {
-        const TransformComponent* boneTransform = m_TransformComponents.get_component(boneID);
+        const TransformComponent* boneTransform = get_component<TransformComponent>(boneID);
         DEV_ASSERT(boneTransform);
 
         const mat4& B = armature.inverseBindMatrices[idx];
@@ -401,9 +401,31 @@ void Scene::update_armature(uint32_t index) {
     }
 };
 
-void Scene::serialize(Archive& archive) {
-    // mGenerator.serialize(archive);
+bool Scene::serialize(Archive& archive) {
+    // guard and seed
+    static const char guard[] = "xScn";
+    bool is_read_mode = !archive.is_write_mode();
+    if (is_read_mode) {
+        std::string read;
+        archive >> read;
+        if (read != guard) {
+            return false;
+        }
+
+        uint32_t seed = Entity::MAX_ID;
+        archive >> seed;
+        Entity::set_seed(seed);
+    } else {
+        archive << guard;
+        archive << Entity::get_seed();
+    }
+
     m_root.serialize(archive);
+    if (is_read_mode) {
+        archive.read(m_bound);
+    } else {
+        archive.write(m_bound);
+    }
 
     m_NameComponents.serialize(archive);
     m_TransformComponents.serialize(archive);
@@ -416,6 +438,8 @@ void Scene::serialize(Archive& archive) {
     m_ArmatureComponents.serialize(archive);
     m_AnimationComponents.serialize(archive);
     m_RigidBodyPhysicsComponents.serialize(archive);
+
+    return true;
 }
 
 Scene::RayIntersectionResult Scene::Intersects(Ray& ray) {

@@ -10,39 +10,55 @@
 
 namespace vct {
 
+using ecs::Entity;
+
 SceneManager* g_scene_manager = new SceneManager;
+
+static bool deserialize_scene(Scene* scene, const std::string& path) {
+    // @TODO:
+    unused(scene);
+    unused(path);
+    Archive archive;
+    if (!archive.open_read(path)) {
+        return false;
+    }
+
+    return scene->serialize(archive);
+}
+
+static void create_empty_scene(Scene* scene) {
+    Entity::set_seed(Entity::INVALID_ID + 1);
+
+    auto root = scene->create_transform_entity("world");
+    scene->m_root = root;
+    {
+        auto light = scene->create_omnilight_entity("omni light", vec3(1), 20.f);
+        auto transform = scene->get_component<TransformComponent>(light);
+        DEV_ASSERT(transform);
+        mat4 r = glm::rotate(glm::radians(30.0f), glm::vec3(0, 0, 1));
+        transform->set_local_transform(r);
+
+        scene->attach_component(light, root);
+    }
+
+    {
+        auto camera = scene->create_camera_entity("camera", 800.0f, 600.0f);
+        scene->attach_component(camera);
+    }
+}
 
 bool SceneManager::initialize() {
     m_revision = 1;
 
     // create an empty scene
-    {
-        m_scene = new Scene;
-        auto root = m_scene->create_transform_entity("world");
-        m_scene->m_root = root;
-
-        {
-            auto light = m_scene->create_omnilight_entity("omni light", vec3(1), 20.f);
-            auto transform = m_scene->get_component<TransformComponent>(light);
-            DEV_ASSERT(transform);
-            mat4 r = glm::rotate(glm::radians(30.0f), glm::vec3(0, 0, 1));
-            transform->set_local_transform(r);
-
-            m_scene->attach_component(light, root);
-        }
-
-        {
-            auto camera = m_scene->create_camera_entity("camera", 800.0f, 600.0f);
-            m_scene->attach_component(camera);
-        }
-
-        on_scene_changed(m_scene);
+    m_scene = new Scene;
+    const std::string& path = DVAR_GET_STRING(project);
+    if (path.empty()) {
+        create_empty_scene(m_scene);
+    } else {
+        deserialize_scene(m_scene, path);
     }
-
-    std::string_view scene_path = DVAR_GET_STRING(scene);
-    if (!scene_path.empty()) {
-        request_scene(scene_path);
-    }
+    on_scene_changed(m_scene);
 
     return true;
 }
@@ -74,9 +90,11 @@ void SceneManager::update(float dt) {
 
     auto [frameW, frameH] = DisplayServer::singleton().get_frame_size();
 
-    DEV_ASSERT(frameW > 0 && frameH > 0);
+    // @TODO: refactor this
     CameraComponent& camera = scene.get_main_camera();
-    camera.set_dimension((float)frameW, (float)frameH);
+    if (frameW > 0 && frameH > 0) {
+        camera.set_dimension((float)frameW, (float)frameH);
+    }
 
     scene.update(dt);
 

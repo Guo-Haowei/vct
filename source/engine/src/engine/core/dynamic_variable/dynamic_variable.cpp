@@ -69,7 +69,7 @@ float DynamicVariable::as_float() const {
     return m_float;
 }
 
-std::string_view DynamicVariable::as_string() const {
+const std::string& DynamicVariable::as_string() const {
     DEV_ASSERT(m_type == VARIANT_TYPE_STRING);
     return m_string;
 }
@@ -133,7 +133,7 @@ bool DynamicVariable::set_float(float value) {
     return true;
 }
 
-bool DynamicVariable::set_string(std::string_view value) {
+bool DynamicVariable::set_string(const std::string& value) {
     ERR_FAIL_COND_V(m_type != VARIANT_TYPE_STRING, false);
     m_string = value;
     return true;
