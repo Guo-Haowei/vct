@@ -1,4 +1,4 @@
-#include "EditorLayer.h"
+#include "editor_layer.h"
 
 #include "imgui/imgui_internal.h"
 #include "servers/rendering/r_cbuffers.h"
@@ -11,29 +11,29 @@
 #include "panels/hierarchy_panel.h"
 #include "panels/menu_bar.h"
 #include "panels/propertiy_panel.h"
+#include "panels/render_graph_editor.h"
 #include "panels/viewer.h"
 #include "scene/scene_manager.h"
 #include "servers/display_server.h"
 
+namespace vct {
+
 EditorLayer::EditorLayer() : Layer("EditorLayer") {
-    AddPanel(std::make_shared<AnimationPanel>());
-    AddPanel(std::make_shared<ConsolePanel>());
-    AddPanel(std::make_shared<DebugPanel>());
-    AddPanel(std::make_shared<HierarchyPanel>());
-    AddPanel(std::make_shared<PropertyPanel>());
-    AddPanel(std::make_shared<Viewer>());
-
-    s_controller.set_camera(SceneManager::get_scene().get_main_camera());
+    add_panel(std::make_shared<RenderGraphEditor>());
+    add_panel(std::make_shared<AnimationPanel>());
+    add_panel(std::make_shared<ConsolePanel>());
+    add_panel(std::make_shared<DebugPanel>());
+    add_panel(std::make_shared<HierarchyPanel>());
+    add_panel(std::make_shared<PropertyPanel>());
+    add_panel(std::make_shared<Viewer>());
 }
 
-void EditorLayer::AddPanel(std::shared_ptr<Panel> panel) {
-    mPanels.emplace_back(panel);
-    panel->SetSelectedRef(&mSelected);
+void EditorLayer::add_panel(std::shared_ptr<Panel> panel) {
+    m_panels.emplace_back(panel);
+    panel->set_selected_ref(&m_selected);
 }
 
-extern void dummy_graph_editor();
-
-void EditorLayer::DockSpace() {
+void EditorLayer::dock_space() {
     ImGui::GetMainViewport();
 
     static bool opt_padding = false;
@@ -76,19 +76,17 @@ void EditorLayer::DockSpace() {
     return;
 }
 
-void EditorLayer::Update(float dt) {
-    DockSpace();
-    dummy_graph_editor();
-    for (auto& it : mPanels) {
-        it->Update(dt);
+void EditorLayer::Update(float) {
+    dock_space();
+    Scene& scene = SceneManager::get_scene();
+    for (auto& it : m_panels) {
+        it->update(scene);
     }
+
+    scene.m_selected = m_selected;
 }
 
 void EditorLayer::Render() {
-    Scene& scene = SceneManager::get_scene();
-    for (auto& it : mPanels) {
-        it->Render(scene);
-    }
-
-    scene.m_selected = mSelected;
 }
+
+}  // namespace vct

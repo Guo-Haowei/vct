@@ -1,4 +1,4 @@
-#include "scene_loader_tinygltf.h"
+#include "scene_importer_tinygltf.h"
 
 #include "scene/scene.h"
 
@@ -41,7 +41,7 @@ bool dummy_write_image(const std::string*,
 
 namespace vct {
 
-void SceneLoaderTinyGLTF::process_node(int node_index, ecs::Entity parent) {
+void SceneImporterTinyGLTF::process_node(int node_index, ecs::Entity parent) {
     if (node_index < 0 || m_entity_map.count(node_index)) {
         return;
     }
@@ -140,7 +140,7 @@ void SceneLoaderTinyGLTF::process_node(int node_index, ecs::Entity parent) {
     }
 }
 
-bool SceneLoaderTinyGLTF::import_impl() {
+bool SceneImporterTinyGLTF::import_impl() {
     tinygltf::TinyGLTF loader;
     std::string err;
     std::string warn;
@@ -168,7 +168,7 @@ bool SceneLoaderTinyGLTF::import_impl() {
 
     ecs::Entity root = ecs::Entity::create();
     m_scene.create<TransformComponent>(root);
-    m_scene.create<TagComponent>(root).set_tag(std::filesystem::path(m_file_path).filename().string());
+    m_scene.create<TagComponent>(root).set_tag(m_scene_name);
     m_scene.m_root = root;
 
     // Create materials
@@ -314,7 +314,7 @@ bool SceneLoaderTinyGLTF::import_impl() {
     return true;
 }
 
-void SceneLoaderTinyGLTF::process_mesh(const tinygltf::Mesh& gltf_mesh, int) {
+void SceneImporterTinyGLTF::process_mesh(const tinygltf::Mesh& gltf_mesh, int) {
     ecs::Entity mesh_id = m_scene.create_mesh_entity("Mesh::" + gltf_mesh.name);
     // m_scene.Component_Attach(mesh_id, state.rootEntity);
     MeshComponent& mesh = *m_scene.get_component<MeshComponent>(mesh_id);
@@ -577,7 +577,7 @@ void SceneLoaderTinyGLTF::process_mesh(const tinygltf::Mesh& gltf_mesh, int) {
     }
 }
 
-void SceneLoaderTinyGLTF::process_animation(const tinygltf::Animation& gltf_anim, int) {
+void SceneImporterTinyGLTF::process_animation(const tinygltf::Animation& gltf_anim, int) {
     static int s_counter = 0;
 
     std::string tag = gltf_anim.name;
@@ -676,6 +676,6 @@ void SceneLoaderTinyGLTF::process_animation(const tinygltf::Animation& gltf_anim
 auto load_scene_tinygltf(const std::string& asset_path, void* data) -> std::expected<void, std::string> {
     DEV_ASSERT(data);
     auto scene = (reinterpret_cast<vct::Scene*>(data));
-    vct::SceneLoaderTinyGLTF loader(*scene, asset_path);
+    vct::SceneImporterTinyGLTF loader(*scene, asset_path);
     return loader.import();
 }

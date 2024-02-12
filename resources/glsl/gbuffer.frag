@@ -11,20 +11,20 @@ in struct PS_INPUT {
 #include "cbuffer.glsl.h"
 
 void main() {
-    vec4 albedo = AlbedoColor;
+    vec4 albedo = c_albedo_color;
 
-    if (HasAlbedoMap != 0) {
-        albedo = texture(AlbedoMaps[TextureMapIdx], ps_in.uv);
+    if (c_has_albedo_map != 0) {
+        albedo = texture(c_albedo_maps[c_texture_map_idx], ps_in.uv);
     }
     if (albedo.a < 0.001) {
         discard;
     }
 
-    float metallic = Metallic;
-    float roughness = Roughness;
-    if (HasPbrMap != 0) {
+    float metallic = c_metallic;
+    float roughness = c_roughness;
+    if (c_has_pbr_map != 0) {
         // g roughness, b metallic
-        vec3 mr = texture(PbrMaps[TextureMapIdx], ps_in.uv).rgb;
+        vec3 mr = texture(c_pbr_maps[c_texture_map_idx], ps_in.uv).rgb;
         metallic = mr.b;
         roughness = mr.g;
     }
@@ -34,8 +34,8 @@ void main() {
 
     // TODO: get rid of branching
     vec3 N;
-    if (HasNormalMap != 0) {
-        N = normalize(ps_in.TBN * (2.0 * texture(NormalMaps[TextureMapIdx], ps_in.uv).xyz - 1.0));
+    if (c_has_normal_map != 0) {
+        N = normalize(ps_in.TBN * (2.0 * texture(c_normal_maps[c_texture_map_idx], ps_in.uv).xyz - 1.0));
     } else {
         N = ps_in.TBN[2];
     }

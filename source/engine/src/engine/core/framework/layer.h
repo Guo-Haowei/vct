@@ -1,6 +1,6 @@
 #pragma once
 
-class Runtime;
+namespace vct {
 
 class Layer {
 public:
@@ -15,3 +15,5 @@ public:
 protected:
     std::string mName;
 };
+
+}  // namespace vct

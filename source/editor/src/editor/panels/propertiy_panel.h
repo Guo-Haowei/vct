@@ -1,12 +1,14 @@
 #pragma once
-
-#include "core/systems/entity.h"
 #include "panel.h"
+
+namespace vct {
 
 class PropertyPanel : public Panel {
 public:
     PropertyPanel() : Panel("Properties") {}
 
 protected:
-    virtual void RenderInternal(Scene& scene) override;
+    void update_internal(Scene& scene) override;
 };
+
+}  // namespace vct

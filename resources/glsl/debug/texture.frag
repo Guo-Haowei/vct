@@ -4,7 +4,7 @@ layout(location = 0) in vec2 pass_uv;
 #include "cbuffer.glsl.h"
 
 void main() {
-    switch (DebugTexture) {
+    switch (c_debug_texture_id) {
         case 3: {
             out_color = vec4(texture(c_gbuffer_depth_map, pass_uv).rrr, 1.0);
             break;

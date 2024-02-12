@@ -1,27 +1,24 @@
 #pragma once
-#include <string>
-
-#include "core/systems/entity.h"
 #include "imgui/imgui.h"
 #include "scene/scene.h"
 
-using namespace vct;
+namespace vct {
 
 class Panel {
 public:
-    Panel(const std::string& name) : mName(name) {}
+    Panel(const std::string& name) : m_name(name) {}
 
-    virtual void Update(float) {}
-    void Render(vct::Scene& scene);
-    bool IsFocused() const;
+    void update(vct::Scene&);
 
-    void SetSelectedRef(ecs::Entity* pSelected) { mpSelected = pSelected; }
-    void SetSelected(ecs::Entity selected) { *mpSelected = selected; }
-    ecs::Entity GetSelected() const { return *mpSelected; }
+    void set_selected_ref(ecs::Entity* selected) { m_selected = selected; }
+    void set_selected(ecs::Entity selected) { *m_selected = selected; }
+    ecs::Entity get_selected() const { return *m_selected; }
 
 protected:
-    virtual void RenderInternal(vct::Scene& scene) = 0;
+    virtual void update_internal(vct::Scene&) {}
 
-    std::string mName;
-    ecs::Entity* mpSelected = nullptr;
+    std::string m_name;
+    ecs::Entity* m_selected = nullptr;
 };
+
+}  // namespace vct

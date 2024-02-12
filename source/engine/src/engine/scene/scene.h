@@ -95,7 +95,7 @@ public:                                                                         
     }
     template<typename T>
     size_t get_index(const ecs::Entity&) const {
-        return ecs::Entity::kInvalidIndex;
+        return ecs::Entity::INVALID_INDEX;
     }
     template<typename T>
     size_t get_count() const {
@@ -103,7 +103,7 @@ public:                                                                         
     }
     template<typename T>
     ecs::Entity get_entity(size_t) const {
-        return ecs::Entity::kInvalid;
+        return ecs::Entity::INVALID;
     }
     template<typename T>
     T& create(const ecs::Entity&) {

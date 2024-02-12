@@ -1,10 +1,10 @@
-#include "scene_loader.h"
+#include "scene_importer.h"
 
 #include "asset_loader.h"
 
 namespace vct {
 
-SceneLoader::SceneLoader(Scene& scene, const std::string& file_path, const char* loader_name)
+SceneImporter::SceneImporter(Scene& scene, const std::string& file_path, const char* loader_name)
     : m_scene(scene), m_file_path(file_path), m_loader_name(loader_name) {
 
     std::filesystem::path system_path{ file_path };
@@ -12,7 +12,7 @@ SceneLoader::SceneLoader(Scene& scene, const std::string& file_path, const char*
     m_search_path = system_path.remove_filename().string();
 }
 
-auto SceneLoader::import() -> std::expected<void, std::string> {
+auto SceneImporter::import() -> std::expected<void, std::string> {
     if (!import_impl()) {
         return std::unexpected(std::format("[{}] {}.", m_loader_name, m_error));
     }

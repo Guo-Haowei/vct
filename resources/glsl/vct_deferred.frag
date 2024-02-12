@@ -24,18 +24,18 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
 }
 
 vec3 traceCone(vec3 from, vec3 direction, float aperture) {
-    float max_dist = 2.0 * WorldSizeHalf;
+    float max_dist = 2.0 * c_world_size_half;
     vec4 acc = vec4(0.0);
 
-    float offset = 2.0 * VoxelSize;
-    float dist = offset + VoxelSize;
+    float offset = 2.0 * c_voxel_size;
+    float dist = offset + c_voxel_size;
 
     while (acc.a < 1.0 && dist < max_dist) {
         vec3 conePosition = from + direction * dist;
         float diameter = 2.0 * aperture * dist;
-        float mipLevel = log2(diameter / VoxelSize);
+        float mipLevel = log2(diameter / c_voxel_size);
 
-        vec3 coords = (conePosition - WorldCenter) / WorldSizeHalf;
+        vec3 coords = (conePosition - c_world_center) / c_world_size_half;
         coords = 0.5 * coords + 0.5;
 
         vec4 voxel = textureLod(c_voxel_map, coords, mipLevel);
@@ -98,16 +98,16 @@ void main() {
     vec3 F0 = mix(vec3(0.04), albedo.rgb, metallic);
     vec3 Lo = vec3(0.0);
 
-    if (NoTexture != 0) {
+    if (c_no_texture != 0) {
         albedo.rgb = vec3(0.6);
     }
 
     const vec3 N = normal_roughness.xyz;
-    const vec3 L = SunDir;
-    const vec3 V = normalize(CamPos - worldPos.xyz);
+    const vec3 L = c_sun_direction;
+    const vec3 V = normalize(c_camera_position - worldPos.xyz);
     const vec3 H = normalize(V + L);
 
-    const vec3 radiance = LightColor;
+    const vec3 radiance = c_light_color;
 
     const float NdotL = max(dot(N, L), 0.0);
     const float NdotH = max(dot(N, H), 0.0);
@@ -134,22 +134,22 @@ void main() {
     // float clipSpaceZ = ( c_projection_view_matrix * worldPos ).z;
     // for ( int idx = 0; idx < NUM_CASCADES; ++idx )
     // {
-    //     if ( clipSpaceZ <= CascadedClipZ[idx + 1] )
+    //     if ( clipSpaceZ <= c_cascade_clip_z[idx + 1] )
     //     {
-    //         vec4 lightSpacePos = LightPVs[idx] * worldPos;
+    //         vec4 lightSpacePos = c_light_matricies[idx] * worldPos;
     //         shadow             = Shadow( c_shadow_map, lightSpacePos, NdotL, idx );
     //         break;
     //     }
     // }
 #else
-    vec4 lightSpacePos = LightPVs[0] * worldPos;
+    vec4 lightSpacePos = c_light_matricies[0] * worldPos;
     shadow = Shadow(c_shadow_map, lightSpacePos, NdotL);
 #endif
     Lo += (1.0 - shadow) * directLight;
 
-    const float ao = EnableSSAO == 0 ? 1.0 : texture(c_ssao_map, uv).r;
+    const float ao = c_enable_ssao == 0 ? 1.0 : texture(c_ssao_map, uv).r;
 
-    if (EnableGI == 1)
+    if (c_enable_vxgi == 1)
     // indirect light
     {
         const vec3 F = fresnelSchlickRoughness(NdotV, F0, roughness);
@@ -176,10 +176,10 @@ void main() {
     out_color = vec4(color, 1.0);
 
 #if ENABLE_CSM
-    if (DebugCSM != 0) {
+    if (c_debug_csm != 0) {
         vec3 mask = vec3(0.1);
         for (int idx = 0; idx < NUM_CASCADES; ++idx) {
-            if (clipSpaceZ <= CascadedClipZ[idx + 1]) {
+            if (clipSpaceZ <= c_cascade_clip_z[idx + 1]) {
                 mask[idx] = 0.7;
                 break;
             }

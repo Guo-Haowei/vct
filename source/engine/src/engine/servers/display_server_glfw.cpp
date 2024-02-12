@@ -1,8 +1,8 @@
 #include "display_server_glfw.h"
 
-#include "Framework/Application.h"
 #include "GLFW/glfw3.h"
 #include "core/dynamic_variable/common_dvars.h"
+#include "core/framework/application.h"
 #include "core/input/input.h"
 #include "imgui/backends/imgui_impl_glfw.h"
 #include "imgui/backends/imgui_impl_opengl3.h"

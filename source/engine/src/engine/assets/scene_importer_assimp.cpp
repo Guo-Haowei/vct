@@ -1,4 +1,4 @@
-#include "scene_loader_assimp.h"
+#include "scene_importer_assimp.h"
 
 #include <assimp/pbrmaterial.h>
 #include <assimp/postprocess.h>
@@ -10,13 +10,13 @@ auto load_scene_assimp(const std::string& asset_path, void* data) -> std::expect
     DEV_ASSERT(data);
     auto scene = (reinterpret_cast<vct::Scene*>(data));
 
-    vct::SceneLoaderAssimp loader(*scene, asset_path);
+    vct::SceneImporterAssimp loader(*scene, asset_path);
     return loader.import();
 }
 
 namespace vct {
 
-bool SceneLoaderAssimp::import_impl() {
+bool SceneImporterAssimp::import_impl() {
     Assimp::Importer importer;
 
     unsigned int flag = aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_FlipUVs;
@@ -43,14 +43,14 @@ bool SceneLoaderAssimp::import_impl() {
         process_mesh(*aiscene->mMeshes[i]);
     }
 
-    ecs::Entity root = process_node(aiscene->mRootNode, ecs::Entity::kInvalid);
-    m_scene.get_component<TagComponent>(root)->set_tag(m_file_path);
+    ecs::Entity root = process_node(aiscene->mRootNode, ecs::Entity::INVALID);
+    m_scene.get_component<TagComponent>(root)->set_tag(m_scene_name);
 
     m_scene.m_root = root;
     return true;
 }
 
-void SceneLoaderAssimp::process_material(aiMaterial& material) {
+void SceneImporterAssimp::process_material(aiMaterial& material) {
     auto material_id = m_scene.create_material_entity(std::string("Material::") + material.GetName().C_Str());
     MaterialComponent* materialComponent = m_scene.get_component<MaterialComponent>(material_id);
     DEV_ASSERT(materialComponent);
@@ -81,7 +81,7 @@ void SceneLoaderAssimp::process_material(aiMaterial& material) {
     m_materials.emplace_back(material_id);
 }
 
-void SceneLoaderAssimp::process_mesh(const aiMesh& mesh) {
+void SceneImporterAssimp::process_mesh(const aiMesh& mesh) {
     DEV_ASSERT(mesh.mNumVertices);
     const std::string mesh_name(mesh.mName.C_Str());
     const bool has_uv = mesh.mTextureCoords[0];
@@ -125,7 +125,7 @@ void SceneLoaderAssimp::process_mesh(const aiMesh& mesh) {
     m_meshes.push_back(mesh_id);
 }
 
-ecs::Entity SceneLoaderAssimp::process_node(const aiNode* node, ecs::Entity parent) {
+ecs::Entity SceneImporterAssimp::process_node(const aiNode* node, ecs::Entity parent) {
     const auto key = std::string(node->mName.C_Str());
 
     ecs::Entity entity;

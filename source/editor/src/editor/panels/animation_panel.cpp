@@ -3,23 +3,22 @@
 #include "imgui/imgui_internal.h"
 #include "scene/scene.h"
 
-void AnimationPanel::RenderInternal(Scene& scene) {
-    if (ImGui::Begin("Animation")) {
+namespace vct {
+
+void AnimationPanel::update_internal(Scene& scene) {
+    // if (ImGui::Begin("Animation"))
+    {
         for (int i = 0; i < scene.get_count<AnimationComponent>(); ++i) {
             ecs::Entity id = scene.get_entity<AnimationComponent>(i);
             AnimationComponent& animation = scene.get_component_array<AnimationComponent>()[i];
             TagComponent* tag = scene.get_component<TagComponent>(id);
             ImGui::Text("Animation %s", tag->get_tag().c_str());
             if (!animation.is_playing()) {
-                std::string button_name = "play";
-                button_name += tag->get_tag();
-                if (ImGui::Button(button_name.c_str())) {
+                if (ImGui::Button("play")) {
                     animation.flags |= AnimationComponent::PLAYING;
                 }
             } else {
-                std::string button_name = "stop";
-                button_name += tag->get_tag();
-                if (ImGui::Button(button_name.c_str())) {
+                if (ImGui::Button("stop")) {
                     animation.flags &= ~AnimationComponent::PLAYING;
                 }
             }
@@ -29,5 +28,7 @@ void AnimationPanel::RenderInternal(Scene& scene) {
             ImGui::Separator();
         }
     }
-    ImGui::End();
+    // ImGui::End();
 }
+
+}  // namespace vct

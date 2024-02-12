@@ -7,9 +7,13 @@ namespace vct {
 #define DEFINE_DVAR
 #include "test_dvars.h"
 
-static void register_test_dvars() {
+void register_test_dvars() {
+    static bool s_registered = false;
+    if (!s_registered) {
 #define REGISTER_DVAR
 #include "test_dvars.h"
+    }
+    s_registered = true;
 }
 
 extern void assert_handler(void*, std::string_view, std::string_view, int, std::string_view);

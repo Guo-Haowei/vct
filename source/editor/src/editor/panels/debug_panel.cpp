@@ -1,19 +1,13 @@
 #include "debug_panel.h"
 
+#include "core/dynamic_variable/common_dvars.h"
 #include "scene/scene.h"
 #include "servers/rendering/r_defines.h"
 #include "servers/rendering/rendering_dvars.h"
 
-/////////////////////
-#include "core/dynamic_variable/common_dvars.h"
+namespace vct {
 
-void DebugPanel::RenderInternal(Scene& scene) {
-    CameraComponent& camera = scene.get_main_camera();
-
-    vec3 eye = camera.get_eye();
-    ImGui::Text("eye: %.2f, %.2f, %.2f", eye.x, eye.y, eye.z);
-    ImGui::Separator();
-
+void DebugPanel::update_internal(Scene&) {
     ImGui::Text("Voxel GI");
     ImGui::Checkbox("Enable GI", (bool*)(DVAR_GET_POINTER(r_enable_vxgi)));
     ImGui::Checkbox("No Texture", (bool*)(DVAR_GET_POINTER(r_no_texture)));
@@ -55,3 +49,5 @@ void DebugPanel::RenderInternal(Scene& scene) {
 
     ImGui::Checkbox("toggle grid visibility", (bool*)(DVAR_GET_POINTER(grid_visibility)));
 }
+
+}  // namespace vct

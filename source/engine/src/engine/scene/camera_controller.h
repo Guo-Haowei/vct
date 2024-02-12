@@ -6,7 +6,7 @@ namespace vct {
 
 class CameraController {
 public:
-    static constexpr float kMaxScrollSpeed = 100.0f;
+    static constexpr float MAX_SCROLL_SPEED = 100.0f;
 
     void set_camera(CameraComponent& camera);
     void move_camera(CameraComponent& camera, float dt);
@@ -25,6 +25,3 @@ private:
 };
 
 }  // namespace vct
-
-// @TODO: fix
-extern vct::CameraController s_controller;

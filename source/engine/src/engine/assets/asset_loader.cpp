@@ -1,8 +1,8 @@
 #include "asset_loader.h"
 
 #include "assets/image_loader.h"
-#include "assets/scene_loader_assimp.h"
-#include "assets/scene_loader_tinygltf.h"
+#include "assets/scene_importer_assimp.h"
+#include "assets/scene_importer_tinygltf.h"
 #include "core/collections/thread_safe_ring_buffer.h"
 #include "core/dynamic_variable/common_dvars.h"
 #include "core/io/file_access.h"
@@ -50,8 +50,9 @@ bool initialize() {
     }
 
     // @TODO: dir_access
-    // force load all shaders
     // @TODO: async
+    // force load all shaders
+#if 0
     const std::string preload[] = {
         "@res://fonts/DroidSans.ttf",
         "@res://glsl/vsinput.glsl.h",
@@ -71,21 +72,20 @@ bool initialize() {
         "@res://glsl/textureCB.glsl",
         "@res://glsl/vct_deferred.frag",
         "@res://glsl/debug/texture.frag",
-        "@res://glsl/editor/image.vert",
-        "@res://glsl/editor/image.frag",
         "@res://glsl/voxel/voxelization.vert",
         "@res://glsl/voxel/voxelization.geom",
         "@res://glsl/voxel/voxelization.frag",
         "@res://glsl/voxel/post.comp",
     };
 
-    // Timer timer;
-    // for (int i = 0; i < array_length(preload); ++i) {
-    //     if (load_file_sync(preload[i])) {
-    //         LOG_VERBOSE("[asset_loader] resource '{}' preloaded", preload[i]);
-    //     }
-    // }
-    // LOG_VERBOSE("[asset_loader] preloaded {} assets in {}", array_length(preload), timer.get_duration_string());
+    Timer timer;
+    for (int i = 0; i < array_length(preload); ++i) {
+        if (load_file_sync(preload[i])) {
+            LOG_VERBOSE("[asset_loader] resource '{}' preloaded", preload[i]);
+        }
+    }
+    LOG_VERBOSE("[asset_loader] preloaded {} assets in {}", array_length(preload), timer.get_duration_string());
+#endif
 
     return true;
 }

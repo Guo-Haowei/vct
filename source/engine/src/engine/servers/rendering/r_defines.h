@@ -4,6 +4,7 @@
 inline constexpr int IMAGE_VOXEL_ALBEDO_SLOT = 0;
 inline constexpr int IMAGE_VOXEL_NORMAL_SLOT = 1;
 
+// @TODO: refactor
 enum DrawTexture {
     TEXTURE_FINAL_IMAGE,
     TEXTURE_VOXEL_ALBEDO,

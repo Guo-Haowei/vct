@@ -3,9 +3,9 @@
 
 namespace vct {
 
-class HierarchyPanel : public Panel {
+class RenderGraphEditor : public Panel {
 public:
-    HierarchyPanel() : Panel("Hierarchy") {}
+    RenderGraphEditor() : Panel("Render Graph") {}
 
 protected:
     void update_internal(Scene& scene) override;

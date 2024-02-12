@@ -149,7 +149,7 @@ void RenderingServer::begin_scene(Scene& scene) {
     }
 
     // create material
-    DEV_ASSERT(scene.get_count<MaterialComponent>() < array_length(g_constantCache.cache.AlbedoMaps));
+    DEV_ASSERT(scene.get_count<MaterialComponent>() < array_length(g_constantCache.cache.c_albedo_maps));
 
     for (int idx = 0; idx < scene.get_count<MaterialComponent>(); ++idx) {
         const MaterialComponent& material_component = scene.get_component_array<MaterialComponent>()[idx];
@@ -164,7 +164,7 @@ void RenderingServer::begin_scene(Scene& scene) {
             material->albedoColor = material_component.mBaseColor;
             if (!textureMap.empty()) {
                 material->albedoMap.create_texture2d_from_image(textureMap);
-                g_constantCache.cache.AlbedoMaps[idx].data = gl::MakeTextureResident(material->albedoMap.GetHandle());
+                g_constantCache.cache.c_albedo_maps[idx].data = gl::MakeTextureResident(material->albedoMap.GetHandle());
             }
         }
 
@@ -174,7 +174,7 @@ void RenderingServer::begin_scene(Scene& scene) {
             material->roughness = material_component.mRoughness;
             if (!textureMap.empty()) {
                 material->materialMap.create_texture2d_from_image(textureMap);
-                g_constantCache.cache.PbrMaps[idx].data = gl::MakeTextureResident(material->materialMap.GetHandle());
+                g_constantCache.cache.c_pbr_maps[idx].data = gl::MakeTextureResident(material->materialMap.GetHandle());
             }
         }
 
@@ -182,7 +182,7 @@ void RenderingServer::begin_scene(Scene& scene) {
             const std::string& textureMap = material_component.mTextures[MaterialComponent::Normal].name;
             if (!textureMap.empty()) {
                 material->normalMap.create_texture2d_from_image(textureMap);
-                g_constantCache.cache.NormalMaps[idx].data = gl::MakeTextureResident(material->normalMap.GetHandle());
+                g_constantCache.cache.c_normal_maps[idx].data = gl::MakeTextureResident(material->normalMap.GetHandle());
                 // LOG("material has bump {}", mat->normalTexture.c_str());
             }
         }
@@ -214,8 +214,8 @@ static void create_ssao_resource() {
         ssaoKernel.emplace_back(vec4(sample, 0.0f));
     }
 
-    memset(&g_constantCache.cache.SSAOKernels, 0, sizeof(g_constantCache.cache.SSAOKernels));
-    memcpy(&g_constantCache.cache.SSAOKernels, ssaoKernel.data(), sizeof(ssaoKernel.front()) * ssaoKernel.size());
+    memset(&g_constantCache.cache.c_ssao_kernels, 0, sizeof(g_constantCache.cache.c_ssao_kernels));
+    memcpy(&g_constantCache.cache.c_ssao_kernels, ssaoKernel.data(), sizeof(ssaoKernel.front()) * ssaoKernel.size());
 
     // generate noise texture
     const int noiseSize = DVAR_GET_INT(r_ssaoNoiseSize);

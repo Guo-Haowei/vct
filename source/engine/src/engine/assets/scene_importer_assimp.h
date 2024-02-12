@@ -1,5 +1,5 @@
 #pragma once
-#include "scene_loader.h"
+#include "scene_importer.h"
 
 struct aiMesh;
 struct aiNode;
@@ -9,12 +9,12 @@ struct aiAnimation;
 
 namespace vct {
 
-class SceneLoaderAssimp : public SceneLoader {
+class SceneImporterAssimp : public SceneImporter {
 public:
-    SceneLoaderAssimp(Scene& scene, const std::string& file_path) : SceneLoader(scene, file_path, "SceneLoaderAssimp") {}
+    SceneImporterAssimp(Scene& scene, const std::string& file_path) : SceneImporter(scene, file_path, "SceneLoaderAssimp") {}
 
 protected:
-    virtual bool import_impl() override;
+    bool import_impl() override;
 
     void process_material(aiMaterial& material);
     void process_mesh(const aiMesh& mesh);

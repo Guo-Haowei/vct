@@ -2,7 +2,8 @@
 
 #include "ImGuizmo/ImGuizmo.h"
 #include "imgui/imgui_internal.h"
-#include "scene/scene.h"
+
+namespace vct {
 
 static constexpr float DEFAULT_COLUMN_WIDTH = 100.0f;
 
@@ -132,8 +133,8 @@ static bool draw_vec3_control(const std::string& label, glm::vec3& values, float
 //     return dirty;
 // }
 
-void PropertyPanel::RenderInternal(Scene& scene) {
-    ecs::Entity id = *mpSelected;
+void PropertyPanel::update_internal(Scene& scene) {
+    ecs::Entity id = *m_selected;
 
     if (!id.is_valid()) {
         return;
@@ -263,3 +264,5 @@ void PropertyPanel::RenderInternal(Scene& scene) {
         }
     });
 }
+
+}  // namespace vct

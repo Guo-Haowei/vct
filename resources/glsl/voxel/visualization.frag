@@ -4,7 +4,7 @@ layout(location = 0) out vec4 out_color;
 #include "cbuffer.glsl.h"
 
 void main() {
-    if (DebugTexture == 1)  // abledo
+    if (c_debug_texture_id == 1)  // abledo
     {
         float gamma = 2.2;
         vec3 color = pass_color.rgb;

@@ -1,7 +1,8 @@
 #include "hierarchy_panel.h"
 
 #include "imgui/imgui_internal.h"
-#include "scene/scene.h"
+
+namespace vct {
 
 class HierarchyCreator {
 public:
@@ -41,11 +42,11 @@ void HierarchyCreator::DrawNode(const Scene& scene, HierarchyNode* pHier, ImGuiT
 
     flags |= ImGuiTreeNodeFlags_NoTreePushOnOpen;
     flags |= pHier->children.empty() ? ImGuiTreeNodeFlags_Leaf : 0;
-    flags |= mPanel.GetSelected() == id ? ImGuiTreeNodeFlags_Selected : 0;
+    flags |= mPanel.get_selected() == id ? ImGuiTreeNodeFlags_Selected : 0;
     bool expanded = ImGui::TreeNodeEx(nodeTag.c_str(), flags);
     ImGui::SameLine();
     if (ImGui::Selectable(tag.c_str())) {
-        mPanel.SetSelected(id);
+        mPanel.set_selected(id);
     }
     if (expanded) {
         float indentWidth = 8.f;
@@ -95,7 +96,9 @@ bool HierarchyCreator::Build(const Scene& scene) {
     return true;
 }
 
-void HierarchyPanel::RenderInternal(Scene& scene) {
+void HierarchyPanel::update_internal(Scene& scene) {
     HierarchyCreator creator(*this);
     creator.Draw(scene);
 }
+
+}  // namespace vct

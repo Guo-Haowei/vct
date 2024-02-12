@@ -90,31 +90,31 @@ void SceneManager::update(float dt) {
 
     // update lightspace matrices
     mat4 lightPV = R_HackLightSpaceMatrix(light_dir);
-    g_perFrameCache.cache.LightPVs[0] = g_perFrameCache.cache.LightPVs[1] = g_perFrameCache.cache.LightPVs[2] = lightPV;
+    g_perFrameCache.cache.c_light_matricies[0] = g_perFrameCache.cache.c_light_matricies[1] = g_perFrameCache.cache.c_light_matricies[2] = lightPV;
 
     // update constants
-    g_perFrameCache.cache.SunDir = light_dir;
-    g_perFrameCache.cache.LightColor = light_component.color * light_component.energy;
+    g_perFrameCache.cache.c_sun_direction = light_dir;
+    g_perFrameCache.cache.c_light_color = light_component.color * light_component.energy;
 
-    g_perFrameCache.cache.CamPos = camera.get_eye();
+    g_perFrameCache.cache.c_camera_position = camera.get_eye();
     g_perFrameCache.cache.c_view_matrix = camera.get_view_matrix();
     g_perFrameCache.cache.c_projection_matrix = camera.get_projection_matrix();
     g_perFrameCache.cache.c_projection_view_matrix = camera.get_projection_view_matrix();
 
-    g_perFrameCache.cache.EnableGI = DVAR_GET_BOOL(r_enable_vxgi);
-    g_perFrameCache.cache.DebugTexture = DVAR_GET_INT(r_debugTexture);
-    g_perFrameCache.cache.NoTexture = DVAR_GET_BOOL(r_no_texture);
-    g_perFrameCache.cache.ScreenWidth = frameW;
-    g_perFrameCache.cache.ScreenHeight = frameH;
+    g_perFrameCache.cache.c_enable_vxgi = DVAR_GET_BOOL(r_enable_vxgi);
+    g_perFrameCache.cache.c_debug_texture_id = DVAR_GET_INT(r_debugTexture);
+    g_perFrameCache.cache.c_no_texture = DVAR_GET_BOOL(r_no_texture);
+    g_perFrameCache.cache.c_screen_width = frameW;
+    g_perFrameCache.cache.c_screen_height = frameH;
 
     // SSAO
-    g_perFrameCache.cache.SSAOKernelSize = DVAR_GET_INT(r_ssaoKernelSize);
-    g_perFrameCache.cache.SSAOKernelRadius = DVAR_GET_FLOAT(r_ssaoKernelRadius);
-    g_perFrameCache.cache.SSAONoiseSize = DVAR_GET_INT(r_ssaoNoiseSize);
-    g_perFrameCache.cache.EnableSSAO = DVAR_GET_BOOL(r_enableSsao);
+    g_perFrameCache.cache.c_ssao_kernel_size = DVAR_GET_INT(r_ssaoKernelSize);
+    g_perFrameCache.cache.c_ssao_kernel_radius = DVAR_GET_FLOAT(r_ssaoKernelRadius);
+    g_perFrameCache.cache.c_ssao_noise_size = DVAR_GET_INT(r_ssaoNoiseSize);
+    g_perFrameCache.cache.c_enable_ssao = DVAR_GET_BOOL(r_enableSsao);
 
     // c_fxaa_image
-    g_perFrameCache.cache.EnableFXAA = DVAR_GET_BOOL(r_enableFXAA);
+    g_perFrameCache.cache.c_enable_fxaa = DVAR_GET_BOOL(r_enableFXAA);
 }
 
 void SceneManager::request_scene(std::string_view path) {
@@ -136,10 +136,10 @@ void SceneManager::on_scene_changed(Scene* new_scene) {
     const float texelSize = 1.0f / static_cast<float>(voxelTextureSize);
     const float voxelSize = worldSize * texelSize;
 
-    g_perFrameCache.cache.WorldCenter = center;
-    g_perFrameCache.cache.WorldSizeHalf = 0.5f * worldSize;
-    g_perFrameCache.cache.TexelSize = texelSize;
-    g_perFrameCache.cache.VoxelSize = voxelSize;
+    g_perFrameCache.cache.c_world_center = center;
+    g_perFrameCache.cache.c_world_size_half = 0.5f * worldSize;
+    g_perFrameCache.cache.c_texel_size = texelSize;
+    g_perFrameCache.cache.c_voxel_size = voxelSize;
 }
 
 Scene& SceneManager::get_scene() {

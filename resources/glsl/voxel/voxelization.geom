@@ -27,7 +27,7 @@ void main()
 
     for ( uint i = 0; i < 3; ++i )
     {
-        output_positions[i] = ( pass_positions[i] - WorldCenter ) / WorldSizeHalf;
+        output_positions[i] = ( pass_positions[i] - c_world_center ) / c_world_size_half;
         if ( dominant == 0 )
         {
             output_positions[i].xyz = output_positions[i].zyx;
@@ -43,9 +43,9 @@ void main()
     vec2 side1N = normalize( output_positions[2].xy - output_positions[1].xy );
     vec2 side2N = normalize( output_positions[0].xy - output_positions[2].xy );
 
-    output_positions[0].xy += normalize( side2N - side0N ) * TexelSize;
-    output_positions[1].xy += normalize( side0N - side1N ) * TexelSize;
-    output_positions[2].xy += normalize( side1N - side2N ) * TexelSize;
+    output_positions[0].xy += normalize( side2N - side0N ) * c_texel_size;
+    output_positions[1].xy += normalize( side0N - side1N ) * c_texel_size;
+    output_positions[2].xy += normalize( side1N - side2N ) * c_texel_size;
 
     for ( uint i = 0; i < 3; ++i )
     {

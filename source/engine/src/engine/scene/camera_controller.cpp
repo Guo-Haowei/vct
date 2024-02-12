@@ -2,8 +2,6 @@
 
 #include "core/input/input.h"
 
-vct::CameraController s_controller;
-
 namespace vct {
 
 void CameraController::set_camera(CameraComponent& camera) {
@@ -58,7 +56,7 @@ void CameraController::move_camera(CameraComponent& camera, float dt) {
     float scrolling = input::get_wheel().y;
     if (scrolling != 0.0f) {
         m_scroll_speed += dt * accel;
-        m_scroll_speed = glm::min(m_scroll_speed, kMaxScrollSpeed);
+        m_scroll_speed = glm::min(m_scroll_speed, MAX_SCROLL_SPEED);
     } else {
         m_scroll_speed -= 10.0f;
         m_scroll_speed = glm::max(m_scroll_speed, 0.0f);

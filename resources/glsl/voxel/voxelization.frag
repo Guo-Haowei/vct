@@ -13,19 +13,19 @@ in vec4 pass_light_space_positions[NUM_CASCADES];
 #include "shadow.glsl"
 
 void main() {
-    vec4 albedo = AlbedoColor;
-    if (HasAlbedoMap != 0) {
-        albedo = texture(AlbedoMaps[TextureMapIdx], pass_uv);
+    vec4 albedo = c_albedo_color;
+    if (c_has_albedo_map != 0) {
+        albedo = texture(c_albedo_maps[c_texture_map_idx], pass_uv);
     }
     if (albedo.a < 0.001) {
         discard;
     }
 
-    float metallic = Metallic;
-    float roughness = Roughness;
-    if (HasPbrMap != 0) {
+    float metallic = c_metallic;
+    float roughness = c_roughness;
+    if (c_has_pbr_map != 0) {
         // g roughness, b metallic
-        vec3 mr = texture(PbrMaps[TextureMapIdx], pass_uv).rgb;
+        vec3 mr = texture(c_pbr_maps[c_texture_map_idx], pass_uv).rgb;
         metallic = mr.b;
         roughness = mr.g;
     }
@@ -37,11 +37,11 @@ void main() {
 
     vec3 N = normalize(pass_normal);
     // vec3 L = normalize(LightPos - world_position);
-    vec3 L = SunDir;
-    vec3 V = normalize(CamPos - world_position);
+    vec3 L = c_sun_direction;
+    vec3 V = normalize(c_camera_position - world_position);
     vec3 H = normalize(V + L);
 
-    vec3 radiance = LightColor;
+    vec3 radiance = c_light_color;
 
     float NdotL = max(dot(N, L), 0.0);
     float NdotH = max(dot(N, H), 0.0);
@@ -77,8 +77,8 @@ void main() {
     ///////////////////////////////////////////////////////////////////////////
 
     // write lighting information to texel
-    vec3 voxel = (pass_position - WorldCenter) / WorldSizeHalf;  // normalize it to [-1, 1]
-    voxel = 0.5 * voxel + vec3(0.5);                             // normalize to [0, 1]
+    vec3 voxel = (pass_position - c_world_center) / c_world_size_half;  // normalize it to [-1, 1]
+    voxel = 0.5 * voxel + vec3(0.5);                                    // normalize to [0, 1]
     ivec3 dim = imageSize(u_albedo_texture);
     ivec3 coord = ivec3(dim * voxel);
 

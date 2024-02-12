@@ -14,8 +14,8 @@ void main() {
     pass_positions = world_position.xyz;
     pass_normals = normalize(in_normal);
     pass_uvs = in_uv;
-    pass_light_space_positions0 = LightPVs[0] * world_position;
-    pass_light_space_positions1 = LightPVs[1] * world_position;
-    pass_light_space_positions2 = LightPVs[2] * world_position;
+    pass_light_space_positions0 = c_light_matricies[0] * world_position;
+    pass_light_space_positions1 = c_light_matricies[1] * world_position;
+    pass_light_space_positions2 = c_light_matricies[2] * world_position;
     gl_Position = world_position;
 }
