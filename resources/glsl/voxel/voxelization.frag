@@ -13,19 +13,19 @@ in vec4 pass_light_space_positions[NUM_CASCADES];
 #include "shadow.glsl"
 
 void main() {
-    vec4 albedo = AlbedoColor;
-    if (HasAlbedoMap != 0) {
-        albedo = texture(AlbedoMaps[TextureMapIdx], pass_uv);
+    vec4 albedo = c_albedo_color;
+    if (c_has_albedo_map != 0) {
+        albedo = texture(c_albedo_maps[c_texture_map_idx], pass_uv);
     }
     if (albedo.a < 0.001) {
         discard;
     }
 
-    float metallic = Metallic;
-    float roughness = Roughness;
-    if (HasPbrMap != 0) {
+    float metallic = c_metallic;
+    float roughness = c_roughness;
+    if (c_has_pbr_map != 0) {
         // g roughness, b metallic
-        vec3 mr = texture(PbrMaps[TextureMapIdx], pass_uv).rgb;
+        vec3 mr = texture(c_pbr_maps[c_texture_map_idx], pass_uv).rgb;
         metallic = mr.b;
         roughness = mr.g;
     }

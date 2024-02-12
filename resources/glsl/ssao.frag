@@ -26,7 +26,7 @@ void main() {
     occlusion = 0.0;
     for (int i = 0; i < c_ssao_kernel_size; ++i) {
         // get sample position
-        vec3 samplePos = TBN * SSAOKernels[i].xyz;  // from tangent to view-space
+        vec3 samplePos = TBN * c_ssao_kernels[i].xyz;  // from tangent to view-space
         samplePos = origin.xyz + samplePos * c_ssao_kernel_radius;
 
         // project sample position (to sample texture) (to get position on screen/texture)

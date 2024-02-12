@@ -94,7 +94,7 @@ void Viewer::RenderInternal(Scene& scene) {
         ImGuizmo::draw_grid(projection_view_matrix, identity, 10.0f);
     }
 
-    // @TODO: fix
+    // @TODO: fix, only rotate now
     auto op = ImGuizmo::ROTATE;
     // draw gizmo
     if (mpSelected->is_valid()) {
