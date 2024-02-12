@@ -3,6 +3,7 @@
 #include "GraphEditor.h"
 #include "servers/rendering/render_graph/render_graph.h"
 
+// @TODO: fix
 extern vct::RenderGraph g_render_graph;
 
 namespace vct {
@@ -132,9 +133,8 @@ struct RenderGraphEditorDelegate : public GraphEditor::Delegate {
     std::vector<Node> mNodes;
     std::vector<GraphEditor::Link> mLinks;
 };
-}  // namespace vct
 
-void RenderGraphEditor::RenderInternal(vct::Scene&) {
+void RenderGraphEditor::update_internal(vct::Scene&) {
     // Graph Editor
     static GraphEditor::Options options;
     static vct::RenderGraphEditorDelegate delegate(g_render_graph);
@@ -150,3 +150,5 @@ void RenderGraphEditor::RenderInternal(vct::Scene&) {
     }
     GraphEditor::Show(delegate, options, viewState, true, &fit);
 }
+
+}  // namespace vct

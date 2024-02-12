@@ -2,7 +2,7 @@
 
 namespace vct::ecs {
 
-const Entity Entity::kInvalid{};
+const Entity Entity::INVALID{};
 
 void Entity::serialize(Archive& archive) {
     if (archive.is_write_mode()) {

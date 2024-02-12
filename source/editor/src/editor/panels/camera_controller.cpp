@@ -2,8 +2,6 @@
 
 #include "core/input/input.h"
 
-vct::CameraController s_controller;
-
 namespace vct {
 
 void CameraController::set_camera(CameraComponent& camera) {

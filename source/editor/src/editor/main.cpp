@@ -14,6 +14,8 @@
 #include "servers/rendering/shader_program_manager.h"
 #include "servers/rendering_server.h"
 
+using namespace vct;
+
 static void register_common_dvars() {
 #define REGISTER_DVAR
 #include "core/dynamic_variable/common_dvars.h"
@@ -23,7 +25,7 @@ static void register_common_dvars() {
 class Editor : public Application {
 public:
     Editor() {
-        AddLayer(std::make_shared<EditorLayer>());
+        AddLayer(std::make_shared<vct::EditorLayer>());
     }
 };
 

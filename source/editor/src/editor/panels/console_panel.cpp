@@ -4,7 +4,7 @@
 #include "core/math/color.h"
 #include "imgui/imgui.h"
 
-using namespace vct;
+namespace vct {
 
 static ImVec4 log_level_to_color(LogLevel level) {
     Color color = Color::hex(ColorCode::COLOR_WHITE);
@@ -27,7 +27,7 @@ static ImVec4 log_level_to_color(LogLevel level) {
     return ImVec4(color.r, color.g, color.b, 1.0f);
 }
 
-void ConsolePanel::RenderInternal(Scene&) {
+void ConsolePanel::update_internal(Scene&) {
     ImGui::Separator();
 
     // reserve enough left-over height for 1 separator + 1 input text
@@ -61,3 +61,5 @@ void ConsolePanel::RenderInternal(Scene&) {
     // Auto-focus on window apparition
     ImGui::SetItemDefaultFocus();
 }
+
+}  // namespace vct

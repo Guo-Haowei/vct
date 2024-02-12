@@ -16,6 +16,8 @@
 #include "scene/scene_manager.h"
 #include "servers/display_server.h"
 
+namespace vct {
+
 EditorLayer::EditorLayer() : Layer("EditorLayer") {
     AddPanel(std::make_shared<RenderGraphEditor>());
     AddPanel(std::make_shared<AnimationPanel>());
@@ -24,13 +26,11 @@ EditorLayer::EditorLayer() : Layer("EditorLayer") {
     AddPanel(std::make_shared<HierarchyPanel>());
     AddPanel(std::make_shared<PropertyPanel>());
     AddPanel(std::make_shared<Viewer>());
-
-    s_controller.set_camera(SceneManager::get_scene().get_main_camera());
 }
 
 void EditorLayer::AddPanel(std::shared_ptr<Panel> panel) {
     mPanels.emplace_back(panel);
-    panel->SetSelectedRef(&mSelected);
+    panel->set_selected_ref(&mSelected);
 }
 
 void EditorLayer::DockSpace() {
@@ -76,18 +76,17 @@ void EditorLayer::DockSpace() {
     return;
 }
 
-void EditorLayer::Update(float dt) {
+void EditorLayer::Update(float) {
     DockSpace();
-    for (auto& it : mPanels) {
-        it->Update(dt);
-    }
-}
-
-void EditorLayer::Render() {
     Scene& scene = SceneManager::get_scene();
     for (auto& it : mPanels) {
-        it->Render(scene);
+        it->update(scene);
     }
 
     scene.m_selected = mSelected;
 }
+
+void EditorLayer::Render() {
+}
+
+}  // namespace vct

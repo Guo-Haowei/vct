@@ -113,12 +113,12 @@ public:
 
     size_t get_index(const Entity& entity) const override {
         if (m_lookup.empty()) {
-            return Entity::kInvalidIndex;
+            return Entity::INVALID_INDEX;
         }
 
         const auto it = m_lookup.find(entity);
         if (it == m_lookup.end()) {
-            return Entity::kInvalidIndex;
+            return Entity::INVALID_INDEX;
         }
 
         return it->second;

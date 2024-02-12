@@ -43,7 +43,7 @@ bool SceneLoaderAssimp::import_impl() {
         process_mesh(*aiscene->mMeshes[i]);
     }
 
-    ecs::Entity root = process_node(aiscene->mRootNode, ecs::Entity::kInvalid);
+    ecs::Entity root = process_node(aiscene->mRootNode, ecs::Entity::INVALID);
     m_scene.get_component<TagComponent>(root)->set_tag(m_file_path);
 
     m_scene.m_root = root;

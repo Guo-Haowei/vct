@@ -46,7 +46,8 @@ int Application::Run(int, const char**) {
         input::begin_frame();
 
         // @TODO: better elapsed time
-        const float dt = static_cast<float>(timer.get_duration().to_second());
+        float dt = static_cast<float>(timer.get_duration().to_second());
+        dt = glm::min(dt, 0.1f);
         SceneManager::singleton().update(dt);
         timer.start();
 

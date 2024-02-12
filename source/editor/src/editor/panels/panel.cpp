@@ -1,19 +1,15 @@
 #include "panel.h"
 
+#include "core/input/input.h"
 #include "imgui/imgui_internal.h"
 
-bool Panel::IsFocused() const {
-    ImGuiContext& g = *GImGui;
-    ImGuiWindow* focusedWindow = g.NavWindow;
-    if (!focusedWindow) {
-        return false;
-    }
-    return strcmp(mName.c_str(), focusedWindow->Name) == 0;
-}
+namespace vct {
 
-void Panel::Render(Scene& scene) {
-    if (ImGui::Begin(mName.c_str())) {
-        RenderInternal(scene);
+void Panel::update(Scene& scene) {
+    if (ImGui::Begin(m_name.c_str())) {
+        update_internal(scene);
     }
     ImGui::End();
 }
+
+}  // namespace vct

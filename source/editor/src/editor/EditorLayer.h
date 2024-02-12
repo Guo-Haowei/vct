@@ -3,6 +3,8 @@
 #include "panels/panel.h"
 #include "scene/scene.h"
 
+namespace vct {
+
 class EditorLayer : public Layer {
 public:
     EditorLayer();
@@ -18,3 +20,5 @@ private:
     std::vector<std::shared_ptr<Panel>> mPanels;
     ecs::Entity mSelected;
 };
+
+}  // namespace vct

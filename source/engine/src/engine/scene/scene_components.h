@@ -91,7 +91,7 @@ public:
         DIRTY = 1,
     };
 
-    static constexpr float DEFAULT_NEAR = 1.0f;
+    static constexpr float DEFAULT_NEAR = 0.1f;
     static constexpr float DEFAULT_FAR = 100.0f;
     static constexpr Degree DEFAULT_FOV{ 50.0f };
 

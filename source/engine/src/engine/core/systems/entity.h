@@ -5,10 +5,10 @@ namespace vct::ecs {
 
 class Entity {
 public:
-    static constexpr size_t kInvalidIndex = ~0llu;
-    static constexpr uint32_t kInvalidId = 0;
+    static constexpr size_t INVALID_INDEX = ~0llu;
+    static constexpr uint32_t INVALID_ID = 0;
 
-    explicit constexpr Entity() : m_id(kInvalidId) {}
+    explicit constexpr Entity() : m_id(INVALID_ID) {}
 
     explicit constexpr Entity(uint32_t handle) : m_id(handle) {}
 
@@ -18,9 +18,9 @@ public:
 
     bool operator!=(const Entity& rhs) const { return m_id != rhs.m_id; }
 
-    bool is_valid() const { return m_id != kInvalidId; }
+    bool is_valid() const { return m_id != INVALID_ID; }
 
-    void make_invalid() { m_id = kInvalidId; }
+    void make_invalid() { m_id = INVALID_ID; }
 
     constexpr uint32_t get_id() const { return m_id; }
 
@@ -28,7 +28,7 @@ public:
 
     static Entity create();
 
-    static const Entity kInvalid;
+    static const Entity INVALID;
 
 private:
     uint32_t m_id;

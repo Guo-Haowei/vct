@@ -5,7 +5,9 @@
 #include "servers/rendering/r_defines.h"
 #include "servers/rendering/rendering_dvars.h"
 
-void DebugPanel::RenderInternal(Scene&) {
+namespace vct {
+
+void DebugPanel::update_internal(Scene&) {
     ImGui::Text("Voxel GI");
     ImGui::Checkbox("Enable GI", (bool*)(DVAR_GET_POINTER(r_enable_vxgi)));
     ImGui::Checkbox("No Texture", (bool*)(DVAR_GET_POINTER(r_no_texture)));
@@ -47,3 +49,5 @@ void DebugPanel::RenderInternal(Scene&) {
 
     ImGui::Checkbox("toggle grid visibility", (bool*)(DVAR_GET_POINTER(grid_visibility)));
 }
+
+}  // namespace vct

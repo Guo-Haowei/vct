@@ -3,8 +3,11 @@
 #include "imgui/imgui_internal.h"
 #include "scene/scene.h"
 
-void AnimationPanel::RenderInternal(Scene& scene) {
-    if (ImGui::Begin("Animation")) {
+namespace vct {
+
+void AnimationPanel::update_internal(Scene& scene) {
+    // if (ImGui::Begin("Animation"))
+    {
         for (int i = 0; i < scene.get_count<AnimationComponent>(); ++i) {
             ecs::Entity id = scene.get_entity<AnimationComponent>(i);
             AnimationComponent& animation = scene.get_component_array<AnimationComponent>()[i];
@@ -25,5 +28,7 @@ void AnimationPanel::RenderInternal(Scene& scene) {
             ImGui::Separator();
         }
     }
-    ImGui::End();
+    // ImGui::End();
 }
+
+}  // namespace vct

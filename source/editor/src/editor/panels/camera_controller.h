@@ -25,6 +25,3 @@ private:
 };
 
 }  // namespace vct
-
-// @TODO: fix
-extern vct::CameraController s_controller;
