@@ -2,11 +2,14 @@
 #include <tuple>
 
 #include "core/base/singleton.h"
+#include "core/framework/module.h"
 
 namespace vct {
 
-class DisplayServer : public Singleton<DisplayServer> {
+class DisplayServer : public Singleton<DisplayServer>, public Module {
 public:
+    DisplayServer() : Module("DisplayManager") {}
+
     virtual bool should_close() = 0;
 
     virtual std::tuple<int, int> get_frame_size() = 0;
@@ -14,9 +17,6 @@ public:
 
     virtual void new_frame() = 0;
     virtual void present() = 0;
-
-    virtual bool initialize() = 0;
-    virtual void finalize() = 0;
 };
 
 }  // namespace vct

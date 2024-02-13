@@ -8,6 +8,7 @@
 #include "core/dynamic_variable/dynamic_variable_manager.h"
 #include "core/framework/UIManager.h"
 #include "core/framework/graphics_manager.h"
+#include "core/framework/physics_manager.h"
 #include "core/framework/scene_manager.h"
 #include "core/input/input.h"
 #include "core/os/threads.h"
@@ -37,16 +38,30 @@ void Application::save_command_line(int argc, const char** argv) {
     }
 }
 
-int Application::run(int argc, const char** argv) {
-    m_os = std::make_shared<OS>();
-    m_rendering_server = std::make_shared<RenderingServer>();
-    m_display_server = std::make_shared<DisplayServerGLFW>();
+void Application::register_module(Module* module) {
+    module->m_app = this;
+    m_modules.push_back(module);
+}
+
+void Application::setup_modules() {
     m_scene_manager = std::make_shared<SceneManager>();
-    m_scene_manager->m_app = this;
+    m_physics_manager = std::make_shared<PhysicsManager>();
+    m_display_server = std::make_shared<DisplayServerGLFW>();
+    m_graphics_manager = std::make_shared<GraphicsManager>();
 
-    m_event_queue.register_listener(m_rendering_server.get());
+    register_module(m_scene_manager.get());
+    register_module(m_physics_manager.get());
+    register_module(m_display_server.get());
+    register_module(m_graphics_manager.get());
 
+    m_event_queue.register_listener(m_graphics_manager.get());
+    m_event_queue.register_listener(m_physics_manager.get());
+}
+
+int Application::run(int argc, const char** argv) {
     save_command_line(argc, argv);
+    m_os = std::make_shared<OS>();
+    setup_modules();
 
     // intialize
     OS::singleton().initialize();
@@ -61,10 +76,17 @@ int Application::run(int argc, const char** argv) {
     jobsystem::initialize();
     asset_loader::initialize();
 
-    SceneManager::singleton().initialize();
     UIManager::initialize();
-    DisplayServer::singleton().initialize();
-    RenderingServer::singleton().initialize();
+
+    for (Module* module : m_modules) {
+        LOG("module '{}' being initialized...", module->get_name());
+        if (!module->initialize()) {
+            LOG_ERROR("Error: failed to initialize module '{}'", module->get_name());
+            return 1;
+        }
+        LOG("module '{}' initialized\n", module->get_name());
+    }
+
     ShaderProgramManager::singleton().initialize();
 
     init_layers();
@@ -113,7 +135,7 @@ int Application::run(int argc, const char** argv) {
         }
         ImGui::Render();
 
-        RenderingServer::singleton().render();
+        GraphicsManager::singleton().render();
 
         DisplayServer::singleton().present();
 
@@ -137,10 +159,14 @@ int Application::run(int argc, const char** argv) {
 
     // finalize
     ShaderProgramManager::singleton().finalize();
-    RenderingServer::singleton().finalize();
-    DisplayServer::singleton().finalize();
+
+    for (int index = (int)m_modules.size() - 1; index >= 0; --index) {
+        Module* module = m_modules[index];
+        module->finalize();
+        LOG_VERBOSE("module '{}' finalized", module->get_name());
+    }
+
     UIManager::finalize();
-    SceneManager::singleton().finalize();
 
     asset_loader::finalize();
     jobsystem::finalize();

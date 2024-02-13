@@ -85,17 +85,20 @@ void SceneManager::update(float dt) {
             m_scene = new_scene;
         }
         m_loading_scene.store(nullptr);
-
         ++m_revision;
+    }
 
+    if (m_last_revision < m_revision) {
         // @TODO: profiler
         Timer timer;
         auto event = std::make_shared<SceneChangeEvent>(m_scene);
         m_app->get_event_queue().dispatch_event(event);
         on_scene_changed(m_scene);
-        LOG("[SceneManager] scene changed from revision {} to revision {}, took {}", m_revision - 1, m_revision, timer.get_duration_string());
+        LOG("[SceneManager] Detected scene changed from revision {} to revision {}, took {}", m_last_revision, m_revision, timer.get_duration_string());
+        m_last_revision = m_revision;
     }
 
+    // @TODO: refactor
     Scene& scene = SceneManager::get_scene();
 
     auto [frameW, frameH] = DisplayServer::singleton().get_frame_size();

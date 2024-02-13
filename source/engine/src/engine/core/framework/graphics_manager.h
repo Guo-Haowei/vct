@@ -1,6 +1,7 @@
 #pragma once
 #include "core/base/singleton.h"
 #include "core/framework/event_queue.h"
+#include "core/framework/module.h"
 #include "rendering/GpuTexture.h"
 #include "rendering/gl_utils.h"
 #include "rendering/r_cbuffers.h"
@@ -9,13 +10,15 @@ namespace vct {
 
 struct RenderData;
 
-class RenderingServer : public Singleton<RenderingServer>, public EventListener {
+class GraphicsManager : public Singleton<GraphicsManager>, public Module, public EventListener {
 public:
     enum {
         RENDER_GRAPH_NONE,
         RENDER_GRAPH_VXGI,
         RENDER_GRAPH_VXGI_DEBUG,
     };
+
+    GraphicsManager() : Module("GraphicsManager") {}
 
     bool initialize();
     void finalize();

@@ -1,12 +1,14 @@
 #pragma once
 #include "core/framework/event_queue.h"
 #include "core/framework/layer.h"
+#include "core/framework/module.h"
 #include "core/os/os.h"
 
 namespace vct {
 
 class DisplayServer;
-class RenderingServer;
+class GraphicsManager;
+class PhysicsManager;
 class SceneManager;
 
 class Application {
@@ -23,6 +25,9 @@ protected:
 private:
     void save_command_line(int argc, const char** argv);
 
+    void register_module(Module* module);
+    void setup_modules();
+
     std::vector<std::shared_ptr<Layer>> m_layers;
     std::vector<std::string> m_command_line;
     std::string m_app_name;
@@ -31,9 +36,11 @@ private:
 
     EventQueue m_event_queue;
 
-    std::shared_ptr<DisplayServer> m_display_server;
-    std::shared_ptr<RenderingServer> m_rendering_server;
     std::shared_ptr<SceneManager> m_scene_manager;
+    std::shared_ptr<PhysicsManager> m_physics_manager;
+    std::shared_ptr<DisplayServer> m_display_server;
+    std::shared_ptr<GraphicsManager> m_graphics_manager;
+    std::vector<Module*> m_modules;
 };
 
 }  // namespace vct

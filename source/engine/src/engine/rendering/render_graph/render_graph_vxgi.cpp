@@ -43,7 +43,7 @@ void shadow_pass_func() {
     const int res = DVAR_GET_INT(r_shadow_res);
     glViewport(0, 0, res, res);
 
-    auto render_data = RenderingServer::singleton().get_render_data();
+    auto render_data = GraphicsManager::singleton().get_render_data();
 
     for (const auto& draw : render_data->shadow_pass.draws) {
         const bool has_bone = draw.armature_id.is_valid();
@@ -87,7 +87,7 @@ void voxelization_pass_func() {
     g_normalVoxel.bindImageTexture(IMAGE_VOXEL_NORMAL_SLOT);
     ShaderProgramManager::get(PROGRAM_VOXELIZATION).bind();
 
-    auto render_data = RenderingServer::singleton().get_render_data();
+    auto render_data = GraphicsManager::singleton().get_render_data();
 
     for (const auto& draw : render_data->shadow_pass.draws) {
         const bool has_bone = draw.armature_id.is_valid();
@@ -141,7 +141,7 @@ void gbuffer_pass_func() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    auto render_data = RenderingServer::singleton().get_render_data();
+    auto render_data = GraphicsManager::singleton().get_render_data();
 
     for (const auto& draw : render_data->shadow_pass.draws) {
         const bool has_bone = draw.armature_id.is_valid();

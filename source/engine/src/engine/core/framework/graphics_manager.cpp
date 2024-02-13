@@ -48,7 +48,7 @@ namespace vct {
 
 static void APIENTRY gl_debug_callback(GLenum, GLenum, unsigned int, GLenum, GLsizei, const char*, const void*);
 
-bool RenderingServer::initialize() {
+bool GraphicsManager::initialize() {
     if (gladLoadGL() == 0) {
         LOG_FATAL("[glad] failed to import gl functions");
         return false;
@@ -81,7 +81,7 @@ bool RenderingServer::initialize() {
     return true;
 }
 
-void RenderingServer::finalize() {
+void GraphicsManager::finalize() {
     destroyGpuResources();
 
     ImGui_ImplOpenGL3_Shutdown();
@@ -143,7 +143,7 @@ static void create_mesh_data(const MeshComponent& mesh, MeshData& out_mesh) {
     glBindVertexArray(0);
 }
 
-void RenderingServer::event_received(std::shared_ptr<Event> event) {
+void GraphicsManager::event_received(std::shared_ptr<Event> event) {
     SceneChangeEvent* e = dynamic_cast<SceneChangeEvent*>(event.get());
     if (!e) {
         return;
@@ -260,7 +260,7 @@ static void create_ssao_resource() {
     g_noiseTexture = noiseTexture;
 }
 
-void RenderingServer::createGpuResources() {
+void GraphicsManager::createGpuResources() {
     create_ssao_resource();
 
     R_Alloc_Cbuffers();
@@ -277,10 +277,10 @@ void RenderingServer::createGpuResources() {
     }
 
     switch (m_method) {
-        case vct::RenderingServer::RENDER_GRAPH_VXGI:
+        case vct::GraphicsManager::RENDER_GRAPH_VXGI:
             create_render_graph_vxgi(g_render_graph);
             break;
-        case vct::RenderingServer::RENDER_GRAPH_VXGI_DEBUG:
+        case vct::GraphicsManager::RENDER_GRAPH_VXGI_DEBUG:
             create_render_graph_vxgi_debug(g_render_graph);
             break;
         default:
@@ -323,10 +323,10 @@ void RenderingServer::createGpuResources() {
     }
 
     switch (m_method) {
-        case vct::RenderingServer::RENDER_GRAPH_VXGI:
+        case vct::GraphicsManager::RENDER_GRAPH_VXGI:
             pass = g_render_graph.find_pass(LIGHTING_PASS);
             break;
-        case vct::RenderingServer::RENDER_GRAPH_VXGI_DEBUG:
+        case vct::GraphicsManager::RENDER_GRAPH_VXGI_DEBUG:
             pass = g_render_graph.find_pass(VXGI_DEBUG_PASS);
             break;
         default:
@@ -372,11 +372,11 @@ struct MaterialCache {
     }
 };
 
-uint32_t RenderingServer::get_final_image() const {
+uint32_t GraphicsManager::get_final_image() const {
     switch (m_method) {
-        case vct::RenderingServer::RENDER_GRAPH_VXGI:
+        case vct::GraphicsManager::RENDER_GRAPH_VXGI:
             return g_render_graph.find_pass(FINAL_PASS)->get_color_attachment(0);
-        case vct::RenderingServer::RENDER_GRAPH_VXGI_DEBUG:
+        case vct::GraphicsManager::RENDER_GRAPH_VXGI_DEBUG:
             return g_render_graph.find_pass(FXAA_PASS)->get_color_attachment(0);
         default:
             CRASH_NOW();
@@ -384,7 +384,7 @@ uint32_t RenderingServer::get_final_image() const {
     }
 }
 
-void RenderingServer::render() {
+void GraphicsManager::render() {
     Scene& scene = SceneManager::singleton().get_scene();
     m_render_data->update(&scene);
 
@@ -392,7 +392,7 @@ void RenderingServer::render() {
     g_render_graph.execute();
 }
 
-void RenderingServer::destroyGpuResources() {
+void GraphicsManager::destroyGpuResources() {
     R_DestroyEditorResource();
     R_Destroy_Cbuffers();
 
