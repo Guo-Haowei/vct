@@ -6,7 +6,7 @@ namespace vct {
 
 class Viewer : public Panel {
 public:
-    Viewer(EditorLayer& editor);
+    Viewer(EditorLayer& editor) : Panel("Viewer", editor) {}
 
 protected:
     void update_internal(Scene& scene) override;

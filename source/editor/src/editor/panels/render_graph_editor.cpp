@@ -1,7 +1,7 @@
 #include "render_graph_editor.h"
 
 #include "GraphEditor.h"
-#include "servers/rendering/render_graph/render_graph.h"
+#include "rendering/render_graph/render_graph.h"
 
 // @TODO: fix
 extern vct::RenderGraph g_render_graph;

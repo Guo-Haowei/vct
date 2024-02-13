@@ -1,6 +1,6 @@
 #include "job_system.h"
 
-#include "core/collections/thread_safe_ring_buffer.h"
+#include "core/base/thread_safe_ring_buffer.h"
 #include "core/math/geomath.h"
 #include "core/os/threads.h"
 
@@ -10,7 +10,7 @@ static struct
 {
     std::condition_variable wake_condition;
     std::mutex wake_mutex;
-    collection::ThreadSafeRingBuffer<Job, 128> job_queue;
+    ThreadSafeRingBuffer<Job, 128> job_queue;
 } s_glob;
 
 static bool work() {

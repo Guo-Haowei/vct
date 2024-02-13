@@ -7,18 +7,13 @@
 
 // @TODO: refactor
 #include "core/dynamic_variable/common_dvars.h"
+#include "core/framework/graphics_manager.h"
+#include "core/framework/scene_manager.h"
 #include "core/input/input.h"
 #include "core/math/ray.h"
-#include "scene/scene_manager.h"
 #include "servers/display_server.h"
-#include "servers/rendering_server.h"
 
 namespace vct {
-
-Viewer::Viewer(EditorLayer& editor_layer) : Panel("Viewer", editor_layer) {
-    // @TODO: fix this
-    m_camera_controller.set_camera(SceneManager::get_scene().get_main_camera());
-}
 
 void Viewer::update_data() {
     auto [frame_width, frame_height] = DisplayServer::singleton().get_frame_size();
@@ -41,7 +36,9 @@ void Viewer::update_data() {
 
 void Viewer::update_camera(CameraComponent& camera, float dt) {
     if (m_focused) {
-        m_camera_controller.move_camera(camera, dt);
+        // @TODO:
+        m_camera_controller.set_camera(&camera);
+        m_camera_controller.move(dt);
     }
 }
 
@@ -89,7 +86,7 @@ void Viewer::draw_gui(Scene& scene, CameraComponent& camera) {
     ImVec2 top_left(m_canvas_min.x, m_canvas_min.y);
     ImVec2 bottom_right(top_left.x + m_canvas_size.x, top_left.y + m_canvas_size.y);
 
-    uint64_t final_image = RenderingServer::singleton().get_final_image();
+    uint64_t final_image = GraphicsManager::singleton().get_final_image();
     ImGui::GetWindowDrawList()->AddImage((ImTextureID)final_image, top_left, bottom_right, ImVec2(0, 1), ImVec2(1, 0));
 
     // draw grid

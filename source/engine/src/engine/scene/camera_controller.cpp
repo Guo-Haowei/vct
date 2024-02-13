@@ -4,14 +4,19 @@
 
 namespace vct {
 
-void CameraController::set_camera(CameraComponent& camera) {
-    vec3 eye = calculate_eye(camera.get_eye());
-    camera.set_eye(eye);
+void CameraController::set_camera(CameraComponent* camera) {
+    if (m_camera) {
+        return;
+    }
 
-    m_direction = glm::normalize(eye - camera.get_center());
+    vec3 eye = calculate_eye(camera->get_eye());
+    camera->set_eye(eye);
+
+    m_direction = glm::normalize(eye - camera->get_center());
+    m_camera = camera;
 }
 
-void CameraController::move_camera(CameraComponent& camera, float dt) {
+void CameraController::move(float dt) {
     // rotate
     if (input::is_button_down(MOUSE_BUTTON_MIDDLE)) {
         const float rotateSpeed = 20.0f * dt;
@@ -28,7 +33,7 @@ void CameraController::move_camera(CameraComponent& camera, float dt) {
         }
 
         if (dirty) {
-            camera.set_eye(calculate_eye(camera.get_center()));
+            m_camera->set_eye(calculate_eye(m_camera->get_center()));
         }
         return;
     }
@@ -39,12 +44,12 @@ void CameraController::move_camera(CameraComponent& camera, float dt) {
         if (glm::abs(p.x) >= 1.0f || glm::abs(p.y) >= 1.0f) {
             const float panSpeed = 10.0f * dt;
 
-            mat4 model = glm::inverse(camera.get_view_matrix());
+            mat4 model = glm::inverse(m_camera->get_view_matrix());
             vec3 offset = glm::normalize(vec3(p.x, p.y, 0.0f));
-            vec3 new_center = camera.get_center();
+            vec3 new_center = m_camera->get_center();
             new_center -= panSpeed * vec3(model * vec4(offset, 0.0f));
-            camera.set_center(new_center);
-            camera.set_eye(calculate_eye(camera.get_center()));
+            m_camera->set_center(new_center);
+            m_camera->set_eye(calculate_eye(m_camera->get_center()));
             return;
         }
     }
@@ -64,7 +69,7 @@ void CameraController::move_camera(CameraComponent& camera, float dt) {
     if (m_scroll_speed != 0.0f) {
         m_distance -= m_scroll_speed * scrolling;
         m_distance = glm::clamp(m_distance, 0.3f, 10000.0f);
-        camera.set_eye(calculate_eye(camera.get_center()));
+        m_camera->set_eye(calculate_eye(m_camera->get_center()));
     }
 }
 

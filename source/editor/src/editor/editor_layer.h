@@ -1,6 +1,6 @@
 #pragma once
+#include "core/base/noncopyable.h"
 #include "core/framework/application.h"
-#include "core/objects/noncopyable.h"
 #include "panels/panel.h"
 #include "scene/scene.h"
 
@@ -17,9 +17,9 @@ public:
 
     EditorLayer();
 
-    void Attach() override {}
-    void Update(float dt) override;
-    void Render() override;
+    void attach() override {}
+    void update(float dt) override;
+    void render() override;
 
     void select_entity(ecs::Entity selected);
     ecs::Entity get_selected_entity() const { return m_selected; }

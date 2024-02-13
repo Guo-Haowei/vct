@@ -1,7 +1,7 @@
 #pragma once
-#include "core/collections/ring_buffer.h"
+#include "core/base/ring_buffer.h"
 // #include "core/math/color.h"
-#include "core/objects/singleton.h"
+#include "core/base/singleton.h"
 #include "print.h"
 
 namespace vct {

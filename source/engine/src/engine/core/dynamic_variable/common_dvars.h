@@ -1,6 +1,7 @@
 #include "dynamic_variable_begin.h"
 
 DVAR_STRING(project, 0, "Open project at start", "");
+DVAR_BOOL(test_physics, 0, "Open physics test scene", false);
 
 // window
 DVAR_IVEC2(window_resolution, DVAR_FLAG_SERIALIZE, "Request window resolution", 800, 600);

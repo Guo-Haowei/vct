@@ -181,34 +181,146 @@ Entity Scene::create_sphere_entity(const std::string& name, Entity material_id, 
 }
 
 Entity Scene::create_cube_entity(const std::string& name, const vec3& scale, const mat4& transform) {
-    Entity matID = create_material_entity(name + ":mat");
-    return create_cube_entity(name, matID, scale, transform);
+    Entity material_id = create_material_entity(name + ":mat");
+    return create_cube_entity(name, material_id, scale, transform);
 }
 
 Entity Scene::create_cube_entity(const std::string& name, Entity material_id, const vec3& scale,
                                  const mat4& transform) {
-    CRASH_NOW();
-    (void)name;
-    (void)material_id;
-    (void)scale;
-    (void)transform;
-    Entity entity = create_object_entity(name);
-    // TransformComponent& trans = *get_component<TransformComponent>(entity);
-    // ObjectComponent& obj = *get_component<ObjectComponent>(entity);
-    // trans.MatrixTransform(transform);
+    ecs::Entity entity = create_object_entity(name);
+    TransformComponent& trans = *get_component<TransformComponent>(entity);
+    ObjectComponent& obj = *get_component<ObjectComponent>(entity);
+    trans.matrix_transform(transform);
 
-    // Entity meshID = Entity_CreateMesh(name + ":mesh");
-    // obj.meshID = meshID;
+    ecs::Entity mesh_id = create_mesh_entity(name + ":mesh");
+    obj.mesh_id = mesh_id;
 
-    // MeshComponent& mesh = *get_component<MeshComponent>(meshID);
+    MeshComponent& mesh = *get_component<MeshComponent>(mesh_id);
 
-    // fill_cube_data(scale, mesh);
+    // clang-format off
+    constexpr uint32_t indices[] = {
+        0,          1,          2,          0,          2,          3,
+        0 + 4,      2 + 4,      1 + 4,      0 + 4,      3 + 4,      2 + 4,  // swapped winding
+        0 + 4 * 2,  1 + 4 * 2,  2 + 4 * 2,  0 + 4 * 2,  2 + 4 * 2,  3 + 4 * 2,
+        0 + 4 * 3,  2 + 4 * 3,  1 + 4 * 3,  0 + 4 * 3,  3 + 4 * 3,  2 + 4 * 3, // swapped winding
+        0 + 4 * 4,  2 + 4 * 4,  1 + 4 * 4,  0 + 4 * 4,  3 + 4 * 4,  2 + 4 * 4, // swapped winding
+        0 + 4 * 5,  1 + 4 * 5,  2 + 4 * 5,  0 + 4 * 5,  2 + 4 * 5,  3 + 4 * 5,
+    };
+    // clang-format on
 
-    // MeshComponent::MeshSubset subset;
-    // subset.materialID = materialID;
-    // subset.indexCount = static_cast<uint32_t>(mesh.mIndices.size());
-    // subset.indexOffset = 0;
-    // mesh.mSubsets.emplace_back(subset);
+    const vec3& s = scale;
+    mesh.positions = {
+        // -Z
+        vec3(-s.x, +s.y, -s.z),
+        vec3(-s.x, -s.y, -s.z),
+        vec3(+s.x, -s.y, -s.z),
+        vec3(+s.x, +s.y, -s.z),
+
+        // +Z
+        vec3(-s.x, +s.y, +s.z),
+        vec3(-s.x, -s.y, +s.z),
+        vec3(+s.x, -s.y, +s.z),
+        vec3(+s.x, +s.y, +s.z),
+
+        // -X
+        vec3(-s.x, -s.y, +s.z),
+        vec3(-s.x, -s.y, -s.z),
+        vec3(-s.x, +s.y, -s.z),
+        vec3(-s.x, +s.y, +s.z),
+
+        // +X
+        vec3(+s.x, -s.y, +s.z),
+        vec3(+s.x, -s.y, -s.z),
+        vec3(+s.x, +s.y, -s.z),
+        vec3(+s.x, +s.y, +s.z),
+
+        // -Y
+        vec3(-s.x, -s.y, +s.z),
+        vec3(-s.x, -s.y, -s.z),
+        vec3(+s.x, -s.y, -s.z),
+        vec3(+s.x, -s.y, +s.z),
+
+        // +Y
+        vec3(-s.x, +s.y, +s.z),
+        vec3(-s.x, +s.y, -s.z),
+        vec3(+s.x, +s.y, -s.z),
+        vec3(+s.x, +s.y, +s.z),
+    };
+
+    mesh.texcoords_0 = {
+        vec2(0, 0),
+        vec2(0, 1),
+        vec2(1, 1),
+        vec2(1, 0),
+
+        vec2(0, 0),
+        vec2(0, 1),
+        vec2(1, 1),
+        vec2(1, 0),
+
+        vec2(0, 0),
+        vec2(0, 1),
+        vec2(1, 1),
+        vec2(1, 0),
+
+        vec2(0, 0),
+        vec2(0, 1),
+        vec2(1, 1),
+        vec2(1, 0),
+
+        vec2(0, 0),
+        vec2(0, 1),
+        vec2(1, 1),
+        vec2(1, 0),
+
+        vec2(0, 0),
+        vec2(0, 1),
+        vec2(1, 1),
+        vec2(1, 0),
+    };
+
+    mesh.normals = {
+        vec3(0, 0, -1),
+        vec3(0, 0, -1),
+        vec3(0, 0, -1),
+        vec3(0, 0, -1),
+
+        vec3(0, 0, 1),
+        vec3(0, 0, 1),
+        vec3(0, 0, 1),
+        vec3(0, 0, 1),
+
+        vec3(-1, 0, 0),
+        vec3(-1, 0, 0),
+        vec3(-1, 0, 0),
+        vec3(-1, 0, 0),
+
+        vec3(1, 0, 0),
+        vec3(1, 0, 0),
+        vec3(1, 0, 0),
+        vec3(1, 0, 0),
+
+        vec3(0, -1, 0),
+        vec3(0, -1, 0),
+        vec3(0, -1, 0),
+        vec3(0, -1, 0),
+
+        vec3(0, 1, 0),
+        vec3(0, 1, 0),
+        vec3(0, 1, 0),
+        vec3(0, 1, 0),
+    };
+    MeshComponent::MeshSubset subset;
+    subset.material_id = material_id;
+    subset.index_count = array_length(indices);
+    subset.index_offset = 0;
+    mesh.subsets.emplace_back(subset);
+
+    for (int i = 0; i < array_length(indices); i += 3) {
+        mesh.indices.push_back(indices[i]);
+        mesh.indices.push_back(indices[i + 2]);
+        mesh.indices.push_back(indices[i + 1]);
+    }
 
     return entity;
 }
@@ -427,17 +539,17 @@ bool Scene::serialize(Archive& archive) {
         archive.write(m_bound);
     }
 
-    m_NameComponents.serialize(archive);
-    m_TransformComponents.serialize(archive);
-    m_HierarchyComponents.serialize(archive);
-    m_MaterialComponents.serialize(archive);
-    m_MeshComponents.serialize(archive);
-    m_ObjectComponents.serialize(archive);
-    m_CameraComponents.serialize(archive);
-    m_LightComponents.serialize(archive);
-    m_ArmatureComponents.serialize(archive);
-    m_AnimationComponents.serialize(archive);
-    m_RigidBodyPhysicsComponents.serialize(archive);
+    serialize<NameComponent>(archive);
+    serialize<TransformComponent>(archive);
+    serialize<HierarchyComponent>(archive);
+    serialize<MaterialComponent>(archive);
+    serialize<MeshComponent>(archive);
+    serialize<ObjectComponent>(archive);
+    serialize<CameraComponent>(archive);
+    serialize<LightComponent>(archive);
+    serialize<ArmatureComponent>(archive);
+    serialize<AnimationComponent>(archive);
+    serialize<RigidBodyComponent>(archive);
 
     return true;
 }

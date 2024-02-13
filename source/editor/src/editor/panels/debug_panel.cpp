@@ -1,9 +1,9 @@
 #include "debug_panel.h"
 
 #include "core/dynamic_variable/common_dvars.h"
+#include "rendering/r_defines.h"
+#include "rendering/rendering_dvars.h"
 #include "scene/scene.h"
-#include "servers/rendering/r_defines.h"
-#include "servers/rendering/rendering_dvars.h"
 
 namespace vct {
 

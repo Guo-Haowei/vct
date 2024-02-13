@@ -1,9 +1,10 @@
 #include "editor_layer.h"
 
 #include "imgui/imgui_internal.h"
-#include "servers/rendering/r_cbuffers.h"
+#include "rendering/r_cbuffers.h"
 /////////////////////
 #include "core/dynamic_variable/common_dvars.h"
+#include "core/framework/scene_manager.h"
 #include "core/input/input.h"
 #include "panels/animation_panel.h"
 #include "panels/console_panel.h"
@@ -13,7 +14,6 @@
 #include "panels/propertiy_panel.h"
 #include "panels/render_graph_editor.h"
 #include "panels/viewer.h"
-#include "scene/scene_manager.h"
 #include "servers/display_server.h"
 
 namespace vct {
@@ -80,7 +80,7 @@ void EditorLayer::dock_space() {
     return;
 }
 
-void EditorLayer::Update(float) {
+void EditorLayer::update(float) {
     dock_space();
     Scene& scene = SceneManager::get_scene();
     for (auto& it : m_panels) {
@@ -90,7 +90,7 @@ void EditorLayer::Update(float) {
     scene.m_selected = m_selected;
 }
 
-void EditorLayer::Render() {
+void EditorLayer::render() {
 }
 
 }  // namespace vct

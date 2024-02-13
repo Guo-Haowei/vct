@@ -1,6 +1,6 @@
 #pragma once
+#include "core/base/noncopyable.h"
 #include "core/math/ray.h"
-#include "core/objects/noncopyable.h"
 #include "core/systems/component_manager.h"
 #include "scene_components.h"
 
@@ -62,6 +62,10 @@ public:                                                                         
     T& create<T>(const ecs::Entity& entity) {                                                    \
         return m_##T##s.create(entity);                                                          \
     }                                                                                            \
+    template<>                                                                                   \
+    void serialize<T>(Archive & archive) {                                                       \
+        return m_##T##s.serialize(archive);                                                      \
+    }                                                                                            \
     enum { __DUMMY_ENUM_TO_FORCE_SEMI_COLON_##T }
 
 #pragma endregion WORLD_COMPONENTS_REGISTERY
@@ -109,6 +113,9 @@ public:                                                                         
     T& create(const ecs::Entity&) {
         return *(T*)(nullptr);
     }
+    template<typename T>
+    void serialize(Archive&) {
+    }
 
     ecs::ComponentLibrary m_component_lib;
 
@@ -122,7 +129,7 @@ public:                                                                         
     REGISTER_COMPONENT(LightComponent, 0);
     REGISTER_COMPONENT(ArmatureComponent, 0);
     REGISTER_COMPONENT(AnimationComponent, 0);
-    REGISTER_COMPONENT(RigidBodyPhysicsComponent, 0);
+    REGISTER_COMPONENT(RigidBodyComponent, 0);
 
     bool serialize(Archive& archive);
 
