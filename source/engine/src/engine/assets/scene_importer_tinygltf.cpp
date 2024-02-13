@@ -271,8 +271,8 @@ bool SceneImporterTinyGLTF::import_impl() {
             const tinygltf::Accessor& accessor = m_model->accessors[skin.inverseBindMatrices];
             const tinygltf::BufferView& bufferView = m_model->bufferViews[accessor.bufferView];
             const tinygltf::Buffer& buffer = m_model->buffers[bufferView.buffer];
-            armature.inverseBindMatrices.resize(accessor.count);
-            memcpy(armature.inverseBindMatrices.data(), &buffer.data[accessor.byteOffset + bufferView.byteOffset], accessor.count * sizeof(mat4));
+            armature.inverse_bind_matrices.resize(accessor.count);
+            memcpy(armature.inverse_bind_matrices.data(), &buffer.data[accessor.byteOffset + bufferView.byteOffset], accessor.count * sizeof(mat4));
         } else {
             LOG_FATAL("No inverse matrices found");
         }
@@ -292,13 +292,13 @@ bool SceneImporterTinyGLTF::import_impl() {
         ArmatureComponent& armature = m_scene.get_component_array<ArmatureComponent>()[armatureIndex++];
 
         const size_t jointCount = skin.joints.size();
-        armature.boneCollection.resize(jointCount);
+        armature.bone_collection.resize(jointCount);
 
         // create bone collection
         for (size_t i = 0; i < jointCount; ++i) {
             int jointIndex = skin.joints[i];
             ecs::Entity boneID = m_entity_map[jointIndex];
-            armature.boneCollection[i] = boneID;
+            armature.bone_collection[i] = boneID;
         }
     }
 

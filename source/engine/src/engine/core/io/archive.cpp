@@ -5,18 +5,33 @@
 namespace vct {
 
 auto Archive::open_mode(const std::string& path, bool write_mode) -> std::expected<void, Error<ErrorCode>> {
-    auto res = FileAccess::open(path, write_mode ? FileAccess::WRITE : FileAccess::READ);
+    m_path = path;
+    m_write_mode = write_mode;
+    if (m_write_mode) {
+        m_path += ".tmp";
+    }
+
+    auto res = FileAccess::open(m_path, write_mode ? FileAccess::WRITE : FileAccess::READ);
     if (!res) {
         return std::unexpected(res.error());
     }
 
     m_file = *res;
-    m_write_mode = write_mode;
     return std::expected<void, Error<ErrorCode>>();
 }
 
 void Archive::close() {
+    if (!m_file) {
+        return;
+    }
+
     m_file.reset();
+
+    if (m_write_mode) {
+        std::filesystem::path final_path{ m_path };
+        final_path.replace_extension();
+        std::filesystem::rename(m_path, final_path);
+    }
 }
 
 bool Archive::is_write_mode() const {

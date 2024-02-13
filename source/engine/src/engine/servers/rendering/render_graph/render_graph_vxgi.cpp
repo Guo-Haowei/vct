@@ -66,9 +66,9 @@ void shadow_pass_func() {
 
             if (has_bone) {
                 auto& armature = *scene.get_component<ArmatureComponent>(mesh.armature_id);
-                DEV_ASSERT(armature.boneTransforms.size() <= MAX_BONE_NUMBER);
+                DEV_ASSERT(armature.bone_transforms.size() <= MAX_BONE_NUMBER);
 
-                memcpy(g_boneCache.cache.c_bones, armature.boneTransforms.data(), sizeof(mat4) * armature.boneTransforms.size());
+                memcpy(g_boneCache.cache.c_bones, armature.bone_transforms.data(), sizeof(mat4) * armature.bone_transforms.size());
                 g_boneCache.Update();
             }
 
@@ -192,9 +192,9 @@ void gbuffer_pass_func() {
 
         if (has_bone) {
             auto& armature = *scene.get_component<ArmatureComponent>(mesh.armature_id);
-            DEV_ASSERT(armature.boneTransforms.size() <= MAX_BONE_NUMBER);
+            DEV_ASSERT(armature.bone_transforms.size() <= MAX_BONE_NUMBER);
 
-            memcpy(g_boneCache.cache.c_bones, armature.boneTransforms.data(), sizeof(mat4) * armature.boneTransforms.size());
+            memcpy(g_boneCache.cache.c_bones, armature.bone_transforms.data(), sizeof(mat4) * armature.bone_transforms.size());
             g_boneCache.Update();
         }
 

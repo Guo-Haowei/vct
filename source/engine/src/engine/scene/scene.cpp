@@ -381,20 +381,20 @@ void Scene::update_armature(uint32_t index) {
     // the hierarchy system. 	But this will correct them too.
 
     const mat4 R = glm::inverse(transform->get_world_matrix());
-    const size_t numBones = armature.boneCollection.size();
-    if (armature.boneTransforms.size() != numBones) {
-        armature.boneTransforms.resize(numBones);
+    const size_t numBones = armature.bone_collection.size();
+    if (armature.bone_transforms.size() != numBones) {
+        armature.bone_transforms.resize(numBones);
     }
 
     int idx = 0;
-    for (Entity boneID : armature.boneCollection) {
+    for (Entity boneID : armature.bone_collection) {
         const TransformComponent* boneTransform = get_component<TransformComponent>(boneID);
         DEV_ASSERT(boneTransform);
 
-        const mat4& B = armature.inverseBindMatrices[idx];
+        const mat4& B = armature.inverse_bind_matrices[idx];
         const mat4& W = boneTransform->get_world_matrix();
         const mat4 M = R * W * B;
-        armature.boneTransforms[idx] = M;
+        armature.bone_transforms[idx] = M;
         ++idx;
 
         // @TODO: armature animation

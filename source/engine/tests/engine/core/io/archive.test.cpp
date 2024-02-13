@@ -8,21 +8,21 @@ namespace vct {
 TEST(Archive, open_read) {
     FileAccess::make_default<FileAccessUnix>(FileAccess::ACCESS_FILESYSTEM);
 
-    Archive reader;
-    auto err = reader.open_read("path_that_does_not_exist").error();
+    Archive archive;
+    auto err = archive.open_read("path_that_does_not_exist").error();
     EXPECT_EQ(err.get_value(), ERR_FILE_NOT_FOUND);
 }
 
 TEST(Archive, open_write) {
     const std::string test_file = "archive_test_open_write";
 
-    Archive reader;
-    auto result = reader.open_write(test_file);
-    ASSERT_TRUE(result);
-    EXPECT_TRUE(reader.is_write_mode());
+    Archive archive;
+    auto result = archive.open_write(test_file);
+    EXPECT_TRUE(result);
+    EXPECT_TRUE(archive.is_write_mode());
 
-    reader.close();
-    ASSERT_TRUE(std::filesystem::remove(test_file));
+    archive.close();
+    EXPECT_TRUE(std::filesystem::remove(test_file));
 }
 
 TEST(Archive, write_and_read) {
@@ -72,9 +72,10 @@ TEST(Archive, write_and_read) {
 
     reader.close();
 
-    ASSERT_TRUE(std::filesystem::remove(test_file));
+    EXPECT_TRUE(std::filesystem::remove(test_file));
 }
 
+// @TODO:
 // TEST(Archive, serialze_tag_component) {
 //     const std::string name = "MyAwesomeObject##001";
 //     const std::string TAG_COMPONENT_SERIALIZE_TEST_FILE = "archive_test_serialize_tag_component";

@@ -126,16 +126,49 @@ void ObjectComponent::serialize(Archive& archive) {
 }
 
 void AnimationComponent::serialize(Archive& archive) {
-    CRASH_NOW_MSG("NOT IMPLMENTED");
     if (archive.is_write_mode()) {
+        archive << flags;
+        archive << start;
+        archive << end;
+        archive << timer;
+        archive << amount;
+        archive << speed;
+        archive << channels;
+
+        uint64_t num_samplers = samplers.size();
+        archive << num_samplers;
+        for (uint64_t i = 0; i < num_samplers; ++i) {
+            archive << samplers[i].keyframe_times;
+            archive << samplers[i].keyframe_data;
+        }
     } else {
+        archive >> flags;
+        archive >> start;
+        archive >> end;
+        archive >> timer;
+        archive >> amount;
+        archive >> speed;
+        archive >> channels;
+
+        uint64_t num_samplers = 0;
+        archive >> num_samplers;
+        samplers.resize(num_samplers);
+        for (uint64_t i = 0; i < num_samplers; ++i) {
+            archive >> samplers[i].keyframe_times;
+            archive >> samplers[i].keyframe_data;
+        }
     }
 }
 
 void ArmatureComponent::serialize(Archive& archive) {
-    CRASH_NOW_MSG("NOT IMPLMENTED");
     if (archive.is_write_mode()) {
+        archive << flags;
+        archive << bone_collection;
+        archive << inverse_bind_matrices;
     } else {
+        archive >> flags;
+        archive >> bone_collection;
+        archive >> inverse_bind_matrices;
     }
 }
 
