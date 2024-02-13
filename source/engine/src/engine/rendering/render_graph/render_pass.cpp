@@ -1,6 +1,6 @@
 #include "render_pass.h"
 
-#include "../GLPrerequisites.h"
+#include "rendering/GLPrerequisites.h"
 
 namespace vct {
 

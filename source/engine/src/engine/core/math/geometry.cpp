@@ -22,7 +22,7 @@ namespace vct {
 enum { A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7 };
 // clang-format on
 
-MeshComponent MakeBox(float size) {
+MeshComponent make_box_mesh(float size) {
     MeshComponent mesh;
     mesh.positions = {
         vec3(-size, +size, +size),  // A
@@ -54,7 +54,7 @@ MeshComponent MakeBox(float size) {
 }
 
 // load scene
-MeshComponent MakeBoxWireFrame(float size) {
+MeshComponent make_box_wireframe_mesh(float size) {
     MeshComponent mesh;
     mesh.positions = {
         vec3(-size, +size, +size),  // A

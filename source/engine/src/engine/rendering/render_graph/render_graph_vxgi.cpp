@@ -2,15 +2,15 @@
 
 #include "core/base/rid_owner.h"
 #include "core/math/frustum.h"
+#include "rendering/rendering_dvars.h"
 #include "servers/display_server.h"
-#include "servers/rendering/rendering_dvars.h"
 
 // @TODO: refactor
-#include "../r_cbuffers.h"
-#include "scene/scene_manager.h"
-#include "servers/rendering/render_data.h"
-#include "servers/rendering/shader_program_manager.h"
-#include "servers/rendering_server.h"
+#include "core/framework/graphics_manager.h"
+#include "core/framework/scene_manager.h"
+#include "rendering/r_cbuffers.h"
+#include "rendering/render_data.h"
+#include "rendering/shader_program_manager.h"
 
 // @TODO: refactor
 using namespace vct;

@@ -12,7 +12,7 @@ NanoSecond Timer::get_duration() const {
 std::string Timer::get_duration_string() const {
     auto duration = get_duration();
 
-    if (duration.m_value < kSecond) {
+    if (duration.m_value < (kSecond / 10)) {
         return std::format("{:.2f} ms", duration.to_millisecond());
     }
 

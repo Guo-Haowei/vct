@@ -7,11 +7,11 @@
 
 // @TODO: refactor
 #include "core/dynamic_variable/common_dvars.h"
+#include "core/framework/graphics_manager.h"
+#include "core/framework/scene_manager.h"
 #include "core/input/input.h"
 #include "core/math/ray.h"
-#include "scene/scene_manager.h"
 #include "servers/display_server.h"
-#include "servers/rendering_server.h"
 
 namespace vct {
 

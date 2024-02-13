@@ -7,7 +7,7 @@
 #include "core/dynamic_variable/common_dvars.h"
 #include "core/io/file_access.h"
 #include "core/os/threads.h"
-#include "core/utility/timer.h"
+#include "core/os/timer.h"
 #include "scene/scene.h"
 
 namespace vct::asset_loader {

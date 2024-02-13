@@ -1,13 +1,16 @@
 #include "scene_manager.h"
 
+#include <imgui/imgui.h>
+
 #include "assets/asset_loader.h"
 #include "core/dynamic_variable/common_dvars.h"
 #include "core/framework/application.h"
-#include "core/utility/timer.h"
-#include "imgui/imgui.h"
+#include "core/os/timer.h"
+#include "rendering/rendering_dvars.h"
 #include "servers/display_server.h"
-#include "servers/rendering/r_cbuffers.h"
-#include "servers/rendering/rendering_dvars.h"
+// @TODO: fix
+
+#include "rendering/r_cbuffers.h"
 
 namespace vct {
 

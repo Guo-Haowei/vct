@@ -6,7 +6,7 @@
 #include "core/input/input.h"
 #include "imgui/backends/imgui_impl_glfw.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
-#include "servers/rendering/rendering_dvars.h"
+#include "rendering/rendering_dvars.h"
 
 namespace vct {
 

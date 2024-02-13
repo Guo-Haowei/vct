@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "assets/asset_loader.h"
-#include "servers/rendering/GLPrerequisites.h"
+#include "rendering/GLPrerequisites.h"
 
 namespace vct {
 

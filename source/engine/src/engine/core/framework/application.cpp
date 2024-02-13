@@ -7,17 +7,17 @@
 #include "core/dynamic_variable/common_dvars.h"
 #include "core/dynamic_variable/dynamic_variable_manager.h"
 #include "core/framework/UIManager.h"
+#include "core/framework/graphics_manager.h"
+#include "core/framework/scene_manager.h"
 #include "core/input/input.h"
 #include "core/os/threads.h"
+#include "core/os/timer.h"
 #include "core/systems/job_system.h"
-#include "core/utility/timer.h"
-#include "scene/scene_manager.h"
+#include "rendering/rendering_dvars.h"
+#include "rendering/rendering_misc.h"
+#include "rendering/shader_program_manager.h"
 #include "servers/display_server.h"
 #include "servers/display_server_glfw.h"
-#include "servers/rendering/rendering_dvars.h"
-#include "servers/rendering/rendering_misc.h"
-#include "servers/rendering/shader_program_manager.h"
-#include "servers/rendering_server.h"
 
 namespace vct {
 

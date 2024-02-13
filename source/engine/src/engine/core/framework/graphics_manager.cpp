@@ -1,20 +1,20 @@
 #pragma once
-#include "rendering_server.h"
+#include "graphics_manager.h"
 
 #include <random>
 
-#include "Core/geometry.h"
+#include "core/math/geometry.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
 #include "rendering/render_data.h"
 /////
 #include "core/base/rid_owner.h"
 #include "core/dynamic_variable/common_dvars.h"
+#include "core/framework/scene_manager.h"
 #include "rendering/r_defines.h"
 #include "rendering/r_editor.h"
+#include "rendering/rendering_dvars.h"
 #include "rendering/shader_program_manager.h"
-#include "scene/scene_manager.h"
 #include "servers/display_server.h"
-#include "servers/rendering/rendering_dvars.h"
 #include "vsinput.glsl.h"
 
 // @TODO: refactor
@@ -267,7 +267,7 @@ void RenderingServer::createGpuResources() {
     R_CreateEditorResource();
 
     // create a dummy box data
-    create_mesh_data(vct::MakeBox(), g_box);
+    create_mesh_data(vct::make_box_mesh(), g_box);
 
     std::string method(DVAR_GET_STRING(r_render_graph));
     if (method == "vxgi") {
