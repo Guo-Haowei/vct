@@ -25,9 +25,10 @@ private:
 
     vec2 m_canvas_min;
     vec2 m_canvas_size;
-    CameraController m_camera_controller;
     bool m_focused;
     State m_state = GIZMO_TRANSLATE;
+    // @TODO: move camera controller to somewhere else
+    CameraController m_camera_controller;
 };
 
 }  // namespace vct

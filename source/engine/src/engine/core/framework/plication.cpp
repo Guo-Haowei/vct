@@ -52,8 +52,8 @@ int Application::run(int argc, const char** argv) {
     // dvars
     register_common_dvars();
     register_rendering_dvars();
-    DynamicVariableManager::parse(m_command_line);
     DynamicVariableManager::deserialize();
+    DynamicVariableManager::parse(m_command_line);
 
     thread::initialize();
     jobsystem::initialize();
@@ -75,6 +75,7 @@ int Application::run(int argc, const char** argv) {
         "\nMain Loop"
         "\n********************************************************************************");
 
+    LOG_WARN("TODO: better camera controller");
     LOG_ERROR("TODO: physics");
     LOG_WARN("TODO: load lua scene");
     LOG_ERROR("TODO: FXAA");

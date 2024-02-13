@@ -1,77 +1,58 @@
 #include "dynamic_variable_manager.h"
 
+#include <sstream>
+
 #include "common_dvars.h"
 #include "core/io/archive.h"
 
 namespace vct {
 
-static constexpr const char* DVAR_CACHE_FILE = "dynamic_variables.cache";
+static constexpr const char* DVAR_CACHE_FILE = "@user://dynamic_variables.cache";
 
 void DynamicVariableManager::serialize() {
-    Archive writer;
-    if (auto res = writer.open_write(DVAR_CACHE_FILE); !res) {
+    auto res = FileAccess::open(DVAR_CACHE_FILE, FileAccess::WRITE);
+    if (!res) {
         LOG_ERROR("{}", res.error().get_message());
         return;
     }
 
     LOG("[dvar] serializing dvars");
-
-    std::vector<DynamicVariable*> dvars;
-    dvars.reserve(DynamicVariable::s_map.size());
+    auto writer = std::move(*res);
 
     for (auto const& [key, dvar] : DynamicVariable::s_map) {
         if (dvar->m_flags & DVAR_FLAG_SERIALIZE) {
-            dvars.push_back(dvar);
+            auto line = std::format("+set {} {}\n", dvar->m_name, dvar->value_to_string());
+            writer->write_buffer(line.data(), line.length());
         }
     }
 
-    size_t count = dvars.size();
-
-    writer << count;
-    for (DynamicVariable* dvar : dvars) {
-        writer << dvar->m_debug_name;
-        writer << dvar->m_string;
-        writer.write(dvar->m_vec);
-        // @TODO: better infomation
-        LOG_VERBOSE("dvar {} serialized.", dvar->m_debug_name);
-    }
+    writer->close();
 }
 
 void DynamicVariableManager::deserialize() {
-    if (DVAR_GET_BOOL(delete_dvar_cache)) {
-        std::filesystem::remove(DVAR_CACHE_FILE);
+    auto res = FileAccess::open(DVAR_CACHE_FILE, FileAccess::READ);
+    if (!res) {
+        LOG_ERROR("{}", res.error().get_message());
         return;
     }
 
-    Archive reader;
-    if (auto res = reader.open_read(DVAR_CACHE_FILE); !res) {
-        if (res.error().get_value() != ERR_FILE_NOT_FOUND) {
-            LOG_ERROR("{}", res.error().get_message());
-        }
-        return;
+    auto reader = std::move(*res);
+    const size_t size = reader->get_length();
+    std::string buffer;
+    buffer.resize(size);
+    reader->read_buffer(buffer.data(), size);
+    reader->close();
+
+    std::stringstream ss{ buffer };
+    std::vector<std::string> commands;
+    std::string token;
+    while (!ss.eof() && ss >> token) {
+        commands.emplace_back(token);
     }
 
-    LOG("[dvar] deserializing dvars");
-
-    size_t count = 0;
-
-    reader >> count;
-    for (size_t i = 0; i < count; ++i) {
-        std::string debug_name;
-        reader >> debug_name;
-
-        DynamicVariable* dvar = DynamicVariable::find_dvar(debug_name);
-        if (!dvar) {
-            reader.close();
-            std::filesystem::remove(DVAR_CACHE_FILE);
-            return;
-        }
-
-        if (dvar->m_flags & DVAR_FLAG_DESERIALIZE) {
-            reader >> dvar->m_string;
-            reader.read(dvar->m_vec);
-            dvar->print_value_change("cache");
-        }
+    DynamicVariableParser parser(commands, DynamicVariableParser::SOURCE_CACHE);
+    if (!parser.parse()) {
+        LOG_ERROR("[dvar] Error: {}", parser.get_error());
     }
 }
 
@@ -122,6 +103,7 @@ bool DynamicVariableParser::process_set() {
 
     VariantType type = dvar->get_type();
     bool ok = true;
+    std::string_view str;
     int ix = 0, iy = 0, iz = 0, iw = 0;
     float fx = 0, fy = 0, fz = 0, fw = 0;
     size_t arg_start_index = m_cursor;
@@ -135,8 +117,8 @@ bool DynamicVariableParser::process_set() {
             ok = ok && dvar->set_float(fx);
             break;
         case VARIANT_TYPE_STRING:
-            ok = ok && !out_of_bound();
-            ok = ok && dvar->set_string(consume());
+            ok = ok && try_get_string(str);
+            ok = ok && dvar->set_string(str);
             break;
         case VARIANT_TYPE_VEC2:
             ok = ok && try_get_float(fx);
@@ -188,8 +170,17 @@ bool DynamicVariableParser::process_set() {
         return false;
     }
 
-    dvar->unset_flag(DVAR_FLAG_DESERIALIZE);
-    dvar->print_value_change("command line");
+    // @TODO: refactor
+    switch (m_source) {
+        case SOURCE_CACHE:
+            dvar->print_value_change("cache");
+            break;
+        case SOURCE_COMMAND_LINE:
+            dvar->print_value_change("command line");
+            break;
+        default:
+            break;
+    }
     return true;
 }
 
@@ -232,12 +223,27 @@ bool DynamicVariableParser::try_get_float(float& out) {
     return true;
 }
 
+bool DynamicVariableParser::try_get_string(std::string_view& out) {
+    if (out_of_bound()) {
+        return false;
+    }
+
+    const std::string& next = consume();
+    if (next.length() >= 2 && next.front() == '"' && next.back() == '"') {
+        out = std::string_view(next.data() + 1, next.length() - 2);
+    } else {
+        out = std::string_view(next.data(), next.length());
+    }
+
+    return true;
+}
+
 bool DynamicVariableParser::out_of_bound() {
     return m_cursor >= m_commands.size();
 }
 
 bool DynamicVariableManager::parse(const std::vector<std::string>& commands) {
-    DynamicVariableParser parser(commands);
+    DynamicVariableParser parser(commands, DynamicVariableParser::SOURCE_COMMAND_LINE);
     bool ok = parser.parse();
     if (!ok) {
         LOG_ERROR("[dvar] Error: {}", parser.get_error());

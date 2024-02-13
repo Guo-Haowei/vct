@@ -1,6 +1,7 @@
 build/
 .vscode/
-projects/
+project/
+user/
 data/models/
 
 imgui.ini

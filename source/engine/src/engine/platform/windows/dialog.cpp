@@ -44,27 +44,38 @@ std::string open_file_dialog(const std::vector<const char*>& filters) {
     return "";
 }
 
-std::string open_save_dialog(const std::string&) {
+template<size_t N>
+static void copy_string(char (&buffer)[N], const std::string& string) {
+    strncpy(buffer, string.c_str(), N);
+}
+
+bool open_save_dialog(std::filesystem::path& inout_path) {
     OPENFILENAMEA ofn;
-
-    char szFileName[MAX_PATH] = "untitled";
-
     ZeroMemory(&ofn, sizeof(ofn));
+
+    // @TODO: string_view
+    char file_name[MAX_PATH]{ 0 };
+    char extension[MAX_PATH]{ 0 };
+    char dir[MAX_PATH]{ 0 };
+    copy_string(file_name, inout_path.filename().replace_extension().string());
+    copy_string(dir, inout_path.parent_path().string());
+    copy_string(extension, inout_path.extension().string());
 
     ofn.lStructSize = sizeof(ofn);
     ofn.hwndOwner = NULL;
     // ofn.lpstrFilter = "Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0";
-    ofn.lpstrFile = szFileName;
+    ofn.lpstrFile = file_name;
     ofn.nMaxFile = MAX_PATH;
     ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-    // @TODO: fix
-    ofn.lpstrDefExt = "scene";
+    ofn.lpstrDefExt = extension + 1;
+    ofn.lpstrInitialDir = dir;
 
     if (GetSaveFileNameA(&ofn)) {
-        return std::string(ofn.lpstrFile);
+        inout_path = std::filesystem::path(ofn.lpstrFile);
+        return true;
     }
 
-    return "";
+    return false;
 }
 
 }  // namespace vct

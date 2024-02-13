@@ -12,7 +12,7 @@ auto FileAccess::create(AccessType access_type) -> std::shared_ptr<FileAccess> {
     return std::shared_ptr<FileAccess>(ret);
 }
 
-auto FileAccess::create_for_path(std::string_view path) -> std::shared_ptr<FileAccess> {
+auto FileAccess::create_for_path(const std::string& path) -> std::shared_ptr<FileAccess> {
     // @TODO: sanitize path
     if (path.starts_with("@res://")) {
         return create(ACCESS_RESOURCE);
@@ -25,7 +25,7 @@ auto FileAccess::create_for_path(std::string_view path) -> std::shared_ptr<FileA
     return create(ACCESS_FILESYSTEM);
 }
 
-auto FileAccess::open(std::string_view path, int mode_flags)
+auto FileAccess::open(const std::string& path, int mode_flags)
     -> std::expected<std::shared_ptr<FileAccess>, Error<ErrorCode>> {
     auto file_access = create_for_path(path);
 
@@ -52,8 +52,7 @@ std::string FileAccess::fix_path(std::string_view path) {
         } break;
         case ACCESS_USERDATA: {
             if (path.starts_with("@user://")) {
-                CRASH_NOW_MSG("NOT IMPLEMENT");
-                replace_first(fixed_path, "@user:/", "???");
+                replace_first(fixed_path, "@user:/", ROOT_FOLDER "user");
                 return fixed_path;
             }
         } break;

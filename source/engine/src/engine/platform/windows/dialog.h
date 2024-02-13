@@ -4,6 +4,6 @@ namespace vct {
 
 std::string open_file_dialog(const std::vector<const char*>& filters);
 
-std::string open_save_dialog(const std::string& file);
+bool open_save_dialog(std::filesystem::path& inout_path);
 
 }  // namespace vct

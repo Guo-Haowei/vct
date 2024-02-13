@@ -31,9 +31,9 @@ public:
     AccessType get_access_type() const { return m_access_type; }
 
     static auto create(AccessType access_type) -> std::shared_ptr<FileAccess>;
-    static auto create_for_path(std::string_view path) -> std::shared_ptr<FileAccess>;
+    static auto create_for_path(const std::string& path) -> std::shared_ptr<FileAccess>;
     // @TODO: use string_view
-    static auto open(std::string_view path, int mode_flags)
+    static auto open(const std::string& path, int mode_flags)
         -> std::expected<std::shared_ptr<FileAccess>, Error<ErrorCode>>;
 
     template<typename T>

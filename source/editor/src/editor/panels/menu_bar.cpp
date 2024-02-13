@@ -57,21 +57,27 @@ static void import_recent() {
     ImGui::EndMenu();
 }
 
-static void save_scene() {
-    auto path = open_save_dialog("");
+static void save_project(bool open_dialog) {
+    const std::string& project = DVAR_GET_STRING(project);
 
-    if (path.empty()) {
-        return;
+    std::filesystem::path path{ project.empty() ? "untitled.scene" : project.c_str() };
+    if (open_dialog || project.empty()) {
+        if (!open_save_dialog(path)) {
+            return;
+        }
     }
 
+    DVAR_SET_STRING(project, path.string());
     Scene& scene = SceneManager::singleton().get_scene();
 
     Archive archive;
-    if (!archive.open_write(path)) {
+    if (!archive.open_write(path.string())) {
         return;
     }
 
     scene.serialize(archive);
+
+    LOG("scene saved to '{}'", path.string());
 }
 
 void menu_bar() {
@@ -84,9 +90,10 @@ void menu_bar() {
                 import_recent();
             }
             if (ImGui::MenuItem("Save", "Ctrl+S")) {
+                save_project(false);
             }
             if (ImGui::MenuItem("Save As..")) {
-                save_scene();
+                save_project(true);
             }
             ImGui::EndMenu();
         }
