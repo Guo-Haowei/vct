@@ -1,14 +1,32 @@
 #pragma once
 #include "assets/scene_importer.h"
-#include "core/objects/singleton.h"
+#include "core/base/singleton.h"
 #include "scene/scene.h"
 
 namespace vct {
 
-class SceneManager : public Singleton<SceneManager> {
+class Application;
+
+class ModuleBase {
 public:
-    bool initialize();
-    void finalize();
+    ModuleBase(std::string_view name) : m_name(name) {}
+    virtual ~ModuleBase() = default;
+
+    virtual bool initialize() = 0;
+    virtual void finalize() = 0;
+
+protected:
+    std::string_view m_name;
+    Application* m_app;
+    friend class Application;
+};
+
+class SceneManager : public Singleton<SceneManager>, public ModuleBase {
+public:
+    SceneManager() : ModuleBase("SceneManager") {}
+
+    bool initialize() override;
+    void finalize() override;
     void update(float dt);
 
     void request_scene(std::string_view path, ImporterName importer);
@@ -24,10 +42,10 @@ public:
     static Scene& get_scene();
 
 private:
-    Scene* m_scene{ nullptr };
-    std::atomic<Scene*> m_loading_scene{ nullptr };
+    Scene* m_scene = nullptr;
+    std::atomic<Scene*> m_loading_scene = nullptr;
 
-    uint32_t m_revision;
+    uint32_t m_revision = 0;
 };
 
 }  // namespace vct

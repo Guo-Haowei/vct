@@ -1,4 +1,4 @@
-#include "engine/core/collections/ring_buffer.h"
+#include "engine/core/base/ring_buffer.h"
 
 namespace vct {
 

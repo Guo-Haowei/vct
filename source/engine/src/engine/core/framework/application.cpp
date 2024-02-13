@@ -21,10 +21,6 @@
 
 namespace vct {
 
-// @TODO: refactor
-static vct::DisplayServer* s_display_server = new vct::DisplayServerGLFW;
-static vct::RenderingServer* s_rendering_server = new vct::RenderingServer;
-
 static void register_common_dvars() {
 #define REGISTER_DVAR
 #include "core/dynamic_variable/common_dvars.h"
@@ -43,6 +39,12 @@ void Application::save_command_line(int argc, const char** argv) {
 
 int Application::run(int argc, const char** argv) {
     m_os = std::make_shared<OS>();
+    m_rendering_server = std::make_shared<RenderingServer>();
+    m_display_server = std::make_shared<DisplayServerGLFW>();
+    m_scene_manager = std::make_shared<SceneManager>();
+    m_scene_manager->m_app = this;
+
+    m_event_queue.register_listener(m_rendering_server.get());
 
     save_command_line(argc, argv);
 
@@ -67,8 +69,8 @@ int Application::run(int argc, const char** argv) {
 
     init_layers();
     for (auto& layer : m_layers) {
-        layer->Attach();
-        LOG("[Runtime] layer '{}' attached!", layer->GetName());
+        layer->attach();
+        LOG("[Runtime] layer '{}' attached!", layer->get_name());
     }
 
     LOG("\n********************************************************************************"
@@ -103,11 +105,11 @@ int Application::run(int argc, const char** argv) {
 
         ImGui::NewFrame();
         for (auto& layer : m_layers) {
-            layer->Update(dt);
+            layer->update(dt);
         }
 
         for (auto& layer : m_layers) {
-            layer->Render();
+            layer->render();
         }
         ImGui::Render();
 

@@ -1,4 +1,4 @@
-#include "engine/core/collections/fixed_stack.h"
+#include "core/base/fixed_stack.h"
 
 namespace vct {
 

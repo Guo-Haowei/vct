@@ -1,6 +1,6 @@
 #include "render_data.h"
 
-#include "core/collections/rid_owner.h"
+#include "core/base/rid_owner.h"
 #include "core/math/frustum.h"
 #include "gl_utils.h"
 #include "r_cbuffers.h"

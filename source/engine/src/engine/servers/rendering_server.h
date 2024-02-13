@@ -1,15 +1,15 @@
 #pragma once
-#include "core/objects/singleton.h"
+#include "core/base/singleton.h"
+#include "core/framework/event_queue.h"
 #include "rendering/GpuTexture.h"
 #include "rendering/gl_utils.h"
 #include "rendering/r_cbuffers.h"
-#include "scene/scene_listener.h"
 
 namespace vct {
 
 struct RenderData;
 
-class RenderingServer : public Singleton<RenderingServer>, public SceneListener {
+class RenderingServer : public Singleton<RenderingServer>, public EventListener {
 public:
     enum {
         RENDER_GRAPH_NONE,
@@ -17,12 +17,10 @@ public:
         RENDER_GRAPH_VXGI_DEBUG,
     };
 
-    RenderingServer() : SceneListener("renderer") {}
-
     bool initialize();
     void finalize();
 
-    void begin_scene(Scene& scene) override;
+    void event_received(std::shared_ptr<Event> event) override;
 
     void createGpuResources();
     void render();

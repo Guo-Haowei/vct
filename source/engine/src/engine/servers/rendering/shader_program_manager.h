@@ -1,5 +1,5 @@
 #pragma once
-#include "core/objects/singleton.h"
+#include "core/base/singleton.h"
 #include "servers/rendering/shader_program.h"
 
 namespace vct {

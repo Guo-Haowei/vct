@@ -1,5 +1,5 @@
 #pragma once
-#include "core/collections/rid.h"
+#include "core/base/rid.h"
 #include "core/math/aabb.h"
 #include "core/math/degree.h"
 #include "core/systems/entity.h"

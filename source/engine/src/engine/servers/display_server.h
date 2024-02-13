@@ -1,7 +1,7 @@
 #pragma once
 #include <tuple>
 
-#include "core/objects/singleton.h"
+#include "core/base/singleton.h"
 
 namespace vct {
 

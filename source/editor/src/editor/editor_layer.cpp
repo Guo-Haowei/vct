@@ -80,7 +80,7 @@ void EditorLayer::dock_space() {
     return;
 }
 
-void EditorLayer::Update(float) {
+void EditorLayer::update(float) {
     dock_space();
     Scene& scene = SceneManager::get_scene();
     for (auto& it : m_panels) {
@@ -90,7 +90,7 @@ void EditorLayer::Update(float) {
     scene.m_selected = m_selected;
 }
 
-void EditorLayer::Render() {
+void EditorLayer::render() {
 }
 
 }  // namespace vct

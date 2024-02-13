@@ -1,6 +1,6 @@
 #pragma once
+#include "core/base/noncopyable.h"
 #include "core/math/ray.h"
-#include "core/objects/noncopyable.h"
 #include "core/systems/component_manager.h"
 #include "scene_components.h"
 

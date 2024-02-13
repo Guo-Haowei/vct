@@ -1,4 +1,4 @@
-#include "core/collections/rid_owner.h"
+#include "core/base/rid_owner.h"
 
 #include <latch>
 

@@ -1,6 +1,6 @@
 #include "render_graph_vxgi.h"
 
-#include "core/collections/rid_owner.h"
+#include "core/base/rid_owner.h"
 #include "core/math/frustum.h"
 #include "servers/display_server.h"
 #include "servers/rendering/rendering_dvars.h"

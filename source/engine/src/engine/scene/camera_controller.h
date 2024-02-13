@@ -8,8 +8,9 @@ class CameraController {
 public:
     static constexpr float MAX_SCROLL_SPEED = 100.0f;
 
-    void set_camera(CameraComponent& camera);
-    void move_camera(CameraComponent& camera, float dt);
+    void set_camera(CameraComponent* camera);
+
+    void move(float dt);
 
 private:
     vec3 calculate_eye(const vec3& center);
@@ -23,6 +24,7 @@ private:
     vec3 m_direction;
 
     float m_scroll_speed = 0.0f;
+    CameraComponent* m_camera = nullptr;
 };
 
 }  // namespace vct

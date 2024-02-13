@@ -7,7 +7,7 @@
 #include "imgui/backends/imgui_impl_opengl3.h"
 #include "rendering/render_data.h"
 /////
-#include "core/collections/rid_owner.h"
+#include "core/base/rid_owner.h"
 #include "core/dynamic_variable/common_dvars.h"
 #include "rendering/r_defines.h"
 #include "rendering/r_editor.h"
@@ -143,9 +143,13 @@ static void create_mesh_data(const MeshComponent& mesh, MeshData& out_mesh) {
     glBindVertexArray(0);
 }
 
-void RenderingServer::begin_scene(Scene& scene) {
-    // create mesh
-    // for (const auto& mesh : scene.get_component_array<MeshComponent>()) {
+void RenderingServer::event_received(std::shared_ptr<Event> event) {
+    SceneChangeEvent* e = dynamic_cast<SceneChangeEvent*>(event.get());
+    if (!e) {
+        return;
+    }
+
+    const Scene& scene = *e->get_scene();
     for (size_t idx = 0; idx < scene.get_count<MeshComponent>(); ++idx) {
         const MeshComponent& mesh = scene.get_component_array<MeshComponent>()[idx];
         if (mesh.gpu_resource.is_valid()) {
@@ -381,8 +385,6 @@ uint32_t RenderingServer::get_final_image() const {
 }
 
 void RenderingServer::render() {
-    check_scene_update();
-
     Scene& scene = SceneManager::singleton().get_scene();
     m_render_data->update(&scene);
 

@@ -1,23 +1,19 @@
 #include "scene_manager.h"
 
 #include "assets/asset_loader.h"
-#include "imgui/imgui.h"
-#include "servers/rendering/r_cbuffers.h"
-///
 #include "core/dynamic_variable/common_dvars.h"
+#include "core/framework/application.h"
+#include "core/utility/timer.h"
+#include "imgui/imgui.h"
 #include "servers/display_server.h"
+#include "servers/rendering/r_cbuffers.h"
 #include "servers/rendering/rendering_dvars.h"
 
 namespace vct {
 
 using ecs::Entity;
 
-SceneManager* g_scene_manager = new SceneManager;
-
 static bool deserialize_scene(Scene* scene, const std::string& path) {
-    // @TODO:
-    unused(scene);
-    unused(path);
     Archive archive;
     if (!archive.open_read(path)) {
         return false;
@@ -48,17 +44,17 @@ static void create_empty_scene(Scene* scene) {
 }
 
 bool SceneManager::initialize() {
-    m_revision = 1;
-
     // create an empty scene
-    m_scene = new Scene;
+    Scene* scene = new Scene;
     const std::string& path = DVAR_GET_STRING(project);
     if (path.empty()) {
-        create_empty_scene(m_scene);
+        create_empty_scene(scene);
     } else {
-        deserialize_scene(m_scene, path);
+        if (!deserialize_scene(scene, path)) {
+            LOG_FATAL("failed to deserialize scene '{}'", path);
+        }
     }
-    on_scene_changed(m_scene);
+    m_loading_scene.store(scene);
 
     return true;
 }
@@ -79,11 +75,22 @@ static mat4 R_HackLightSpaceMatrix(const vec3& lightDir) {
 void SceneManager::update(float dt) {
     Scene* new_scene = m_loading_scene.load();
     if (new_scene) {
-        m_scene->merge(*new_scene);
-        delete new_scene;
+        if (m_scene) {
+            m_scene->merge(*new_scene);
+            delete new_scene;
+        } else {
+            m_scene = new_scene;
+        }
         m_loading_scene.store(nullptr);
-        on_scene_changed(m_scene);
+
         ++m_revision;
+
+        // @TODO: profiler
+        Timer timer;
+        auto event = std::make_shared<SceneChangeEvent>(m_scene);
+        m_app->get_event_queue().dispatch_event(event);
+        on_scene_changed(m_scene);
+        LOG("[SceneManager] scene changed from revision {} to revision {}, took {}", m_revision - 1, m_revision, timer.get_duration_string());
     }
 
     Scene& scene = SceneManager::get_scene();
@@ -144,6 +151,8 @@ void SceneManager::request_scene(std::string_view path, ImporterName importer) {
 }
 
 void SceneManager::on_scene_changed(Scene* new_scene) {
+
+    // @TODO: refactor the following
     const int voxelTextureSize = DVAR_GET_INT(r_voxel_size);
     DEV_ASSERT(math::is_power_of_two(voxelTextureSize));
     DEV_ASSERT(voxelTextureSize <= 256);

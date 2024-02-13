@@ -1,5 +1,5 @@
 #pragma once
-#include "core/collections/intrusive_list.h"
+#include "core/base/intrusive_list.h"
 #include "error.h"
 
 namespace vct {

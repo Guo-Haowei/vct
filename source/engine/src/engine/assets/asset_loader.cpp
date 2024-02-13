@@ -3,7 +3,7 @@
 #include "assets/image_loader.h"
 #include "assets/scene_importer_assimp.h"
 #include "assets/scene_importer_tinygltf.h"
-#include "core/collections/thread_safe_ring_buffer.h"
+#include "core/base/thread_safe_ring_buffer.h"
 #include "core/dynamic_variable/common_dvars.h"
 #include "core/io/file_access.h"
 #include "core/os/threads.h"
@@ -22,13 +22,12 @@ struct LoadTask {
     ImportErrorFunc on_error;
 };
 
-static struct
-{
+static struct {
     // @TODO: better wake up
     std::condition_variable wake_condition;
     std::mutex wake_mutex;
     // @TODO: better thread safe queue
-    collection::ThreadSafeRingBuffer<LoadTask, 128> job_queue;
+    ThreadSafeRingBuffer<LoadTask, 128> job_queue;
 
     // image
     std::map<std::string, std::shared_ptr<Image>> image_cache;

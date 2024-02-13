@@ -1,6 +1,6 @@
 #pragma once
+#include "core/base/singleton.h"
 #include "core/io/logger.h"
-#include "core/objects/singleton.h"
 
 namespace vct {
 

@@ -1,6 +1,6 @@
 #include "logger.h"
 
-#include "core/collections/ring_buffer.h"
+#include "core/base/ring_buffer.h"
 
 // @TODO: refactor
 #define WIN32_LEAN_AND_MEAN

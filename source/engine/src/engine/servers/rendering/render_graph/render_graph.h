@@ -1,5 +1,5 @@
 #pragma once
-#include "core/collections/graph.h"
+#include "core/base/graph.h"
 #include "render_pass.h"
 
 namespace vct {

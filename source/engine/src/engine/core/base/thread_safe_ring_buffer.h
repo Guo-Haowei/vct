@@ -1,7 +1,7 @@
 #pragma once
 #include "ring_buffer.h"
 
-namespace vct::collection {
+namespace vct {
 
 // @TODO: change to atomic int implementation
 template<typename T, size_t N>
@@ -30,4 +30,4 @@ struct ThreadSafeRingBuffer {
         return true;
     }
 };
-}  // namespace vct::collection
+}  // namespace vct

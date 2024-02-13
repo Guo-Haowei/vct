@@ -1,6 +1,6 @@
 #pragma once
 #include "assets/image.h"
-#include "core/collections/fixed_stack.h"
+#include "core/base/fixed_stack.h"
 
 namespace vct {
 
