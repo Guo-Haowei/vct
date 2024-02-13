@@ -5,7 +5,7 @@ namespace vct {
 
 class HierarchyPanel : public Panel {
 public:
-    HierarchyPanel() : Panel("Hierarchy") {}
+    HierarchyPanel(EditorLayer& editor) : Panel("Scene", editor) {}
 
 protected:
     void update_internal(Scene& scene) override;

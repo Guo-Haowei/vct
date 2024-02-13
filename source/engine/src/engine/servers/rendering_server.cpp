@@ -5,6 +5,7 @@
 
 #include "Core/geometry.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
+#include "rendering/render_data.h"
 /////
 #include "core/collections/rid_owner.h"
 #include "core/dynamic_variable/common_dvars.h"
@@ -75,6 +76,8 @@ bool RenderingServer::initialize() {
 
     g_meshes.set_description("GPU-Mesh-Allocator");
     g_materials.set_description("GPU-Material-Allocator");
+
+    m_render_data = std::make_shared<RenderData>();
     return true;
 }
 
@@ -142,7 +145,15 @@ static void create_mesh_data(const MeshComponent& mesh, MeshData& out_mesh) {
 
 void RenderingServer::begin_scene(Scene& scene) {
     // create mesh
-    for (const auto& mesh : scene.get_component_array<MeshComponent>()) {
+    // for (const auto& mesh : scene.get_component_array<MeshComponent>()) {
+    for (size_t idx = 0; idx < scene.get_count<MeshComponent>(); ++idx) {
+        const MeshComponent& mesh = scene.get_component_array<MeshComponent>()[idx];
+        if (mesh.gpu_resource.is_valid()) {
+            ecs::Entity entity = scene.get_entity<MeshComponent>(idx);
+            const NameComponent& name = *scene.get_component<NameComponent>(entity);
+            LOG_WARN("[begin_scene] mesh '{}' (idx: {}) already has gpu resource", name.get_name(), idx);
+            continue;
+        }
         RID rid = g_meshes.make_rid();
         mesh.gpu_resource = rid;
         create_mesh_data(mesh, *g_meshes.get_or_null(rid));
@@ -153,6 +164,12 @@ void RenderingServer::begin_scene(Scene& scene) {
 
     for (int idx = 0; idx < scene.get_count<MaterialComponent>(); ++idx) {
         const MaterialComponent& material_component = scene.get_component_array<MaterialComponent>()[idx];
+        if (material_component.gpu_resource.is_valid()) {
+            ecs::Entity entity = scene.get_entity<MaterialComponent>(idx);
+            const NameComponent& name = *scene.get_component<NameComponent>(entity);
+            LOG_WARN("[begin_scene] material '{}' (idx: {}) already has gpu resource", name.get_name(), idx);
+            continue;
+        }
 
         RID rid = g_materials.make_rid();
         material_component.gpu_resource = rid;
@@ -365,6 +382,10 @@ uint32_t RenderingServer::get_final_image() const {
 
 void RenderingServer::render() {
     check_scene_update();
+
+    Scene& scene = SceneManager::singleton().get_scene();
+    m_render_data->update(&scene);
+
     g_perFrameCache.Update();
     g_render_graph.execute();
 }

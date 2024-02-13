@@ -5,7 +5,7 @@ namespace vct {
 
 class RenderGraphEditor : public Panel {
 public:
-    RenderGraphEditor() : Panel("Render Graph") {}
+    RenderGraphEditor(EditorLayer& editor) : Panel("Render Graph", editor) {}
 
 protected:
     void update_internal(Scene& scene) override;

@@ -7,6 +7,8 @@
 
 namespace vct {
 
+struct RenderData;
+
 class RenderingServer : public Singleton<RenderingServer>, public SceneListener {
 public:
     enum {
@@ -28,9 +30,13 @@ public:
 
     uint32_t get_final_image() const;
 
+    std::shared_ptr<RenderData> get_render_data() { return m_render_data; }
+
 private:
     GpuTexture m_lightIcons[MAX_LIGHT_ICON];
     int m_method = RENDER_GRAPH_NONE;
+
+    std::shared_ptr<RenderData> m_render_data;
 };
 
 }  // namespace vct

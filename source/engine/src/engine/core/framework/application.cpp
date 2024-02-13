@@ -75,9 +75,10 @@ int Application::run(int argc, const char** argv) {
         "\nMain Loop"
         "\n********************************************************************************");
 
-    LOG_WARN("TODO: better camera controller");
+    LOG_ERROR("TODO: cloth physics");
+    LOG_WARN("TODO: refactor application");
     LOG_ERROR("TODO: physics");
-    LOG_WARN("TODO: load lua scene");
+    LOG_WARN("TODO: better camera controller");
     LOG_ERROR("TODO: FXAA");
     LOG_WARN("TODO: TAA");
     LOG_ERROR("TODO: soft shadow");
@@ -86,8 +87,6 @@ int Application::run(int argc, const char** argv) {
     LOG_WARN("TODO: fix multiple objects play same animation");
     LOG_ERROR("TODO: link object with animation");
     LOG_WARN("TODO: render texels around camera");
-    LOG_ERROR("TODO: cloth physics");
-    LOG_WARN("TODO: refactor application");
 
     // @TODO: add frame count, elapsed time, etc
     Timer timer;

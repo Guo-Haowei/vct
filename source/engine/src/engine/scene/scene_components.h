@@ -277,7 +277,6 @@ struct ObjectComponent {
         NONE = 0,
         RENDERABLE = 1 << 0,
         CAST_SHADOW = 1 << 1,
-        DYNAMIC = 1 << 2,
     };
 
     uint32_t flags = RENDERABLE | CAST_SHADOW;

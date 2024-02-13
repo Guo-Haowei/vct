@@ -1,5 +1,6 @@
 #include "hierarchy_panel.h"
 
+#include "../editor_layer.h"
 #include "imgui/imgui_internal.h"
 
 namespace vct {
@@ -13,12 +14,12 @@ public:
         std::vector<HierarchyNode*> children;
     };
 
-    HierarchyCreator(HierarchyPanel& panel) : mPanel(panel) {}
+    HierarchyCreator(EditorLayer& editor) : m_editor_layer(editor) {}
 
     void Draw(const Scene& scene) {
         if (Build(scene)) {
-            DEV_ASSERT(mRoot);
-            DrawNode(scene, mRoot, ImGuiTreeNodeFlags_DefaultOpen);
+            DEV_ASSERT(m_root);
+            DrawNode(scene, m_root, ImGuiTreeNodeFlags_DefaultOpen);
         }
     }
 
@@ -27,8 +28,8 @@ private:
     void DrawNode(const Scene& scene, HierarchyNode* pNode, ImGuiTreeNodeFlags flags = 0);
 
     std::map<ecs::Entity, std::shared_ptr<HierarchyNode>> m_nodes;
-    HierarchyNode* mRoot = nullptr;
-    HierarchyPanel& mPanel;
+    HierarchyNode* m_root = nullptr;
+    EditorLayer& m_editor_layer;
 };
 
 void HierarchyCreator::DrawNode(const Scene& scene, HierarchyNode* pHier, ImGuiTreeNodeFlags flags) {
@@ -42,13 +43,13 @@ void HierarchyCreator::DrawNode(const Scene& scene, HierarchyNode* pHier, ImGuiT
 
     flags |= ImGuiTreeNodeFlags_NoTreePushOnOpen;
     flags |= pHier->children.empty() ? ImGuiTreeNodeFlags_Leaf : 0;
-    flags |= mPanel.get_selected() == id ? ImGuiTreeNodeFlags_Selected : 0;
+    flags |= m_editor_layer.get_selected_entity() == id ? ImGuiTreeNodeFlags_Selected : 0;
     bool expanded = ImGui::TreeNodeEx(nodeTag.c_str(), flags);
     ImGui::SameLine();
     ImGui::Selectable(tag.c_str());
     if (ImGui::IsItemHovered()) {
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-            mPanel.set_selected(id);
+            m_editor_layer.select_entity(id);
         } else if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
             ImGui::OpenPopup("my dummy popup");
         }
@@ -95,7 +96,7 @@ bool HierarchyCreator::Build(const Scene& scene) {
     for (auto& it : m_nodes) {
         if (!it.second->parent) {
             ++nodes_without_parent;
-            mRoot = it.second.get();
+            m_root = it.second.get();
         }
     }
     DEV_ASSERT(nodes_without_parent == 1);
@@ -103,7 +104,7 @@ bool HierarchyCreator::Build(const Scene& scene) {
 }
 
 void HierarchyPanel::update_internal(Scene& scene) {
-    HierarchyCreator creator(*this);
+    HierarchyCreator creator(m_editor);
 
     // right click popup
     if (ImGui::BeginPopup("my dummy popup")) {

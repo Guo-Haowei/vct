@@ -5,7 +5,7 @@ namespace vct {
 
 class DebugPanel : public Panel {
 public:
-    DebugPanel() : Panel("Debug") {}
+    DebugPanel(EditorLayer& editor) : Panel("Debug", editor) {}
 
 protected:
     void update_internal(Scene& scene) override;
