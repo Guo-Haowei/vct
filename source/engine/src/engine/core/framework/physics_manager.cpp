@@ -30,7 +30,6 @@ void PhysicsManager::event_received(std::shared_ptr<Event> event) {
 }
 
 void PhysicsManager::update(float dt) {
-
     Scene& scene = SceneManager::singleton().get_scene();
 
     if (has_world()) {

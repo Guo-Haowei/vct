@@ -46,15 +46,68 @@ static void create_empty_scene(Scene* scene) {
     }
 }
 
+static void create_physics_test(Scene* scene) {
+    create_empty_scene(scene);
+
+    {
+        vec3 half(3.f, .02f, 3.f);
+        ecs::Entity ground = scene->create_cube_entity("Ground", half);
+        scene->attach_component(ground, scene->m_root);
+        RigidBodyPhysicsComponent& rigidBody = scene->create<RigidBodyPhysicsComponent>(ground);
+
+        rigidBody.shape = RigidBodyPhysicsComponent::BOX;
+        rigidBody.mass = 0.0f;
+        rigidBody.param.box.halfExtent = half;
+    }
+
+    for (int t = 0; t < 16; ++t) {
+        int x = t % 8;
+        int y = t / 8;
+        vec3 translate = vec3(x - 3.f, 5 - 1.f * y, 0.0f);
+        vec3 half = vec3(0.25f);
+
+        // random rotation
+        auto random_angle = []() {
+            return glm::radians<float>(float(rand() % 180));
+        };
+        float rx = random_angle();
+        float ry = random_angle();
+        float rz = random_angle();
+        mat4 R = glm::rotate(rx, vec3(1, 0, 0)) *
+                 glm::rotate(ry, vec3(0, 1, 0)) *
+                 glm::rotate(rz, vec3(0, 0, 1));
+
+        vec3 _s, _t;
+        vec4 rotation;
+        Decompose(R, _s, rotation, _t);
+
+        std::string name = "Cube" + std::to_string(t);
+        ecs::Entity id = scene->create_cube_entity(name, half, glm::translate(translate) * R);
+        scene->attach_component(id, scene->m_root);
+
+        RigidBodyPhysicsComponent& rigid_body = scene->create<RigidBodyPhysicsComponent>(id);
+
+        rigid_body.shape = RigidBodyPhysicsComponent::BOX;
+        rigid_body.mass = 1.0f;
+        rigid_body.param.box.halfExtent = half;
+    }
+}
+
 bool SceneManager::initialize() {
     // create an empty scene
     Scene* scene = new Scene;
-    const std::string& path = DVAR_GET_STRING(project);
-    if (path.empty()) {
-        create_empty_scene(scene);
+
+    // @TODO: fix
+    if (DVAR_GET_BOOL(test_physics)) {
+        create_physics_test(scene);
     } else {
-        if (!deserialize_scene(scene, path)) {
-            LOG_FATAL("failed to deserialize scene '{}'", path);
+        const std::string& path = DVAR_GET_STRING(project);
+        if (path.empty()) {
+            create_empty_scene(scene);
+        } else {
+            if (!deserialize_scene(scene, path)) {
+                LOG_FATAL("failed to deserialize scene '{}'", path);
+            }
         }
     }
     m_loading_scene.store(scene);

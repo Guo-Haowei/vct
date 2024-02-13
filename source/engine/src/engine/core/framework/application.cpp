@@ -115,14 +115,14 @@ int Application::run(int argc, const char** argv) {
     // @TODO: add frame count, elapsed time, etc
     Timer timer;
     while (!DisplayServer::singleton().should_close()) {
-        DisplayServer::singleton().new_frame();
+        m_display_server->new_frame();
 
         input::begin_frame();
 
         // @TODO: better elapsed time
         float dt = static_cast<float>(timer.get_duration().to_second());
         dt = glm::min(dt, 0.1f);
-        SceneManager::singleton().update(dt);
+        m_scene_manager->update(dt);
         timer.start();
 
         ImGui::NewFrame();
@@ -135,9 +135,11 @@ int Application::run(int argc, const char** argv) {
         }
         ImGui::Render();
 
-        GraphicsManager::singleton().render();
+        m_physics_manager->update(dt);
 
-        DisplayServer::singleton().present();
+        m_graphics_manager->render();
+
+        m_display_server->present();
 
         ImGui::EndFrame();
 
