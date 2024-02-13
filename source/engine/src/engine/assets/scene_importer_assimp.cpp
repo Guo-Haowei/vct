@@ -6,14 +6,6 @@
 
 #include <assimp/Importer.hpp>
 
-auto load_scene_assimp(const std::string& asset_path, void* data) -> std::expected<void, std::string> {
-    DEV_ASSERT(data);
-    auto scene = (reinterpret_cast<vct::Scene*>(data));
-
-    vct::SceneImporterAssimp loader(*scene, asset_path);
-    return loader.import();
-}
-
 namespace vct {
 
 bool SceneImporterAssimp::import_impl() {

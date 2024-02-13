@@ -3,6 +3,12 @@
 
 namespace vct {
 
+enum ImporterName {
+    IMPORTER_TINYGLTF,
+    IMPORTER_ASSIMP,
+    IMPORTER_MAX,
+};
+
 class SceneImporter {
 public:
     SceneImporter(Scene& scene, const std::string& file_path, const char* loader_name);

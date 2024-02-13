@@ -1,9 +1,12 @@
 #pragma once
 #include "image.h"
+#include "scene_importer.h"
 
 namespace vct {
 class Scene;
 }  // namespace vct
+
+// @TODO: make it asset manager, and load with multiple threads
 
 namespace vct {
 
@@ -15,15 +18,13 @@ struct File {
 
 namespace vct::asset_loader {
 
-using LoadSuccessFunc = void (*)(void*);
+using ImportSuccessFunc = void (*)(void*);
+using ImportErrorFunc = void (*)(const std::string& error);
 
 bool initialize();
 void finalize();
 
-// @TODO: allow load with different loader
-// LOADER_ASSIMP
-// LOADER_TINYGLTF
-void load_scene_async(const std::string& path, LoadSuccessFunc on_success);
+void load_scene_async(ImporterName importer, const std::string& path, ImportSuccessFunc on_success, ImportErrorFunc on_error = nullptr);
 
 std::shared_ptr<File> load_file_sync(const std::string& path);
 std::shared_ptr<File> find_file(const std::string& path);

@@ -15,7 +15,4 @@ DVAR_STRING(recent_files, DVAR_FLAG_SERIALIZE, "A list of recent opened scenes",
 // gui
 DVAR_BOOL(grid_visibility, 0, "show editor grid", true);
 
-// loader
-DVAR_BOOL(force_assimp_loader, 0, "force use assimp loader", false);
-
 #include "dynamic_variable_end.h"

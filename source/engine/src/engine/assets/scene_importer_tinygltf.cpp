@@ -672,10 +672,3 @@ void SceneImporterTinyGLTF::process_animation(const tinygltf::Animation& gltf_an
 }
 
 }  // namespace vct
-
-auto load_scene_tinygltf(const std::string& asset_path, void* data) -> std::expected<void, std::string> {
-    DEV_ASSERT(data);
-    auto scene = (reinterpret_cast<vct::Scene*>(data));
-    vct::SceneImporterTinyGLTF loader(*scene, asset_path);
-    return loader.import();
-}
