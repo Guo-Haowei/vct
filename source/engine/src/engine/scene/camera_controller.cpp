@@ -5,7 +5,6 @@
 namespace vct {
 
 void CameraController::set_camera(CameraComponent& camera) {
-    m_angle_xz = 30.0f;
     vec3 eye = calculate_eye(camera.get_eye());
     camera.set_eye(eye);
 
@@ -19,11 +18,11 @@ void CameraController::move_camera(CameraComponent& camera, float dt) {
         vec2 p = input::mouse_move();
         bool dirty = false;
         if (p.x != 0.0f) {
-            m_angle_x -= rotateSpeed * p.x;
+            m_angle_x -= Degree(rotateSpeed * p.x);
             dirty = true;
         }
         if (p.y != 0.0f) {
-            m_angle_xz += rotateSpeed * p.y;
+            m_angle_xz += Degree(rotateSpeed * p.y);
             m_angle_xz.clamp(-80.0f, 80.0f);
             dirty = true;
         }

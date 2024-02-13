@@ -14,10 +14,11 @@ public:
 private:
     vec3 calculate_eye(const vec3& center);
 
-    Degree m_angle_x = 90.0f;
-    Degree m_angle_xz = 0.0f;
+    // @TODO: serialize camera controller
+    Degree m_angle_x = Degree(90);
+    Degree m_angle_xz = Degree(30);
 
-    float m_distance = 10.0f;
+    float m_distance = 10;
 
     vec3 m_direction;
 

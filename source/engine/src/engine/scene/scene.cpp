@@ -71,7 +71,7 @@ void Scene::merge(Scene& other) {
 
 Entity Scene::create_name_entity(const std::string& name) {
     Entity entity = Entity::create();
-    create<TagComponent>(entity).set_tag(name);
+    create<NameComponent>(entity).set_name(name);
     return entity;
 }
 
@@ -224,7 +224,7 @@ void Scene::attach_component(Entity child, Entity parent) {
     }
 
     HierarchyComponent& hier = m_HierarchyComponents.create(child);
-    hier.mParent = parent;
+    hier.m_parent_id = parent;
 }
 
 void Scene::detach_component(Entity entity) {
@@ -288,7 +288,7 @@ void Scene::update_animation(uint32_t index) {
         }
         t = saturate(t);
 
-        TransformComponent* targetTransform = m_TransformComponents.get_component(channel.target_id);
+        TransformComponent* targetTransform = get_component<TransformComponent>(channel.target_id);
         DEV_ASSERT(targetTransform);
         switch (channel.path) {
             case AnimationComponent::Channel::PATH_SCALE: {
@@ -341,7 +341,7 @@ void Scene::update_hierarchy(uint32_t index) {
     TransformComponent* childTrans = get_component<TransformComponent>(child);
     if (childTrans) {
         const HierarchyComponent* hier = &m_HierarchyComponents[index];
-        Entity parent = hier->mParent;
+        Entity parent = hier->m_parent_id;
         mat4 W = childTrans->get_local_matrix();
 
         while (parent.is_valid()) {
@@ -351,7 +351,7 @@ void Scene::update_hierarchy(uint32_t index) {
             }
 
             if ((hier = get_component<HierarchyComponent>(parent)) != nullptr) {
-                parent = hier->mParent;
+                parent = hier->m_parent_id;
                 DEV_ASSERT(parent.is_valid());
             } else {
                 parent.make_invalid();
@@ -366,7 +366,7 @@ void Scene::update_hierarchy(uint32_t index) {
 void Scene::update_armature(uint32_t index) {
     Entity id = m_ArmatureComponents.get_entity(index);
     ArmatureComponent& armature = m_ArmatureComponents[index];
-    TransformComponent* transform = m_TransformComponents.get_component(id);
+    TransformComponent* transform = get_component<TransformComponent>(id);
     DEV_ASSERT(transform);
 
     // The transform world matrices are in world space, but skinning needs them in armature-local space,
@@ -381,31 +381,53 @@ void Scene::update_armature(uint32_t index) {
     // the hierarchy system. 	But this will correct them too.
 
     const mat4 R = glm::inverse(transform->get_world_matrix());
-    const size_t numBones = armature.boneCollection.size();
-    if (armature.boneTransforms.size() != numBones) {
-        armature.boneTransforms.resize(numBones);
+    const size_t numBones = armature.bone_collection.size();
+    if (armature.bone_transforms.size() != numBones) {
+        armature.bone_transforms.resize(numBones);
     }
 
     int idx = 0;
-    for (Entity boneID : armature.boneCollection) {
-        const TransformComponent* boneTransform = m_TransformComponents.get_component(boneID);
+    for (Entity boneID : armature.bone_collection) {
+        const TransformComponent* boneTransform = get_component<TransformComponent>(boneID);
         DEV_ASSERT(boneTransform);
 
-        const mat4& B = armature.inverseBindMatrices[idx];
+        const mat4& B = armature.inverse_bind_matrices[idx];
         const mat4& W = boneTransform->get_world_matrix();
         const mat4 M = R * W * B;
-        armature.boneTransforms[idx] = M;
+        armature.bone_transforms[idx] = M;
         ++idx;
 
         // @TODO: armature animation
     }
 };
 
-void Scene::serialize(Archive& archive) {
-    // mGenerator.serialize(archive);
-    m_root.serialize(archive);
+bool Scene::serialize(Archive& archive) {
+    // guard and seed
+    static const char guard[] = "xScn";
+    bool is_read_mode = !archive.is_write_mode();
+    if (is_read_mode) {
+        std::string read;
+        archive >> read;
+        if (read != guard) {
+            return false;
+        }
 
-    m_TagComponents.serialize(archive);
+        uint32_t seed = Entity::MAX_ID;
+        archive >> seed;
+        Entity::set_seed(seed);
+    } else {
+        archive << guard;
+        archive << Entity::get_seed();
+    }
+
+    m_root.serialize(archive);
+    if (is_read_mode) {
+        archive.read(m_bound);
+    } else {
+        archive.write(m_bound);
+    }
+
+    m_NameComponents.serialize(archive);
     m_TransformComponents.serialize(archive);
     m_HierarchyComponents.serialize(archive);
     m_MaterialComponents.serialize(archive);
@@ -416,6 +438,8 @@ void Scene::serialize(Archive& archive) {
     m_ArmatureComponents.serialize(archive);
     m_AnimationComponents.serialize(archive);
     m_RigidBodyPhysicsComponents.serialize(archive);
+
+    return true;
 }
 
 Scene::RayIntersectionResult Scene::Intersects(Ray& ray) {
@@ -424,7 +448,7 @@ Scene::RayIntersectionResult Scene::Intersects(Ray& ray) {
     for (int objIdx = 0; objIdx < get_count<ObjectComponent>(); ++objIdx) {
         Entity entity = get_entity<ObjectComponent>(objIdx);
         ObjectComponent& object = get_component_array<ObjectComponent>()[objIdx];
-        MeshComponent* mesh = get_component<MeshComponent>(object.meshID);
+        MeshComponent* mesh = get_component<MeshComponent>(object.mesh_id);
         TransformComponent* transform = get_component<TransformComponent>(entity);
         DEV_ASSERT(mesh && transform);
 

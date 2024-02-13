@@ -20,7 +20,6 @@ enum VariantType {
 enum DvarFlags {
     DVAR_FLAG_NONE = 0,
     DVAR_FLAG_SERIALIZE = 1,
-    DVAR_FLAG_DESERIALIZE = 2,
 };
 
 class DynamicVariable {
@@ -40,7 +39,7 @@ public:
 
     int as_int() const;
     float as_float() const;
-    std::string_view as_string() const;
+    const std::string& as_string() const;
     vec2 as_vec2() const;
     vec3 as_vec3() const;
     vec4 as_vec4() const;
@@ -51,6 +50,7 @@ public:
 
     bool set_int(int value);
     bool set_float(float value);
+    bool set_string(const std::string& value);
     bool set_string(std::string_view value);
     bool set_vec2(float x, float y);
     bool set_vec3(float x, float y, float z);
@@ -62,7 +62,8 @@ public:
     void set_flag(uint32_t flag) { m_flags |= flag; }
     void unset_flag(uint32_t flag) { m_flags &= ~flag; }
 
-    void print_value_change(std::string_view source);
+    std::string value_to_string() const;
+    void print_value_change(std::string_view source) const;
 
     VariantType get_type() const { return m_type; }
     const char* get_desc() const { return m_desc; }
@@ -86,7 +87,7 @@ private:
         } m_ivec;
     };
     std::string m_string;
-    std::string m_debug_name;
+    std::string m_name;
 
     inline static std::unordered_map<std::string, DynamicVariable*> s_map;
     friend class DynamicVariableManager;

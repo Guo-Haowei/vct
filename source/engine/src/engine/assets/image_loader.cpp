@@ -43,6 +43,3 @@ std::shared_ptr<Image> load_image(const std::string& path) {
 }
 
 }  // namespace vct
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"

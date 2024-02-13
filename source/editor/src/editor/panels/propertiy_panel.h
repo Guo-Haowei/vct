@@ -5,7 +5,7 @@ namespace vct {
 
 class PropertyPanel : public Panel {
 public:
-    PropertyPanel() : Panel("Properties") {}
+    PropertyPanel(EditorLayer& editor) : Panel("Properties", editor) {}
 
 protected:
     void update_internal(Scene& scene) override;

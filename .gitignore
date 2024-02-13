@@ -1,4 +1,10 @@
-build*/
+build/
 .vscode/
+project/
+user/
 data/models/
+
 imgui.ini
+
+# scene
+*.scene

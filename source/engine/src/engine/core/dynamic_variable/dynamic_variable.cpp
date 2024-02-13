@@ -69,7 +69,7 @@ float DynamicVariable::as_float() const {
     return m_float;
 }
 
-std::string_view DynamicVariable::as_string() const {
+const std::string& DynamicVariable::as_string() const {
     DEV_ASSERT(m_type == VARIANT_TYPE_STRING);
     return m_string;
 }
@@ -133,6 +133,12 @@ bool DynamicVariable::set_float(float value) {
     return true;
 }
 
+bool DynamicVariable::set_string(const std::string& value) {
+    ERR_FAIL_COND_V(m_type != VARIANT_TYPE_STRING, false);
+    m_string = value;
+    return true;
+}
+
 bool DynamicVariable::set_string(std::string_view value) {
     ERR_FAIL_COND_V(m_type != VARIANT_TYPE_STRING, false);
     m_string = value;
@@ -187,7 +193,33 @@ bool DynamicVariable::set_ivec4(int x, int y, int z, int w) {
     return true;
 }
 
-void DynamicVariable::print_value_change(std::string_view source) {
+std::string DynamicVariable::value_to_string() const {
+    switch (m_type) {
+        case VARIANT_TYPE_INT:
+            return std::format("{}", m_int);
+        case VARIANT_TYPE_FLOAT:
+            return std::format("{}", m_float);
+        case VARIANT_TYPE_STRING:
+            return std::format("\"{}\"", m_string);
+        case VARIANT_TYPE_VEC2:
+            return std::format("{} {}", m_vec.x, m_vec.y);
+        case VARIANT_TYPE_IVEC2:
+            return std::format("{} {}", m_ivec.x, m_ivec.y);
+        case VARIANT_TYPE_VEC3:
+            return std::format("{} {} {}", m_vec.x, m_vec.y, m_vec.z);
+        case VARIANT_TYPE_IVEC3:
+            return std::format("{} {} {}", m_ivec.x, m_ivec.y, m_ivec.z);
+        case VARIANT_TYPE_VEC4:
+            return std::format("{} {} {} {}", m_vec.x, m_vec.y, m_vec.z, m_vec.w);
+        case VARIANT_TYPE_IVEC4:
+            return std::format("{} {} {} {}", m_ivec.x, m_ivec.y, m_ivec.z, m_ivec.w);
+        default:
+            CRASH_NOW();
+            return std::string{};
+    }
+}
+
+void DynamicVariable::print_value_change(std::string_view source) const {
     static const char* s_names[] = {
         "",
         "int",
@@ -203,40 +235,8 @@ void DynamicVariable::print_value_change(std::string_view source) {
 
     static_assert(array_length(s_names) == VARIANT_TYPE_MAX);
 
-    std::string value_string;
-    switch (m_type) {
-        case VARIANT_TYPE_INT:
-            value_string = std::format("{}", m_int);
-            break;
-        case VARIANT_TYPE_FLOAT:
-            value_string = std::format("{}", m_float);
-            break;
-        case VARIANT_TYPE_STRING:
-            value_string = std::format("\"{}\"", m_string);
-            break;
-        case VARIANT_TYPE_VEC2:
-            value_string = std::format("{},{}", m_vec.x, m_vec.y);
-            break;
-        case VARIANT_TYPE_IVEC2:
-            value_string = std::format("{},{}", m_ivec.x, m_ivec.y);
-            break;
-        case VARIANT_TYPE_VEC3:
-            value_string = std::format("{},{},{}", m_vec.x, m_vec.y, m_vec.z);
-            break;
-        case VARIANT_TYPE_IVEC3:
-            value_string = std::format("{},{},{}", m_ivec.x, m_ivec.y, m_ivec.z);
-            break;
-        case VARIANT_TYPE_VEC4:
-            value_string = std::format("{},{},{},{}", m_vec.x, m_vec.y, m_vec.z, m_vec.w);
-            break;
-        case VARIANT_TYPE_IVEC4:
-            value_string = std::format("{},{},{},{}", m_ivec.x, m_ivec.y, m_ivec.z, m_ivec.w);
-            break;
-        default:
-            break;
-    }
-
-    LOG_VERBOSE("[dvar] change dvar '{}'({}) to {} (source: {})", m_debug_name, s_names[m_type], value_string, source);
+    std::string value_string = value_to_string();
+    LOG_VERBOSE("[dvar] change dvar '{}'({}) to {} (source: {})", m_name, s_names[m_type], value_string, source);
 }
 
 DynamicVariable* DynamicVariable::find_dvar(const std::string& name) {
@@ -254,7 +254,7 @@ void DynamicVariable::register_dvar(std::string_view key, DynamicVariable* dvar)
         LOG_ERROR("duplicated dvar {} detected", key);
     }
 
-    dvar->m_debug_name = key;
+    dvar->m_name = key;
 
     s_map.insert(std::make_pair(keyStr, dvar));
 }

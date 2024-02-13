@@ -19,18 +19,22 @@
 namespace vct {
 
 EditorLayer::EditorLayer() : Layer("EditorLayer") {
-    add_panel(std::make_shared<RenderGraphEditor>());
-    add_panel(std::make_shared<AnimationPanel>());
-    add_panel(std::make_shared<ConsolePanel>());
-    add_panel(std::make_shared<DebugPanel>());
-    add_panel(std::make_shared<HierarchyPanel>());
-    add_panel(std::make_shared<PropertyPanel>());
-    add_panel(std::make_shared<Viewer>());
+    add_panel(std::make_shared<RenderGraphEditor>(*this));
+    add_panel(std::make_shared<AnimationPanel>(*this));
+    add_panel(std::make_shared<ConsolePanel>(*this));
+    add_panel(std::make_shared<DebugPanel>(*this));
+    add_panel(std::make_shared<HierarchyPanel>(*this));
+    add_panel(std::make_shared<PropertyPanel>(*this));
+    add_panel(std::make_shared<Viewer>(*this));
 }
 
 void EditorLayer::add_panel(std::shared_ptr<Panel> panel) {
     m_panels.emplace_back(panel);
-    panel->set_selected_ref(&m_selected);
+}
+
+void EditorLayer::select_entity(ecs::Entity selected) {
+    m_selected = selected;
+    m_state = STATE_PICKING;
 }
 
 void EditorLayer::dock_space() {

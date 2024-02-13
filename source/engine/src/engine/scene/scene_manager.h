@@ -1,4 +1,5 @@
 #pragma once
+#include "assets/scene_importer.h"
 #include "core/objects/singleton.h"
 #include "scene/scene.h"
 
@@ -10,7 +11,7 @@ public:
     void finalize();
     void update(float dt);
 
-    void request_scene(std::string_view path);
+    void request_scene(std::string_view path, ImporterName importer);
 
     void on_scene_changed(Scene* new_scene);
 

@@ -32,6 +32,23 @@ public:
     }
 
     template<typename T, class = typename std::enable_if<std::is_trivially_copyable<T>::value>::type>
+    Archive& operator<<(const std::vector<T>& value) {
+        uint64_t size = value.size();
+        write(size);
+        write(value.data(), sizeof(T) * size);
+        return *this;
+    }
+
+    template<typename T, class = typename std::enable_if<std::is_trivially_copyable<T>::value>::type>
+    Archive& operator>>(std::vector<T>& value) {
+        uint64_t size = 0;
+        read(size);
+        value.resize(size);
+        read(value.data(), sizeof(T) * size);
+        return *this;
+    }
+
+    template<typename T, class = typename std::enable_if<std::is_trivially_copyable<T>::value>::type>
     Archive& operator<<(const T& value) {
         write(&value, sizeof(T));
         return *this;
@@ -61,8 +78,9 @@ private:
 
     Archive& write_string(const char* data, size_t length);
 
-    bool m_write_mode;
+    bool m_write_mode{ false };
     std::shared_ptr<FileAccess> m_file;
+    std::string m_path;
 };
 
 }  // namespace vct

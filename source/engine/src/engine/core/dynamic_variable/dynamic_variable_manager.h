@@ -8,7 +8,15 @@ namespace vct {
 //--------------------------------------------------------------------------------------------------
 class DynamicVariableParser {
 public:
-    DynamicVariableParser(const std::vector<std::string>& commands) : m_commands(commands) {}
+    enum Source {
+        SOURCE_NONE,
+        SOURCE_COMMAND_LINE,
+        SOURCE_CACHE,
+    };
+
+    DynamicVariableParser(const std::vector<std::string>& commands, Source source)
+        : m_source(source),
+          m_commands(commands) {}
 
     bool parse();
 
@@ -23,7 +31,9 @@ private:
 
     bool try_get_int(int& out);
     bool try_get_float(float& out);
+    bool try_get_string(std::string_view& out);
 
+    const Source m_source;
     const std::vector<std::string>& m_commands;
     size_t m_cursor = 0;
     inline static const std::string s_eof = "<EOF>";

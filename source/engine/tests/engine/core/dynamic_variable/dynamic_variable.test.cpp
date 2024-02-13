@@ -95,7 +95,7 @@ TEST(DynamicVariable, float) {
 TEST(DynamicVariable, string) {
     auto value = DVAR_GET_STRING(test_string);
     EXPECT_EQ(value, "abc");
-    DVAR_SET_STRING(test_string, "bcd");
+    DVAR_SET_STRING(test_string, std::string_view("bcd"));
     value = DVAR_GET_STRING(test_string);
     EXPECT_EQ(value, "bcd");
 }

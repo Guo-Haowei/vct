@@ -1,5 +1,6 @@
 #include "propertiy_panel.h"
 
+#include "../editor_layer.h"
 #include "ImGuizmo/ImGuizmo.h"
 #include "imgui/imgui_internal.h"
 
@@ -134,21 +135,21 @@ static bool draw_vec3_control(const std::string& label, glm::vec3& values, float
 // }
 
 void PropertyPanel::update_internal(Scene& scene) {
-    ecs::Entity id = *m_selected;
+    ecs::Entity id = m_editor.get_selected_entity();
 
     if (!id.is_valid()) {
         return;
     }
 
-    TagComponent* tagComponent = scene.get_component<TagComponent>(id);
+    NameComponent* tagComponent = scene.get_component<NameComponent>(id);
     if (!tagComponent) {
         LOG_WARN("Entity {} does not have name", id.get_id());
         return;
     }
 
-    std::string tag = tagComponent->get_tag();
+    std::string tag = tagComponent->get_name();
     if (ImGui::InputText("##Tag", tag.data(), tag.capacity(), ImGuiInputTextFlags_EnterReturnsTrue)) {
-        tagComponent->set_tag(tag);
+        tagComponent->set_name(tag);
     }
 
     ImGui::SameLine();
@@ -231,17 +232,24 @@ void PropertyPanel::update_internal(Scene& scene) {
     //     camera.m_fovy = glm::radians(fovy);
     // });
 
-    ObjectComponent* objectComponent = scene.get_component<ObjectComponent>(id);
-    DrawComponent("Object", objectComponent, [&](ObjectComponent& object) {
-        MeshComponent* mesh = scene.get_component<MeshComponent>(object.meshID);
-        TagComponent* meshName = scene.get_component<TagComponent>(object.meshID);
-        ImGui::Text("Mesh Component (%d)", object.meshID);
+    ObjectComponent* object_component = scene.get_component<ObjectComponent>(id);
+    DrawComponent("Object", object_component, [&](ObjectComponent& object) {
+        MeshComponent* mesh = scene.get_component<MeshComponent>(object.mesh_id);
+        NameComponent* meshName = scene.get_component<NameComponent>(object.mesh_id);
+        ImGui::Text("Mesh Component (%d)", object.mesh_id);
         if (mesh) {
-            const char* meshNameStr = meshName ? meshName->get_tag().c_str() : "untitled";
+            const char* meshNameStr = meshName ? meshName->get_name().c_str() : "untitled";
             ImGui::Text("mesh %s (%zu submesh)", meshNameStr, mesh->subsets.size());
             ImGui::Text("%zu triangles", mesh->indices.size() / 3);
             ImGui::Text("v:%zu, n:%zu, u:%zu, b:%zu", mesh->positions.size(), mesh->normals.size(),
                         mesh->texcoords_0.size(), mesh->weights_0.size());
+
+            bool hide = !(object_component->flags & ObjectComponent::RENDERABLE);
+            bool cast_shadow = object_component->flags & ObjectComponent::CAST_SHADOW;
+            ImGui::Checkbox("Hide", &hide);
+            ImGui::Checkbox("Cast shadow", &cast_shadow);
+
+            object_component->flags = (hide ? 0 : ObjectComponent::RENDERABLE) | (cast_shadow ? ObjectComponent::CAST_SHADOW : 0);
 
             // if (mesh->armature_id.is_valid()) {
             //     TagComponent* animation_name = scene.get_component<TagComponent>(mesh->armature_id);

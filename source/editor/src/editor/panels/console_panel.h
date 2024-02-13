@@ -5,7 +5,7 @@ namespace vct {
 
 class ConsolePanel : public Panel {
 public:
-    ConsolePanel() : Panel("Console") {}
+    ConsolePanel(EditorLayer& editor) : Panel("Console", editor) {}
 
 protected:
     void update_internal(Scene& scene) override;

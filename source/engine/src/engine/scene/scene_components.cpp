@@ -1,20 +1,7 @@
 #pragma once
 #include "scene_components.h"
 
-#include "core/io/archive.h"
-
 namespace vct {
-
-//--------------------------------------------------------------------------------------------------
-// Tag Component
-//--------------------------------------------------------------------------------------------------
-void TagComponent::serialize(Archive& archive) {
-    if (archive.is_write_mode()) {
-        archive << m_tag;
-    } else {
-        archive >> m_tag;
-    }
-}
 
 //--------------------------------------------------------------------------------------------------
 // Transform Component
@@ -75,21 +62,6 @@ void TransformComponent::update_transform_parented(const TransformComponent& par
     m_world_matrix = worldMatrixParent * worldMatrix;
 }
 
-void TransformComponent::serialize(Archive& archive) {
-    if (archive.is_write_mode()) {
-        archive << m_flags;
-        archive << m_scale;
-        archive << m_translation;
-        archive << m_rotation;
-    } else {
-        archive >> m_flags;
-        archive >> m_scale;
-        archive >> m_translation;
-        archive >> m_rotation;
-        set_dirty();
-    }
-}
-
 //--------------------------------------------------------------------------------------------------
 // Camera Component
 //--------------------------------------------------------------------------------------------------
@@ -107,26 +79,6 @@ void CameraComponent::set_dimension(float width, float height) {
     if (m_width != width || m_height != height) {
         m_width = width;
         m_height = height;
-        set_dirty();
-    }
-}
-
-void CameraComponent::serialize(Archive& archive) {
-    if (archive.is_write_mode()) {
-        archive << m_flags;
-        archive << m_near;
-        archive << m_far;
-        archive << m_fovy;
-        archive << m_width;
-        archive << m_height;
-    } else {
-        archive >> m_flags;
-        archive >> m_near;
-        archive >> m_far;
-        archive >> m_fovy;
-        archive >> m_width;
-        archive >> m_height;
-
         set_dirty();
     }
 }
@@ -193,13 +145,6 @@ void MeshComponent::create_render_data() {
     return;
 }
 
-void MeshComponent::serialize(Archive& archive) {
-    CRASH_NOW();
-    if (archive.is_write_mode()) {
-    } else {
-    }
-}
-
 std::vector<char> MeshComponent::generate_combined_buffer() const {
     std::vector<char> result;
     result.resize(vertex_buffer_size);
@@ -221,69 +166,6 @@ std::vector<char> MeshComponent::generate_combined_buffer() const {
     safe_copy(attributes[VertexAttribute::WEIGHTS_0], weights_0.data());
     safe_copy(attributes[VertexAttribute::COLOR_0], color_0.data());
     return result;
-}
-
-//--------------------------------------------------------------------------------------------------
-// Material Component
-//--------------------------------------------------------------------------------------------------
-void MaterialComponent::serialize(Archive& archive) {
-    if (archive.is_write_mode()) {
-        archive << mMetallic;
-        archive << mRoughness;
-        archive << mBaseColor;
-    } else {
-        archive >> mMetallic;
-        archive >> mRoughness;
-        archive >> mBaseColor;
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-// Animation Component
-//--------------------------------------------------------------------------------------------------
-void AnimationComponent::serialize(Archive& archive) {
-    unused(archive);
-    CRASH_NOW_MSG("NOT IMPLMENTED");
-}
-
-//--------------------------------------------------------------------------------------------------
-//
-//--------------------------------------------------------------------------------------------------
-void HierarchyComponent::serialize(Archive& archive) { mParent.serialize(archive); }
-
-void ObjectComponent::serialize(Archive& archive) { meshID.serialize(archive); }
-
-void ArmatureComponent::serialize(Archive& archive) {
-    unused(archive);
-    CRASH_NOW_MSG("NOT IMPLMENTED");
-}
-
-void RigidBodyPhysicsComponent::serialize(Archive& archive) {
-    if (archive.is_write_mode()) {
-        archive << shape;
-        archive << param;
-        archive << mass;
-    } else {
-        archive >> shape;
-        archive >> param;
-        archive >> mass;
-    }
-}
-
-void LightComponent::serialize(Archive& archive) {
-    (void)archive;
-    // if (archive.is_write_mode())
-    // {
-    //     archive << type;
-    //     archive << color;
-    //     archive << energy;
-    // }
-    // else
-    // {
-    //     archive >> type;
-    //     archive >> color;
-    //     archive >> energy;
-    // }
 }
 
 }  // namespace vct

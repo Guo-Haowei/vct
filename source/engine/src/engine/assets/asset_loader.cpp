@@ -10,17 +10,16 @@
 #include "core/utility/timer.h"
 #include "scene/scene.h"
 
-extern auto load_scene_assimp(const std::string& asset_path, void* data) -> std::expected<void, std::string>;
-extern auto load_scene_tinygltf(const std::string& asset_path, void* data) -> std::expected<void, std::string>;
-
 namespace vct::asset_loader {
 
 using LoadFunc = std::expected<void, std::string> (*)(const std::string& asset_path, void* asset);
 
 struct LoadTask {
+    ImporterName importer;
     // @TODO: better string
     std::string asset_path;
-    LoadSuccessFunc on_load_success;
+    ImportSuccessFunc on_success;
+    ImportErrorFunc on_error;
 };
 
 static struct
@@ -31,9 +30,6 @@ static struct
     // @TODO: better thread safe queue
     collection::ThreadSafeRingBuffer<LoadTask, 128> job_queue;
 
-    // loader
-    std::map<std::string, LoadFunc> loaders;
-
     // image
     std::map<std::string, std::shared_ptr<Image>> image_cache;
     std::mutex image_cache_lock;
@@ -43,12 +39,6 @@ static struct
 } s_glob;
 
 bool initialize() {
-    s_glob.loaders[".gltf"] = load_scene_tinygltf;
-    s_glob.loaders[".obj"] = load_scene_assimp;
-    if (DVAR_GET_BOOL(force_assimp_loader)) {
-        s_glob.loaders[".gltf"] = load_scene_assimp;
-    }
-
     // @TODO: dir_access
     // @TODO: async
     // force load all shaders
@@ -94,9 +84,8 @@ void finalize() {
     s_glob.wake_condition.notify_all();
 }
 
-// @TODO: refactor
-void load_scene_async(const std::string& path, LoadSuccessFunc on_load_success) {
-    s_glob.job_queue.push_back({ path, on_load_success });
+void load_scene_async(ImporterName importer, const std::string& path, ImportSuccessFunc on_success, ImportErrorFunc on_error) {
+    s_glob.job_queue.push_back({ importer, path, on_success, on_error });
     s_glob.wake_condition.notify_all();
 }
 
@@ -159,29 +148,49 @@ std::shared_ptr<File> load_file_sync(const std::string& path) {
     s_glob.text_cache[path] = text;
     return text;
 }
+//
+// auto load_scene_assimp(const std::string& asset_path, void* data) -> std::expected<void, std::string> {
+//    DEV_ASSERT(data);
+//    auto scene = (reinterpret_cast<vct::Scene*>(data));
+//
+//    vct::SceneImporterAssimp loader(*scene, asset_path);
+//    return loader.import();
+//}
+
+auto load_scene_tinygltf(const std::string& asset_path, void* data) -> std::expected<void, std::string> {
+    DEV_ASSERT(data);
+    auto scene = (reinterpret_cast<vct::Scene*>(data));
+    vct::SceneImporterTinyGLTF loader(*scene, asset_path);
+    return loader.import();
+}
 
 static void load_scene_internal(LoadTask& task) {
     LOG("[asset_loader] Loading scene '{}'...", task.asset_path);
 
-    std::string ext = std::filesystem::path(task.asset_path).extension().string();
-    auto it = s_glob.loaders.find(ext);
-    if (it == s_glob.loaders.end()) {
-        LOG_FATAL("[asset_loader] Error: no suitable loader found for '{}'", task.asset_path);
-        // @TODO: error callback
+    Scene* scene = new Scene;
+    std::expected<void, std::string> res;
+
+    Timer timer;
+    if (task.importer == IMPORTER_TINYGLTF) {
+        SceneImporterTinyGLTF loader(*scene, task.asset_path);
+        res = loader.import();
+    } else {
+        SceneImporterAssimp loader(*scene, task.asset_path);
+        res = loader.import();
+    }
+
+    if (!res) {
+        std::string error = std::move(res.error());
+        if (task.on_error) {
+            task.on_error(error);
+        } else {
+            LOG_FATAL("{}", res.error());
+        }
         return;
     }
 
-    Timer timer;
-
-    Scene* scene = new Scene;
-    auto res = it->second(task.asset_path, scene);
-    if (!res) {
-        LOG_FATAL("{}", res.error());
-        // @TODO: on_load_error
-    } else {
-        LOG("[asset_loader] Scene '{}' loaded in {}", task.asset_path, timer.get_duration_string());
-        task.on_load_success(scene);
-    }
+    LOG("[asset_loader] Scene '{}' loaded in {}", task.asset_path, timer.get_duration_string());
+    task.on_success(scene);
 }
 
 static bool work() {

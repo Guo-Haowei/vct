@@ -4,21 +4,19 @@
 
 namespace vct {
 
+class EditorLayer;
+
 class Panel {
 public:
-    Panel(const std::string& name) : m_name(name) {}
+    Panel(const std::string& name, EditorLayer& editor) : m_name(name), m_editor(editor) {}
 
     void update(vct::Scene&);
-
-    void set_selected_ref(ecs::Entity* selected) { m_selected = selected; }
-    void set_selected(ecs::Entity selected) { *m_selected = selected; }
-    ecs::Entity get_selected() const { return *m_selected; }
 
 protected:
     virtual void update_internal(vct::Scene&) {}
 
     std::string m_name;
-    ecs::Entity* m_selected = nullptr;
+    EditorLayer& m_editor;
 };
 
 }  // namespace vct

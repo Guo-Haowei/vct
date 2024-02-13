@@ -112,7 +112,7 @@ public:                                                                         
 
     ecs::ComponentLibrary m_component_lib;
 
-    REGISTER_COMPONENT(TagComponent, 0);
+    REGISTER_COMPONENT(NameComponent, 0);
     REGISTER_COMPONENT(TransformComponent, 0);
     REGISTER_COMPONENT(HierarchyComponent, 0);
     REGISTER_COMPONENT(MaterialComponent, 0);
@@ -124,7 +124,7 @@ public:                                                                         
     REGISTER_COMPONENT(AnimationComponent, 0);
     REGISTER_COMPONENT(RigidBodyPhysicsComponent, 0);
 
-    void serialize(Archive& archive);
+    bool serialize(Archive& archive);
 
     // Non-serialized attributes
     void update(float deltaTime);

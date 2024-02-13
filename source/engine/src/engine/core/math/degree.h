@@ -5,14 +5,15 @@ namespace vct {
 
 class Degree {
 public:
-    constexpr Degree(float degree) : m_value(degree) {}
+    explicit constexpr Degree() : m_value(0) {}
+    explicit constexpr Degree(float degree) : m_value(degree) {}
 
-    Degree& operator+=(float d) {
-        m_value += d;
+    Degree& operator+=(Degree d) {
+        m_value += d.m_value;
         return *this;
     }
-    Degree& operator-=(float d) {
-        m_value -= d;
+    Degree& operator-=(Degree d) {
+        m_value -= d.m_value;
         return *this;
     }
     void clamp(float a, float b) { m_value = glm::clamp(m_value, a, b); }
@@ -21,7 +22,7 @@ public:
     float cos() const { return glm::cos(to_rad()); }
 
 private:
-    float m_value = 0.0f;
+    float m_value;
 };
 
 }  // namespace vct

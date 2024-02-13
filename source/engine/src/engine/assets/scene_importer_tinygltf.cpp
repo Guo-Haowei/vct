@@ -54,13 +54,13 @@ void SceneImporterTinyGLTF::process_node(int node_index, ecs::Entity parent) {
         if (node.skin >= 0) {  // this node is an armature
             entity = m_scene.get_entity<ArmatureComponent>(node.skin);
             MeshComponent* mesh = &m_scene.get_component_array<MeshComponent>()[node.mesh];
-            ecs::Entity meshID = m_scene.get_entity<MeshComponent>(node.mesh);
+            ecs::Entity mesh_id = m_scene.get_entity<MeshComponent>(node.mesh);
             DEV_ASSERT(!mesh->joints_0.empty());
             if (mesh->armature_id.is_valid()) {
                 // Reuse mesh with different skin is not possible currently, so we create a new one:
                 LOG_WARN("Re-use mesh for different skin!");
-                meshID = entity;
-                MeshComponent& newMesh = m_scene.create<MeshComponent>(meshID);
+                mesh_id = entity;
+                MeshComponent& newMesh = m_scene.create<MeshComponent>(mesh_id);
                 newMesh = m_scene.get_component_array<MeshComponent>()[node.mesh];
                 mesh = &newMesh;
             }
@@ -69,12 +69,12 @@ void SceneImporterTinyGLTF::process_node(int node_index, ecs::Entity parent) {
             // the object component will use an identity transform but will be parented to the armature
             ecs::Entity objectID = m_scene.create_object_entity("Animated::" + node.name);
             ObjectComponent& object = *m_scene.get_component<ObjectComponent>(objectID);
-            object.meshID = meshID;
+            object.mesh_id = mesh_id;
             m_scene.attach_component(objectID, entity);
         } else {  // this node is a mesh instance
             entity = m_scene.create_object_entity("Object::" + node.name);
             ObjectComponent& object = *m_scene.get_component<ObjectComponent>(entity);
-            object.meshID = m_scene.get_entity<MeshComponent>(node.mesh);
+            object.mesh_id = m_scene.get_entity<MeshComponent>(node.mesh);
         }
     } else if (node.camera >= 0) {
         LOG_WARN("@TODO: camera");
@@ -86,7 +86,7 @@ void SceneImporterTinyGLTF::process_node(int node_index, ecs::Entity parent) {
     if (!entity.is_valid()) {
         entity = ecs::Entity::create();
         m_scene.create<TransformComponent>(entity);
-        m_scene.create<TagComponent>(entity).set_tag("Transform::" + node.name);
+        m_scene.create<NameComponent>(entity).set_name("Transform::" + node.name);
     }
 
     m_entity_map[node_index] = entity;
@@ -168,7 +168,7 @@ bool SceneImporterTinyGLTF::import_impl() {
 
     ecs::Entity root = ecs::Entity::create();
     m_scene.create<TransformComponent>(root);
-    m_scene.create<TagComponent>(root).set_tag(m_scene_name);
+    m_scene.create<NameComponent>(root).set_name(m_scene_name);
     m_scene.m_root = root;
 
     // Create materials
@@ -198,7 +198,7 @@ bool SceneImporterTinyGLTF::import_impl() {
                 img_source = tex.extensions["KHR_texture_basisu"].Get("source").Get<int>();
             }
             auto& img = m_model->images[img_source];
-            material.mTextures[MaterialComponent::Base].name = m_search_path + img.uri;
+            material.textures[MaterialComponent::TEXTURE_BASE].name = m_search_path + img.uri;
 
             // @TODO:
             // material.mTextures[MaterialComponent::Base].image = g_assetManager->LoadImageSync(searchName);
@@ -211,7 +211,7 @@ bool SceneImporterTinyGLTF::import_impl() {
                 img_source = tex.extensions["KHR_texture_basisu"].Get("source").Get<int>();
             }
             auto& img = m_model->images[img_source];
-            material.mTextures[MaterialComponent::Normal].name = m_search_path + img.uri;
+            material.textures[MaterialComponent::TEXTURE_NORMAL].name = m_search_path + img.uri;
             // material.mTextures[MaterialComponent::Normal].image = g_assetManager->LoadImageSync(searchName);
             //  material.textures[MaterialComponent::NORMAL_MAP].uvset = normalTexture->second.TextureTexCoord();
         }
@@ -222,7 +222,7 @@ bool SceneImporterTinyGLTF::import_impl() {
                 img_source = tex.extensions["KHR_texture_basisu"].Get("source").Get<int>();
             }
             auto& img = m_model->images[img_source];
-            material.mTextures[MaterialComponent::MetallicRoughness].name = m_search_path + img.uri;
+            material.textures[MaterialComponent::TEXTURE_METALLIC_ROUGHNESS].name = m_search_path + img.uri;
             // material.mTextures[MaterialComponent::MetallicRoughness].resource = ;
         }
 #if 0
@@ -264,15 +264,15 @@ bool SceneImporterTinyGLTF::import_impl() {
     // Create armatures
     for (const auto& skin : m_model->skins) {
         ecs::Entity armature_id = ecs::Entity::create();
-        m_scene.create<TagComponent>(armature_id).set_tag(skin.name);
+        m_scene.create<NameComponent>(armature_id).set_name(skin.name);
         m_scene.create<TransformComponent>(armature_id);
         ArmatureComponent& armature = m_scene.create<ArmatureComponent>(armature_id);
         if (skin.inverseBindMatrices >= 0) {
             const tinygltf::Accessor& accessor = m_model->accessors[skin.inverseBindMatrices];
             const tinygltf::BufferView& bufferView = m_model->bufferViews[accessor.bufferView];
             const tinygltf::Buffer& buffer = m_model->buffers[bufferView.buffer];
-            armature.inverseBindMatrices.resize(accessor.count);
-            memcpy(armature.inverseBindMatrices.data(), &buffer.data[accessor.byteOffset + bufferView.byteOffset], accessor.count * sizeof(mat4));
+            armature.inverse_bind_matrices.resize(accessor.count);
+            memcpy(armature.inverse_bind_matrices.data(), &buffer.data[accessor.byteOffset + bufferView.byteOffset], accessor.count * sizeof(mat4));
         } else {
             LOG_FATAL("No inverse matrices found");
         }
@@ -292,13 +292,13 @@ bool SceneImporterTinyGLTF::import_impl() {
         ArmatureComponent& armature = m_scene.get_component_array<ArmatureComponent>()[armatureIndex++];
 
         const size_t jointCount = skin.joints.size();
-        armature.boneCollection.resize(jointCount);
+        armature.bone_collection.resize(jointCount);
 
         // create bone collection
         for (size_t i = 0; i < jointCount; ++i) {
             int jointIndex = skin.joints[i];
             ecs::Entity boneID = m_entity_map[jointIndex];
-            armature.boneCollection[i] = boneID;
+            armature.bone_collection[i] = boneID;
         }
     }
 
@@ -672,10 +672,3 @@ void SceneImporterTinyGLTF::process_animation(const tinygltf::Animation& gltf_an
 }
 
 }  // namespace vct
-
-auto load_scene_tinygltf(const std::string& asset_path, void* data) -> std::expected<void, std::string> {
-    DEV_ASSERT(data);
-    auto scene = (reinterpret_cast<vct::Scene*>(data));
-    vct::SceneImporterTinyGLTF loader(*scene, asset_path);
-    return loader.import();
-}

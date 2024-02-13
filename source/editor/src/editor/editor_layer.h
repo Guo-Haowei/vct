@@ -1,17 +1,30 @@
 #pragma once
 #include "core/framework/application.h"
+#include "core/objects/noncopyable.h"
 #include "panels/panel.h"
 #include "scene/scene.h"
 
 namespace vct {
 
-class EditorLayer : public Layer {
+class EditorLayer : public Layer, public NonCopyable {
 public:
+    enum State {
+        STATE_PICKING,
+        STATE_TRANSLATE,
+        STATE_ROTATE,
+        STATE_SCALE,
+    };
+
     EditorLayer();
 
     void Attach() override {}
     void Update(float dt) override;
     void Render() override;
+
+    void select_entity(ecs::Entity selected);
+    ecs::Entity get_selected_entity() const { return m_selected; }
+    State get_state() const { return m_state; }
+    void set_state(State state) { m_state = state; }
 
 private:
     void dock_space();
@@ -19,6 +32,7 @@ private:
 
     std::vector<std::shared_ptr<Panel>> m_panels;
     ecs::Entity m_selected;
+    State m_state{ STATE_PICKING };
 };
 
 }  // namespace vct
