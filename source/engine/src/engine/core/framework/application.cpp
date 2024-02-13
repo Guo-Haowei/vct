@@ -99,10 +99,9 @@ int Application::run(int argc, const char** argv) {
         "\nMain Loop"
         "\n********************************************************************************");
 
+    LOG_WARN("TODO: editor add/remove component");
     LOG_ERROR("TODO: cloth physics");
-    LOG_WARN("TODO: refactor application");
-    LOG_ERROR("TODO: physics");
-    LOG_WARN("TODO: better camera controller");
+    LOG_WARN("TODO: better camera controller (both orbit and 3rd person)");
     LOG_ERROR("TODO: FXAA");
     LOG_WARN("TODO: TAA");
     LOG_ERROR("TODO: soft shadow");

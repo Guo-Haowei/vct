@@ -334,9 +334,8 @@ struct AnimationComponent {
 };
 
 //--------------------------------------------------------------------------------------------------
-//
+// Armature Component
 //--------------------------------------------------------------------------------------------------
-// @TODO: refactor
 struct ArmatureComponent {
     enum FLAGS {
         NONE = 0,
@@ -352,24 +351,29 @@ struct ArmatureComponent {
     void serialize(Archive& archive);
 };
 
-struct RigidBodyPhysicsComponent {
+//--------------------------------------------------------------------------------------------------
+// Rigid Body Component
+//--------------------------------------------------------------------------------------------------
+struct RigidBodyComponent {
     enum CollisionShape {
-        UNKNOWN,
-        SPHERE,
-        BOX,
-    } shape;
+        SHAPE_UNKNOWN,
+        SHAPE_SPHERE,
+        SHAPE_BOX,
+        SHAPE_MAX,
+    };
 
-    struct BoxParam {
-        vec3 halfExtent;
+    union Parameter {
+        struct {
+            vec3 half_size;
+        } box;
+        struct {
+            float radius;
+        } sphere;
     };
-    struct SphereParam {
-        float radius;
-    };
-    union {
-        BoxParam box;
-        SphereParam sphere;
-    } param;
+
     float mass = 1.0f;
+    CollisionShape shape;
+    Parameter param;
 
     void serialize(Archive& archive);
 };

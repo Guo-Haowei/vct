@@ -208,11 +208,11 @@ void PropertyPanel::update_internal(Scene& scene) {
         }
     });
 
-    RigidBodyPhysicsComponent* rigidBodyComponent = scene.get_component<RigidBodyPhysicsComponent>(id);
-    DrawComponent("RigidBody", rigidBodyComponent, [](RigidBodyPhysicsComponent& rigidbody) {
+    RigidBodyComponent* rigidBodyComponent = scene.get_component<RigidBodyComponent>(id);
+    DrawComponent("RigidBody", rigidBodyComponent, [](RigidBodyComponent& rigidbody) {
         switch (rigidbody.shape) {
-            case RigidBodyPhysicsComponent::BOX: {
-                const auto& half = rigidbody.param.box.halfExtent;
+            case RigidBodyComponent::SHAPE_BOX: {
+                const auto& half = rigidbody.param.box.half_size;
                 ImGui::Text("shape: box");
                 ImGui::Text("half size: %.2f, %.2f, %.2f", half.x, half.y, half.z);
                 break;

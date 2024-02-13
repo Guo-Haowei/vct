@@ -59,7 +59,7 @@ bool initialize() {
         "@res://glsl/shadow.glsl",
         "@res://glsl/ssao.frag",
         "@res://glsl/textureCB.glsl",
-        "@res://glsl/vct_deferred.frag",
+        "@res://glsl/lighting_vxgi.frag",
         "@res://glsl/debug/texture.frag",
         "@res://glsl/voxel/voxelization.vert",
         "@res://glsl/voxel/voxelization.geom",

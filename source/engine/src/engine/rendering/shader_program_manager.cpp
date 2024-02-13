@@ -163,19 +163,19 @@ bool ShaderProgramManager::initialize() {
         ProgramCreateInfo info;
         info.vs = "@res://glsl/fullscreen.vert";
         info.ps = "@res://glsl/ssao.frag";
-        s_shader_cache[(PROGRAM_SSAO)] = create(info);
+        s_shader_cache[PROGRAM_SSAO] = create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "@res://glsl/fullscreen.vert";
-        info.ps = "@res://glsl/vct_deferred.frag";
-        s_shader_cache[(PROGRAM_DEFERERD_VOXEL_LIGHTING)] = create(info);
+        info.ps = "@res://glsl/lighting_vxgi.frag";
+        s_shader_cache[PROGRAM_LIGHTING_VXGI] = create(info);
     }
     {
         ProgramCreateInfo info;
         info.vs = "@res://glsl/fullscreen.vert";
         info.ps = "@res://glsl/fxaa.frag";
-        s_shader_cache[(PROGRAM_FXAA)] = create(info);
+        s_shader_cache[PROGRAM_FXAA] = create(info);
     }
     {
         ProgramCreateInfo info;

@@ -26,7 +26,7 @@ public:
     void event_received(std::shared_ptr<Event> event) override;
 
 protected:
-    void create_world(Scene& scene);
+    void create_world(const Scene& scene);
     void clean_world();
     bool has_world() const { return m_collision_config != nullptr; }
 

@@ -539,17 +539,17 @@ bool Scene::serialize(Archive& archive) {
         archive.write(m_bound);
     }
 
-    m_NameComponents.serialize(archive);
-    m_TransformComponents.serialize(archive);
-    m_HierarchyComponents.serialize(archive);
-    m_MaterialComponents.serialize(archive);
-    m_MeshComponents.serialize(archive);
-    m_ObjectComponents.serialize(archive);
-    m_CameraComponents.serialize(archive);
-    m_LightComponents.serialize(archive);
-    m_ArmatureComponents.serialize(archive);
-    m_AnimationComponents.serialize(archive);
-    m_RigidBodyPhysicsComponents.serialize(archive);
+    serialize<NameComponent>(archive);
+    serialize<TransformComponent>(archive);
+    serialize<HierarchyComponent>(archive);
+    serialize<MaterialComponent>(archive);
+    serialize<MeshComponent>(archive);
+    serialize<ObjectComponent>(archive);
+    serialize<CameraComponent>(archive);
+    serialize<LightComponent>(archive);
+    serialize<ArmatureComponent>(archive);
+    serialize<AnimationComponent>(archive);
+    serialize<RigidBodyComponent>(archive);
 
     return true;
 }

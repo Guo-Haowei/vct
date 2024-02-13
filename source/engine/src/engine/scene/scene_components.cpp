@@ -47,12 +47,12 @@ void TransformComponent::rotate(const vec3& euler) {
 
 void TransformComponent::set_local_transform(const mat4& matrix) {
     set_dirty();
-    Decompose(matrix, m_scale, m_rotation, m_translation);
+    decompose(matrix, m_scale, m_rotation, m_translation);
 }
 
 void TransformComponent::matrix_transform(const mat4& matrix) {
     set_dirty();
-    Decompose(matrix * get_local_matrix(), m_scale, m_rotation, m_translation);
+    decompose(matrix * get_local_matrix(), m_scale, m_rotation, m_translation);
 }
 
 void TransformComponent::update_transform_parented(const TransformComponent& parent) {

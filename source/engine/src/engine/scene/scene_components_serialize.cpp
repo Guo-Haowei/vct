@@ -172,7 +172,7 @@ void ArmatureComponent::serialize(Archive& archive) {
     }
 }
 
-void RigidBodyPhysicsComponent::serialize(Archive& archive) {
+void RigidBodyComponent::serialize(Archive& archive) {
     if (archive.is_write_mode()) {
         archive << shape;
         archive << param;

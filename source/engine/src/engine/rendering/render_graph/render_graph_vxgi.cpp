@@ -194,7 +194,7 @@ void lighting_pass_func() {
     glViewport(0, 0, frameW, frameH);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    const auto& program = ShaderProgramManager::get(PROGRAM_DEFERERD_VOXEL_LIGHTING);
+    const auto& program = ShaderProgramManager::get(PROGRAM_LIGHTING_VXGI);
     program.bind();
     R_DrawQuad();
     program.unbind();

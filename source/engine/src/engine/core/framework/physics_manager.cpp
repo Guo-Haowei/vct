@@ -26,7 +26,7 @@ void PhysicsManager::event_received(std::shared_ptr<Event> event) {
 
     const Scene& scene = *e->get_scene();
     // @TODO: fix
-    create_world((Scene&)scene);
+    create_world(scene);
 }
 
 void PhysicsManager::update(float dt) {
@@ -36,30 +36,30 @@ void PhysicsManager::update(float dt) {
         m_dynamic_world->stepSimulation(dt, 10);
 
         for (int j = m_dynamic_world->getNumCollisionObjects() - 1; j >= 0; j--) {
-            btCollisionObject* obj = m_dynamic_world->getCollisionObjectArray()[j];
-            btRigidBody* body = btRigidBody::upcast(obj);
-            btTransform trans;
+            btCollisionObject* collision_object = m_dynamic_world->getCollisionObjectArray()[j];
+            btRigidBody* rigid_body = btRigidBody::upcast(collision_object);
+            btTransform transform;
 
-            if (body && body->getMotionState()) {
-                body->getMotionState()->getWorldTransform(trans);
+            if (rigid_body && rigid_body->getMotionState()) {
+                rigid_body->getMotionState()->getWorldTransform(transform);
             } else {
-                trans = obj->getWorldTransform();
+                transform = collision_object->getWorldTransform();
             }
 
-            uint32_t handle = (uint32_t)(uintptr_t)obj->getUserPointer();
-            ecs::Entity id(handle);
+            uint32_t handle = (uint32_t)(uintptr_t)collision_object->getUserPointer();
+            ecs::Entity id{ handle };
             if (id.is_valid()) {
-                TransformComponent& transComponent = *scene.get_component<TransformComponent>(id);
-                const btVector3& origin = trans.getOrigin();
-                const btQuaternion rotation = trans.getRotation();
-                transComponent.set_translation(vec3(origin.getX(), origin.getY(), origin.getZ()));
-                transComponent.set_rotation(vec4(rotation.getX(), rotation.getY(), rotation.getZ(), rotation.getW()));
+                TransformComponent& transform_component = *scene.get_component<TransformComponent>(id);
+                const btVector3& origin = transform.getOrigin();
+                const btQuaternion rotation = transform.getRotation();
+                transform_component.set_translation(vec3(origin.getX(), origin.getY(), origin.getZ()));
+                transform_component.set_rotation(vec4(rotation.getX(), rotation.getY(), rotation.getZ(), rotation.getW()));
             }
         }
     }
 }
 
-void PhysicsManager::create_world(Scene& scene) {
+void PhysicsManager::create_world(const Scene& scene) {
     m_collision_config = new btDefaultCollisionConfiguration();
     m_dispatcher = new btCollisionDispatcher(m_collision_config);
     m_overlapping_pair_cache = new btDbvtBroadphase();
@@ -68,19 +68,19 @@ void PhysicsManager::create_world(Scene& scene) {
 
     m_dynamic_world->setGravity(btVector3(0, -10, 0));
 
-    for (int i = 0; i < scene.get_count<RigidBodyPhysicsComponent>(); ++i) {
-        ecs::Entity id = scene.get_entity<RigidBodyPhysicsComponent>(i);
-        RigidBodyPhysicsComponent& rigidBody = scene.get_component_array<RigidBodyPhysicsComponent>()[i];
-        TransformComponent* transformComponent = scene.get_component<TransformComponent>(id);
-        DEV_ASSERT(transformComponent);
-        if (!transformComponent) {
+    for (int i = 0; i < scene.get_count<RigidBodyComponent>(); ++i) {
+        ecs::Entity id = scene.get_entity<RigidBodyComponent>(i);
+        const RigidBodyComponent& rigid_body = scene.get_component_array<RigidBodyComponent>()[i];
+        const TransformComponent* transform_component = scene.get_component<TransformComponent>(id);
+        DEV_ASSERT(transform_component);
+        if (!transform_component) {
             continue;
         }
 
         btCollisionShape* shape = nullptr;
-        switch (rigidBody.shape) {
-            case RigidBodyPhysicsComponent::BOX: {
-                const vec3& half = rigidBody.param.box.halfExtent;
+        switch (rigid_body.shape) {
+            case RigidBodyComponent::SHAPE_BOX: {
+                const vec3& half = rigid_body.param.box.half_size;
                 shape = new btBoxShape(btVector3(half.x, half.y, half.z));
                 break;
             }
@@ -91,14 +91,14 @@ void PhysicsManager::create_world(Scene& scene) {
 
         m_collision_shapes.push_back(shape);
 
-        const vec3& origin = transformComponent->get_translation();
-        const vec4& rotation = transformComponent->get_rotation();
+        const vec3& origin = transform_component->get_translation();
+        const vec4& rotation = transform_component->get_rotation();
         btTransform transform;
         transform.setIdentity();
         transform.setOrigin(btVector3(origin.x, origin.y, origin.z));
         transform.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z, rotation.w));
 
-        btScalar mass(rigidBody.mass);
+        btScalar mass(rigid_body.mass);
         bool isDynamic = (mass != 0.f);  // rigidbody is dynamic if and only if mass is non zero, otherwise static
 
         btVector3 localInertia(0, 0, 0);

@@ -53,11 +53,11 @@ static void create_physics_test(Scene* scene) {
         vec3 half(3.f, .02f, 3.f);
         ecs::Entity ground = scene->create_cube_entity("Ground", half);
         scene->attach_component(ground, scene->m_root);
-        RigidBodyPhysicsComponent& rigidBody = scene->create<RigidBodyPhysicsComponent>(ground);
+        RigidBodyComponent& rigidBody = scene->create<RigidBodyComponent>(ground);
 
-        rigidBody.shape = RigidBodyPhysicsComponent::BOX;
+        rigidBody.shape = RigidBodyComponent::SHAPE_BOX;
         rigidBody.mass = 0.0f;
-        rigidBody.param.box.halfExtent = half;
+        rigidBody.param.box.half_size = half;
     }
 
     for (int t = 0; t < 16; ++t) {
@@ -79,17 +79,20 @@ static void create_physics_test(Scene* scene) {
 
         vec3 _s, _t;
         vec4 rotation;
-        Decompose(R, _s, rotation, _t);
+        decompose(R, _s, rotation, _t);
 
         std::string name = "Cube" + std::to_string(t);
-        ecs::Entity id = scene->create_cube_entity(name, half, glm::translate(translate) * R);
-        scene->attach_component(id, scene->m_root);
+        auto material_id = scene->create_material_entity(name);
+        MaterialComponent& material = *scene->get_component<MaterialComponent>(material_id);
+        material.base_color = vec4((float)x / 8, (float)y / 8, 0.8f, 1.0f);
 
-        RigidBodyPhysicsComponent& rigid_body = scene->create<RigidBodyPhysicsComponent>(id);
+        auto cube_id = scene->create_cube_entity(name, material_id, half, glm::translate(translate) * R);
+        scene->attach_component(cube_id, scene->m_root);
 
-        rigid_body.shape = RigidBodyPhysicsComponent::BOX;
+        RigidBodyComponent& rigid_body = scene->create<RigidBodyComponent>(cube_id);
+        rigid_body.shape = RigidBodyComponent::SHAPE_BOX;
         rigid_body.mass = 1.0f;
-        rigid_body.param.box.halfExtent = half;
+        rigid_body.param.box.half_size = half;
     }
 }
 
