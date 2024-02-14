@@ -2,7 +2,7 @@
 
 #include <imgui/imgui.h>
 
-#include "core/dynamic_variable/common_dvars.h"
+#include "core/framework/common_dvars.h"
 #include "core/framework/scene_manager.h"
 #include "platform/windows/dialog.h"
 

@@ -1,6 +1,6 @@
 #include "debug_panel.h"
 
-#include "core/dynamic_variable/common_dvars.h"
+#include "core/framework/common_dvars.h"
 #include "rendering/r_defines.h"
 #include "rendering/rendering_dvars.h"
 #include "scene/scene.h"

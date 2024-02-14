@@ -1,6 +1,11 @@
 #pragma once
 #include "core/math/geomath.h"
 
+enum DvarFlags {
+    DVAR_FLAG_NONE = 0,
+    DVAR_FLAG_SERIALIZE = 1,
+};
+
 namespace vct {
 
 enum VariantType {
@@ -15,11 +20,6 @@ enum VariantType {
     VARIANT_TYPE_IVEC3,
     VARIANT_TYPE_IVEC4,
     VARIANT_TYPE_MAX,
-};
-
-enum DvarFlags {
-    DVAR_FLAG_NONE = 0,
-    DVAR_FLAG_SERIALIZE = 1,
 };
 
 class DynamicVariable {

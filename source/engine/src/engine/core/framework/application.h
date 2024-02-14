@@ -8,6 +8,7 @@ namespace vct {
 
 class DisplayServer;
 class GraphicsManager;
+class ImGuiModule;
 class PhysicsManager;
 class SceneManager;
 
@@ -40,6 +41,8 @@ private:
     std::shared_ptr<PhysicsManager> m_physics_manager;
     std::shared_ptr<DisplayServer> m_display_server;
     std::shared_ptr<GraphicsManager> m_graphics_manager;
+    std::shared_ptr<ImGuiModule> m_imgui_module;
+
     std::vector<Module*> m_modules;
 };
 

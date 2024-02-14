@@ -1,22 +1,19 @@
-#include "UIManager.h"
+#include "imgui_module.h"
+
+#include <imgui/imgui.h>
 
 #include "assets/asset_loader.h"
-#include "imgui/imgui.h"
 
-UIManager* gUIManager = new UIManager;
+namespace vct {
 
-using namespace vct;
-
-static std::string gIniPath;
-
-bool UIManager::initialize() {
+bool ImGuiModule::initialize() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
     std::filesystem::path path(ROOT_FOLDER);
-    path = path.parent_path() / "Config/imgui.ini";
-    gIniPath = path.string();
-    LOG_VERBOSE("Set imgui ini file to {}", gIniPath);
+    path = path.parent_path() / "config/imgui.ini";
+    m_ini_path = path.string();
+    LOG_VERBOSE("Set imgui ini file to {}", m_ini_path);
 
     ImGuiIO& io = ImGui::GetIO();
 
@@ -26,7 +23,7 @@ bool UIManager::initialize() {
     font_cfg.FontDataOwnedByAtlas = false;
     io.Fonts->AddFontFromMemoryTTF(asset->buffer.data(), (int)asset->buffer.size(), 16, &font_cfg);
 
-    io.IniFilename = gIniPath.c_str();
+    io.IniFilename = m_ini_path.c_str();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
@@ -72,6 +69,8 @@ bool UIManager::initialize() {
     return true;
 }
 
-void UIManager::finalize() {
+void ImGuiModule::finalize() {
     ImGui::DestroyContext();
 }
+
+}  // namespace vct

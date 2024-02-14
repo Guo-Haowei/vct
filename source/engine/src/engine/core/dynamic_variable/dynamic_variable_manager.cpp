@@ -2,7 +2,6 @@
 
 #include <sstream>
 
-#include "common_dvars.h"
 #include "core/io/archive.h"
 
 namespace vct {

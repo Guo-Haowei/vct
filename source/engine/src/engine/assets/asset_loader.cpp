@@ -4,7 +4,6 @@
 #include "assets/scene_importer_assimp.h"
 #include "assets/scene_importer_tinygltf.h"
 #include "core/base/thread_safe_ring_buffer.h"
-#include "core/dynamic_variable/common_dvars.h"
 #include "core/io/file_access.h"
 #include "core/os/threads.h"
 #include "core/os/timer.h"

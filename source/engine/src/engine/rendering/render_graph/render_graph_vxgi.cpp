@@ -12,9 +12,6 @@
 #include "rendering/render_data.h"
 #include "rendering/shader_program_manager.h"
 
-// @TODO: refactor
-using namespace vct;
-
 /// textures
 vct::RenderGraph g_render_graph;
 

@@ -1,4 +1,4 @@
-#include "dynamic_variable_begin.h"
+#include "core/dynamic_variable/dynamic_variable_begin.h"
 
 DVAR_STRING(project, 0, "Open project at start", "");
 DVAR_BOOL(test_physics, 0, "Open physics test scene", false);
@@ -16,4 +16,4 @@ DVAR_STRING(recent_files, DVAR_FLAG_SERIALIZE, "A list of recent opened scenes",
 // gui
 DVAR_BOOL(grid_visibility, 0, "show editor grid", true);
 
-#include "dynamic_variable_end.h"
+#include "core/dynamic_variable/dynamic_variable_end.h"

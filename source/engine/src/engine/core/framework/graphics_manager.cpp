@@ -8,7 +8,6 @@
 #include "rendering/render_data.h"
 /////
 #include "core/base/rid_owner.h"
-#include "core/dynamic_variable/common_dvars.h"
 #include "core/framework/scene_manager.h"
 #include "rendering/r_defines.h"
 #include "rendering/r_editor.h"

@@ -4,10 +4,10 @@
 // @TODO: refactor
 
 #include "assets/asset_loader.h"
-#include "core/dynamic_variable/common_dvars.h"
 #include "core/dynamic_variable/dynamic_variable_manager.h"
-#include "core/framework/UIManager.h"
+#include "core/framework/common_dvars.h"
 #include "core/framework/graphics_manager.h"
+#include "core/framework/imgui_module.h"
 #include "core/framework/physics_manager.h"
 #include "core/framework/scene_manager.h"
 #include "core/input/input.h"
@@ -20,11 +20,14 @@
 #include "servers/display_server.h"
 #include "servers/display_server_glfw.h"
 
+#define DEFINE_DVAR
+#include "core/framework/common_dvars.h"
+
 namespace vct {
 
 static void register_common_dvars() {
 #define REGISTER_DVAR
-#include "core/dynamic_variable/common_dvars.h"
+#include "core/framework/common_dvars.h"
 }
 
 void Application::add_layer(std::shared_ptr<Layer> layer) {
@@ -46,11 +49,13 @@ void Application::register_module(Module* module) {
 void Application::setup_modules() {
     m_scene_manager = std::make_shared<SceneManager>();
     m_physics_manager = std::make_shared<PhysicsManager>();
+    m_imgui_module = std::make_shared<ImGuiModule>();
     m_display_server = std::make_shared<DisplayServerGLFW>();
     m_graphics_manager = std::make_shared<GraphicsManager>();
 
     register_module(m_scene_manager.get());
     register_module(m_physics_manager.get());
+    register_module(m_imgui_module.get());
     register_module(m_display_server.get());
     register_module(m_graphics_manager.get());
 
@@ -75,8 +80,6 @@ int Application::run(int argc, const char** argv) {
     thread::initialize();
     jobsystem::initialize();
     asset_loader::initialize();
-
-    UIManager::initialize();
 
     for (Module* module : m_modules) {
         LOG("module '{}' being initialized...", module->get_name());
@@ -166,8 +169,6 @@ int Application::run(int argc, const char** argv) {
         module->finalize();
         LOG_VERBOSE("module '{}' finalized", module->get_name());
     }
-
-    UIManager::finalize();
 
     asset_loader::finalize();
     jobsystem::finalize();
