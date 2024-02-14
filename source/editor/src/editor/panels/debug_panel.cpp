@@ -11,7 +11,7 @@ void DebugPanel::update_internal(Scene&) {
     ImGui::Text("Voxel GI");
     ImGui::Checkbox("Enable GI", (bool*)(DVAR_GET_POINTER(r_enable_vxgi)));
     ImGui::Checkbox("No Texture", (bool*)(DVAR_GET_POINTER(r_no_texture)));
-    int debug_texture = DVAR_GET_INT(r_debugTexture);
+    int debug_texture = DVAR_GET_INT(r_debug_texture);
 
     constexpr float offset = 150;
     ImGui::RadioButton("VXGI", &debug_texture, 0);
@@ -34,7 +34,10 @@ void DebugPanel::update_internal(Scene&) {
     ImGui::SameLine(ImGui::GetWindowWidth() - offset);
     ImGui::RadioButton("Shadow Map", &debug_texture, TEXTURE_SHADOW_MAP);
 
-    DVAR_SET_INT(r_debugTexture, debug_texture);
+    DVAR_SET_INT(r_debug_texture, debug_texture);
+    ImGui::Separator();
+
+    ImGui::DragFloat("World size", (float*)DVAR_GET_POINTER(r_world_size), 1.0f, 1.0f, 100.0f);
     ImGui::Separator();
 
     ImGui::Text("SSAO");

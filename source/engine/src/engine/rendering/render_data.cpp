@@ -11,14 +11,21 @@ extern vct::RIDAllocator<MaterialData> g_materials;
 
 namespace vct {
 
+void RenderData::clear() {
+    scene = nullptr;
+    shadow_pass.clear();
+    main_pass.clear();
+}
+
 void RenderData::update(const Scene* p_scene) {
+    clear();
     scene = p_scene;
-    shadow_pass.draws.clear();
+
     fill(
         p_scene,
         g_perFrameCache.cache.c_light_matricies[0],
         [](const ObjectComponent& object) {
-            return !(object.flags & ObjectComponent::CAST_SHADOW) && !(object.flags & ObjectComponent::RENDERABLE);
+            return !(object.flags & ObjectComponent::CAST_SHADOW) || !(object.flags & ObjectComponent::RENDERABLE);
         },
         shadow_pass);
     fill(

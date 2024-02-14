@@ -189,7 +189,7 @@ void SceneManager::update(float dt) {
     g_perFrameCache.cache.c_projection_view_matrix = camera.get_projection_view_matrix();
 
     g_perFrameCache.cache.c_enable_vxgi = DVAR_GET_BOOL(r_enable_vxgi);
-    g_perFrameCache.cache.c_debug_texture_id = DVAR_GET_INT(r_debugTexture);
+    g_perFrameCache.cache.c_debug_texture_id = DVAR_GET_INT(r_debug_texture);
     g_perFrameCache.cache.c_no_texture = DVAR_GET_BOOL(r_no_texture);
     g_perFrameCache.cache.c_screen_width = frameW;
     g_perFrameCache.cache.c_screen_height = frameH;
@@ -202,6 +202,21 @@ void SceneManager::update(float dt) {
 
     // c_fxaa_image
     g_perFrameCache.cache.c_enable_fxaa = DVAR_GET_BOOL(r_enableFXAA);
+
+    // @TODO: refactor the following
+    const int voxel_texture_size = DVAR_GET_INT(r_voxel_size);
+    DEV_ASSERT(math::is_power_of_two(voxel_texture_size));
+    DEV_ASSERT(voxel_texture_size <= 256);
+
+    vec3 world_center = camera.get_center();
+    const float world_size = DVAR_GET_FLOAT(r_world_size);
+    const float texel_size = 1.0f / static_cast<float>(voxel_texture_size);
+    const float voxel_size = world_size * texel_size;
+
+    g_perFrameCache.cache.c_world_center = world_center;
+    g_perFrameCache.cache.c_world_size_half = 0.5f * world_size;
+    g_perFrameCache.cache.c_texel_size = texel_size;
+    g_perFrameCache.cache.c_voxel_size = voxel_size;
 }
 
 void SceneManager::request_scene(std::string_view path, ImporterName importer) {
@@ -212,8 +227,8 @@ void SceneManager::request_scene(std::string_view path, ImporterName importer) {
     });
 }
 
-void SceneManager::on_scene_changed(Scene* new_scene) {
-
+void SceneManager::on_scene_changed(Scene*) {
+#if 0
     // @TODO: refactor the following
     const int voxelTextureSize = DVAR_GET_INT(r_voxel_size);
     DEV_ASSERT(math::is_power_of_two(voxelTextureSize));
@@ -229,6 +244,7 @@ void SceneManager::on_scene_changed(Scene* new_scene) {
     g_perFrameCache.cache.c_world_size_half = 0.5f * worldSize;
     g_perFrameCache.cache.c_texel_size = texelSize;
     g_perFrameCache.cache.c_voxel_size = voxelSize;
+#endif
 }
 
 Scene& SceneManager::get_scene() {

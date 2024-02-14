@@ -55,7 +55,8 @@ void main() {
     vec3 nom = NDF * G * F;
     float denom = 4 * NdotV * NdotL;
 
-    vec3 specular = nom / max(denom, 0.001);
+    // vec3 specular = nom / max(denom, 0.001);
+    vec3 specular = vec3(0);
 
     vec3 kS = F;
     vec3 kD = vec3(1.0) - kS;

@@ -23,9 +23,11 @@ struct RenderData {
     struct Pass {
         mat4 projection_view_matrix;
         std::vector<Mesh> draws;
+
+        void clear() { draws.clear(); }
     };
 
-    const Scene* scene;
+    const Scene* scene = nullptr;
 
     Pass shadow_pass;
     Pass main_pass;
@@ -33,6 +35,8 @@ struct RenderData {
     void update(const Scene* p_scene);
 
 private:
+    void clear();
+
     void fill(const Scene* p_scene, const mat4& projection_view_matrix, FilterObjectFunc filter, Pass& pass);
 };
 

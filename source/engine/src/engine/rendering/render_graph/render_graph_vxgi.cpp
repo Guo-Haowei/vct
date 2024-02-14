@@ -44,8 +44,9 @@ void shadow_pass_func() {
     glViewport(0, 0, res, res);
 
     auto render_data = GraphicsManager::singleton().get_render_data();
+    RenderData::Pass& pass = render_data->shadow_pass;
 
-    for (const auto& draw : render_data->shadow_pass.draws) {
+    for (const auto& draw : pass.draws) {
         const bool has_bone = draw.armature_id.is_valid();
 
         if (has_bone) {
@@ -59,7 +60,7 @@ void shadow_pass_func() {
         const auto& program = ShaderProgramManager::get(has_bone ? PROGRAM_DPETH_ANIMATED : PROGRAM_DPETH_STATIC);
         program.bind();
 
-        g_perBatchCache.cache.c_projection_view_model_matrix = render_data->shadow_pass.projection_view_matrix * draw.world_matrix;
+        g_perBatchCache.cache.c_projection_view_model_matrix = pass.projection_view_matrix * draw.world_matrix;
         g_perBatchCache.cache.c_model_matrix = draw.world_matrix;
         g_perBatchCache.Update();
 
@@ -88,8 +89,9 @@ void voxelization_pass_func() {
     ShaderProgramManager::get(PROGRAM_VOXELIZATION).bind();
 
     auto render_data = GraphicsManager::singleton().get_render_data();
+    RenderData::Pass& pass = render_data->main_pass;
 
-    for (const auto& draw : render_data->shadow_pass.draws) {
+    for (const auto& draw : pass.draws) {
         const bool has_bone = draw.armature_id.is_valid();
 
         if (has_bone) {
@@ -100,7 +102,7 @@ void voxelization_pass_func() {
             g_boneCache.Update();
         }
 
-        g_perBatchCache.cache.c_projection_view_model_matrix = render_data->shadow_pass.projection_view_matrix * draw.world_matrix;
+        g_perBatchCache.cache.c_projection_view_model_matrix = pass.projection_view_matrix * draw.world_matrix;
         g_perBatchCache.cache.c_model_matrix = draw.world_matrix;
         g_perBatchCache.Update();
 
@@ -142,8 +144,9 @@ void gbuffer_pass_func() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     auto render_data = GraphicsManager::singleton().get_render_data();
+    RenderData::Pass& pass = render_data->main_pass;
 
-    for (const auto& draw : render_data->shadow_pass.draws) {
+    for (const auto& draw : pass.draws) {
         const bool has_bone = draw.armature_id.is_valid();
 
         if (has_bone) {
@@ -157,7 +160,7 @@ void gbuffer_pass_func() {
         const auto& program = ShaderProgramManager::get(has_bone ? PROGRAM_GBUFFER_ANIMATED : PROGRAM_GBUFFER_STATIC);
         program.bind();
 
-        g_perBatchCache.cache.c_projection_view_model_matrix = render_data->shadow_pass.projection_view_matrix * draw.world_matrix;
+        g_perBatchCache.cache.c_projection_view_model_matrix = pass.projection_view_matrix * draw.world_matrix;
         g_perBatchCache.cache.c_model_matrix = draw.world_matrix;
         g_perBatchCache.Update();
 
