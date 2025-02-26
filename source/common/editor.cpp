@@ -175,7 +175,6 @@ void Editor::DockSpace()
     pos  = node->Pos;
     size = node->Size;
 
-    return;
     if ( ImGui::BeginMenuBar() )
     {
         if ( ImGui::BeginMenu( "Options" ) )
